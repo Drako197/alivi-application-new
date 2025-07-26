@@ -86,6 +86,24 @@ function AppContent() {
                 />
               </div>
               
+              {/* Alivi Logo - All Screen Sizes */}
+              <div className="mb-8">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <img 
+                      src="/images/Alivi_A_Icon.png" 
+                      alt="Alivi Icon" 
+                      className="w-12 h-12 object-contain filter brightness-0 invert"
+                    />
+                  </div>
+                  <span className="text-2xl font-bold text-white">Alivi</span>
+                  <div className="text-center">
+                    <p className="text-white/90 text-sm font-medium">Healthcare Data Intelligence</p>
+                    <p className="text-white/70 text-xs mt-1">Streamlining HEDIS & Quality Measures</p>
+                  </div>
+                </div>
+              </div>
+              
               <h1 className="text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
                 Billing, adjudication, and payment workflows—modernized.
               </h1>
@@ -141,23 +159,7 @@ function AppContent() {
               </button>
             </div>
 
-            {/* Mobile Alivi Logo */}
-            <div className="mobile-alivi-logo">
-              <div className="mobile-logo-container">
-                <div className="logo-icon">
-                  <img 
-                    src="/images/Alivi_A_Icon.png" 
-                    alt="Alivi Icon" 
-                    className="w-16 h-16 object-contain filter brightness-0 invert"
-                  />
-                </div>
-                <span className="logo-text text-4xl font-bold text-white">Alivi</span>
-                <div className="mobile-tagline text-center">
-                  <p className="text-white/90 text-lg font-medium">Healthcare Data Intelligence</p>
-                  <p className="text-white/70 text-sm mt-1">Streamlining HEDIS & Quality Measures</p>
-                </div>
-              </div>
-            </div>
+
 
             {/* Auth Card */}
             <div className="login-form-card">

@@ -209,9 +209,19 @@ export default function Dashboard() {
             <header className="header">
               <div className="header-content">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="header-title">Dashboard</h1>
-                    <p className="header-subtitle">Welcome back, {user?.fullName?.split(' ')[0] || 'User'}!</p>
+                  <div className="flex items-center space-x-2">
+                    {/* Breadcrumb */}
+                    <nav className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                      <span className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer">
+                        Dashboard
+                      </span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      <span className="text-gray-900 dark:text-white font-medium">
+                        Overview
+                      </span>
+                    </nav>
                   </div>
                   <div className="header-user-section flex items-center space-x-4">
                     <div>

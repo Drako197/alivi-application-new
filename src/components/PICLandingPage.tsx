@@ -18,43 +18,36 @@ export default function PICLandingPage() {
   // Dummy data for actions
   const allActions: ActionItem[] = [
     // Claims & Eligibility
-    { id: 'claim-status', name: 'Check Claim Status', description: 'View real-time claim processing status', category: 'claims', frequency: 95, icon: 'search' },
-    { id: 'eligibility-verification', name: 'Eligibility Verification', description: 'Verify member eligibility and benefits', category: 'claims', frequency: 88, icon: 'check-circle' },
-    { id: 'claim-submission', name: 'Submit Claim', description: 'Submit new claims for processing', category: 'claims', frequency: 82, icon: 'upload' },
-    { id: 'claim-appeal', name: 'Claim Appeal', description: 'Submit appeals for denied claims', category: 'claims', frequency: 45, icon: 'refresh' },
+    { id: 'request-patient-eligibility', name: 'Request Patient Eligibility', description: 'Check patient eligibility and benefits', category: 'eligibility', frequency: 95, icon: 'check-circle' },
+    { id: 'claims-submission', name: 'Claims Submission', description: 'Submit new claims for processing', category: 'claims', frequency: 92, icon: 'upload' },
+    { id: 'claim-status', name: 'Claim Status', description: 'View real-time claim processing status', category: 'claims', frequency: 88, icon: 'search' },
+    { id: 'claim-summary', name: 'Claim Summary', description: 'View detailed claim summaries and reports', category: 'claims', frequency: 82, icon: 'document-report' },
+    { id: 'job-status-online', name: 'Job Status Online Entry', description: 'Enter job status information online', category: 'claims', frequency: 75, icon: 'computer-desktop' },
+    { id: 'job-status-paper', name: 'Job Status Paper Claim', description: 'Submit job status via paper claim', category: 'claims', frequency: 68, icon: 'document-text' },
     
-    // Services & Products
-    { id: 'prior-auth', name: 'Prior Authorization', description: 'Request pre-authorization for services', category: 'services', frequency: 78, icon: 'shield-check' },
-    { id: 'benefit-inquiry', name: 'Benefit Inquiry', description: 'Check coverage and benefit details', category: 'services', frequency: 72, icon: 'information-circle' },
-    { id: 'referral-management', name: 'Referral Management', description: 'Manage specialist referrals', category: 'services', frequency: 65, icon: 'user-group' },
-    { id: 'pharmacy-benefits', name: 'Pharmacy Benefits', description: 'Check prescription coverage', category: 'services', frequency: 58, icon: 'pills' },
+    // Health Plans & Payments
+    { id: 'health-plan-details', name: 'Health Plan Details', description: 'View health plan information and coverage', category: 'plans', frequency: 85, icon: 'information-circle' },
+    { id: 'explanation-of-payments', name: 'Explanation of Payments', description: 'View detailed payment explanations', category: 'plans', frequency: 78, icon: 'currency-dollar' },
+    { id: 'payment-summary-report', name: 'Payment Summary Report', description: 'Generate payment summary reports', category: 'plans', frequency: 72, icon: 'chart-bar' },
+    { id: 'frame-collections', name: 'Frame Collections', description: 'Access frame collection information', category: 'plans', frequency: 65, icon: 'collection' },
+    { id: 'lens-price-list', name: 'Lens Price List', description: 'View current lens pricing information', category: 'plans', frequency: 58, icon: 'price-tag' },
     
-    // Reports & Analytics
-    { id: 'performance-report', name: 'Performance Report', description: 'Generate provider performance metrics', category: 'reports', frequency: 52, icon: 'chart-bar' },
-    { id: 'claims-report', name: 'Claims Report', description: 'Generate claims activity reports', category: 'reports', frequency: 48, icon: 'document-report' },
-    { id: 'payment-report', name: 'Payment Report', description: 'View payment and reimbursement data', category: 'reports', frequency: 42, icon: 'currency-dollar' },
-    { id: 'quality-metrics', name: 'Quality Metrics', description: 'Access HEDIS and quality measures', category: 'reports', frequency: 38, icon: 'chart-pie' },
+    // Authorization & Management
+    { id: 'um-prior-authorization', name: 'UM Prior Authorization', description: 'Submit utilization management authorizations', category: 'authorization', frequency: 82, icon: 'shield-check' },
+    { id: 'um-authorization-status', name: 'UM Authorization Status', description: 'Check authorization request status', category: 'authorization', frequency: 75, icon: 'clock' },
     
-    // Management & Authorization
-    { id: 'provider-enrollment', name: 'Provider Enrollment', description: 'Complete provider enrollment forms', category: 'management', frequency: 35, icon: 'user-plus' },
-    { id: 'credentialing', name: 'Credentialing', description: 'Manage provider credentials', category: 'management', frequency: 32, icon: 'badge-check' },
-    { id: 'contract-management', name: 'Contract Management', description: 'View and manage contracts', category: 'management', frequency: 28, icon: 'document-text' },
-    { id: 'network-participation', name: 'Network Participation', description: 'Manage network participation status', category: 'management', frequency: 25, icon: 'network' },
-    
-    // Tools & Resources
-    { id: 'manual-eligibility', name: 'Manual Eligibility Entry', description: 'Enter eligibility information manually', category: 'resources', frequency: 62, icon: 'pencil' },
-    { id: 'code-lookup', name: 'Code Lookup', description: 'Search for diagnosis and procedure codes', category: 'resources', frequency: 55, icon: 'magnifying-glass' },
-    { id: 'document-upload', name: 'Document Upload', description: 'Upload supporting documentation', category: 'resources', frequency: 48, icon: 'cloud-upload' },
-    { id: 'training-materials', name: 'Training Materials', description: 'Access training and help resources', category: 'resources', frequency: 35, icon: 'academic-cap' }
+    // Resources & Tools
+    { id: 'manual-eligibility-request', name: 'Manual Eligibility Request', description: 'Submit manual eligibility requests', category: 'resources', frequency: 68, icon: 'pencil' },
+    { id: 'provider-resources', name: 'Provider Resources', description: 'Access provider tools and resources', category: 'resources', frequency: 62, icon: 'academic-cap' }
   ]
 
   const categories = [
     { id: 'all', name: 'All Actions', count: allActions.length },
-    { id: 'claims', name: 'Claims & Eligibility', count: allActions.filter(a => a.category === 'claims').length },
-    { id: 'services', name: 'Services & Products', count: allActions.filter(a => a.category === 'services').length },
-    { id: 'reports', name: 'Reports & Analytics', count: allActions.filter(a => a.category === 'reports').length },
-    { id: 'management', name: 'Management & Authorization', count: allActions.filter(a => a.category === 'management').length },
-    { id: 'resources', name: 'Tools & Resources', count: allActions.filter(a => a.category === 'resources').length }
+    { id: 'eligibility', name: 'Eligibility', count: allActions.filter(a => a.category === 'eligibility').length },
+    { id: 'claims', name: 'Claims', count: allActions.filter(a => a.category === 'claims').length },
+    { id: 'plans', name: 'Health Plans & Payments', count: allActions.filter(a => a.category === 'plans').length },
+    { id: 'authorization', name: 'Authorization', count: allActions.filter(a => a.category === 'authorization').length },
+    { id: 'resources', name: 'Resources & Tools', count: allActions.filter(a => a.category === 'resources').length }
   ]
 
   const getIcon = (iconName: string): ReactElement => {
@@ -160,6 +153,26 @@ export default function PICLandingPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
         </svg>
+      ),
+      'computer-desktop': (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      ),
+      'collection': (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      ),
+      'price-tag': (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+      ),
+      'clock': (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
       )
     }
     return iconMap[iconName] || iconMap['information-circle']
@@ -172,7 +185,8 @@ export default function PICLandingPage() {
 
   const filteredActions = allActions.filter(action => {
     const matchesSearch = action.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         action.description.toLowerCase().includes(searchTerm.toLowerCase())
+                         action.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         action.category.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === 'all' || action.category === selectedCategory
     return matchesSearch && matchesCategory
   })
@@ -222,6 +236,17 @@ export default function PICLandingPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pic-search-input"
           />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              aria-label="Clear search"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -250,12 +275,12 @@ export default function PICLandingPage() {
               <div
                 key={action.id}
                 onClick={() => handleActionClick(action)}
-                className="pic-action-card group pic-frequent-action"
+                className={`pic-action-card group pic-frequent-action ${viewMode === 'list' ? 'flex items-center space-x-4 p-4' : ''}`}
               >
-                <div className="pic-action-icon">
+                <div className={`pic-action-icon ${viewMode === 'list' ? 'flex-shrink-0' : ''}`}>
                   {getIcon(action.icon)}
                 </div>
-                <div className="pic-action-content">
+                <div className={`pic-action-content ${viewMode === 'list' ? 'flex-1 min-w-0' : ''}`}>
                   <div className="pic-action-badge">
                     {action.frequency >= 80 ? (
                       <span className="pic-badge-popular">
@@ -287,8 +312,8 @@ export default function PICLandingPage() {
                       </span>
                     )}
                   </div>
-                  <h3 className="pic-action-title">{action.name}</h3>
-                  <p className="pic-action-description">{action.description}</p>
+                  <h3 className={`pic-action-title ${viewMode === 'list' ? 'text-base font-medium mb-1' : ''}`}>{action.name}</h3>
+                  <p className={`pic-action-description ${viewMode === 'list' ? 'text-sm text-gray-600 dark:text-gray-400' : ''}`}>{action.description}</p>
                 </div>
               </div>
             ))}
@@ -307,12 +332,12 @@ export default function PICLandingPage() {
               <div
                 key={action.id}
                 onClick={() => handleActionClick(action)}
-                className="pic-action-card group"
+                className={`pic-action-card group ${viewMode === 'list' ? 'flex items-center space-x-4 p-4' : ''}`}
               >
-                <div className="pic-action-icon">
+                <div className={`pic-action-icon ${viewMode === 'list' ? 'flex-shrink-0' : ''}`}>
                   {getIcon(action.icon)}
                 </div>
-                <div className="pic-action-content">
+                <div className={`pic-action-content ${viewMode === 'list' ? 'flex-1 min-w-0' : ''}`}>
                   <div className="pic-action-badge">
                     {action.frequency >= 80 ? (
                       <span className="pic-badge-popular">
@@ -344,8 +369,8 @@ export default function PICLandingPage() {
                       </span>
                     )}
                   </div>
-                  <h3 className="pic-action-title">{action.name}</h3>
-                  <p className="pic-action-description">{action.description}</p>
+                  <h3 className={`pic-action-title ${viewMode === 'list' ? 'text-base font-medium mb-1' : ''}`}>{action.name}</h3>
+                  <p className={`pic-action-description ${viewMode === 'list' ? 'text-sm text-gray-600 dark:text-gray-400' : ''}`}>{action.description}</p>
                 </div>
               </div>
             ))}

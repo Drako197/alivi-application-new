@@ -497,6 +497,13 @@ body {
     @apply w-full max-w-md;
   }
   
+  /* Mobile form container - use full width */
+  @media (max-width: 1023px) {
+    .login-form-container {
+      @apply w-full max-w-none;
+    }
+  }
+  
   .login-form-card {
     @apply w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8;
   }
@@ -594,6 +601,17 @@ body {
   
   .auth-subtitle {
     @apply text-gray-600 dark:text-gray-400;
+  }
+  
+  /* Pre-login tagline styling - Desktop only */
+  @media (min-width: 1024px) {
+    .pre-login-tagline-main {
+      @apply text-white/90 text-lg font-medium;
+    }
+    
+    .pre-login-tagline-subtitle {
+      @apply text-white/70 text-base mt-1;
+    }
   }
   
   /* Button Classes */

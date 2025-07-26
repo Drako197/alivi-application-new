@@ -22,8 +22,8 @@ export default function PICLandingPage() {
     { id: 'claims-submission', name: 'Claims Submission', description: 'Submit new claims for processing', category: 'claims', frequency: 92, icon: 'upload' },
     { id: 'claim-status', name: 'Claim Status', description: 'View real-time claim processing status', category: 'claims', frequency: 88, icon: 'search' },
     { id: 'claim-summary', name: 'Claim Summary', description: 'View detailed claim summaries and reports', category: 'claims', frequency: 82, icon: 'document-report' },
-    { id: 'job-status-online', name: 'Job Status Online Entry', description: 'Enter job status information online', category: 'claims', frequency: 75, icon: 'computer-desktop' },
-    { id: 'job-status-paper', name: 'Job Status Paper Claim', description: 'Submit job status via paper claim', category: 'claims', frequency: 68, icon: 'document-text' },
+    { id: 'job-status-online', name: 'Job Status Online Entry', description: 'Enter job status information online', category: 'claims', frequency: 55, icon: 'computer-desktop' },
+    { id: 'job-status-paper', name: 'Job Status Paper Claim', description: 'Submit job status via paper claim', category: 'claims', frequency: 45, icon: 'document-text' },
     
     // Health Plans & Payments
     { id: 'health-plan-details', name: 'Health Plan Details', description: 'View health plan information and coverage', category: 'plans', frequency: 85, icon: 'information-circle' },
@@ -38,7 +38,7 @@ export default function PICLandingPage() {
     
     // Resources & Tools
     { id: 'manual-eligibility-request', name: 'Manual Eligibility Request', description: 'Submit manual eligibility requests', category: 'resources', frequency: 68, icon: 'pencil' },
-    { id: 'provider-resources', name: 'Provider Resources', description: 'Access provider tools and resources', category: 'resources', frequency: 62, icon: 'academic-cap' }
+    { id: 'provider-resources', name: 'Provider Resources', description: 'Access provider tools and resources', category: 'resources', frequency: 35, icon: 'academic-cap' }
   ]
 
   const categories = [
@@ -193,7 +193,7 @@ export default function PICLandingPage() {
 
   const frequentActions = allActions
     .sort((a, b) => b.frequency - a.frequency)
-    .slice(0, 6)
+    .slice(0, 3)
 
   return (
     <div className="pic-landing-page">

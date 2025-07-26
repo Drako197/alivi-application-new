@@ -238,7 +238,21 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
           Don't have an account?{' '}
           <button
             type="button"
-            onClick={() => onViewChange('signup')}
+            onClick={() => {
+              onViewChange('signup')
+              // Smooth scroll to form on mobile
+              if (window.innerWidth <= 1023) {
+                setTimeout(() => {
+                  const formElement = document.querySelector('.form-container form')
+                  if (formElement) {
+                    formElement.scrollIntoView({ 
+                      behavior: 'smooth', 
+                      block: 'start' 
+                    })
+                  }
+                }, 100) // Small delay to ensure form is rendered
+              }
+            }}
             className="form-link"
             disabled={isSubmitting}
           >

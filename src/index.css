@@ -34,11 +34,44 @@ body {
   }
   
   .sidebar {
-    @apply w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col;
+    @apply w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen;
   }
   
   .main-content {
     @apply flex-1 bg-gray-50 dark:bg-gray-900;
+  }
+  
+  /* Mobile Layout Classes */
+  .mobile-app-container {
+    @apply min-h-screen flex flex-col;
+  }
+  
+  .mobile-main-content {
+    @apply flex-1 bg-gray-50 dark:bg-gray-900 pb-20;
+  }
+  
+  .mobile-bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50;
+  }
+  
+  .mobile-header {
+    @apply bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-4 py-3;
+  }
+  
+  .mobile-side-menu {
+    @apply fixed inset-0 bg-black bg-opacity-50 z-50;
+  }
+  
+  .mobile-side-menu-content {
+    @apply fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out;
+  }
+  
+  .mobile-side-menu-content.closed {
+    @apply translate-x-full;
+  }
+  
+  .mobile-side-menu-content.open {
+    @apply translate-x-0;
   }
   
   /* Header Classes */
@@ -74,6 +107,10 @@ body {
     @apply absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50;
   }
   
+  .user-dropdown-container {
+    @apply relative;
+  }
+  
   .user-dropdown-item {
     @apply w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
   }
@@ -84,11 +121,11 @@ body {
   
   /* Navigation Classes */
   .nav-section {
-    @apply space-y-6 mt-5;
+    @apply space-y-6 mt-5 px-4 flex-1;
   }
   
   .nav-section-title {
-    @apply text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3;
+    @apply text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3;
   }
   
   .nav-section-container-main-menu {
@@ -100,7 +137,7 @@ body {
   }
   
   .nav-item {
-    @apply w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors;
+    @apply w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors;
   }
   
   .nav-item-active {
@@ -117,11 +154,210 @@ body {
   
   /* Sidebar Bottom Section */
   .sidebar-bottom {
-    @apply p-4 border-t border-gray-200 dark:border-gray-700;
+    @apply p-4 border-t border-gray-200 dark:border-gray-700 mt-auto;
+  }
+  
+  .bottom-nav-container {
+    @apply mt-4;
   }
   
   .dark-mode-toggle {
-    @apply w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors;
+    @apply w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors;
+  }
+  
+  /* Mobile Navigation Classes */
+  .mobile-nav-tab {
+    @apply flex flex-col items-center justify-center py-2 px-3 text-xs font-medium transition-all duration-200 ease-in-out;
+  }
+  
+  .mobile-nav-tab-active {
+    @apply text-blue-600 dark:text-blue-400;
+  }
+  
+  .mobile-nav-tab-inactive {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+  
+  .mobile-nav-icon {
+    @apply w-6 h-6 mb-1 transition-transform duration-200 ease-in-out;
+  }
+  
+  .mobile-nav-tab-active .mobile-nav-icon {
+    @apply scale-110;
+  }
+  
+  .mobile-nav-tab:hover .mobile-nav-icon {
+    @apply scale-105;
+  }
+  
+  /* Mobile Content Transitions */
+  .mobile-content {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .mobile-content-enter {
+    @apply opacity-0 transform translate-y-4;
+  }
+  
+  .mobile-content-enter-active {
+    @apply opacity-100 transform translate-y-0;
+  }
+  
+  .mobile-content-exit {
+    @apply opacity-100 transform translate-y-0;
+  }
+  
+  .mobile-content-exit-active {
+    @apply opacity-0 transform -translate-y-4;
+  }
+  
+  /* Enhanced Mobile Side Menu Animations */
+  .mobile-side-menu {
+    @apply fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 ease-in-out;
+  }
+  
+  .mobile-side-menu-content {
+    @apply fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-800 shadow-lg transform transition-all duration-300 ease-in-out;
+  }
+  
+  .mobile-side-menu-content.closed {
+    @apply translate-x-full;
+  }
+  
+  .mobile-side-menu-content.open {
+    @apply translate-x-0;
+  }
+  
+  /* Mobile Header Animations */
+  .mobile-header {
+    @apply bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-4 py-3 transition-all duration-200 ease-in-out;
+  }
+  
+  .mobile-header-title {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  /* Mobile Bottom Nav Animations */
+  .mobile-bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ease-in-out;
+  }
+  
+  .mobile-bottom-nav-tab {
+    @apply relative overflow-hidden;
+  }
+  
+  .mobile-bottom-nav-tab::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-200 ease-in-out transform -translate-x-1/2;
+  }
+  
+  .mobile-bottom-nav-tab-active::after {
+    @apply w-8;
+  }
+  
+  /* Mobile Profile Animations */
+  .mobile-profile-card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 ease-in-out hover:shadow-md;
+  }
+  
+  .mobile-profile-avatar {
+    @apply transition-transform duration-200 ease-in-out hover:scale-105;
+  }
+  
+  /* Mobile Button Animations */
+  .mobile-button {
+    @apply transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95;
+  }
+  
+  /* Mobile Menu Item Animations */
+  .mobile-menu-item {
+    @apply transition-all duration-200 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg;
+  }
+  
+  .mobile-menu-item:hover {
+    @apply transform translate-x-1;
+  }
+  
+  /* Content Transition Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .mobile-content-animate {
+    animation: fadeInUp 0.3s ease-out;
+  }
+  
+  .mobile-card-animate {
+    animation: scaleIn 0.2s ease-out;
+  }
+  
+  .mobile-menu-animate {
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  /* Hover Effects */
+  .mobile-nav-tab:hover {
+    @apply transform scale-105;
+  }
+  
+  .mobile-button:hover {
+    @apply shadow-md;
+  }
+  
+  .mobile-profile-card:hover {
+    @apply shadow-lg transform scale-[1.02];
+  }
+  
+  /* Active State Animations */
+  .mobile-nav-tab-active {
+    @apply transform scale-110;
+  }
+  
+  .mobile-nav-tab-active .mobile-nav-icon {
+    @apply animate-pulse;
+  }
+  
+  /* Loading States */
+  .mobile-loading {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700;
+  }
+  
+  /* Focus States */
+  .mobile-nav-tab:focus {
+    @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
+  }
+  
+  .mobile-button:focus {
+    @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
   }
   
   /* Logo and Brand */
@@ -238,6 +474,145 @@ body {
   
   .auth-card {
     @apply w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8;
+  }
+  
+  /* Human-friendly auth class names */
+  .login-page-container {
+    @apply min-h-screen flex;
+  }
+  
+  .login-page-wrapper {
+    @apply w-full max-w-[1440px] mx-auto flex;
+  }
+  
+  .login-page-left-side {
+    @apply hidden lg:flex lg:w-1/2 relative overflow-hidden;
+  }
+  
+  .login-page-right-side {
+    @apply flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8;
+  }
+  
+  .login-form-container {
+    @apply w-full max-w-md;
+  }
+  
+  .login-form-card {
+    @apply w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8;
+  }
+  
+  .login-form-dark-mode-toggle {
+    @apply flex justify-end mb-6;
+  }
+  
+  .login-form-content {
+    @apply p-8;
+  }
+  
+  /* Mobile-specific auth centering */
+  @media (max-width: 1023px) {
+    .auth-container {
+      @apply flex-col;
+    }
+    
+    .auth-right {
+      @apply w-full flex-1 flex items-center justify-center px-4;
+    }
+    
+    .auth-card {
+      @apply w-full max-w-sm mx-auto;
+    }
+    
+    /* Mobile gradient background */
+    .login-page-container {
+      @apply relative overflow-hidden;
+    }
+    
+    .login-page-container::before {
+      content: '';
+      @apply absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800;
+    }
+    
+    .login-page-container::after {
+      content: '';
+      @apply absolute inset-0 bg-gradient-to-tr from-blue-500/20 via-transparent to-purple-600/20 animate-pulse;
+    }
+    
+    /* Mobile geometric pattern overlay */
+    .login-page-container .mobile-gradient-pattern {
+      @apply absolute inset-0 opacity-10;
+    }
+    
+    .login-page-container .mobile-gradient-pattern::before {
+      content: '';
+      @apply absolute top-10 left-10 w-32 h-32 border-2 border-white/20 rounded-full;
+    }
+    
+    .login-page-container .mobile-gradient-pattern::after {
+      content: '';
+      @apply absolute bottom-20 right-10 w-24 h-24 border-2 border-white/20 rounded-full;
+    }
+    
+    /* Ensure content is above background */
+    .login-page-wrapper {
+      @apply relative z-10;
+    }
+    
+    /* Mobile Alivi Logo */
+    .mobile-alivi-logo {
+      @apply flex justify-center;
+    }
+    
+    .mobile-alivi-logo .mobile-logo-container {
+      @apply flex flex-col items-center justify-center space-y-4 mt-0 mb-8;
+    }
+    
+    .mobile-alivi-logo .logo-icon {
+      @apply w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg;
+    }
+    
+    .mobile-alivi-logo .logo-text {
+      @apply text-4xl font-bold text-white;
+    }
+    
+    .mobile-alivi-logo .mobile-tagline {
+      @apply mt-2;
+    }
+    
+    .mobile-alivi-logo .mobile-tagline p {
+      @apply leading-relaxed;
+    }
+    
+    /* Hide mobile logo on desktop */
+    @media (min-width: 1024px) {
+      .mobile-alivi-logo {
+        @apply hidden;
+      }
+      
+      /* Desktop dashboard centering */
+      .app-wrapper {
+        @apply max-w-[1440px] mx-auto;
+      }
+    }
+    
+    /* Mobile form spacing and scrolling */
+    @media (max-width: 1023px) {
+      .form-container {
+        @apply mb-8;
+      }
+      
+      .form-container form {
+        @apply scroll-mt-4;
+      }
+      
+      .login-form-card {
+        @apply mb-8;
+      }
+      
+      .login-form-content {
+        @apply p-4;
+      }
+    }
   }
   
   .auth-header {

@@ -12,6 +12,7 @@ export default function SignUpView({ onViewChange }: SignUpViewProps) {
     email: '',
     password: '',
     confirmPassword: '',
+    role: '',
     agreeToTerms: false
   })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
@@ -23,6 +24,7 @@ export default function SignUpView({ onViewChange }: SignUpViewProps) {
     email: false,
     password: false,
     confirmPassword: false,
+    role: false,
     agreeToTerms: false
   })
 
@@ -33,13 +35,15 @@ export default function SignUpView({ onViewChange }: SignUpViewProps) {
       email: /\S+@\S+\.\S+/.test(formData.email),
       password: formData.password.length >= 8 && /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password),
       confirmPassword: formData.password === formData.confirmPassword && formData.confirmPassword.length > 0,
+      role: formData.role.length > 0,
       agreeToTerms: formData.agreeToTerms
     }
     setValidations(newValidations)
   }, [formData])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target
+    const checked = 'checked' in e.target ? e.target.checked : false
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -78,6 +82,10 @@ export default function SignUpView({ onViewChange }: SignUpViewProps) {
       newErrors.confirmPassword = 'Please confirm your password'
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match'
+    }
+
+    if (!formData.role) {
+      newErrors.role = 'Role is required'
     }
     
     if (!formData.agreeToTerms) {
@@ -311,6 +319,27 @@ export default function SignUpView({ onViewChange }: SignUpViewProps) {
               </svg>
               Passwords match!
             </p>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="role" className="form-label">
+            Role
+          </label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleInputChange}
+            className={getInputClassName('role')}
+            disabled={isSubmitting}
+          >
+            <option value="">Select a role</option>
+            <option value="Licensed Medical Doctor">Licensed Medical Doctor</option>
+            <option value="Field Technician">Field Technician</option>
+          </select>
+          {errors.role && (
+            <p className="form-error">{errors.role}</p>
           )}
         </div>
 

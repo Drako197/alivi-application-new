@@ -49,11 +49,14 @@ function AppContent() {
 
   // Show login/signup forms if not authenticated
   return (
-    <div className={`auth-container ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`login-page-container ${isDarkMode ? 'dark' : ''}`}>
+      {/* Mobile gradient pattern overlay */}
+      <div className="mobile-gradient-pattern"></div>
+      
       {/* Container with max-width and centering */}
-      <div className="app-wrapper">
+      <div className="login-page-wrapper">
         {/* Left side - Modern Gradient Background */}
-        <div className="auth-left">
+        <div className="login-page-left-side">
           {/* Modern gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800">
             {/* Animated gradient overlay */}
@@ -117,10 +120,10 @@ function AppContent() {
         </div>
 
         {/* Right side - Auth Card */}
-        <div className="auth-right">
-          <div className="w-full max-w-md">
+        <div className="login-page-right-side">
+          <div className="login-form-container">
             {/* Dark mode toggle */}
-            <div className="flex justify-end mb-6">
+            <div className="login-form-dark-mode-toggle">
               <button
                 onClick={toggleDarkMode}
                 className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
@@ -138,9 +141,27 @@ function AppContent() {
               </button>
             </div>
 
+            {/* Mobile Alivi Logo */}
+            <div className="mobile-alivi-logo">
+              <div className="mobile-logo-container">
+                <div className="logo-icon">
+                  <img 
+                    src="/images/Alivi_A_Icon.png" 
+                    alt="Alivi Icon" 
+                    className="w-16 h-16 object-contain filter brightness-0 invert"
+                  />
+                </div>
+                <span className="logo-text text-4xl font-bold text-white">Alivi</span>
+                <div className="mobile-tagline text-center">
+                  <p className="text-white/90 text-lg font-medium">Healthcare Data Intelligence</p>
+                  <p className="text-white/70 text-sm mt-1">Streamlining HEDIS & Quality Measures</p>
+                </div>
+              </div>
+            </div>
+
             {/* Auth Card */}
-            <div className="auth-card">
-              <div className="p-8">
+            <div className="login-form-card">
+              <div className="login-form-content">
                 {renderAuthView()}
               </div>
             </div>

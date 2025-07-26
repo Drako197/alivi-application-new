@@ -4,17 +4,18 @@ import type { ReactElement } from 'react'
 interface SidebarProps {
   isDarkMode: boolean
   onToggleDarkMode: () => void
+  activeTab: string
+  onTabChange: (tab: string) => void
 }
 
-export default function Sidebar({ isDarkMode, onToggleDarkMode }: SidebarProps) {
-  const [activeItem, setActiveItem] = useState('dashboard')
+export default function Sidebar({ isDarkMode, onToggleDarkMode, activeTab, onTabChange }: SidebarProps) {
 
   const menuItems = [
     {
       section: 'Main Menu',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
-        { id: 'hedis', label: 'HEDIS', icon: 'document' },
+        { id: 'hedis', label: 'H.E.D.I.S.', icon: 'document' },
         { id: 'pic', label: 'P.I.C.', icon: 'credit-card' },
         { id: 'reports', label: 'Reports', icon: 'chart-bar' },
         { id: 'analytics', label: 'Analytics', icon: 'chart-pie' }
@@ -120,9 +121,9 @@ export default function Sidebar({ isDarkMode, onToggleDarkMode }: SidebarProps) 
               {section.items.map((item) => (
                 <li key={item.id}>
                   <button
-                    onClick={() => setActiveItem(item.id)}
+                    onClick={() => onTabChange(item.id)}
                     className={`nav-item ${
-                      activeItem === item.id
+                      activeTab === item.id
                         ? 'nav-item-active'
                         : 'nav-item-inactive'
                     }`}
@@ -166,9 +167,9 @@ export default function Sidebar({ isDarkMode, onToggleDarkMode }: SidebarProps) 
             {bottomItems.map((item) => (
               <li key={item.id}>
                 <button
-                  onClick={() => setActiveItem(item.id)}
+                  onClick={() => onTabChange(item.id)}
                   className={`nav-item ${
-                    activeItem === item.id
+                    activeTab === item.id
                       ? 'nav-item-active'
                       : 'nav-item-inactive'
                   }`}

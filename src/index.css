@@ -883,3 +883,354 @@ body {
 .pic-empty-description {
   @apply text-gray-600 dark:text-gray-400;
 }
+
+/* HEDIS Landing Page Styles */
+.hedis-landing-page {
+  @apply max-w-7xl mx-auto p-6 space-y-8;
+}
+
+.hedis-header {
+  @apply flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8;
+}
+
+.hedis-greeting-section {
+  @apply flex flex-col sm:flex-row sm:items-center gap-4;
+}
+
+.hedis-greeting {
+  @apply text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white;
+}
+
+.hedis-role-badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+}
+
+.hedis-role-text {
+  @apply text-sm font-medium;
+}
+
+.hedis-date-section {
+  @apply flex justify-end;
+}
+
+.hedis-date-card {
+  @apply flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4;
+}
+
+.hedis-date-icon {
+  @apply flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg text-blue-600 dark:text-blue-400;
+}
+
+.hedis-date-content {
+  @apply flex flex-col;
+}
+
+.hedis-date-label {
+  @apply text-xs text-gray-500 dark:text-gray-400 font-medium;
+}
+
+.hedis-date-value {
+  @apply text-sm font-semibold text-gray-900 dark:text-white;
+}
+
+.hedis-dashboard-section {
+  @apply mb-8;
+}
+
+.hedis-section-title {
+  @apply text-xl font-semibold text-gray-900 dark:text-white mb-6;
+}
+
+.hedis-dashboard-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.hedis-dashboard-card {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 flex items-start gap-4 hover:bg-blue-50 dark:hover:bg-blue-900/10;
+}
+
+.hedis-dashboard-card:hover .hedis-card-label {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+.hedis-dashboard-card:hover .hedis-card-description {
+  @apply text-blue-700 dark:text-blue-300;
+}
+
+.hedis-card-badge {
+  @apply flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium flex-shrink-0;
+}
+
+.hedis-badge-view-only {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+}
+
+.hedis-badge-continue-editing {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+}
+
+.hedis-dashboard-card:hover {
+  @apply transform -translate-y-1;
+}
+
+.hedis-card-icon {
+  @apply flex items-center justify-center w-12 h-12 rounded-lg flex-shrink-0;
+}
+
+.hedis-completed-icon {
+  @apply bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400;
+}
+
+.hedis-saved-icon {
+  @apply bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400;
+}
+
+.hedis-card-content {
+  @apply flex flex-col flex-1 min-w-0;
+}
+
+.hedis-card-header {
+  @apply flex items-center gap-3 mb-2;
+}
+
+.hedis-card-number {
+  @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.hedis-card-label {
+  @apply text-lg font-semibold text-blue-600 dark:text-blue-400;
+}
+
+.hedis-card-description {
+  @apply text-sm text-gray-600 dark:text-gray-400;
+}
+
+.hedis-tasks-section {
+  @apply mb-8;
+}
+
+.hedis-tasks-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+}
+
+.hedis-task-card {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6;
+}
+
+.hedis-task-header {
+  @apply flex items-start gap-4 mb-6;
+}
+
+.hedis-task-icon {
+  @apply flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg text-blue-600 dark:text-blue-400 flex-shrink-0;
+}
+
+.hedis-task-content {
+  @apply flex-1;
+}
+
+.hedis-task-title {
+  @apply text-lg font-semibold text-gray-900 dark:text-white mb-2;
+}
+
+.hedis-task-description {
+  @apply text-sm text-gray-600 dark:text-gray-400;
+}
+
+.hedis-task-actions {
+  @apply flex flex-col sm:flex-row gap-3;
+}
+
+.hedis-primary-btn {
+  @apply flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200;
+}
+
+.hedis-secondary-btn {
+  @apply flex-1 px-4 py-2 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 font-medium rounded-lg transition-colors duration-200;
+}
+
+/* Hero Layout Styles */
+.hedis-primary-action-section {
+  @apply mb-8;
+}
+
+.hedis-primary-action-card {
+  @apply bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-8 text-white;
+}
+
+.hedis-primary-action-header {
+  @apply flex items-start gap-6 mb-6;
+}
+
+.hedis-primary-action-icon {
+  @apply w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0;
+}
+
+.hedis-primary-action-icon svg {
+  @apply w-8 h-8 text-white;
+}
+
+.hedis-primary-action-icon {
+  @apply w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 relative;
+}
+
+.hedis-icon-badge {
+  @apply absolute -top-2 -left-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg;
+}
+
+.hedis-icon-badge svg {
+  @apply w-3 h-3 text-white;
+}
+
+.hedis-primary-action-content {
+  @apply flex-1;
+}
+
+.hedis-primary-action-title {
+  @apply text-3xl font-bold text-white mb-3;
+}
+
+.hedis-primary-action-description {
+  @apply text-lg text-blue-100 leading-relaxed;
+}
+
+.hedis-primary-action-button {
+  @apply flex justify-start;
+}
+
+.hedis-hero-btn {
+  @apply px-8 py-4 bg-white text-blue-600 hover:bg-blue-50 font-semibold text-lg rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg;
+}
+
+.hedis-secondary-actions-section {
+  @apply space-y-6;
+}
+
+.hedis-secondary-actions-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+}
+
+.hedis-secondary-action-card {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6;
+}
+
+.hedis-secondary-action-header {
+  @apply flex items-start gap-4 mb-4;
+}
+
+.hedis-secondary-action-icon {
+  @apply w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0;
+}
+
+.hedis-secondary-action-icon svg {
+  @apply w-6 h-6 text-blue-600 dark:text-blue-400;
+}
+
+.hedis-secondary-action-content {
+  @apply flex-1;
+}
+
+.hedis-secondary-action-title {
+  @apply text-xl font-semibold text-gray-900 dark:text-white mb-2;
+}
+
+.hedis-secondary-action-description {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+.hedis-secondary-action-button {
+  @apply flex justify-start;
+}
+
+.hedis-dashboard-compact {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6;
+}
+
+.hedis-compact-title {
+  @apply text-lg font-semibold text-gray-900 dark:text-white mb-4;
+}
+
+.hedis-compact-grid {
+  @apply space-y-3;
+}
+
+.hedis-compact-card {
+  @apply flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer;
+}
+
+.hedis-compact-icon {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0;
+}
+
+.hedis-compact-content {
+  @apply flex-1 flex items-center justify-between;
+}
+
+.hedis-compact-header {
+  @apply flex items-center gap-3;
+}
+
+.hedis-compact-number {
+  @apply text-xl font-bold text-gray-900 dark:text-white;
+}
+
+.hedis-compact-label {
+  @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+.hedis-compact-badge {
+  @apply flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium flex-shrink-0;
+}
+
+
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .hedis-header {
+    @apply flex-col items-start;
+  }
+  
+  .hedis-greeting-section {
+    @apply w-full;
+  }
+  
+  .hedis-role-badge {
+    @apply w-full bg-blue-100 dark:bg-blue-900;
+  }
+  
+  .hedis-date-section {
+    @apply w-full justify-start;
+  }
+  
+  .hedis-date-card {
+    @apply w-full;
+  }
+  
+  .hedis-dashboard-grid {
+    @apply grid-cols-1;
+  }
+  
+  .hedis-tasks-grid {
+    @apply grid-cols-1;
+  }
+  
+  .hedis-task-actions {
+    @apply flex-col;
+  }
+  
+  .hedis-primary-action-header {
+    @apply flex-col items-start gap-4;
+  }
+  
+  .hedis-primary-action-content {
+    @apply w-full text-left;
+  }
+  
+  .hedis-primary-action-description {
+    @apply text-left;
+  }
+  
+  .hedis-hero-btn {
+    @apply w-full;
+  }
+}

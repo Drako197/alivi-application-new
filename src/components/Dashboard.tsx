@@ -7,6 +7,7 @@ import MobileBottomNav from './MobileBottomNav'
 import MobileSideMenu from './MobileSideMenu'
 import MobileProfile from './MobileProfile'
 import PICLandingPage from './PICLandingPage'
+import HEDISLandingPage from './HEDISLandingPage'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
@@ -347,15 +348,7 @@ export default function Dashboard() {
   const renderDesktopContent = () => {
     switch (activeDesktopTab) {
       case 'hedis':
-        return (
-          <div className="dashboard-content">
-            <h1 className="welcome-title">H.E.D.I.S.</h1>
-            <p className="welcome-subtitle">Healthcare Effectiveness Data and Information Set</p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">HEDIS content coming soon...</p>
-            </div>
-          </div>
-        )
+        return <HEDISLandingPage />
       case 'pic':
         return <PICLandingPage />
       case 'reports':
@@ -558,14 +551,7 @@ export default function Dashboard() {
       case 'profile':
         return <MobileProfile />
       case 'hedis':
-        return (
-          <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">HEDIS</h2>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">HEDIS content coming soon...</p>
-            </div>
-          </div>
-        )
+        return <HEDISLandingPage />
       case 'pic':
         return (
           <div className="p-4">

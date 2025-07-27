@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
 
+// NOTE: Using React Portal to ensure modal overlay covers entire viewport
+// This fixes the issue where modals don't start from the top of the page
+// Apply this pattern to all future modals in the application
+
 // TypeScript Interfaces
 interface Patient {
   id: string

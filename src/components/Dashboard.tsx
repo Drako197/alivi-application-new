@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { ReactElement } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Sidebar from './Sidebar'
@@ -14,11 +14,35 @@ export default function Dashboard() {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const [activeMobileTab, setActiveMobileTab] = useState('dashboard')
-  const [activeDesktopTab, setActiveDesktopTab] = useState('dashboard')
+  
+  // Initialize tab state from localStorage or default to 'dashboard'
+  const [activeMobileTab, setActiveMobileTab] = useState(() => {
+    const saved = localStorage.getItem('activeMobileTab')
+    return saved || 'dashboard'
+  })
+  
+  const [activeDesktopTab, setActiveDesktopTab] = useState(() => {
+    const saved = localStorage.getItem('activeDesktopTab')
+    return saved || 'dashboard'
+  })
+  
   const [breadcrumbPath, setBreadcrumbPath] = useState(['Dashboard'])
   const [mobileSearchTerm, setMobileSearchTerm] = useState('')
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
+
+  // Save tab state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('activeMobileTab', activeMobileTab)
+  }, [activeMobileTab])
+
+  useEffect(() => {
+    localStorage.setItem('activeDesktopTab', activeDesktopTab)
+  }, [activeDesktopTab])
+
+  // Initialize breadcrumb path based on restored tab
+  useEffect(() => {
+    updateBreadcrumbPath(activeDesktopTab)
+  }, [activeDesktopTab])
 
   // Mobile P.I.C. Action Data
   const mobileActions = [

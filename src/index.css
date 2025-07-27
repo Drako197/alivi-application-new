@@ -428,8 +428,8 @@ body {
   }
   
   .form-label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
-  }
+  @apply block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2;
+}
   
   .form-input {
     @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white;
@@ -1232,5 +1232,279 @@ body {
   
   .hedis-hero-btn {
     @apply w-full;
+  }
+}
+
+/* Patient Search Modal Styles */
+.patient-search-modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+.patient-search-modal {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden;
+}
+
+.patient-search-modal-header {
+  @apply flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700;
+}
+
+.patient-search-modal-title {
+  @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.patient-search-modal-close {
+  @apply p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors;
+}
+
+.patient-search-modal-tabs {
+  @apply flex border-b border-gray-200 dark:border-gray-700;
+}
+
+.patient-search-tab {
+  @apply flex-1 px-6 py-4 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors;
+}
+
+.patient-search-tab-active {
+  @apply text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/10;
+}
+
+.patient-search-input-section {
+  @apply p-6;
+}
+
+.patient-search-input-label {
+  @apply block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2;
+}
+
+.patient-search-input-hint {
+  @apply mb-3;
+}
+
+.patient-search-input-hint p {
+  @apply text-xs text-gray-500 dark:text-gray-400 italic;
+}
+
+.patient-search-input-container {
+  @apply flex gap-3 relative;
+}
+
+.patient-search-input {
+  @apply flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400;
+}
+
+.patient-search-button {
+  @apply px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center;
+}
+
+.patient-search-loading {
+  @apply w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin;
+}
+
+.patient-search-loading-container {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2;
+}
+
+.patient-search-clear-button {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors;
+}
+
+.patient-search-results {
+  @apply p-6 pt-0;
+}
+
+.patient-search-table {
+  @apply border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm;
+}
+
+.patient-search-table-header {
+  @apply bg-blue-100 dark:bg-blue-900 text-gray-900 dark:text-white grid grid-cols-12 gap-4 p-4 font-semibold text-sm uppercase tracking-wide;
+}
+
+.patient-search-table-header .patient-search-table-cell:nth-child(1) {
+  @apply col-span-1;
+}
+
+.patient-search-table-header .patient-search-table-cell:nth-child(2) {
+  @apply col-span-2;
+}
+
+.patient-search-table-header .patient-search-table-cell:nth-child(3) {
+  @apply col-span-3;
+}
+
+.patient-search-table-header .patient-search-table-cell:nth-child(4) {
+  @apply col-span-2;
+}
+
+.patient-search-table-header .patient-search-table-cell:nth-child(5) {
+  @apply col-span-2;
+}
+
+.patient-search-table-header .patient-search-table-cell:nth-child(6) {
+  @apply col-span-2;
+}
+
+.patient-search-table-cell {
+  @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+.patient-search-table-header .patient-search-table-cell {
+  @apply text-gray-900 dark:text-white font-semibold;
+}
+
+.patient-search-table-body {
+  @apply divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.patient-search-table-row {
+  @apply grid grid-cols-12 gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors;
+}
+
+.patient-search-table-row .patient-search-table-cell:nth-child(1) {
+  @apply col-span-1;
+}
+
+.patient-search-table-row .patient-search-table-cell:nth-child(2) {
+  @apply col-span-2;
+}
+
+.patient-search-table-row .patient-search-table-cell:nth-child(3) {
+  @apply col-span-3;
+}
+
+.patient-search-table-row .patient-search-table-cell:nth-child(4) {
+  @apply col-span-2;
+}
+
+.patient-search-table-row .patient-search-table-cell:nth-child(5) {
+  @apply col-span-2;
+}
+
+.patient-search-table-row .patient-search-table-cell:nth-child(6) {
+  @apply col-span-2;
+}
+
+.patient-search-table-row .patient-search-table-cell {
+  @apply text-sm text-gray-900 dark:text-gray-100;
+}
+
+.patient-search-select-button {
+  @apply p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors;
+}
+
+.patient-status-badge {
+  @apply ml-2 px-2 py-1 text-xs font-medium rounded-full;
+}
+
+.patient-status-active {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+}
+
+.patient-status-inactive {
+  @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200;
+}
+
+.patient-search-empty {
+  @apply text-center py-8 text-gray-500 dark:text-gray-400;
+}
+
+/* Auto-complete Styles */
+.patient-search-autocomplete {
+  @apply absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto;
+}
+
+.patient-search-autocomplete-item {
+  @apply p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0;
+}
+
+.patient-search-autocomplete-name {
+  @apply font-medium text-gray-900 dark:text-white;
+}
+
+.patient-search-autocomplete-details {
+  @apply text-sm text-gray-500 dark:text-gray-400 mt-1;
+}
+
+/* Advanced Filters Styles */
+.patient-search-filters {
+  @apply p-6 pt-0;
+}
+
+.patient-search-filters-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.patient-search-filters-title {
+  @apply text-lg font-semibold text-gray-900 dark:text-white;
+}
+
+.patient-search-filters-clear {
+  @apply text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium;
+}
+
+.patient-search-filters-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.patient-search-filter-group {
+  @apply space-y-2;
+}
+
+.patient-search-filter-label {
+  @apply block text-sm font-bold text-gray-700 dark:text-gray-300;
+}
+
+.patient-search-filter-input,
+.patient-search-filter-select {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white;
+}
+
+.patient-search-filter-select {
+  @apply bg-white dark:bg-gray-700;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .patient-search-modal {
+    @apply max-w-none mx-4 max-h-[95vh];
+  }
+  
+  .patient-search-modal-header {
+    @apply p-4;
+  }
+  
+  .patient-search-modal-title {
+    @apply text-xl;
+  }
+  
+  .patient-search-input-section {
+    @apply p-4;
+  }
+  
+  .patient-search-results {
+    @apply p-4 pt-0;
+  }
+  
+  .patient-search-table-header,
+  .patient-search-table-row {
+    @apply grid-cols-4 gap-2 p-3;
+  }
+  
+  .patient-search-table-cell:nth-child(4),
+  .patient-search-table-cell:nth-child(5) {
+    @apply hidden;
+  }
+  
+  .patient-search-filters-grid {
+    @apply grid-cols-1;
+  }
+  
+  .patient-search-autocomplete {
+    @apply max-h-40;
   }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import type { ReactElement } from 'react'
+import PatientSearchModal from './PatientSearchModal'
 
 interface HEDISForm {
   id: string
@@ -21,6 +22,8 @@ export default function HEDISLandingPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [userRole, setUserRole] = useState('Field Technician') // This would come from user context
   const [userName, setUserName] = useState('John') // This would come from user context
+  const [showPatientSearch, setShowPatientSearch] = useState(false)
+  const [selectedPatient, setSelectedPatient] = useState<any>(null)
 
   // Update time every minute
   useEffect(() => {
@@ -137,6 +140,12 @@ export default function HEDISLandingPage() {
     // Handle form navigation
   }
 
+  const handlePatientSelect = (patient: any) => {
+    setSelectedPatient(patient)
+    console.log('Selected patient:', patient)
+    // Here you would typically navigate to the screening form with the selected patient
+  }
+
   return (
     <div className="hedis-landing-page">
       {/* Header Section */}
@@ -185,7 +194,7 @@ export default function HEDISLandingPage() {
           <div className="hedis-primary-action-button">
             <button 
               className="hedis-hero-btn"
-              onClick={() => handleTaskClick('new-screening')}
+              onClick={() => setShowPatientSearch(true)}
             >
               Start New Screening
             </button>
@@ -248,6 +257,13 @@ export default function HEDISLandingPage() {
           </div>
         </div>
       </div>
+
+      {/* Patient Search Modal */}
+      <PatientSearchModal
+        isOpen={showPatientSearch}
+        onClose={() => setShowPatientSearch(false)}
+        onPatientSelect={handlePatientSelect}
+      />
     </div>
   )
 } 

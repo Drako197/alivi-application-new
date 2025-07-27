@@ -1346,7 +1346,7 @@ body {
 }
 
 .patient-search-table-header .patient-search-table-cell:nth-child(6) {
-  @apply col-span-2;
+  @apply col-span-2 text-center;
 }
 
 .patient-search-table-cell {
@@ -1394,7 +1394,7 @@ body {
 }
 
 .patient-search-select-button {
-  @apply p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors;
+  @apply p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center w-full;
 }
 
 .patient-status-badge {
@@ -1439,8 +1439,16 @@ body {
   @apply flex items-center justify-between mb-4;
 }
 
+.patient-search-filters-title-section {
+  @apply flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md p-1 transition-colors duration-200;
+}
+
+.patient-search-filters-toggle {
+  @apply text-gray-500 transition-colors duration-200;
+}
+
 .patient-search-filters-title {
-  @apply text-lg font-semibold text-gray-900 dark:text-white;
+  @apply text-base font-semibold text-gray-900 dark:text-white;
 }
 
 .patient-search-filters-clear {
@@ -1449,6 +1457,18 @@ body {
 
 .patient-search-filters-grid {
   @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .patient-search-filter-group {
@@ -1459,13 +1479,35 @@ body {
   @apply block text-sm font-bold text-gray-700 dark:text-gray-300;
 }
 
-.patient-search-filter-input,
-.patient-search-filter-select {
+.patient-search-filter-input {
   @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
 .patient-search-filter-select {
-  @apply bg-white dark:bg-gray-700;
+  @apply w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white;
+  padding-right: 2rem !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 1em !important;
+}
+
+
+
+/* General select element styling - Updated for dropdown arrow spacing */
+select {
+  @apply pr-8;
+  padding-right: 2rem !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 1em !important;
 }
 
 /* Mobile Responsive Adjustments */
@@ -1488,16 +1530,214 @@ body {
   
   .patient-search-results {
     @apply p-4 pt-0;
+    max-height: 60vh;
+    overflow-y: auto;
   }
   
-  .patient-search-table-header,
+  /* Mobile table layout - Force card layout */
+  .patient-search-table {
+    @apply space-y-3 !important;
+    display: block !important;
+    border-width: 0px !important;
+  }
+  
+  .patient-search-table-header {
+    @apply hidden !important;
+  }
+  
+  .patient-search-table-body {
+    @apply space-y-3 !important;
+    display: block !important;
+    border: none !important;
+  }
+  
   .patient-search-table-row {
-    @apply grid-cols-4 gap-2 p-3;
+    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 !important;
+    display: block !important;
+    width: 100% !important;
   }
   
-  .patient-search-table-cell:nth-child(4),
+  .patient-search-table-cell {
+    @apply block text-sm !important;
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Mobile cell styling - Force block layout */
+  .patient-search-table-cell:first-child {
+    @apply text-xs text-gray-500 dark:text-gray-400 font-medium mb-2 !important;
+  }
+  
+  .patient-search-table-cell:nth-child(2) {
+    @apply text-base font-semibold text-gray-900 dark:text-white mb-2 !important;
+  }
+  
+  .patient-search-table-cell:nth-child(3) {
+    @apply text-sm text-gray-600 dark:text-gray-400 mb-2 !important;
+  }
+  
+  .patient-search-table-cell:nth-child(4) {
+    @apply text-sm text-gray-600 dark:text-gray-400 mb-2 !important;
+  }
+  
   .patient-search-table-cell:nth-child(5) {
+    @apply text-sm text-gray-600 dark:text-gray-400 mb-3 !important;
+  }
+  
+  .patient-search-table-cell:last-child {
+    @apply pt-2 border-t border-gray-200 dark:border-gray-700 !important;
+  }
+  
+  /* Mobile status badge */
+  .patient-status-badge {
+    @apply ml-2 px-2 py-1 text-xs font-medium rounded-full;
+  }
+  
+  /* Override any existing grid/table styles for mobile */
+  .patient-search-table,
+  .patient-search-table-body,
+  .patient-search-table-row {
+    display: block !important;
+    grid-template-columns: none !important;
+    grid: none !important;
+  }
+  
+  .patient-search-table-cell {
+    display: block !important;
+    grid-column: none !important;
+    width: 100% !important;
+  }
+  
+
+  
+  /* Mobile Option 2: List Layout */
+  .patient-search-table.mobile-list {
+    @apply space-y-2;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-header {
     @apply hidden;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-body {
+    @apply space-y-2;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-row {
+    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 flex items-center justify-between;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-cell {
+    @apply flex-1 text-sm;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-cell:first-child {
+    @apply flex-none w-8 text-center text-xs text-gray-500 dark:text-gray-400;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-cell:nth-child(2) {
+    @apply font-semibold text-gray-900 dark:text-white;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-cell:nth-child(3) {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-cell:nth-child(4),
+  .patient-search-table.mobile-list .patient-search-table-cell:nth-child(5) {
+    @apply hidden;
+  }
+  
+  .patient-search-table.mobile-list .patient-search-table-cell:last-child {
+    @apply flex-none w-auto;
+  }
+  
+  /* Mobile Option 3: Grid Layout */
+  .patient-search-table.mobile-grid {
+    @apply grid grid-cols-1 gap-3;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-header {
+    @apply hidden;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-body {
+    @apply grid grid-cols-1 gap-3;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-row {
+    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-cell {
+    @apply block text-sm mb-2;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-cell:first-child {
+    @apply text-xs text-gray-500 dark:text-gray-400 font-medium;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-cell:nth-child(2) {
+    @apply text-lg font-bold text-gray-900 dark:text-white;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-cell:nth-child(3) {
+    @apply text-sm text-gray-600 dark:text-gray-400;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-cell:nth-child(4) {
+    @apply text-sm text-gray-600 dark:text-gray-400;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-cell:nth-child(5) {
+    @apply text-sm text-gray-600 dark:text-gray-400 mb-3;
+  }
+  
+  .patient-search-table.mobile-grid .patient-search-table-cell:last-child {
+    @apply pt-3 border-t border-gray-200 dark:border-gray-700;
+  }
+  
+  /* Mobile Option 4: Minimal Cards */
+  .patient-search-table.mobile-minimal {
+    @apply space-y-2;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-header {
+    @apply hidden;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-body {
+    @apply space-y-2;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-row {
+    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-cell {
+    @apply block text-sm;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-cell:first-child {
+    @apply text-xs text-gray-500 dark:text-gray-400 font-medium mb-1;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-cell:nth-child(2) {
+    @apply text-base font-semibold text-gray-900 dark:text-white mb-1;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-cell:nth-child(3) {
+    @apply text-sm text-gray-600 dark:text-gray-400 mb-1;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-cell:nth-child(4),
+  .patient-search-table.mobile-minimal .patient-search-table-cell:nth-child(5) {
+    @apply text-xs text-gray-500 dark:text-gray-400 mb-2;
+  }
+  
+  .patient-search-table.mobile-minimal .patient-search-table-cell:last-child {
+    @apply pt-2;
   }
   
   .patient-search-filters-grid {

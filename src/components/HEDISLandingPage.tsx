@@ -2436,6 +2436,7 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
   // State for screening form
   const [currentScreeningStep, setCurrentScreeningStep] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false)
   const [screeningFormData, setScreeningFormData] = useState<{
     details: ScreeningDetails
     images: RetinalImages
@@ -2991,7 +2992,7 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
       ...prev,
       completedPatientForms: prev.completedPatientForms + 1
     }))
-    setShowSuccess(true)
+    setShowSuccessAlert(true)
   }
 
   const handleBackToDashboard = () => {
@@ -3235,35 +3236,6 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
   // Original HEDIS landing page content
   return (
     <div className="hedis-landing-page">
-      {/* Save Success Alert */}
-      {showSaveAlert && (
-        <div className="hedis-save-alert">
-          <div className="hedis-save-alert-content">
-            <div className="hedis-save-alert-icon">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="hedis-save-alert-message">
-              <h4 className="hedis-save-alert-title">Form Saved Successfully!</h4>
-              <p className="hedis-save-alert-description">
-                Your patient screening form has been saved for later completion. 
-                You have 5 business days to complete the form in a timely manner.
-              </p>
-            </div>
-            <button 
-              className="hedis-save-alert-close"
-              onClick={() => setShowSaveAlert(false)}
-              aria-label="Close alert"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Header Section */}
       <div className="hedis-header">
         <div className="hedis-greeting-section">
@@ -3284,6 +3256,63 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
           </div>
         </div>
       </div>
+
+      {/* Integrated Alerts */}
+      {showSaveAlert && (
+        <div className="hedis-integrated-alert show">
+          <div className="hedis-integrated-alert-content">
+            <div className="hedis-integrated-alert-icon">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="hedis-integrated-alert-message">
+              <h4 className="hedis-integrated-alert-title">Form Saved Successfully!</h4>
+              <p className="hedis-integrated-alert-description">
+                Your patient screening form has been saved for later completion. 
+                You have 30 days to complete the form. It will be automatically deleted after 30 days.
+              </p>
+            </div>
+            <button 
+              className="hedis-integrated-alert-close"
+              onClick={() => setShowSaveAlert(false)}
+              aria-label="Close alert"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showSuccessAlert && (
+        <div className="hedis-integrated-alert hedis-integrated-alert-success show">
+          <div className="hedis-integrated-alert-content">
+            <div className="hedis-integrated-alert-icon">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="hedis-integrated-alert-message">
+              <h4 className="hedis-integrated-alert-title">Screening Completed Successfully!</h4>
+              <p className="hedis-integrated-alert-description">
+                Your patient screening has been submitted and is now being processed. 
+                The screening data is available in the completed screenings section.
+              </p>
+            </div>
+            <button 
+              className="hedis-integrated-alert-close"
+              onClick={() => setShowSuccessAlert(false)}
+              aria-label="Close alert"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Primary Action - New Patient Screening */}
       <div className="hedis-primary-action-section">

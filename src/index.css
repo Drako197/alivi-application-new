@@ -1182,33 +1182,66 @@ body {
   @apply flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium flex-shrink-0;
 }
 
-/* HEDIS Save Alert Styles */
-.hedis-save-alert {
-  @apply fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4;
+/* HEDIS Integrated Alert Styles */
+.hedis-integrated-alert {
+  @apply w-full mb-6 overflow-hidden transition-all duration-500 ease-in-out;
+  max-height: 0;
+  opacity: 0;
 }
 
-.hedis-save-alert-content {
-  @apply bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-700 rounded-lg p-4 shadow-lg flex items-start;
+.hedis-integrated-alert.show {
+  max-height: 120px;
+  opacity: 1;
 }
 
-.hedis-save-alert-icon {
-  @apply flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center text-green-600 dark:text-green-400;
+.hedis-integrated-alert.hide {
+  max-height: 0;
+  opacity: 0;
 }
 
-.hedis-save-alert-message {
+.hedis-integrated-alert-content {
+  @apply bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 shadow-lg flex items-start;
+}
+
+.hedis-integrated-alert-icon {
+  @apply flex-shrink-0 w-8 h-8 bg-yellow-100 dark:bg-yellow-800 rounded-full flex items-center justify-center text-yellow-600 dark:text-yellow-400;
+}
+
+.hedis-integrated-alert-message {
   @apply flex-1 ml-3;
 }
 
-.hedis-save-alert-title {
-  @apply text-sm font-medium text-green-800 dark:text-green-200;
+.hedis-integrated-alert-title {
+  @apply text-sm font-medium text-yellow-800 dark:text-yellow-200;
 }
 
-.hedis-save-alert-description {
-  @apply text-sm text-green-700 dark:text-green-300 mt-1;
+.hedis-integrated-alert-description {
+  @apply text-sm text-yellow-700 dark:text-yellow-300 mt-1;
 }
 
-.hedis-save-alert-close {
-  @apply flex-shrink-0 ml-3 text-green-400 hover:text-green-600 dark:hover:text-green-300 transition-colors;
+.hedis-integrated-alert-close {
+  @apply flex-shrink-0 ml-3 text-yellow-400 hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors;
+}
+
+/* Success Alert Variant */
+.hedis-integrated-alert-success .hedis-integrated-alert-content {
+  @apply bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-700;
+}
+
+.hedis-integrated-alert-success .hedis-integrated-alert-icon {
+  @apply bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-400;
+}
+
+.hedis-integrated-alert-success .hedis-integrated-alert-title {
+  @apply text-green-800 dark:text-green-200;
+}
+
+.hedis-integrated-alert-success .hedis-integrated-alert-description {
+  @apply text-green-700 dark:text-green-300;
+}
+
+.hedis-integrated-alert-success .hedis-integrated-alert-close {
+  @apply text-green-400 hover:text-green-600 dark:hover:text-green-300;
 }
 
 /* Mobile Responsive Adjustments */

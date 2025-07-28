@@ -2429,10 +2429,8 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
 }
 
 export default function HEDISLandingPage({ 
-  key, 
   onUpdateBreadcrumb 
 }: { 
-  key?: string
   onUpdateBreadcrumb?: (path: string[]) => void 
 }) {
   // State for current view and breadcrumb
@@ -2440,7 +2438,31 @@ export default function HEDISLandingPage({
   const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([])
 
   // Function to update breadcrumbs based on current step
-  
+  const updateBreadcrumbs = (step: number, patientName?: string) => {
+    if (!onUpdateBreadcrumb) return
+    
+    const basePath = ['Dashboard', 'H.E.D.I.S.']
+    
+    if (step === 0) {
+      // Dashboard
+      onUpdateBreadcrumb(basePath)
+    } else if (step === 1) {
+      // Patient Search
+      onUpdateBreadcrumb([...basePath, 'Patient Search'])
+    } else if (step === 2) {
+      // Screening Details
+      const patientDisplay = patientName ? ` - ${patientName}` : ''
+      onUpdateBreadcrumb([...basePath, 'Patient Search', `Screening Details${patientDisplay}`])
+    } else if (step === 3) {
+      // Retinal Images
+      const patientDisplay = patientName ? ` - ${patientName}` : ''
+      onUpdateBreadcrumb([...basePath, 'Patient Search', `Screening Details${patientDisplay}`, 'Retinal Images'])
+    } else if (step === 4) {
+      // Review & Submit
+      const patientDisplay = patientName ? ` - ${patientName}` : ''
+      onUpdateBreadcrumb([...basePath, 'Patient Search', `Screening Details${patientDisplay}`, 'Retinal Images', 'Review & Submit'])
+    }
+  }
 
   // State for screening form
   const [currentScreeningStep, setCurrentScreeningStep] = useState(0)

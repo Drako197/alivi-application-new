@@ -382,7 +382,6 @@ export default function Dashboard() {
         return (
           <div className="dashboard-content">
             <HEDISLandingPage 
-              key={`hedis-desktop-${mobileTabChangeCount.toString()}`} 
               onUpdateBreadcrumb={setBreadcrumbPath}
             />
           </div>
@@ -593,7 +592,7 @@ export default function Dashboard() {
       case 'profile':
         return <MobileProfile />
       case 'hedis':
-        return <HEDISLandingPage key={`hedis-${mobileTabChangeCount.toString()}`} onUpdateBreadcrumb={setBreadcrumbPath} />
+        return <HEDISLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />
       case 'pic':
         return (
           <div className="p-4">

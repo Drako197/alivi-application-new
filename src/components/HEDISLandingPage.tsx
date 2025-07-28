@@ -3348,7 +3348,7 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
           </div>
         </div>
 
-        {/* Secondary Actions */}
+        {/* Secondary Actions and Quick Access - Horizontal Layout */}
         <div className="hedis-secondary-actions-section">
           <div className="hedis-secondary-actions-grid">
             {/* HEDIS Reports */}
@@ -3373,36 +3373,36 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Dashboard Overview - Compact */}
-        <div className="hedis-dashboard-compact">
-          <h3 className="hedis-compact-title">Quick Access</h3>
-          <div className="hedis-compact-grid">
-            {dashboardCards.map((card) => (
-              <div 
-                key={card.id}
-                className={`hedis-compact-card hedis-${card.id}-card group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
-                onClick={() => handleFormCardClick(card.id)}
-              >
-                <div className={`hedis-compact-icon hedis-${card.id}-icon`}>
-                  {getIcon(card.icon)}
-                </div>
-                <div className="hedis-compact-content">
-                  <div className="hedis-compact-header">
-                    <span className="hedis-compact-number">{card.number}</span>
-                    <span className="hedis-compact-label">{card.label}</span>
+            {/* Quick Access */}
+            <div className="hedis-dashboard-compact">
+              <h3 className="hedis-compact-title">Quick Access</h3>
+              <div className="hedis-compact-grid">
+                {dashboardCards.map((card) => (
+                  <div 
+                    key={card.id}
+                    className={`hedis-compact-card hedis-${card.id}-card group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
+                    onClick={() => handleFormCardClick(card.id)}
+                  >
+                    <div className={`hedis-compact-icon hedis-${card.id}-icon`}>
+                      {getIcon(card.icon)}
+                    </div>
+                    <div className="hedis-compact-content">
+                      <div className="hedis-compact-header">
+                        <span className="hedis-compact-number">{card.number}</span>
+                        <span className="hedis-compact-label">{card.label}</span>
+                      </div>
+                      <div className={`hedis-compact-badge ${card.id === 'completed' ? 'hedis-badge-view-only' : 'hedis-badge-continue-editing'}`}>
+                        <span>{card.id === 'completed' ? 'View Only' : 'Continue Editing'}</span>
+                        <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
-                  <div className={`hedis-compact-badge ${card.id === 'completed' ? 'hedis-badge-view-only' : 'hedis-badge-continue-editing'}`}>
-                    <span>{card.id === 'completed' ? 'View Only' : 'Continue Editing'}</span>
-                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>

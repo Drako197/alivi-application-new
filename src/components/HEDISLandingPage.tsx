@@ -2096,7 +2096,7 @@ export default function HEDISLandingPage() {
   const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([])
 
   // State for screening form
-  const [currentScreeningStep, setCurrentScreeningStep] = useState(1)
+  const [currentScreeningStep, setCurrentScreeningStep] = useState(0)
   const [screeningFormData, setScreeningFormData] = useState<{
     details: ScreeningDetails
     images: RetinalImages
@@ -2369,11 +2369,43 @@ export default function HEDISLandingPage() {
         technicianComments: ''
       })
       setErrors(parsedState.errors || {})
-    } else if (step) {
-      // Fallback to URL params if no localStorage
+    } else if (step && step !== '0') {
+      // Only use URL params if step is not 0 (dashboard) and no localStorage
       setCurrentScreeningStep(parseInt(step))
       if (mode) setFormMode(mode as 'new' | 'edit' | 'view')
       if (formId) setCurrentFormId(formId)
+    } else {
+      // Default to dashboard if no valid state
+      setCurrentScreeningStep(0)
+      setFormMode('new')
+      setCurrentFormId(undefined)
+      setSelectedPatient(null)
+      setScreeningDetails({
+        dateOfScreening: '',
+        placeOfService: '',
+        pcpLocation: '',
+        practicePhone: '305-555-5555',
+        practiceFax: '305-555-5556',
+        practiceEmail: 'Contact@gableseyecare.com',
+        practiceName: 'Coral Gables Eye Care',
+        practiceLocation: '2525 Ponce De Leon Blv',
+        officeContact: 'Tom Brady',
+        diabetesMellitus: '',
+        diabetesType: '',
+        lastEyeExam: '',
+        ocularHistory: [],
+        ocularSurgery: [],
+        ocularHistoryOther: '',
+        ocularSurgeryOther: ''
+      })
+      setRetinalImages({
+        rightEyeMissing: false,
+        leftEyeMissing: false,
+        rightEyeImages: [],
+        leftEyeImages: [],
+        technicianComments: ''
+      })
+      setErrors({})
     }
   }, [])
 

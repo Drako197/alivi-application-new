@@ -21,6 +21,8 @@ export default function Dashboard() {
     return saved || 'dashboard'
   })
   
+  const [mobileTabChangeCount, setMobileTabChangeCount] = useState(0)
+  
   const [activeDesktopTab, setActiveDesktopTab] = useState(() => {
     const saved = localStorage.getItem('activeDesktopTab')
     return saved || 'dashboard'
@@ -333,6 +335,7 @@ export default function Dashboard() {
 
   const handleMobileTabChange = (tab: string) => {
     setActiveMobileTab(tab)
+    setMobileTabChangeCount(prev => prev + 1)
   }
 
   const handleDesktopTabChange = (tab: string) => {
@@ -575,7 +578,7 @@ export default function Dashboard() {
       case 'profile':
         return <MobileProfile />
       case 'hedis':
-        return <HEDISLandingPage />
+        return <HEDISLandingPage key={`hedis-${activeMobileTab}-${mobileTabChangeCount}`} />
       case 'pic':
         return (
           <div className="p-4">

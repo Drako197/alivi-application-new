@@ -2090,7 +2090,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
   )
 }
 
-export default function HEDISLandingPage() {
+export default function HEDISLandingPage({ key }: { key?: string }) {
   // State for current view and breadcrumb
   const [currentView, setCurrentView] = useState<'dashboard' | 'screening'>('dashboard')
   const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([])

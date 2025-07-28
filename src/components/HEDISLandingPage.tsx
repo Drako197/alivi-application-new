@@ -1639,148 +1639,208 @@ function ReviewAndSubmitForm({
 
   return (
     <div className="screening-form-content">
-      {/* Summary Header */}
-      <div className="screening-form-section">
-        <div className="flex items-center space-x-3 mb-6">
-          {getIcon('check')}
-          <div>
-            <h3 className="screening-form-section-title">Ready to Submit</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Please review all information before submitting the screening form.
-            </p>
+      {/* Enhanced Header with Status Indicators */}
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-6 mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Review & Submit</h2>
+              <p className="text-gray-600 dark:text-gray-400">All sections completed successfully</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-sm font-medium rounded-full">
+              Ready to Submit
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Patient Information Summary */}
-      <div className="screening-form-section">
-        <h3 className="screening-form-section-title">Patient Information</h3>
-        <div className="screening-form-grid">
-          <div className="screening-form-field">
-            <label className="screening-form-label">Patient Name</label>
-            <div className="screening-form-field-disabled">
-              {patient.firstName} {patient.lastName}
-            </div>
-          </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">Patient ID</label>
-            <div className="screening-form-field-disabled">
-              {patient.patientId}
-            </div>
-          </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">Date of Birth</label>
-            <div className="screening-form-field-disabled">
-              {patient.dateOfBirth}
-            </div>
-          </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">PCP Name</label>
-            <div className="screening-form-field-disabled">
-              {patient.pcpName}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Screening Details Summary */}
-      <div className="screening-form-section">
+      {/* Patient Information Card */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="screening-form-section-title">Screening Details</h3>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Information</h3>
+            <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+              Complete
+            </span>
+          </div>
           <button
-            onClick={() => onEditStep(2)}
-            className="screening-form-button screening-form-button-secondary"
+            onClick={() => onEditStep(1)}
+            className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
           >
-            Edit
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
           </button>
         </div>
-        <div className="screening-form-grid">
-          <div className="screening-form-field">
-            <label className="screening-form-label">Date of Screening</label>
-            <div className="screening-form-field-disabled">
-              {screeningDetails.dateOfScreening || 'Not specified'}
-            </div>
+        
+        {/* Patient Info Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Name:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{patient.firstName} {patient.lastName}</span>
           </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">Place of Service</label>
-            <div className="screening-form-field-disabled">
-              {screeningDetails.placeOfService || 'Not specified'}
-            </div>
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">ID:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{patient.patientId}</span>
           </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">PCP Location</label>
-            <div className="screening-form-field-disabled">
-              {screeningDetails.pcpLocation || 'Not specified'}
-            </div>
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">DOB:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{patient.dateOfBirth}</span>
           </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">Diabetes Mellitus</label>
-            <div className="screening-form-field-disabled">
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">PCP:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{patient.pcpName}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Screening Details Card */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Screening Details</h3>
+            <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+              Complete
+            </span>
+          </div>
+          <button
+            onClick={() => onEditStep(2)}
+            className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
+          </button>
+        </div>
+        
+        {/* Screening Details Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Screening Date:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{screeningDetails.dateOfScreening || 'Not specified'}</span>
+          </div>
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Place of Service:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{screeningDetails.placeOfService || 'Not specified'}</span>
+          </div>
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">PCP Location:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{screeningDetails.pcpLocation || 'Not specified'}</span>
+          </div>
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Diabetes Status:</span>
+            <span className="text-sm text-gray-900 dark:text-white">
               {screeningDetails.diabetesMellitus ? 
                 `${screeningDetails.diabetesMellitus}${screeningDetails.diabetesType ? ` (${screeningDetails.diabetesType})` : ''}` : 
                 'Not specified'}
-            </div>
+            </span>
           </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">Last Eye Exam</label>
-            <div className="screening-form-field-disabled">
-              {screeningDetails.lastEyeExam || 'Not specified'}
-            </div>
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Last Eye Exam:</span>
+            <span className="text-sm text-gray-900 dark:text-white">{screeningDetails.lastEyeExam || 'Not specified'}</span>
           </div>
         </div>
       </div>
 
-      {/* Retinal Images Summary */}
-      <div className="screening-form-section">
+      {/* Retinal Images Card */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="screening-form-section-title">Retinal Images</h3>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Retinal Images</h3>
+            <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+              Complete
+            </span>
+          </div>
           <button
             onClick={() => onEditStep(3)}
-            className="screening-form-button screening-form-button-secondary"
+            className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
           >
-            Edit
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
           </button>
         </div>
-        <div className="screening-form-grid">
-          <div className="screening-form-field">
-            <label className="screening-form-label">Right Eye (OD)</label>
-            <div className="screening-form-field-disabled">
-              {retinalImages.rightEyeMissing ? 'Missing Eye' : 
-               `${retinalImages.rightEyeImages.length} image(s) uploaded`}
-            </div>
+        
+        {/* Image Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <div className={`w-3 h-3 rounded-full ${retinalImages.rightEyeMissing || retinalImages.rightEyeImages.length > 0 ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Right Eye (OD):</span>
+            <span className="text-sm text-gray-900 dark:text-white">
+              {retinalImages.rightEyeMissing ? 'Missing Eye' : `${retinalImages.rightEyeImages.length} image(s)`}
+            </span>
           </div>
-          <div className="screening-form-field">
-            <label className="screening-form-label">Left Eye (OS)</label>
-            <div className="screening-form-field-disabled">
-              {retinalImages.leftEyeMissing ? 'Missing Eye' : 
-               `${retinalImages.leftEyeImages.length} image(s) uploaded`}
-            </div>
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <div className={`w-3 h-3 rounded-full ${retinalImages.leftEyeMissing || retinalImages.leftEyeImages.length > 0 ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Left Eye (OS):</span>
+            <span className="text-sm text-gray-900 dark:text-white">
+              {retinalImages.leftEyeMissing ? 'Missing Eye' : `${retinalImages.leftEyeImages.length} image(s)`}
+            </span>
           </div>
-          {retinalImages.technicianComments && (
-            <div className="screening-form-field col-span-2">
-              <label className="screening-form-label">Technician Comments</label>
-              <div className="screening-form-field-disabled">
-                {retinalImages.technicianComments}
-              </div>
-            </div>
-          )}
         </div>
+        
+        {retinalImages.technicianComments && (
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Technician Comments:</span>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">{retinalImages.technicianComments}</p>
+          </div>
+        )}
       </div>
 
-      {/* Form Actions */}
-      <div className="screening-form-actions">
-        <button
-          onClick={onSave}
-          className="screening-form-button screening-form-button-secondary"
-        >
-          Save for Later
-        </button>
-        <button
-          onClick={onComplete}
-          className="screening-form-button screening-form-button-primary"
-        >
-          Submit Screening
-        </button>
+      {/* Enhanced Action Buttons */}
+      <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={onSave}
+            className="flex items-center space-x-2 px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            <span>Save for Later</span>
+          </button>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            All sections completed
+          </div>
+          <button
+            onClick={onComplete}
+            className="flex items-center space-x-2 px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-lg"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Submit Screening</span>
+          </button>
+        </div>
       </div>
     </div>
   )

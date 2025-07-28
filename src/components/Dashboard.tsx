@@ -375,9 +375,17 @@ export default function Dashboard() {
   const renderDesktopContent = () => {
     switch (activeDesktopTab) {
       case 'hedis':
-        return <HEDISLandingPage />
+        return (
+          <div className="dashboard-content">
+            <HEDISLandingPage key={`hedis-desktop-${mobileTabChangeCount.toString()}`} />
+          </div>
+        )
       case 'pic':
-        return <PICLandingPage />
+        return (
+          <div className="dashboard-content">
+            <PICLandingPage />
+          </div>
+        )
       case 'reports':
         return (
           <div className="dashboard-content">
@@ -578,7 +586,7 @@ export default function Dashboard() {
       case 'profile':
         return <MobileProfile />
       case 'hedis':
-        return <HEDISLandingPage key={`hedis-${activeMobileTab}-${mobileTabChangeCount}`} />
+        return <HEDISLandingPage key={`hedis-${mobileTabChangeCount.toString()}`} />
       case 'pic':
         return (
           <div className="p-4">

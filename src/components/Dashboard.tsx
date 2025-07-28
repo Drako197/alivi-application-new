@@ -367,6 +367,10 @@ export default function Dashboard() {
     if (index === 0) {
       setActiveDesktopTab('dashboard')
       setBreadcrumbPath(['Dashboard'])
+    } else if (index === 1 && breadcrumbPath[1] === 'H.E.D.I.S.') {
+      // Clicking on H.E.D.I.S. should take us back to HEDIS dashboard
+      setActiveDesktopTab('hedis')
+      // The HEDIS component will update the breadcrumb to show just Dashboard > H.E.D.I.S.
     }
     // For future sub-pages, we can add more logic here
   }
@@ -377,7 +381,10 @@ export default function Dashboard() {
       case 'hedis':
         return (
           <div className="dashboard-content">
-            <HEDISLandingPage key={`hedis-desktop-${mobileTabChangeCount.toString()}`} />
+            <HEDISLandingPage 
+              key={`hedis-desktop-${mobileTabChangeCount.toString()}`} 
+              onUpdateBreadcrumb={setBreadcrumbPath}
+            />
           </div>
         )
       case 'pic':
@@ -586,7 +593,7 @@ export default function Dashboard() {
       case 'profile':
         return <MobileProfile />
       case 'hedis':
-        return <HEDISLandingPage key={`hedis-${mobileTabChangeCount.toString()}`} />
+        return <HEDISLandingPage key={`hedis-${mobileTabChangeCount.toString()}`} onUpdateBreadcrumb={setBreadcrumbPath} />
       case 'pic':
         return (
           <div className="p-4">

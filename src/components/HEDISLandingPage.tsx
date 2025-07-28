@@ -2428,10 +2428,19 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
   )
 }
 
-export default function HEDISLandingPage({ key }: { key?: string }) {
+export default function HEDISLandingPage({ 
+  key, 
+  onUpdateBreadcrumb 
+}: { 
+  key?: string
+  onUpdateBreadcrumb?: (path: string[]) => void 
+}) {
   // State for current view and breadcrumb
   const [currentView, setCurrentView] = useState<'dashboard' | 'screening'>('dashboard')
   const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([])
+
+  // Function to update breadcrumbs based on current step
+  
 
   // State for screening form
   const [currentScreeningStep, setCurrentScreeningStep] = useState(0)
@@ -2507,6 +2516,12 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
   const [showPatientSearchModal, setShowPatientSearchModal] = useState(false)
   const [showCompletedScreeningListModal, setShowCompletedScreeningListModal] = useState(false)
   const [showSavedScreeningListModal, setShowSavedScreeningListModal] = useState(false)
+
+  // Update breadcrumbs when step changes
+  useEffect(() => {
+    const patientName = selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : undefined
+    updateBreadcrumbs(currentScreeningStep, patientName)
+  }, [currentScreeningStep, selectedPatient])
 
   // Dashboard stats
   const [dashboardStats, setDashboardStats] = useState({

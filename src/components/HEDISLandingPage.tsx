@@ -2099,30 +2099,32 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
           )}
 
           <div className="hedis-list-search">
-            <input
-              type="text"
-              placeholder="Search by patient name or ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="hedis-list-search-input"
-            />
-            <select
-              value={`${sortBy}-${sortOrder}`}
-              onChange={(e) => {
-                const [newSortBy, newSortOrder] = e.target.value.split('-')
-                setSortBy(newSortBy as 'dateSaved' | 'patientName' | 'progress' | 'urgency')
-                setSortOrder(newSortOrder as 'asc' | 'desc')
-              }}
-              className="hedis-list-sort-select"
-            >
-              <option value="urgency-desc">Urgency (Most Urgent First)</option>
-              <option value="dateSaved-desc">Date Saved (Newest)</option>
-              <option value="dateSaved-asc">Date Saved (Oldest)</option>
-              <option value="patientName-asc">Patient Name (A-Z)</option>
-              <option value="patientName-desc">Patient Name (Z-A)</option>
-              <option value="progress-asc">Progress (Step 1-4)</option>
-              <option value="progress-desc">Progress (Step 4-1)</option>
-            </select>
+            <div className="flex gap-4 items-center">
+              <input
+                type="text"
+                placeholder="Search by patient name or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="hedis-list-search-input flex-1"
+              />
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [newSortBy, newSortOrder] = e.target.value.split('-')
+                  setSortBy(newSortBy as 'dateSaved' | 'patientName' | 'progress' | 'urgency')
+                  setSortOrder(newSortOrder as 'asc' | 'desc')
+                }}
+                className="hedis-list-sort-select"
+              >
+                <option value="urgency-desc">Urgency (Most Urgent First)</option>
+                <option value="dateSaved-desc">Date Saved (Newest)</option>
+                <option value="dateSaved-asc">Date Saved (Oldest)</option>
+                <option value="patientName-asc">Patient Name (A-Z)</option>
+                <option value="patientName-desc">Patient Name (Z-A)</option>
+                <option value="progress-asc">Progress (Step 1-4)</option>
+                <option value="progress-desc">Progress (Step 4-1)</option>
+              </select>
+            </div>
           </div>
 
           <div className="hedis-list-results">

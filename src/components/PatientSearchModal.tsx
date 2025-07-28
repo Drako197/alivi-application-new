@@ -507,7 +507,7 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
               }}
               title={showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
             >
-              <h3 className="patient-search-filters-title">Advanced Filters</h3>
+              <h3 className="patient-search-filters-title px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Advanced Filters</h3>
               <div className="patient-search-filters-toggle">
                 {getIcon(showAdvancedFilters ? 'chevron-up' : 'chevron-down')}
               </div>

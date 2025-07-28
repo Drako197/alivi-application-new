@@ -512,7 +512,7 @@ function ScreeningDetailsForm({
     <div className="space-y-8">
       {/* Patient Screening Details */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
           Patient Screening Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -712,7 +712,7 @@ function ScreeningDetailsForm({
 
       {/* Patient History */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
           Patient History
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

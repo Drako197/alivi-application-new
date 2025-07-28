@@ -517,7 +517,7 @@ export default function Dashboard() {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
                   <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     Submit New Claim
@@ -532,7 +532,7 @@ export default function Dashboard() {
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
                   <div className="flex items-center text-sm">
                     <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
@@ -550,7 +550,7 @@ export default function Dashboard() {
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">System Status</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">System Status</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Claims Processing</span>
@@ -803,7 +803,7 @@ export default function Dashboard() {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
                   <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     Submit New Claim
@@ -818,7 +818,7 @@ export default function Dashboard() {
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
                   <div className="flex items-center text-sm">
                     <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
@@ -836,7 +836,7 @@ export default function Dashboard() {
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">System Status</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">System Status</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Claims Processing</span>

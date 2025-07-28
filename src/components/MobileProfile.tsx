@@ -26,7 +26,7 @@ export default function MobileProfile() {
 
       {/* Quick Actions */}
       <div className="mobile-profile-card">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 transition-all duration-200 ease-in-out">Quick Actions</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg transition-all duration-200 ease-in-out">Quick Actions</h3>
         <div className="space-y-3">
           <button className="mobile-menu-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
             <svg className="w-5 h-5 mr-3 transition-transform duration-200 ease-in-out" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@ export default function MobileProfile() {
 
       {/* Sign Out */}
       <div className="mobile-profile-card">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 transition-all duration-200 ease-in-out">Account</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg transition-all duration-200 ease-in-out">Account</h3>
         <button
           onClick={handleLogout}
           className="mobile-menu-item w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-lg transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"

@@ -227,7 +227,7 @@ export default function DatePicker({
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-gray-900 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
                 {currentMonth.toLocaleDateString('en-US', { 
                   month: 'long'
                 })}

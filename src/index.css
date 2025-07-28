@@ -1619,15 +1619,15 @@ select {
   }
 
   .screening-form-actions {
-    @apply flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700;
+    @apply flex justify-end space-x-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700;
   }
 
   .screening-form-section {
-    @apply space-y-8;
+    @apply space-y-6;
   }
 
   .screening-form-section-title {
-    @apply text-lg font-semibold text-gray-900 dark:text-white mb-4;
+    @apply text-2xl font-bold text-gray-900 dark:text-white mb-8;
   }
 
   .screening-form-grid {
@@ -1647,7 +1647,7 @@ select {
   }
 
   .screening-form-label {
-    @apply block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2;
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
   }
 
   .screening-form-error {
@@ -1667,7 +1667,7 @@ select {
   }
 
   .screening-form-radio-label {
-    @apply ml-2 text-sm text-gray-700 dark:text-gray-300;
+    @apply ml-2 text-sm font-semibold text-gray-700 dark:text-gray-300;
   }
 
   .screening-form-checkbox-group {
@@ -1683,7 +1683,7 @@ select {
   }
 
   .screening-form-checkbox-label {
-    @apply ml-2 text-sm text-gray-700 dark:text-gray-300;
+    @apply ml-2 text-sm font-semibold text-gray-700 dark:text-gray-300;
   }
 
   .screening-form-checkbox-other {
@@ -1728,6 +1728,88 @@ select {
 
   .screening-form-textarea {
     @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  /* New Form Structure Classes */
+  .form-field-group {
+    @apply space-y-1;
+  }
+
+  .form-field-display {
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 bg-gray-50 dark:bg-gray-800 sm:text-sm sm:leading-6;
+  }
+
+  .form-input {
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6;
+  }
+
+  .form-select {
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 appearance-none cursor-pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .form-radio-group {
+    @apply flex space-x-6;
+  }
+
+  .form-radio {
+    @apply flex items-center cursor-pointer;
+  }
+
+  .form-radio-input {
+    @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer;
+  }
+
+  .form-radio-label {
+    @apply ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer;
+  }
+
+  .form-checkbox-group {
+    @apply space-y-3;
+  }
+
+  .form-checkbox {
+    @apply flex items-center cursor-pointer;
+  }
+
+  .form-checkbox-input {
+    @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer;
+  }
+
+  .form-checkbox-label {
+    @apply ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer;
+  }
+
+  .form-error {
+    @apply mt-2 text-sm text-red-600 dark:text-red-400;
+  }
+
+  .form-button {
+    @apply flex items-center px-6 py-3 rounded-lg border transition-colors font-semibold text-sm;
+  }
+
+  .form-button-primary {
+    @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+
+  .form-button-secondary {
+    @apply bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-active {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+  }
+
+  .status-inactive {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
   }
   
   /* Mobile table layout - Force card layout */
@@ -2003,11 +2085,11 @@ select {
 }
 
 .hedis-screening-step-title {
-  @apply text-2xl font-bold text-gray-900 dark:text-white;
+  @apply text-3xl font-bold tracking-tight text-gray-900 dark:text-white mb-4;
 }
 
 .hedis-screening-step-description {
-  @apply text-gray-600 dark:text-gray-400 text-lg;
+  @apply text-lg text-gray-600 dark:text-gray-400 mb-10 font-medium leading-relaxed;
 }
 
 /* Mobile responsive adjustments */
@@ -2039,15 +2121,23 @@ select {
 }
 
 .hedis-search-label {
-  @apply block text-sm font-medium text-gray-700 dark:text-gray-300;
+  @apply block text-base font-bold text-gray-800 dark:text-gray-200 mb-3 tracking-wide;
 }
 
 .hedis-search-input-container {
-  @apply flex space-x-2;
+  @apply flex space-x-2 relative;
 }
 
 .hedis-search-input {
   @apply flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400;
+}
+
+.hedis-search-clear-button {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors;
+}
+
+.hedis-search-hint {
+  @apply mt-2 text-sm text-gray-500 dark:text-gray-400;
 }
 
 .hedis-search-button {
@@ -2067,23 +2157,31 @@ select {
 }
 
 .hedis-result-card {
-  @apply flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors;
+  @apply flex flex-col md:flex-row md:items-center md:justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer;
 }
 
 .hedis-result-info {
-  @apply flex-1;
+  @apply flex-1 mb-3 md:mb-0;
 }
 
 .hedis-result-name {
-  @apply text-lg font-medium text-gray-900 dark:text-white;
+  @apply text-lg font-medium text-gray-900 dark:text-white mb-2;
 }
 
 .hedis-result-details {
-  @apply flex space-x-4 text-sm text-gray-600 dark:text-gray-400 mt-1;
+  @apply flex flex-col space-y-1 text-sm text-gray-600 dark:text-gray-400;
+}
+
+.hedis-result-details span {
+  @apply block;
+}
+
+.hedis-result-action {
+  @apply flex justify-end;
 }
 
 .hedis-select-patient-button {
-  @apply px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors;
+  @apply w-full md:w-auto px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors;
 }
 
 /* HEDIS Form Mode Styles */
@@ -2188,4 +2286,141 @@ select {
 
 .hedis-list-item-action {
   @apply text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors;
+}
+
+/* HEDIS Advanced Filters Styles */
+.hedis-advanced-filters {
+  @apply mt-6;
+}
+
+.hedis-filters-header {
+  @apply flex items-center justify-between;
+}
+
+.hedis-filters-toggle {
+  @apply flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors cursor-pointer;
+}
+
+.hedis-filters-title {
+  @apply text-sm font-medium;
+}
+
+.hedis-filters-content {
+  @apply mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600;
+}
+
+.hedis-filters-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.hedis-filter-group {
+  @apply space-y-2;
+}
+
+.hedis-filter-label {
+  @apply block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2;
+}
+
+.hedis-filter-input {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400;
+}
+
+.hedis-filter-select {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white pr-8 appearance-none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+}
+
+/* Toggle Button Styles */
+.form-toggle-group {
+  @apply flex space-x-1;
+}
+
+.form-toggle-btn {
+  @apply flex-1 px-4 py-2 text-sm font-medium rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+}
+
+.form-toggle-active {
+  @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700;
+}
+
+.form-toggle-inactive {
+  @apply bg-white text-gray-700 border-gray-300 hover:bg-gray-50;
+}
+
+/* Slide Down Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Patient Search No Results */
+.patient-search-no-results {
+  @apply text-center py-8 px-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700;
+}
+
+.patient-search-no-results-icon {
+  @apply flex justify-center mb-4;
+}
+
+.patient-search-no-results-title {
+  @apply text-lg font-semibold text-gray-900 dark:text-white mb-2;
+}
+
+.patient-search-no-results-message {
+  @apply text-gray-600 dark:text-gray-400 mb-4;
+}
+
+.patient-search-no-results-suggestions {
+  @apply text-left bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700;
+}
+
+/* Patient Search Result Cards */
+.patient-search-result-card {
+  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors;
+}
+
+.patient-search-result-content {
+  @apply flex-1;
+}
+
+.patient-search-result-header {
+  @apply flex justify-between items-start mb-2;
+}
+
+.patient-search-result-name {
+  @apply text-lg font-semibold text-gray-900 dark:text-white;
+}
+
+.patient-search-result-id {
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.patient-search-result-details {
+  @apply space-y-1;
+}
+
+.patient-search-result-pcp,
+.patient-search-result-location {
+  @apply text-sm text-gray-600 dark:text-gray-400;
+}
+
+.patient-search-result-actions {
+  @apply flex justify-end mt-3;
+}
+
+.patient-search-select-button {
+  @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium;
 }

@@ -3,8 +3,9 @@ import type { ReactElement } from 'react'
 import { createPortal } from 'react-dom'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
+import DatePicker from './DatePicker'
 
-// Patient Search Step Component
+// TypeScript Interfaces
 interface Patient {
   id: string
   patientId: string
@@ -17,6 +18,34 @@ interface Patient {
   status: 'active' | 'inactive'
 }
 
+interface ScreeningDetails {
+  dateOfScreening: string
+  placeOfService: string
+  pcpLocation: string
+  practicePhone: string
+  practiceFax: string
+  practiceEmail: string
+  practiceName: string
+  practiceLocation: string
+  officeContact: string
+  diabetesMellitus: 'yes' | 'no' | ''
+  diabetesType: 'type1' | 'type2' | ''
+  lastEyeExam: string
+  ocularHistory: string[]
+  ocularSurgery: string[]
+  ocularHistoryOther: string
+  ocularSurgeryOther: string
+}
+
+interface RetinalImages {
+  rightEyeMissing: boolean
+  leftEyeMissing: boolean
+  rightEyeImages: File[]
+  leftEyeImages: File[]
+  technicianComments: string
+}
+
+// Patient Search Step Component
 interface PatientSearchStepProps {
   onPatientSelect: (patient: Patient) => void
   onNextStep: () => void
@@ -26,43 +55,120 @@ function PatientSearchStep({ onPatientSelect, onNextStep }: PatientSearchStepPro
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState<Patient[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [selectedFilters, setSelectedFilters] = useState({
+    pcpName: '',
+    pcpLocation: '',
+    patientStatus: 'all'
+  })
+
+  // Mock patient data for type-ahead
+  const allPatients: Patient[] = [
+    {
+      id: '1',
+      patientId: '12345678',
+      firstName: 'John',
+      lastName: 'Doe',
+      dateOfBirth: '1985-03-15',
+      pcpName: 'Dr. Sarah Johnson',
+      pcpLocation: 'Downtown Medical Center',
+      lastVisit: '2024-01-15',
+      status: 'active'
+    },
+    {
+      id: '2',
+      patientId: '87654321',
+      firstName: 'Jane',
+      lastName: 'Smith',
+      dateOfBirth: '1990-07-22',
+      pcpName: 'Dr. Michael Chen',
+      pcpLocation: 'Westside Clinic',
+      lastVisit: '2024-02-10',
+      status: 'active'
+    },
+    {
+      id: '3',
+      patientId: '11223344',
+      firstName: 'Robert',
+      lastName: 'Wilson',
+      dateOfBirth: '1978-11-05',
+      pcpName: 'Dr. Sarah Johnson',
+      pcpLocation: 'Downtown Medical Center',
+      lastVisit: '2024-01-20',
+      status: 'active'
+    },
+    {
+      id: '4',
+      patientId: '55667788',
+      firstName: 'Alice',
+      lastName: 'Johnson',
+      dateOfBirth: '1992-04-12',
+      pcpName: 'Dr. Michael Chen',
+      pcpLocation: 'Westside Clinic',
+      lastVisit: '2024-02-15',
+      status: 'active'
+    },
+    {
+      id: '5',
+      patientId: '99887766',
+      firstName: 'David',
+      lastName: 'Brown',
+      dateOfBirth: '1983-09-18',
+      pcpName: 'Dr. Sarah Johnson',
+      pcpLocation: 'Downtown Medical Center',
+      lastVisit: '2024-01-25',
+      status: 'active'
+    }
+  ]
+
+  // Type-ahead filtering
+  const filteredPatients = allPatients.filter(patient => {
+    const matchesSearch = 
+      patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.patientId.includes(searchTerm) ||
+      `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesPcpName = !selectedFilters.pcpName || 
+      patient.pcpName.toLowerCase().includes(selectedFilters.pcpName.toLowerCase())
+    
+    const matchesPcpLocation = !selectedFilters.pcpLocation || 
+      patient.pcpLocation === selectedFilters.pcpLocation
+    
+    const matchesStatus = selectedFilters.patientStatus === 'all' || 
+      patient.status === selectedFilters.patientStatus
+    
+    return matchesSearch && matchesPcpName && matchesPcpLocation && matchesStatus
+  })
 
   const handleSearch = async () => {
     setIsSearching(true)
     // Simulate search delay
     setTimeout(() => {
-      const mockResults: Patient[] = [
-        {
-          id: '1',
-          patientId: '12345678',
-          firstName: 'John',
-          lastName: 'Doe',
-          dateOfBirth: '1985-03-15',
-          pcpName: 'Dr. Sarah Johnson',
-          pcpLocation: 'Downtown Medical Center',
-          lastVisit: '2024-01-15',
-          status: 'active'
-        },
-        {
-          id: '2',
-          patientId: '87654321',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          dateOfBirth: '1990-07-22',
-          pcpName: 'Dr. Michael Chen',
-          pcpLocation: 'Westside Clinic',
-          lastVisit: '2024-02-10',
-          status: 'active'
-        }
-      ]
-      setSearchResults(mockResults)
+      setSearchResults(filteredPatients)
       setIsSearching(false)
-    }, 1000)
+    }, 500)
   }
+
+  // Update search results when search term or filters change
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      setSearchResults(filteredPatients)
+    } else {
+      setSearchResults([])
+    }
+  }, [searchTerm, selectedFilters])
 
   const handlePatientSelect = (patient: Patient) => {
     onPatientSelect(patient)
     onNextStep()
+  }
+
+  const handleFilterChange = (filterName: string, value: string) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterName]: value
+    }))
   }
 
   return (
@@ -78,52 +184,1224 @@ function PatientSearchStep({ onPatientSelect, onNextStep }: PatientSearchStepPro
               placeholder="Enter Patient ID (8 digits) or patient name..."
               className="hedis-search-input"
             />
-            <button
-              onClick={handleSearch}
-              disabled={!searchTerm.trim() || isSearching}
-              className="hedis-search-button"
-            >
-              {isSearching ? (
-                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-              ) : (
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="hedis-search-clear-button"
+                aria-label="Clear search"
+              >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-              )}
-            </button>
+              </button>
+            )}
           </div>
+          {searchTerm && (
+            <div className="hedis-search-hint">
+              <p>Type to see matching patients...</p>
+            </div>
+          )}
         </div>
 
-        {searchResults.length > 0 && (
-          <div className="hedis-search-results">
-            <h3 className="hedis-results-title">Search Results</h3>
-            <div className="hedis-results-list">
-              {searchResults.map((patient) => (
-                <div key={patient.id} className="hedis-result-card">
-                  <div className="hedis-result-info">
-                    <div className="hedis-result-name">
-                      {patient.firstName} {patient.lastName}
+        {/* Advanced Filters */}
+        <div className="hedis-advanced-filters">
+          <div className="hedis-filters-header">
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="hedis-filters-toggle"
+            >
+              <span className="hedis-filters-title">Advanced Filters</span>
+              <svg 
+                className={`w-5 h-5 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+
+          {showAdvancedFilters && (
+            <div className="hedis-filters-content">
+              <div className="hedis-filters-grid">
+                <div className="hedis-filter-group">
+                  <label className="hedis-filter-label">PCP Name</label>
+                  <input
+                    type="text"
+                    value={selectedFilters.pcpName}
+                    onChange={(e) => handleFilterChange('pcpName', e.target.value)}
+                    placeholder="Search by PCP name..."
+                    className="hedis-filter-input"
+                  />
+                </div>
+
+                <div className="hedis-filter-group">
+                  <label className="hedis-filter-label">PCP Location</label>
+                  <select
+                    value={selectedFilters.pcpLocation}
+                    onChange={(e) => handleFilterChange('pcpLocation', e.target.value)}
+                    className="hedis-filter-select"
+                  >
+                    <option value="">All Locations</option>
+                    <option value="Downtown Medical Center">Downtown Medical Center</option>
+                    <option value="Westside Clinic">Westside Clinic</option>
+                    <option value="Northside Hospital">Northside Hospital</option>
+                    <option value="Eastside Medical Group">Eastside Medical Group</option>
+                  </select>
+                </div>
+
+                <div className="hedis-filter-group">
+                  <label className="hedis-filter-label">Patient Status</label>
+                  <select
+                    value={selectedFilters.patientStatus}
+                    onChange={(e) => handleFilterChange('patientStatus', e.target.value)}
+                    className="hedis-filter-select"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Search Results */}
+        {searchTerm && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Search Results
+            </h3>
+            
+            {searchResults.length > 0 ? (
+              <div className="space-y-3">
+                {searchResults.map((patient) => (
+                  <div
+                    key={patient.id}
+                    onClick={() => handlePatientSelect(patient)}
+                    className="patient-search-result-card cursor-pointer"
+                  >
+                    <div className="patient-search-result-content">
+                      <div className="patient-search-result-header">
+                        <h4 className="patient-search-result-name">
+                          {patient.firstName} {patient.lastName}
+                        </h4>
+                        <span className="patient-search-result-id">
+                          ID: {patient.patientId}
+                        </span>
+                      </div>
+                      <div className="patient-search-result-details">
+                        <p className="patient-search-result-pcp">
+                          PCP: {patient.pcpName}
+                        </p>
+                        <p className="patient-search-result-location">
+                          Location: {patient.pcpLocation}
+                        </p>
+                      </div>
                     </div>
-                    <div className="hedis-result-details">
-                      <span>ID: {patient.patientId}</span>
-                      <span>DOB: {patient.dateOfBirth}</span>
-                      <span>PCP: {patient.pcpName}</span>
+                    <div className="patient-search-result-actions">
+                      <button className="patient-search-select-button">
+                        Start Screening
+                      </button>
                     </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              <div className="patient-search-no-results">
+                <div className="patient-search-no-results-icon">
+                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <h4 className="patient-search-no-results-title">
+                  No patients found
+                </h4>
+                <p className="patient-search-no-results-message">
+                  No patients match your search criteria. Try updating your search terms or adjusting the filters above.
+                </p>
+                <div className="patient-search-no-results-suggestions">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Suggestions:</strong>
+                  </p>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 mt-2 space-y-1">
+                    <li>• Check the spelling of the patient name or ID</li>
+                    <li>• Try searching by just the first or last name</li>
+                    <li>• Use the advanced filters to narrow your search</li>
+                    <li>• Clear filters if you've applied too many restrictions</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Screening Details Form Component
+interface ScreeningDetailsFormProps {
+  patient: Patient
+  screeningDetails: ScreeningDetails
+  setScreeningDetails: (details: ScreeningDetails) => void
+  errors: { [key: string]: string }
+  setErrors: (errors: { [key: string]: string }) => void
+  onNextStep: () => void
+  onPreviousStep: () => void
+  updateScreeningStep: (step: number, mode?: 'new' | 'edit' | 'view' | 'dashboard', formId?: string) => void
+  currentFormId: string | undefined
+  selectedPatient: Patient | null
+  currentScreeningStep: number
+  savedForms: any[]
+  setSavedForms: (forms: any[]) => void
+  setDashboardStats: (stats: any) => void
+  setSelectedPatient: (patient: Patient | null) => void
+  setCurrentFormId: (formId: string | undefined) => void
+}
+
+function ScreeningDetailsForm({ 
+  patient, 
+  screeningDetails, 
+  setScreeningDetails, 
+  errors,
+  setErrors,
+  onNextStep,
+  onPreviousStep,
+  updateScreeningStep,
+  currentFormId,
+  selectedPatient,
+  currentScreeningStep,
+  savedForms,
+  setSavedForms,
+  setDashboardStats,
+  setSelectedPatient,
+  setCurrentFormId
+}: ScreeningDetailsFormProps) {
+  const handleInputChange = (field: keyof ScreeningDetails, value: any) => {
+    setScreeningDetails({ ...screeningDetails, [field]: value })
+  }
+
+  const handleRadioChange = (field: keyof ScreeningDetails, value: any) => {
+    setScreeningDetails({ ...screeningDetails, [field]: value })
+  }
+
+  const handleCheckboxChange = (field: 'ocularHistory' | 'ocularSurgery', value: string, checked: boolean) => {
+    const currentValues = screeningDetails[field]
+    const newValues = checked 
+      ? [...currentValues, value]
+      : currentValues.filter(v => v !== value)
+    setScreeningDetails({ ...screeningDetails, [field]: newValues })
+  }
+
+  // Validation function
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {}
+
+    // Required fields validation
+    if (!screeningDetails.dateOfScreening) {
+      newErrors.dateOfScreening = 'Date of screening is required'
+    }
+
+    if (!screeningDetails.placeOfService) {
+      newErrors.placeOfService = 'Place of service is required'
+    }
+
+    if (!screeningDetails.pcpLocation) {
+      newErrors.pcpLocation = 'PCP location is required'
+    }
+
+    // DM validation
+    if (!screeningDetails.diabetesMellitus) {
+      newErrors.diabetesMellitus = 'Please select DM status'
+    }
+
+    // DM Type validation (only if DM is 'yes')
+    if (screeningDetails.diabetesMellitus === 'yes' && !screeningDetails.diabetesType) {
+      newErrors.diabetesType = 'Please select diabetes type'
+    }
+
+    // Ocular History validation
+    if (screeningDetails.ocularHistory.length === 0) {
+      newErrors.ocularHistory = 'Please select at least one ocular history option'
+    }
+
+    // Ocular History Other validation
+    if (screeningDetails.ocularHistory.includes('Other') && !screeningDetails.ocularHistoryOther.trim()) {
+      newErrors.ocularHistoryOther = 'Please specify other ocular history'
+    }
+
+    // Ocular Surgery validation
+    if (screeningDetails.ocularSurgery.length === 0) {
+      newErrors.ocularSurgery = 'Please select at least one ocular surgery option'
+    }
+
+    // Ocular Surgery Other validation
+    if (screeningDetails.ocularSurgery.includes('Other') && !screeningDetails.ocularSurgeryOther.trim()) {
+      newErrors.ocularSurgeryOther = 'Please specify other ocular surgery'
+    }
+
+    // Update errors state
+    setErrors(newErrors)
+    
+    return Object.keys(newErrors).length === 0
+  }
+
+  // Handle Next button click with validation
+  const handleNextClick = () => {
+    if (validateForm()) {
+      onNextStep()
+    } else {
+      // Scroll to first error
+      const firstErrorElement = document.querySelector('[data-error="true"]')
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }
+  }
+
+  const getIcon = (iconName: string): ReactElement => {
+    const iconMap: { [key: string]: ReactElement } = {
+      calendar: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      user: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      building: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      ),
+      phone: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+      ),
+      eye: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      )
+    }
+    return iconMap[iconName] || <></>
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Patient Screening Details */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Patient Screening Details
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Date of Screening */}
+          <div data-error={!!errors.dateOfScreening}>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Date of Screening *
+            </label>
+            <DatePicker
+              name="dateOfScreening"
+              value={screeningDetails.dateOfScreening}
+              onChange={(date) => handleInputChange('dateOfScreening', date)}
+              placeholder="Date of Screening"
+              className={errors.dateOfScreening ? 'border-red-300' : ''}
+            />
+            {errors.dateOfScreening && (
+              <p className="mt-1 text-sm text-red-600">{errors.dateOfScreening}</p>
+            )}
+          </div>
+
+          {/* Patient Name */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Patient Name
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {patient.firstName} {patient.lastName}
+            </div>
+          </div>
+
+          {/* Place of Service */}
+          <div data-error={!!errors.placeOfService}>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Place of Service *
+            </label>
+            <select
+              name="placeOfService"
+              value={screeningDetails.placeOfService}
+              onChange={(e) => handleInputChange('placeOfService', e.target.value)}
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-8 appearance-none bg-white ${
+                errors.placeOfService ? 'border-red-300' : 'border-gray-300'
+              }`}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                backgroundPosition: 'right 0.5rem center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '1.5em 1.5em'
+              }}
+            >
+              <option value="">Place of Service</option>
+              <option value="11">11 - Doctor's Office</option>
+              <option value="12">12 - Patient's Home</option>
+              <option value="15">15 - Mobile Unit</option>
+              <option value="99">99 - Other Unlisted Facility</option>
+            </select>
+            {errors.placeOfService && (
+              <p className="mt-1 text-sm text-red-600">{errors.placeOfService}</p>
+            )}
+          </div>
+
+          {/* PCP Location */}
+          <div data-error={!!errors.pcpLocation}>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              PCP Location *
+            </label>
+            <select
+              name="pcpLocation"
+              value={screeningDetails.pcpLocation}
+              onChange={(e) => handleInputChange('pcpLocation', e.target.value)}
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-8 appearance-none bg-white ${
+                errors.pcpLocation ? 'border-red-300' : 'border-gray-300'
+              }`}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                backgroundPosition: 'right 0.5rem center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '1.5em 1.5em'
+              }}
+            >
+              <option value="">PCP Location</option>
+              <option value="Downtown Medical Center">Downtown Medical Center</option>
+              <option value="Westside Clinic">Westside Clinic</option>
+              <option value="Northside Hospital">Northside Hospital</option>
+              <option value="Eastside Medical Group">Eastside Medical Group</option>
+            </select>
+            {errors.pcpLocation && (
+              <p className="mt-1 text-sm text-red-600">{errors.pcpLocation}</p>
+            )}
+          </div>
+
+          {/* Practice Phone */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Practice Phone
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {screeningDetails.practicePhone || '305-555-5555'}
+            </div>
+          </div>
+
+          {/* PCP Name */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              PCP Name
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {patient.pcpName}
+            </div>
+          </div>
+
+          {/* Patient Date of Birth */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Patient Date of Birth
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {patient.dateOfBirth}
+            </div>
+          </div>
+
+          {/* Health Insurance Plan */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Health Insurance Plan
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              Aetna
+            </div>
+          </div>
+
+          {/* Patient ID */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Patient ID
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {patient.patientId}
+            </div>
+          </div>
+
+          {/* Practice Name */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Practice Name
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {screeningDetails.practiceName || 'Coral Gables Eye Care'}
+            </div>
+          </div>
+
+          {/* Last Visit */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Last Visit
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {patient.lastVisit}
+            </div>
+          </div>
+
+          {/* Practice Location */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Practice Location
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {screeningDetails.practiceLocation || '2525 Ponce De Leon Blv'}
+            </div>
+          </div>
+
+          {/* Patient Status */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Patient Status
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                patient.status === 'active' 
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+              }`}>
+                {patient.status === 'active' ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+
+          {/* Practice Fax */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Practice Fax
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {screeningDetails.practiceFax || '305-555-5556'}
+            </div>
+          </div>
+
+          {/* Practice Email */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Practice Email
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {screeningDetails.practiceEmail || 'Contact@gableseyecare.com'}
+            </div>
+          </div>
+
+          {/* Office Contact */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Office Contact
+            </label>
+            <div className="text-gray-900 dark:text-white">
+              {screeningDetails.officeContact || 'Tom Brady'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Patient History */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Patient History
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* DM (Diabetes Mellitus) */}
+          <div data-error={!!errors.diabetesMellitus || !!errors.diabetesType}>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
+              DM *
+            </label>
+            <div className="space-y-3">
+              {/* DM Toggle Buttons */}
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleInputChange('diabetesMellitus', 'yes')
+                    if (screeningDetails.diabetesMellitus === 'no') {
+                      handleInputChange('diabetesType', '')
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    screeningDetails.diabetesMellitus === 'yes'
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleInputChange('diabetesMellitus', 'no')
+                    handleInputChange('diabetesType', '')
+                  }}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    screeningDetails.diabetesMellitus === 'no'
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  No
+                </button>
+              </div>
+
+              {/* Type Options - Only show when 'yes' is selected */}
+              {screeningDetails.diabetesMellitus === 'yes' && (
+                <div className="ml-6 border-l-2 border-gray-200 dark:border-gray-600 pl-4 animate-slide-down">
+                  <label className="block text-sm font-extrabold text-gray-600 dark:text-gray-400 mb-2">
+                    Type *
+                  </label>
+                  <div className="flex space-x-6">
+                    {[
+                      { value: 'type1', label: 'Type I' },
+                      { value: 'type2', label: 'Type II' }
+                    ].map((option) => (
+                      <label key={option.value} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="diabetesType"
+                          value={option.value}
+                          checked={screeningDetails.diabetesType === option.value}
+                          onChange={(e) => handleInputChange('diabetesType', e.target.value)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
+                        />
+                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                          {option.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  {errors.diabetesType && (
+                    <p className="mt-1 text-sm text-red-600">{errors.diabetesType}</p>
+                  )}
+                </div>
+              )}
+            </div>
+            {errors.diabetesMellitus && (
+              <p className="mt-1 text-sm text-red-600">{errors.diabetesMellitus}</p>
+            )}
+          </div>
+
+          {/* Last Eye Exam */}
+          <div>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Last Eye Exam (Optional)
+            </label>
+            <DatePicker
+              name="lastEyeExam"
+              value={screeningDetails.lastEyeExam}
+              onChange={(date) => handleInputChange('lastEyeExam', date)}
+              placeholder="Last Eye Exam"
+            />
+            {errors.lastEyeExam && (
+              <p className="mt-1 text-sm text-red-600">{errors.lastEyeExam}</p>
+            )}
+          </div>
+
+          {/* Ocular HX */}
+          <div data-error={!!errors.ocularHistory || !!errors.ocularHistoryOther}>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
+              Ocular HX *
+            </label>
+            <div className="space-y-2">
+              {[
+                { value: 'Glaucoma', label: 'Glaucoma' },
+                { value: 'Retinal Detachment', label: 'Retinal Detachment' },
+                { value: 'Macular Degeneration', label: 'Macular Degeneration' },
+                { value: 'Other', label: 'Other' }
+              ].map((option) => (
+                <label key={option.value} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="ocularHistory"
+                    value={option.value}
+                    checked={screeningDetails.ocularHistory.includes(option.value)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        handleCheckboxChange('ocularHistory', option.value, true)
+                      } else {
+                        handleCheckboxChange('ocularHistory', option.value, false)
+                      }
+                    }}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                    {option.label}
+                  </span>
+                  {option.value === 'Other' && screeningDetails.ocularHistory.includes('Other') && (
+                    <input
+                      type="text"
+                      name="ocularHistoryOther"
+                      value={screeningDetails.ocularHistoryOther}
+                      onChange={(e) => handleInputChange('ocularHistoryOther', e.target.value)}
+                      placeholder="Specify other"
+                      className="ml-2 flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  )}
+                </label>
+              ))}
+            </div>
+            {errors.ocularHistory && (
+              <p className="mt-1 text-sm text-red-600">{errors.ocularHistory}</p>
+            )}
+            {errors.ocularHistoryOther && (
+              <p className="mt-1 text-sm text-red-600">{errors.ocularHistoryOther}</p>
+            )}
+          </div>
+
+          {/* Ocular SX */}
+          <div data-error={!!errors.ocularSurgery || !!errors.ocularSurgeryOther}>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
+              Ocular SX *
+            </label>
+            <div className="space-y-2">
+              {[
+                { value: 'Cataract', label: 'Cataract' },
+                { value: 'Laser', label: 'Laser' },
+                { value: 'Other', label: 'Other' }
+              ].map((option) => (
+                <label key={option.value} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="ocularSurgery"
+                    value={option.value}
+                    checked={screeningDetails.ocularSurgery.includes(option.value)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        handleCheckboxChange('ocularSurgery', option.value, true)
+                      } else {
+                        handleCheckboxChange('ocularSurgery', option.value, false)
+                      }
+                    }}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                    {option.label}
+                  </span>
+                  {option.value === 'Other' && screeningDetails.ocularSurgery.includes('Other') && (
+                    <input
+                      type="text"
+                      name="ocularSurgeryOther"
+                      value={screeningDetails.ocularSurgeryOther}
+                      onChange={(e) => handleInputChange('ocularSurgeryOther', e.target.value)}
+                      placeholder="Specify other"
+                      className="ml-2 flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  )}
+                </label>
+              ))}
+            </div>
+            {errors.ocularSurgery && (
+              <p className="mt-1 text-sm text-red-600">{errors.ocularSurgery}</p>
+            )}
+            {errors.ocularSurgeryOther && (
+              <p className="mt-1 text-sm text-red-600">{errors.ocularSurgeryOther}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-700">
+        {/* Left side - Close & Don't Save */}
+        <button
+          onClick={() => {
+            // Reset form and go back to dashboard
+            setScreeningDetails({
+              dateOfScreening: '',
+              placeOfService: '',
+              pcpLocation: '',
+              practicePhone: '305-555-5555',
+              practiceFax: '305-555-5556',
+              practiceEmail: 'Contact@gableseyecare.com',
+              practiceName: 'Coral Gables Eye Care',
+              practiceLocation: '2525 Ponce De Leon Blv',
+              officeContact: 'Tom Brady',
+              diabetesMellitus: '',
+              diabetesType: '',
+              lastEyeExam: '',
+              ocularHistory: [],
+              ocularSurgery: [],
+              ocularHistoryOther: '',
+              ocularSurgeryOther: ''
+            })
+            setErrors({})
+            setSelectedPatient(null)
+            setCurrentFormId(undefined)
+            localStorage.removeItem('hedisScreeningState')
+            updateScreeningStep(0, 'dashboard', undefined)
+          }}
+          className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span>Close & Don't Save</span>
+        </button>
+
+        {/* Center - Save for Later */}
+        <button
+          onClick={() => {
+            // Save current progress and go back to dashboard
+            const savedForm = {
+              id: currentFormId || `form_${Date.now()}`,
+              patient: selectedPatient,
+              screeningDetails: screeningDetails,
+              currentStep: currentScreeningStep,
+              savedAt: new Date().toISOString(),
+              status: 'saved'
+            }
+            
+            // Add to saved forms list
+            const updatedSavedForms = [...savedForms, savedForm]
+            setSavedForms(updatedSavedForms)
+            
+            // Update dashboard count
+            setDashboardStats((prev: { completedPatientForms: number; savedPatientForms: number }) => ({
+              ...prev,
+              savedPatientForms: prev.savedPatientForms + 1
+            }))
+            
+            // Show success message
+            alert('Form saved for later! You have 5 business days to complete this form.')
+            
+            // Reset and go back to dashboard
+            setScreeningDetails({
+              dateOfScreening: '',
+              placeOfService: '',
+              pcpLocation: '',
+              practicePhone: '305-555-5555',
+              practiceFax: '305-555-5556',
+              practiceEmail: 'Contact@gableseyecare.com',
+              practiceName: 'Coral Gables Eye Care',
+              practiceLocation: '2525 Ponce De Leon Blv',
+              officeContact: 'Tom Brady',
+              diabetesMellitus: '',
+              diabetesType: '',
+              lastEyeExam: '',
+              ocularHistory: [],
+              ocularSurgery: [],
+              ocularHistoryOther: '',
+              ocularSurgeryOther: ''
+            })
+            setErrors({})
+            setSelectedPatient(null)
+            setCurrentFormId(undefined)
+            localStorage.removeItem('hedisScreeningState')
+            updateScreeningStep(0, 'dashboard', undefined)
+          }}
+          className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          <span>Save for Later</span>
+        </button>
+
+        {/* Right side - Continue */}
+        <button
+          onClick={handleNextClick}
+          className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <span>Continue</span>
+          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Retinal Images Form Component
+interface RetinalImagesFormProps {
+  retinalImages: RetinalImages
+  setRetinalImages: (images: RetinalImages) => void
+  errors: { [key: string]: string }
+  onNextStep: () => void
+  onPreviousStep: () => void
+}
+
+function RetinalImagesForm({ 
+  retinalImages, 
+  setRetinalImages, 
+  errors,
+  onNextStep,
+  onPreviousStep
+}: RetinalImagesFormProps) {
+  const handleInputChange = (field: keyof RetinalImages, value: any) => {
+    setRetinalImages({ ...retinalImages, [field]: value })
+  }
+
+  const handleImageUpload = (eye: 'right' | 'left', files: FileList | null) => {
+    if (!files) return
+    
+    const newImages = Array.from(files)
+    const currentImages = eye === 'right' ? retinalImages.rightEyeImages : retinalImages.leftEyeImages
+    const updatedImages = [...currentImages, ...newImages].slice(0, 3) // Max 3 images per eye
+    
+    if (eye === 'right') {
+      setRetinalImages({ ...retinalImages, rightEyeImages: updatedImages })
+    } else {
+      setRetinalImages({ ...retinalImages, leftEyeImages: updatedImages })
+    }
+  }
+
+  const removeImage = (eye: 'right' | 'left', index: number) => {
+    const currentImages = eye === 'right' ? retinalImages.rightEyeImages : retinalImages.leftEyeImages
+    const updatedImages = currentImages.filter((_, i) => i !== index)
+    
+    if (eye === 'right') {
+      setRetinalImages({ ...retinalImages, rightEyeImages: updatedImages })
+    } else {
+      setRetinalImages({ ...retinalImages, leftEyeImages: updatedImages })
+    }
+  }
+
+  return (
+    <div className="screening-form-content">
+      {/* Right Eye Section */}
+      <div className="screening-form-section">
+        <h3 className="screening-form-section-title">Right Eye (OD)</h3>
+        <div className="screening-form-field">
+          <label className="screening-form-label">
+            <input
+              type="checkbox"
+              checked={retinalImages.rightEyeMissing}
+              onChange={(e) => handleInputChange('rightEyeMissing', e.target.checked)}
+              className="mr-2"
+            />
+            Missing Eye
+          </label>
+        </div>
+        
+        {!retinalImages.rightEyeMissing && (
+          <div className="screening-form-image-upload">
+            <label className="screening-form-label">Retinal Images (Max 3)</label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => handleImageUpload('right', e.target.files)}
+              className="screening-form-upload-button"
+              name="rightEyeImages"
+            />
+            <div className="screening-form-image-preview">
+              {retinalImages.rightEyeImages.map((file, index) => (
+                <div key={index} className="screening-form-image">
+                  <img 
+                    src={URL.createObjectURL(file)} 
+                    alt={`Right eye image ${index + 1}`}
+                    className="w-20 h-20 object-cover rounded"
+                  />
                   <button
-                    onClick={() => handlePatientSelect(patient)}
-                    className="hedis-select-patient-button"
+                    onClick={() => removeImage('right', index)}
+                    className="screening-form-image-remove"
                   >
-                    Select Patient
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
               ))}
             </div>
           </div>
         )}
+      </div>
+
+      {/* Left Eye Section */}
+      <div className="screening-form-section">
+        <h3 className="screening-form-section-title">Left Eye (OS)</h3>
+        <div className="screening-form-field">
+          <label className="screening-form-label">
+            <input
+              type="checkbox"
+              checked={retinalImages.leftEyeMissing}
+              onChange={(e) => handleInputChange('leftEyeMissing', e.target.checked)}
+              className="mr-2"
+            />
+            Missing Eye
+          </label>
+        </div>
+        
+        {!retinalImages.leftEyeMissing && (
+          <div className="screening-form-image-upload">
+            <label className="screening-form-label">Retinal Images (Max 3)</label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => handleImageUpload('left', e.target.files)}
+              className="screening-form-upload-button"
+              name="leftEyeImages"
+            />
+            <div className="screening-form-image-preview">
+              {retinalImages.leftEyeImages.map((file, index) => (
+                <div key={index} className="screening-form-image">
+                  <img 
+                    src={URL.createObjectURL(file)} 
+                    alt={`Left eye image ${index + 1}`}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                  <button
+                    onClick={() => removeImage('left', index)}
+                    className="screening-form-image-remove"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Technician Comments */}
+      <div className="screening-form-section">
+        <h3 className="screening-form-section-title">Technician Comments</h3>
+        <div className="screening-form-field">
+          <textarea
+            value={retinalImages.technicianComments}
+            onChange={(e) => handleInputChange('technicianComments', e.target.value)}
+            placeholder="Enter any additional comments or observations..."
+            className="screening-form-textarea"
+            rows={4}
+            name="technicianComments"
+          />
+          {errors.technicianComments && (
+            <div className="screening-form-error">{errors.technicianComments}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="screening-form-actions">
+        <button
+          onClick={onPreviousStep}
+          className="screening-form-button screening-form-button-secondary"
+        >
+          Previous
+        </button>
+        <button
+          onClick={onNextStep}
+          className="screening-form-button screening-form-button-primary"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Review and Submit Form Component
+interface ReviewAndSubmitFormProps {
+  patient: Patient
+  screeningDetails: ScreeningDetails
+  retinalImages: RetinalImages
+  onEditStep: (step: number) => void
+  onComplete: () => void
+  onSave: () => void
+}
+
+function ReviewAndSubmitForm({ 
+  patient, 
+  screeningDetails, 
+  retinalImages, 
+  onEditStep,
+  onComplete,
+  onSave
+}: ReviewAndSubmitFormProps) {
+  const getIcon = (iconName: string): ReactElement => {
+    const iconMap: { [key: string]: ReactElement } = {
+      user: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      calendar: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      eye: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      ),
+      check: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    }
+    return iconMap[iconName] || <></>
+  }
+
+  return (
+    <div className="screening-form-content">
+      {/* Summary Header */}
+      <div className="screening-form-section">
+        <div className="flex items-center space-x-3 mb-6">
+          {getIcon('check')}
+          <div>
+            <h3 className="screening-form-section-title">Ready to Submit</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Please review all information before submitting the screening form.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Patient Information Summary */}
+      <div className="screening-form-section">
+        <h3 className="screening-form-section-title">Patient Information</h3>
+        <div className="screening-form-grid">
+          <div className="screening-form-field">
+            <label className="screening-form-label">Patient Name</label>
+            <div className="screening-form-field-disabled">
+              {patient.firstName} {patient.lastName}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">Patient ID</label>
+            <div className="screening-form-field-disabled">
+              {patient.patientId}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">Date of Birth</label>
+            <div className="screening-form-field-disabled">
+              {patient.dateOfBirth}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">PCP Name</label>
+            <div className="screening-form-field-disabled">
+              {patient.pcpName}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Screening Details Summary */}
+      <div className="screening-form-section">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="screening-form-section-title">Screening Details</h3>
+          <button
+            onClick={() => onEditStep(2)}
+            className="screening-form-button screening-form-button-secondary"
+          >
+            Edit
+          </button>
+        </div>
+        <div className="screening-form-grid">
+          <div className="screening-form-field">
+            <label className="screening-form-label">Date of Screening</label>
+            <div className="screening-form-field-disabled">
+              {screeningDetails.dateOfScreening || 'Not specified'}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">Place of Service</label>
+            <div className="screening-form-field-disabled">
+              {screeningDetails.placeOfService || 'Not specified'}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">PCP Location</label>
+            <div className="screening-form-field-disabled">
+              {screeningDetails.pcpLocation || 'Not specified'}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">Diabetes Mellitus</label>
+            <div className="screening-form-field-disabled">
+              {screeningDetails.diabetesMellitus ? 
+                `${screeningDetails.diabetesMellitus}${screeningDetails.diabetesType ? ` (${screeningDetails.diabetesType})` : ''}` : 
+                'Not specified'}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">Last Eye Exam</label>
+            <div className="screening-form-field-disabled">
+              {screeningDetails.lastEyeExam || 'Not specified'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Retinal Images Summary */}
+      <div className="screening-form-section">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="screening-form-section-title">Retinal Images</h3>
+          <button
+            onClick={() => onEditStep(3)}
+            className="screening-form-button screening-form-button-secondary"
+          >
+            Edit
+          </button>
+        </div>
+        <div className="screening-form-grid">
+          <div className="screening-form-field">
+            <label className="screening-form-label">Right Eye (OD)</label>
+            <div className="screening-form-field-disabled">
+              {retinalImages.rightEyeMissing ? 'Missing Eye' : 
+               `${retinalImages.rightEyeImages.length} image(s) uploaded`}
+            </div>
+          </div>
+          <div className="screening-form-field">
+            <label className="screening-form-label">Left Eye (OS)</label>
+            <div className="screening-form-field-disabled">
+              {retinalImages.leftEyeMissing ? 'Missing Eye' : 
+               `${retinalImages.leftEyeImages.length} image(s) uploaded`}
+            </div>
+          </div>
+          {retinalImages.technicianComments && (
+            <div className="screening-form-field col-span-2">
+              <label className="screening-form-label">Technician Comments</label>
+              <div className="screening-form-field-disabled">
+                {retinalImages.technicianComments}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="screening-form-actions">
+        <button
+          onClick={onSave}
+          className="screening-form-button screening-form-button-secondary"
+        >
+          Save for Later
+        </button>
+        <button
+          onClick={onComplete}
+          className="screening-form-button screening-form-button-primary"
+        >
+          Submit Screening
+        </button>
       </div>
     </div>
   )
@@ -559,71 +1837,185 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
 }
 
 export default function HEDISLandingPage() {
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [userRole, setUserRole] = useState('Field Technician')
-  const [userName, setUserName] = useState('John Smith')
-  const [savedFormsCount, setSavedFormsCount] = useState(12)
-  const [showSaveAlert, setShowSaveAlert] = useState(false)
-  const [showPatientSearch, setShowPatientSearch] = useState(false)
-  const [selectedPatient, setSelectedPatient] = useState(null)
-  const [showScreeningForm, setShowScreeningForm] = useState(false)
-  
-  // URL-based step management for screening sub-page
-  const [currentScreeningStep, setCurrentScreeningStep] = useState(0)
-  const [screeningFormData, setScreeningFormData] = useState(null)
-  
-  // Enhanced form state management
-  const [formMode, setFormMode] = useState<'new' | 'edit' | 'view'>('new')
-  const [currentFormId, setCurrentFormId] = useState<string | null>(null)
-  
-  // Screening list modal states
-  const [showCompletedListModal, setShowCompletedListModal] = useState(false)
-  const [showSavedListModal, setShowSavedListModal] = useState(false)
+  // State for current view and breadcrumb
+  const [currentView, setCurrentView] = useState<'dashboard' | 'screening'>('dashboard')
+  const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([])
 
+  // State for screening form
+  const [currentScreeningStep, setCurrentScreeningStep] = useState(1)
+  const [screeningFormData, setScreeningFormData] = useState<{
+    details: ScreeningDetails
+    images: RetinalImages
+  }>({
+    details: {
+      dateOfScreening: '',
+      placeOfService: '',
+      pcpLocation: '',
+      practicePhone: '305-555-5555',
+      practiceFax: '305-555-5556',
+      practiceEmail: 'Contact@gableseyecare.com',
+      practiceName: 'Coral Gables Eye Care',
+      practiceLocation: '2525 Ponce De Leon Blv',
+      officeContact: 'Tom Brady',
+      diabetesMellitus: '',
+      diabetesType: '',
+      lastEyeExam: '',
+      ocularHistory: [],
+      ocularSurgery: [],
+      ocularHistoryOther: '',
+      ocularSurgeryOther: ''
+    },
+    images: {
+      rightEyeMissing: false,
+      leftEyeMissing: false,
+      rightEyeImages: [],
+      leftEyeImages: [],
+      technicianComments: ''
+    }
+  })
+
+  // State for form management
+  const [formMode, setFormMode] = useState<'new' | 'edit' | 'view'>('new')
+  const [currentFormId, setCurrentFormId] = useState<string | undefined>(undefined)
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+  const [screeningDetails, setScreeningDetails] = useState<ScreeningDetails>({
+    dateOfScreening: '',
+    placeOfService: '',
+    pcpLocation: '',
+    practicePhone: '305-555-5555',
+    practiceFax: '305-555-5556',
+    practiceEmail: 'Contact@gableseyecare.com',
+    practiceName: 'Coral Gables Eye Care',
+    practiceLocation: '2525 Ponce De Leon Blv',
+    officeContact: 'Tom Brady',
+    diabetesMellitus: '',
+    diabetesType: '',
+    lastEyeExam: '',
+    ocularHistory: [],
+    ocularSurgery: [],
+    ocularHistoryOther: '',
+    ocularSurgeryOther: ''
+  })
+  const [retinalImages, setRetinalImages] = useState<RetinalImages>({
+    rightEyeMissing: false,
+    leftEyeMissing: false,
+    rightEyeImages: [],
+    leftEyeImages: [],
+    technicianComments: ''
+  })
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  // State for saved and completed forms
+  const [savedForms, setSavedForms] = useState<any[]>([])
+  const [completedForms, setCompletedForms] = useState<any[]>([])
+
+  // State for modals
+  const [showPatientSearchModal, setShowPatientSearchModal] = useState(false)
+  const [showCompletedScreeningListModal, setShowCompletedScreeningListModal] = useState(false)
+  const [showSavedScreeningListModal, setShowSavedScreeningListModal] = useState(false)
+
+  // Dashboard stats
+  const [dashboardStats, setDashboardStats] = useState({
+    completedPatientForms: 20,
+    savedPatientForms: 12
+  })
+
+  // Dashboard state
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [userName, setUserName] = useState('John Smith')
+  const [userRole, setUserRole] = useState('Field Technician')
+  const [showSaveAlert, setShowSaveAlert] = useState(false)
+
+  // Update time every minute
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
-    }, 1000)
+    }, 60000)
 
     return () => clearInterval(timer)
   }, [])
 
-  // URL step management for screening sub-page
+  // URL-based step management for screening sub-page
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const step = urlParams.get('step')
     const mode = urlParams.get('mode')
     const formId = urlParams.get('formId')
-    
-    if (step && !isNaN(parseInt(step))) {
+
+    // Check localStorage first for persistent state
+    const storedState = localStorage.getItem('hedisScreeningState')
+    if (storedState) {
+      const parsedState = JSON.parse(storedState)
+      setCurrentScreeningStep(parsedState.step || 0)
+      setFormMode(parsedState.mode || 'new')
+      setCurrentFormId(parsedState.formId || undefined)
+      setSelectedPatient(parsedState.selectedPatient || null)
+      setScreeningDetails(parsedState.screeningDetails || {
+        dateOfScreening: '',
+        placeOfService: '',
+        pcpLocation: '',
+        practicePhone: '305-555-5555',
+        practiceFax: '305-555-5556',
+        practiceEmail: 'Contact@gableseyecare.com',
+        practiceName: 'Coral Gables Eye Care',
+        practiceLocation: '2525 Ponce De Leon Blv',
+        officeContact: 'Tom Brady',
+        diabetesMellitus: '',
+        diabetesType: '',
+        lastEyeExam: '',
+        ocularHistory: [],
+        ocularSurgery: [],
+        ocularHistoryOther: '',
+        ocularSurgeryOther: ''
+      })
+      setRetinalImages(parsedState.retinalImages || {
+        rightEyeMissing: false,
+        leftEyeMissing: false,
+        rightEyeImages: [],
+        leftEyeImages: [],
+        technicianComments: ''
+      })
+      setErrors(parsedState.errors || {})
+    } else if (step) {
+      // Fallback to URL params if no localStorage
       setCurrentScreeningStep(parseInt(step))
-    }
-    
-    if (mode) {
-      setFormMode(mode as 'new' | 'edit' | 'view')
-    }
-    
-    if (formId) {
-      setCurrentFormId(formId)
+      if (mode) setFormMode(mode as 'new' | 'edit' | 'view')
+      if (formId) setCurrentFormId(formId)
     }
   }, [])
 
-  const updateScreeningStep = (step: number, mode?: 'new' | 'edit' | 'view', formId?: string) => {
-    setCurrentScreeningStep(step)
-    if (mode) setFormMode(mode)
-    if (formId) setCurrentFormId(formId)
-    
-    const url = new URL(window.location.href)
-    if (step === 0) {
-      url.searchParams.delete('step')
-      url.searchParams.delete('mode')
-      url.searchParams.delete('formId')
-    } else {
-      url.searchParams.set('step', step.toString())
-      if (mode) url.searchParams.set('mode', mode)
-      if (formId) url.searchParams.set('formId', formId)
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    const stateToSave = {
+      step: currentScreeningStep,
+      mode: formMode,
+      formId: currentFormId,
+      selectedPatient: selectedPatient,
+      screeningDetails: screeningDetails,
+      retinalImages: retinalImages,
+      errors: errors
     }
-    window.history.pushState({}, '', url.toString())
+    localStorage.setItem('hedisScreeningState', JSON.stringify(stateToSave))
+  }, [currentScreeningStep, formMode, currentFormId, selectedPatient, screeningDetails, retinalImages, errors])
+
+  const updateScreeningStep = (step: number, mode?: 'new' | 'edit' | 'view' | 'dashboard', formId?: string) => {
+    setCurrentScreeningStep(step)
+    if (mode) setFormMode(mode as 'new' | 'edit' | 'view')
+    if (formId) setCurrentFormId(formId)
+
+    // Clear localStorage if going back to dashboard
+    if (step === 0) {
+      localStorage.removeItem('hedisScreeningState')
+    }
+
+    // Update URL
+    const urlParams = new URLSearchParams()
+    urlParams.set('step', step.toString())
+    if (mode && mode !== 'dashboard') urlParams.set('mode', mode)
+    if (formId) urlParams.set('formId', formId)
+
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}`
+    window.history.pushState({}, '', newUrl)
   }
 
   const getGreeting = () => {
@@ -642,16 +2034,11 @@ export default function HEDISLandingPage() {
     })
   }
 
-  const dashboardStats = {
-    completedForms: 20,
-    savedForms: savedFormsCount
-  }
-
   const dashboardCards = [
     {
       id: 'completed',
       icon: 'check-circle',
-      number: dashboardStats.completedForms,
+      number: dashboardStats.completedPatientForms,
       label: 'Completed Patient Forms',
       description: 'Successfully completed and submitted forms',
       badge: 'View Only',
@@ -660,7 +2047,7 @@ export default function HEDISLandingPage() {
     {
       id: 'saved',
       icon: 'save',
-      number: dashboardStats.savedForms,
+      number: dashboardStats.savedPatientForms,
       label: 'Saved Patient Forms',
       description: 'Forms saved for later completion',
       badge: 'Continue Editing',
@@ -723,34 +2110,36 @@ export default function HEDISLandingPage() {
 
   const handleFormCardClick = (cardId: string) => {
     if (cardId === 'completed') {
-      setShowCompletedListModal(true)
+      setShowCompletedScreeningListModal(true)
     } else if (cardId === 'saved') {
-      setShowSavedListModal(true)
+      setShowSavedScreeningListModal(true)
     }
   }
 
   const handleCompletedFormSelect = (formId: string) => {
-    setShowCompletedListModal(false)
+    setShowCompletedScreeningListModal(false)
     updateScreeningStep(4, 'view', formId)
   }
 
   const handleSavedFormSelect = (formId: string) => {
-    setShowSavedListModal(false)
+    setShowSavedScreeningListModal(false)
     updateScreeningStep(2, 'edit', formId)
   }
 
-  const handlePatientSelect = (patient: any) => {
+  const handlePatientSelect = (patient: Patient) => {
     setSelectedPatient(patient)
     updateScreeningStep(2, formMode, currentFormId || undefined) // Move to screening details with current mode
   }
 
   const handleScreeningFormClose = () => {
-    setShowScreeningForm(false)
     updateScreeningStep(0) // Back to dashboard
   }
 
   const handleScreeningFormSave = () => {
-    setSavedFormsCount(prev => prev + 1)
+    setDashboardStats(prev => ({
+      ...prev,
+      savedPatientForms: prev.savedPatientForms + 1
+    }))
     setShowSaveAlert(true)
     setTimeout(() => setShowSaveAlert(false), 10000)
   }
@@ -758,7 +2147,11 @@ export default function HEDISLandingPage() {
   const handleScreeningFormComplete = () => {
     // Handle form completion
     console.log('Screening form completed')
-    // Could navigate to completed form view or back to dashboard
+    setDashboardStats(prev => ({
+      ...prev,
+      completedPatientForms: prev.completedPatientForms + 1
+    }))
+    updateScreeningStep(0) // Back to dashboard
   }
 
   // Render screening sub-page if we're in screening flow
@@ -841,7 +2234,26 @@ export default function HEDISLandingPage() {
                  formMode === 'edit' ? 'Continue editing patient screening information.' :
                  'View patient screening information and medical history.'}
               </p>
-              {/* Screening Details Component will go here */}
+              {selectedPatient && (
+                <ScreeningDetailsForm
+                  patient={selectedPatient}
+                  screeningDetails={screeningDetails}
+                  setScreeningDetails={setScreeningDetails}
+                  errors={errors}
+                  setErrors={setErrors}
+                  onNextStep={() => updateScreeningStep(3, formMode, currentFormId || undefined)}
+                  onPreviousStep={() => updateScreeningStep(1, formMode, currentFormId || undefined)}
+                  updateScreeningStep={updateScreeningStep}
+                  currentFormId={currentFormId}
+                  selectedPatient={selectedPatient}
+                  currentScreeningStep={currentScreeningStep}
+                  savedForms={savedForms}
+                  setSavedForms={setSavedForms}
+                  setDashboardStats={setDashboardStats}
+                  setSelectedPatient={setSelectedPatient}
+                  setCurrentFormId={setCurrentFormId}
+                />
+              )}
             </div>
           )}
 
@@ -856,7 +2268,15 @@ export default function HEDISLandingPage() {
                  formMode === 'edit' ? 'Continue uploading retinal images.' :
                  'View uploaded retinal images and technician comments.'}
               </p>
-              {/* Retinal Images Component will go here */}
+              {selectedPatient && (
+                <RetinalImagesForm
+                  retinalImages={retinalImages}
+                  setRetinalImages={setRetinalImages}
+                  errors={errors}
+                  onNextStep={() => updateScreeningStep(4, formMode, currentFormId || undefined)}
+                  onPreviousStep={() => updateScreeningStep(2, formMode, currentFormId || undefined)}
+                />
+              )}
             </div>
           )}
 
@@ -881,7 +2301,16 @@ export default function HEDISLandingPage() {
                   </button>
                 </div>
               )}
-              {/* Review & Submit Component will go here */}
+              {selectedPatient && formMode !== 'view' && (
+                <ReviewAndSubmitForm
+                  patient={selectedPatient}
+                  screeningDetails={screeningDetails}
+                  retinalImages={retinalImages}
+                  onEditStep={(step) => updateScreeningStep(step, formMode, currentFormId || undefined)}
+                  onComplete={handleScreeningFormComplete}
+                  onSave={handleScreeningFormSave}
+                />
+              )}
             </div>
           )}
         </div>
@@ -1029,40 +2458,22 @@ export default function HEDISLandingPage() {
         </div>
       </div>
 
-      {/* Patient Search Modal */}
-      {showPatientSearch && (
-        <PatientSearchModal
-          isOpen={showPatientSearch}
-          onClose={() => setShowPatientSearch(false)}
-          onPatientSelect={handlePatientSelect}
-        />
-      )}
 
-      {/* New Screening Form Modal */}
-      {showScreeningForm && selectedPatient && (
-        <NewScreeningForm
-          patient={selectedPatient}
-          isOpen={showScreeningForm}
-          onClose={handleScreeningFormClose}
-          onSave={handleScreeningFormSave}
-          onComplete={handleScreeningFormComplete}
-        />
-      )}
 
       {/* Completed Screening List Modal */}
-      {showCompletedListModal && (
+      {showCompletedScreeningListModal && (
         <CompletedScreeningListModal
-          isOpen={showCompletedListModal}
-          onClose={() => setShowCompletedListModal(false)}
+          isOpen={showCompletedScreeningListModal}
+          onClose={() => setShowCompletedScreeningListModal(false)}
           onFormSelect={handleCompletedFormSelect}
         />
       )}
 
       {/* Saved Screening List Modal */}
-      {showSavedListModal && (
+      {showSavedScreeningListModal && (
         <SavedScreeningListModal
-          isOpen={showSavedListModal}
-          onClose={() => setShowSavedListModal(false)}
+          isOpen={showSavedScreeningListModal}
+          onClose={() => setShowSavedScreeningListModal(false)}
           onFormSelect={handleSavedFormSelect}
         />
       )}

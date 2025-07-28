@@ -20,12 +20,16 @@ const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDat
 function generateSavedDates() {
   const dates = [];
   
-  // One record within 5-day auto-delete window (5 days ago)
-  const urgentDate = new Date(currentDate);
-  urgentDate.setDate(currentDate.getDate() - 5);
-  dates.push({
-    date: urgentDate,
-    label: '5 days ago - 5 days until auto-delete'
+  // Multiple records within 5-day auto-delete window (1-5 days ago)
+  const urgentDates = [1, 2, 3, 4, 5];
+  
+  urgentDates.forEach(daysAgo => {
+    const date = new Date(currentDate);
+    date.setDate(currentDate.getDate() - daysAgo);
+    dates.push({
+      date: date,
+      label: `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago - ${6 - daysAgo} day${6 - daysAgo > 1 ? 's' : ''} until auto-delete`
+    });
   });
   
   // Other records within 2 weeks (7-27 days ago)
@@ -61,13 +65,15 @@ function generateUpdatedSavedScreenings() {
   const patientNames = [
     'Alice Johnson', 'David Brown', 'Emily Davis', 'Frank Miller',
     'Grace Lee', 'Henry White', 'Isabella Clark', 'James Hall',
-    'Katherine Young', 'Lucas King', 'Mia Wright', 'Noah Green'
+    'Katherine Young', 'Lucas King', 'Mia Wright', 'Noah Green',
+    'Olivia Taylor', 'Peter Anderson', 'Quinn Martinez', 'Rachel Wilson'
   ];
   
   const patientIds = [
     '55556666', '77778888', '99990000', '11112222',
     '33334444', '55556666', '77778888', '99990000',
-    '11112222', '33334444', '55556666', '77778888'
+    '11112222', '33334444', '55556666', '77778888',
+    '99990000', '11112222', '33334444', '55556666'
   ];
   
   const technicians = ['Sarah Johnson', 'Mike Chen'];
@@ -156,10 +162,15 @@ ${updatedScreenings.map(screening => `    {
     // Write the updated content back to the file
     fs.writeFileSync(filePath, newContent, 'utf8');
     
+    // Count urgent records (within 5 days)
+    const urgentCount = updatedScreenings.filter(screening => 
+      screening.label.includes('until auto-delete')
+    ).length;
+    
     console.log('✅ Successfully updated saved patient screening dates!');
     console.log(`📅 Updated ${updatedScreenings.length} records to be current as of ${currentDate.toDateString()}`);
-    console.log(`🚨 1 record is within 5-day auto-delete window`);
-    console.log(`✅ ${updatedScreenings.length - 1} records are within safe range`);
+    console.log(`🚨 ${urgentCount} record${urgentCount > 1 ? 's' : ''} ${urgentCount > 1 ? 'are' : 'is'} within 5-day auto-delete window`);
+    console.log(`✅ ${updatedScreenings.length - urgentCount} records are within safe range`);
     
   } catch (error) {
     console.error('❌ Error updating file:', error.message);

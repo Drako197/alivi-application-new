@@ -1857,13 +1857,15 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
   const [sortBy, setSortBy] = useState<'dateSaved' | 'patientName' | 'progress' | 'urgency'>('urgency')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   
-    // Mock saved screenings data
+
+  
+              // Mock saved screenings data
   const savedScreenings = [
     {
       id: 'saved-001',
       patientName: 'Alice Johnson',
       patientId: '55556666',
-      dateSaved: '2025-07-23T01:41:00', // 5 days ago - 5 days until auto-delete
+      dateSaved: '2025-07-27T03:39:00', // 1 day ago - 5 days until auto-delete
       progress: 'Step 1 of 4',
       technician: 'Sarah Johnson'
     },
@@ -1871,7 +1873,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-002',
       patientName: 'David Brown',
       patientId: '77778888',
-      dateSaved: '2025-07-21T23:33:00', // 7 days ago - SAFE
+      dateSaved: '2025-07-26T10:10:00', // 2 days ago - 4 days until auto-delete
       progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
@@ -1879,7 +1881,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-003',
       patientName: 'Emily Davis',
       patientId: '99990000',
-      dateSaved: '2025-07-19T17:47:00', // 9 days ago - SAFE
+      dateSaved: '2025-07-25T23:53:00', // 3 days ago - 3 days until auto-delete
       progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
@@ -1887,7 +1889,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-004',
       patientName: 'Frank Miller',
       patientId: '11112222',
-      dateSaved: '2025-07-17T09:28:00', // 11 days ago - SAFE
+      dateSaved: '2025-07-24T17:12:00', // 4 days ago - 2 days until auto-delete
       progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     },
@@ -1895,7 +1897,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-005',
       patientName: 'Grace Lee',
       patientId: '33334444',
-      dateSaved: '2025-07-15T22:56:00', // 13 days ago - SAFE
+      dateSaved: '2025-07-23T01:04:00', // 5 days ago - 1 day until auto-delete
       progress: 'Step 1 of 4',
       technician: 'Sarah Johnson'
     },
@@ -1903,7 +1905,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-006',
       patientName: 'Henry White',
       patientId: '55556666',
-      dateSaved: '2025-07-13T11:43:00', // 15 days ago - SAFE
+      dateSaved: '2025-07-21T23:01:00', // 7 days ago - SAFE
       progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
@@ -1911,7 +1913,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-007',
       patientName: 'Isabella Clark',
       patientId: '77778888',
-      dateSaved: '2025-07-11T14:08:00', // 17 days ago - SAFE
+      dateSaved: '2025-07-19T06:33:00', // 9 days ago - SAFE
       progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
@@ -1919,7 +1921,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-008',
       patientName: 'James Hall',
       patientId: '99990000',
-      dateSaved: '2025-07-09T21:01:00', // 19 days ago - SAFE
+      dateSaved: '2025-07-17T04:04:00', // 11 days ago - SAFE
       progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     },
@@ -1927,7 +1929,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-009',
       patientName: 'Katherine Young',
       patientId: '11112222',
-      dateSaved: '2025-07-07T14:22:00', // 21 days ago - SAFE
+      dateSaved: '2025-07-15T13:37:00', // 13 days ago - SAFE
       progress: 'Step 1 of 4',
       technician: 'Sarah Johnson'
     },
@@ -1935,7 +1937,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-010',
       patientName: 'Lucas King',
       patientId: '33334444',
-      dateSaved: '2025-07-05T02:38:00', // 23 days ago - SAFE
+      dateSaved: '2025-07-13T07:48:00', // 15 days ago - SAFE
       progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
@@ -1943,7 +1945,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-011',
       patientName: 'Mia Wright',
       patientId: '55556666',
-      dateSaved: '2025-07-03T16:34:00', // 25 days ago - SAFE
+      dateSaved: '2025-07-11T02:23:00', // 17 days ago - SAFE
       progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
@@ -1951,7 +1953,39 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-012',
       patientName: 'Noah Green',
       patientId: '77778888',
-      dateSaved: '2025-07-01T17:44:00', // 27 days ago - SAFE
+      dateSaved: '2025-07-09T13:52:00', // 19 days ago - SAFE
+      progress: 'Step 4 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-013',
+      patientName: 'Olivia Taylor',
+      patientId: '99990000',
+      dateSaved: '2025-07-07T02:38:00', // 21 days ago - SAFE
+      progress: 'Step 1 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-014',
+      patientName: 'Peter Anderson',
+      patientId: '11112222',
+      dateSaved: '2025-07-05T23:38:00', // 23 days ago - SAFE
+      progress: 'Step 2 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-015',
+      patientName: 'Quinn Martinez',
+      patientId: '33334444',
+      dateSaved: '2025-07-03T02:48:00', // 25 days ago - SAFE
+      progress: 'Step 3 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-016',
+      patientName: 'Rachel Wilson',
+      patientId: '55556666',
+      dateSaved: '2025-07-01T18:45:00', // 27 days ago - SAFE
       progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     }
@@ -1978,18 +2012,21 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
     const now = new Date()
     const diffTime = now.getTime() - savedDate.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    console.log(`getDaysSinceSaved: ${dateString} -> ${diffDays} days`)
     return diffDays
   }
 
   const getDaysUntilExpiry = (dateString: string) => {
     const daysSinceSaved = getDaysSinceSaved(dateString)
-    return Math.max(0, 30 - daysSinceSaved)
+    const daysUntilExpiry = Math.max(0, 30 - daysSinceSaved)
+    console.log(`getDaysUntilExpiry: ${dateString} -> ${daysSinceSaved} days since saved, ${daysUntilExpiry} days until expiry`)
+    return daysUntilExpiry
   }
 
   const getUrgencyLevel = (dateString: string) => {
-    const daysUntilExpiry = getDaysUntilExpiry(dateString)
-    if (daysUntilExpiry <= 5) return 'urgent'
-    if (daysUntilExpiry <= 10) return 'warning'
+    const daysSinceSaved = getDaysSinceSaved(dateString)
+    if (daysSinceSaved <= 5) return 'urgent'
+    if (daysSinceSaved <= 10) return 'warning'
     return 'safe'
   }
 
@@ -2037,13 +2074,15 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
         bValue = b.progress
         break
       case 'urgency':
-        const aUrgency = getDaysUntilExpiry(a.dateSaved)
-        const bUrgency = getDaysUntilExpiry(b.dateSaved)
-        // Sort by urgency: urgent (1-5 days) first, then warning (6-10 days), then safe (11+ days)
-        const aUrgencyScore = aUrgency <= 5 ? 0 : aUrgency <= 10 ? 1 : 2
-        const bUrgencyScore = bUrgency <= 5 ? 0 : bUrgency <= 10 ? 1 : 2
+        const aDaysSinceSaved = getDaysSinceSaved(a.dateSaved)
+        const bDaysSinceSaved = getDaysSinceSaved(b.dateSaved)
+        // Sort by urgency: urgent (1-5 days since saved) first, then warning (6-10 days), then safe (11+ days)
+        // Lower urgency score = more urgent (should appear first)
+        const aUrgencyScore = aDaysSinceSaved <= 5 ? 0 : aDaysSinceSaved <= 10 ? 1 : 2
+        const bUrgencyScore = bDaysSinceSaved <= 5 ? 0 : bDaysSinceSaved <= 10 ? 1 : 2
         aValue = aUrgencyScore
         bValue = bUrgencyScore
+        console.log(`URGENCY SORT: ${a.patientName} (${aDaysSinceSaved} days since saved, score ${aUrgencyScore}) vs ${b.patientName} (${bDaysSinceSaved} days since saved, score ${bUrgencyScore})`)
         break
       default:
         aValue = a.patientName.toLowerCase()
@@ -2053,7 +2092,12 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
     if (sortOrder === 'asc') {
       return aValue > bValue ? 1 : -1
     } else {
-      return aValue < bValue ? 1 : -1
+      // For urgency sorting, we want lower scores (more urgent) to appear first with desc order
+      if (sortBy === 'urgency') {
+        return aValue < bValue ? -1 : 1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
     }
   })
 
@@ -2147,7 +2191,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
                       <div className="hedis-list-item-info">
                         <div className="hedis-list-item-header">
                           <div className="hedis-list-item-name">{screening.patientName}</div>
-                          {urgencyLevel !== 'safe' && (
+                          {(urgencyLevel !== 'safe' || sortBy === 'urgency') && (
                             <span className={`hedis-list-item-urgency-badge ${getUrgencyColor(urgencyLevel)}`}>
                               {getUrgencyLabel(urgencyLevel)}
                             </span>

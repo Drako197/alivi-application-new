@@ -932,24 +932,99 @@ function ScreeningDetailsForm({
 
       {/* Form Actions */}
       <div className="flex justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-700">
-        <button
-          onClick={onPreviousStep}
-          className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Previous</span>
-        </button>
-        <button
-          onClick={onNextStep}
-          className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <span>Next</span>
-          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => updateScreeningStep(0, 'dashboard')}
+            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>Close & Don't Save</span>
+          </button>
+          <button
+            onClick={() => {
+              // Save form data
+              const formData = {
+                id: currentFormId || `form_${Date.now()}`,
+                patientId: patient.patientId,
+                patientName: `${patient.firstName} ${patient.lastName}`,
+                dateSaved: new Date().toISOString(),
+                progress: `Step ${currentScreeningStep} of 4`,
+                screeningDetails,
+                retinalImages: { rightEyeImages: [], leftEyeImages: [], rightEyeMissing: false, leftEyeMissing: false, technicianComments: '' }
+              }
+              
+              // Add to saved forms
+              const updatedSavedForms = [...savedForms, formData]
+              setSavedForms(updatedSavedForms)
+              
+              // Update dashboard stats
+              setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
+                ...prev,
+                savedPatientForms: prev.savedPatientForms + 1
+              }))
+              
+              // Return to dashboard
+              updateScreeningStep(0, 'dashboard')
+              
+              // Show alert
+              const alert = document.createElement('div')
+              alert.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border border-yellow-400 text-yellow-800 px-6 py-4 rounded-lg shadow-lg max-w-md'
+              alert.innerHTML = `
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="font-medium">Form saved successfully!</span>
+                  </div>
+                  <button onclick="this.parentElement.parentElement.remove()" class="text-yellow-800 hover:text-yellow-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+                <p class="mt-2 text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
+              `
+              document.body.appendChild(alert)
+              
+              // Remove alert after 10 seconds
+              setTimeout(() => {
+                if (alert.parentNode) {
+                  alert.remove()
+                }
+              }, 10000)
+            }}
+            className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            <span>Save for Later</span>
+          </button>
+        </div>
+        
+        <div className="flex space-x-3">
+          <button
+            onClick={onPreviousStep}
+            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Previous</span>
+          </button>
+          <button
+            onClick={handleNextClick}
+            className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <span>Next</span>
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -966,9 +1041,11 @@ interface RetinalImagesFormProps {
   currentFormId?: string
   selectedPatient: Patient | null
   screeningDetails: ScreeningDetails
-  setSavedForms: (forms: any) => void
+  savedForms: any[]
+  setSavedForms: (forms: any[]) => void
   setDashboardStats: (stats: any) => void
   updateScreeningStep: (step: number, mode?: 'new' | 'edit' | 'view' | 'dashboard', formId?: string) => void
+  currentScreeningStep: number
 }
 
 function RetinalImagesForm({ 
@@ -981,9 +1058,11 @@ function RetinalImagesForm({
   currentFormId,
   selectedPatient,
   screeningDetails,
+  savedForms,
   setSavedForms,
   setDashboardStats,
-  updateScreeningStep
+  updateScreeningStep,
+  currentScreeningStep
 }: RetinalImagesFormProps) {
   const handleInputChange = (field: keyof RetinalImages, value: any) => {
     setRetinalImages({ ...retinalImages, [field]: value })
@@ -1043,6 +1122,39 @@ function RetinalImagesForm({
     e.preventDefault()
     e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50')
     handleImageUpload(eye, e.dataTransfer.files)
+  }
+
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {}
+
+    // Check if at least one eye has images or is marked as missing
+    const rightEyeValid = retinalImages.rightEyeMissing || retinalImages.rightEyeImages.length > 0
+    const leftEyeValid = retinalImages.leftEyeMissing || retinalImages.leftEyeImages.length > 0
+
+    if (!rightEyeValid) {
+      newErrors.rightEyeImages = 'Please upload images for right eye or mark as missing'
+    }
+
+    if (!leftEyeValid) {
+      newErrors.leftEyeImages = 'Please upload images for left eye or mark as missing'
+    }
+
+    // Update errors state
+    setErrors(newErrors)
+    
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleNextClick = () => {
+    if (validateForm()) {
+      onNextStep()
+    } else {
+      // Scroll to first error
+      const firstErrorElement = document.querySelector('[data-error="true"]')
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }
   }
 
   const getIcon = (iconName: string): ReactElement => {
@@ -1382,24 +1494,99 @@ function RetinalImagesForm({
 
       {/* Form Actions */}
       <div className="flex justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-700">
-        <button
-          onClick={onPreviousStep}
-          className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Previous</span>
-        </button>
-        <button
-          onClick={onNextStep}
-          className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <span>Next</span>
-          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => updateScreeningStep(0, 'dashboard')}
+            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>Close & Don't Save</span>
+          </button>
+          <button
+            onClick={() => {
+              // Save form data
+              const formData = {
+                id: currentFormId || `form_${Date.now()}`,
+                patientId: selectedPatient?.patientId || '',
+                patientName: selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : '',
+                dateSaved: new Date().toISOString(),
+                progress: `Step ${currentScreeningStep} of 4`,
+                screeningDetails,
+                retinalImages
+              }
+              
+              // Add to saved forms
+              const updatedSavedForms = [...savedForms, formData]
+              setSavedForms(updatedSavedForms)
+              
+              // Update dashboard stats
+              setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
+                ...prev,
+                savedPatientForms: prev.savedPatientForms + 1
+              }))
+              
+              // Return to dashboard
+              updateScreeningStep(0, 'dashboard')
+              
+              // Show alert
+              const alert = document.createElement('div')
+              alert.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border border-yellow-400 text-yellow-800 px-6 py-4 rounded-lg shadow-lg max-w-md'
+              alert.innerHTML = `
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="font-medium">Form saved successfully!</span>
+                  </div>
+                  <button onclick="this.parentElement.parentElement.remove()" class="text-yellow-800 hover:text-yellow-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+                <p class="mt-2 text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
+              `
+              document.body.appendChild(alert)
+              
+              // Remove alert after 10 seconds
+              setTimeout(() => {
+                if (alert.parentNode) {
+                  alert.remove()
+                }
+              }, 10000)
+            }}
+            className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            <span>Save for Later</span>
+          </button>
+        </div>
+        
+        <div className="flex space-x-3">
+          <button
+            onClick={onPreviousStep}
+            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Previous</span>
+          </button>
+          <button
+            onClick={handleNextClick}
+            className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <span>Next</span>
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -2780,9 +2967,11 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
                   currentFormId={currentFormId}
                   selectedPatient={selectedPatient}
                   screeningDetails={screeningDetails}
+                  savedForms={savedForms}
                   setSavedForms={setSavedForms}
                   setDashboardStats={setDashboardStats}
                   updateScreeningStep={updateScreeningStep}
+                  currentScreeningStep={currentScreeningStep}
                 />
               )}
             </div>

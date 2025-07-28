@@ -1891,9 +1891,9 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
   }
 
   const getUrgencyLevel = (dateString: string) => {
-    const daysSinceSaved = getDaysSinceSaved(dateString)
-    if (daysSinceSaved <= 5) return 'urgent'
-    if (daysSinceSaved <= 10) return 'warning'
+    const daysUntilExpiry = getDaysUntilExpiry(dateString)
+    if (daysUntilExpiry <= 5) return 'urgent'
+    if (daysUntilExpiry <= 10) return 'warning'
     return 'safe'
   }
 
@@ -1941,15 +1941,15 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
         bValue = b.progress
         break
       case 'urgency':
-        const aDaysSinceSaved = getDaysSinceSaved(a.dateSaved)
-        const bDaysSinceSaved = getDaysSinceSaved(b.dateSaved)
-        // Sort by urgency: urgent (1-5 days since saved) first, then warning (6-10 days), then safe (11+ days)
+        const aDaysUntilExpiry = getDaysUntilExpiry(a.dateSaved)
+        const bDaysUntilExpiry = getDaysUntilExpiry(b.dateSaved)
+        // Sort by urgency: urgent (1-5 days until expiry) first, then warning (6-10 days), then safe (11+ days)
         // Lower urgency score = more urgent (should appear first)
-        const aUrgencyScore = aDaysSinceSaved <= 5 ? 0 : aDaysSinceSaved <= 10 ? 1 : 2
-        const bUrgencyScore = bDaysSinceSaved <= 5 ? 0 : bDaysSinceSaved <= 10 ? 1 : 2
+        const aUrgencyScore = aDaysUntilExpiry <= 5 ? 0 : aDaysUntilExpiry <= 10 ? 1 : 2
+        const bUrgencyScore = bDaysUntilExpiry <= 5 ? 0 : bDaysUntilExpiry <= 10 ? 1 : 2
         aValue = aUrgencyScore
         bValue = bUrgencyScore
-        console.log(`URGENCY SORT: ${a.patientName} (${aDaysSinceSaved} days since saved, score ${aUrgencyScore}) vs ${b.patientName} (${bDaysSinceSaved} days since saved, score ${bUrgencyScore})`)
+        console.log(`URGENCY SORT: ${a.patientName} (${aDaysUntilExpiry} days until expiry, score ${aUrgencyScore}) vs ${b.patientName} (${bDaysUntilExpiry} days until expiry, score ${bUrgencyScore})`)
         break
       default:
         aValue = a.patientName.toLowerCase()
@@ -2180,13 +2180,13 @@ export default function HEDISLandingPage() {
   const [userRole, setUserRole] = useState('Field Technician')
   const [showSaveAlert, setShowSaveAlert] = useState(false)
 
-  // Mock saved screenings data
+    // Mock saved screenings data
   const savedScreenings = [
     {
       id: 'saved-001',
       patientName: 'Alice Johnson',
       patientId: '55556666',
-      dateSaved: '2025-07-27T03:39:00', // 1 day ago - 5 days until auto-delete
+      dateSaved: '2025-07-03T21:44:00', // 25 days ago - 5 days until auto-delete
       progress: 'Step 2 of 4',
       technician: 'Sarah Johnson'
     },
@@ -2194,7 +2194,7 @@ export default function HEDISLandingPage() {
       id: 'saved-002',
       patientName: 'David Brown',
       patientId: '77778888',
-      dateSaved: '2025-07-26T10:10:00', // 2 days ago - 4 days until auto-delete
+      dateSaved: '2025-07-04T01:54:00', // 24 days ago - 6 days until auto-delete
       progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
@@ -2202,7 +2202,7 @@ export default function HEDISLandingPage() {
       id: 'saved-003',
       patientName: 'Emily Davis',
       patientId: '99990000',
-      dateSaved: '2025-07-25T23:53:00', // 3 days ago - 3 days until auto-delete
+      dateSaved: '2025-07-05T05:00:00', // 23 days ago - 7 days until auto-delete
       progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
@@ -2210,7 +2210,7 @@ export default function HEDISLandingPage() {
       id: 'saved-004',
       patientName: 'Frank Miller',
       patientId: '11112222',
-      dateSaved: '2025-07-24T17:12:00', // 4 days ago - 2 days until auto-delete
+      dateSaved: '2025-07-06T07:49:00', // 22 days ago - 8 days until auto-delete
       progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     },
@@ -2218,7 +2218,7 @@ export default function HEDISLandingPage() {
       id: 'saved-005',
       patientName: 'Grace Lee',
       patientId: '33334444',
-      dateSaved: '2025-07-23T01:04:00', // 5 days ago - 1 day until auto-delete
+      dateSaved: '2025-07-07T03:43:00', // 21 days ago - 9 days until auto-delete
       progress: 'Step 2 of 4',
       technician: 'Sarah Johnson'
     },
@@ -2226,7 +2226,7 @@ export default function HEDISLandingPage() {
       id: 'saved-006',
       patientName: 'Henry White',
       patientId: '55556666',
-      dateSaved: '2025-07-21T23:01:00', // 7 days ago - SAFE
+      dateSaved: '2025-07-08T18:23:00', // 20 days ago - 10 days until auto-delete
       progress: 'Step 3 of 4',
       technician: 'Mike Chen'
     },
@@ -2234,7 +2234,7 @@ export default function HEDISLandingPage() {
       id: 'saved-007',
       patientName: 'Isabella Clark',
       patientId: '77778888',
-      dateSaved: '2025-07-19T06:33:00', // 9 days ago - SAFE
+      dateSaved: '2025-07-09T17:07:00', // 19 days ago - 11 days until auto-delete (SAFE)
       progress: 'Step 4 of 4',
       technician: 'Sarah Johnson'
     },
@@ -2242,7 +2242,7 @@ export default function HEDISLandingPage() {
       id: 'saved-008',
       patientName: 'James Hall',
       patientId: '99990000',
-      dateSaved: '2025-07-17T04:04:00', // 11 days ago - SAFE
+      dateSaved: '2025-07-10T06:14:00', // 18 days ago - 12 days until auto-delete (SAFE)
       progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
@@ -2250,7 +2250,7 @@ export default function HEDISLandingPage() {
       id: 'saved-009',
       patientName: 'Katherine Young',
       patientId: '11112222',
-      dateSaved: '2025-07-15T13:37:00', // 13 days ago - SAFE
+      dateSaved: '2025-07-11T21:28:00', // 17 days ago - 13 days until auto-delete (SAFE)
       progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
@@ -2258,39 +2258,39 @@ export default function HEDISLandingPage() {
       id: 'saved-010',
       patientName: 'Lucas King',
       patientId: '33334444',
-      dateSaved: '2025-07-13T07:48:00', // 15 days ago - SAFE
-      progress: 'Step 4 of 4',
+      dateSaved: '2025-07-12T14:53:00', // 16 days ago - 14 days until auto-delete (SAFE)
+      progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
     {
       id: 'saved-011',
       patientName: 'Mia Wright',
       patientId: '55556666',
-      dateSaved: '2025-07-11T02:23:00', // 17 days ago - SAFE
-      progress: 'Step 2 of 4',
+      dateSaved: '2025-07-13T11:08:00', // 15 days ago - 15 days until auto-delete (SAFE)
+      progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-012',
       patientName: 'Noah Green',
       patientId: '77778888',
-      dateSaved: '2025-07-09T13:52:00', // 19 days ago - SAFE
-      progress: 'Step 3 of 4',
+      dateSaved: '2025-07-14T06:15:00', // 14 days ago - 16 days until auto-delete (SAFE)
+      progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     },
     {
       id: 'saved-013',
       patientName: 'Olivia Taylor',
       patientId: '99990000',
-      dateSaved: '2025-07-07T02:38:00', // 21 days ago - SAFE
-      progress: 'Step 4 of 4',
+      dateSaved: '2025-07-15T13:54:00', // 13 days ago - 17 days until auto-delete (SAFE)
+      progress: 'Step 2 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-014',
       patientName: 'Peter Anderson',
       patientId: '11112222',
-      dateSaved: '2025-07-05T23:38:00', // 23 days ago - SAFE
+      dateSaved: '2025-07-16T02:08:00', // 12 days ago - 18 days until auto-delete (SAFE)
       progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
@@ -2298,7 +2298,7 @@ export default function HEDISLandingPage() {
       id: 'saved-015',
       patientName: 'Quinn Martinez',
       patientId: '33334444',
-      dateSaved: '2025-07-03T02:48:00', // 25 days ago - SAFE
+      dateSaved: '2025-07-17T07:59:00', // 11 days ago - 19 days until auto-delete (SAFE)
       progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
@@ -2306,7 +2306,7 @@ export default function HEDISLandingPage() {
       id: 'saved-016',
       patientName: 'Rachel Wilson',
       patientId: '55556666',
-      dateSaved: '2025-07-01T18:45:00', // 27 days ago - SAFE
+      dateSaved: '2025-07-18T15:13:00', // 10 days ago - 20 days until auto-delete (SAFE)
       progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     }

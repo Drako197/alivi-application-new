@@ -2514,6 +2514,28 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
     savedPatientForms: 12
   })
 
+  // Dashboard cards data
+  const dashboardCards = [
+    {
+      id: 'completed',
+      icon: 'check-circle',
+      number: dashboardStats.completedPatientForms,
+      label: 'Completed Patient Forms',
+      description: 'Successfully completed and submitted forms',
+      badge: 'View Only',
+      badgeColor: 'green'
+    },
+    {
+      id: 'saved',
+      icon: 'save',
+      number: dashboardStats.savedPatientForms,
+      label: 'Saved Patient Forms',
+      description: 'Forms saved for later completion',
+      badge: 'Continue Editing',
+      badgeColor: 'yellow'
+    }
+  ]
+
   // Dashboard state
   const [currentTime, setCurrentTime] = useState(new Date())
   const [userName, setUserName] = useState('John Smith')
@@ -2798,27 +2820,6 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
       day: 'numeric'
     })
   }
-
-  const dashboardCards = [
-    {
-      id: 'completed',
-      icon: 'check-circle',
-      number: dashboardStats.completedPatientForms,
-      label: 'Completed Patient Forms',
-      description: 'Successfully completed and submitted forms',
-      badge: 'View Only',
-      badgeColor: 'green'
-    },
-    {
-      id: 'saved',
-      icon: 'save',
-      number: dashboardStats.savedPatientForms,
-      label: 'Saved Patient Forms',
-      description: 'Forms saved for later completion',
-      badge: 'Continue Editing',
-      badgeColor: 'yellow'
-    }
-  ]
 
   const hedisTasks = [
     {
@@ -3375,56 +3376,33 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
           </div>
         </div>
 
-        {/* Dashboard Overview Cards */}
-        <div className="hedis-dashboard-overview-section">
-          <div className="hedis-dashboard-overview-grid">
-            {/* Completed Patient Forms */}
-            <div className="hedis-overview-card" onClick={() => handleFormCardClick('completed')}>
-              <div className="hedis-overview-card-header">
-                <div className="hedis-overview-card-icon">
-                  {getIcon('check-circle')}
+        {/* Dashboard Overview - Compact */}
+        <div className="hedis-dashboard-compact">
+          <h3 className="hedis-compact-title">Quick Access</h3>
+          <div className="hedis-compact-grid">
+            {dashboardCards.map((card) => (
+              <div 
+                key={card.id}
+                className={`hedis-compact-card hedis-${card.id}-card group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
+                onClick={() => handleFormCardClick(card.id)}
+              >
+                <div className={`hedis-compact-icon hedis-${card.id}-icon`}>
+                  {getIcon(card.icon)}
                 </div>
-                <div className="hedis-overview-card-content">
-                  <h3 className="hedis-overview-card-title">Completed Patient Forms</h3>
-                  <p className="hedis-overview-card-description">
-                    View and manage all completed patient screening forms and their results.
-                  </p>
-                </div>
-                <div className="hedis-overview-card-badge">
-                  <span className="hedis-badge-view-only">View Only</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-              <div className="hedis-overview-card-footer">
-                <span className="hedis-overview-card-count">{dashboardStats.completedPatientForms}</span>
-              </div>
-            </div>
-
-            {/* Saved Patient Forms */}
-            <div className="hedis-overview-card" onClick={() => handleFormCardClick('saved')}>
-              <div className="hedis-overview-card-header">
-                <div className="hedis-overview-card-icon">
-                  {getIcon('document-arrow-down')}
-                </div>
-                <div className="hedis-overview-card-content">
-                  <h3 className="hedis-overview-card-title">Saved Patient Forms</h3>
-                  <p className="hedis-overview-card-description">
-                    Continue working on saved patient screening forms that were not completed.
-                  </p>
-                </div>
-                <div className="hedis-overview-card-badge">
-                  <span className="hedis-badge-continue-editing">Continue Editing</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <div className="hedis-compact-content">
+                  <div className="hedis-compact-header">
+                    <span className="hedis-compact-number">{card.number}</span>
+                    <span className="hedis-compact-label">{card.label}</span>
+                  </div>
+                  <div className={`hedis-compact-badge ${card.id === 'completed' ? 'hedis-badge-view-only' : 'hedis-badge-continue-editing'}`}>
+                    <span>{card.id === 'completed' ? 'View Only' : 'Continue Editing'}</span>
+                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
-              <div className="hedis-overview-card-footer">
-                <span className="hedis-overview-card-count">{dashboardStats.savedPatientForms}</span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

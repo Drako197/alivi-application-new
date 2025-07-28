@@ -1142,6 +1142,7 @@ body {
   @apply flex justify-start;
 }
 
+/* HEDIS Dashboard Compact Cards */
 .hedis-dashboard-compact {
   @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6;
 }
@@ -2646,83 +2647,43 @@ select {
   @apply text-yellow-600 hover:bg-yellow-100;
 }
 
-/* HEDIS Dashboard Overview Cards */
-.hedis-dashboard-overview-section {
-  @apply mt-8;
+/* HEDIS Dashboard Compact Cards */
+.hedis-dashboard-compact {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6;
 }
 
-.hedis-dashboard-overview-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+.hedis-compact-title {
+  @apply text-lg font-semibold text-gray-900 dark:text-white mb-4;
 }
 
-.hedis-overview-card {
-  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer;
+.hedis-compact-grid {
+  @apply space-y-3;
 }
 
-.hedis-overview-card:hover {
-  @apply border-blue-300 dark:border-blue-600;
+.hedis-compact-card {
+  @apply flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer;
 }
 
-.hedis-overview-card-header {
-  @apply flex items-start justify-between mb-4;
+.hedis-compact-icon {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0;
 }
 
-.hedis-overview-card-icon {
-  @apply w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400;
+.hedis-compact-content {
+  @apply flex-1 flex items-center justify-between;
 }
 
-.hedis-overview-card-content {
-  @apply flex-1 ml-4;
+.hedis-compact-header {
+  @apply flex items-center gap-3;
 }
 
-.hedis-overview-card-title {
-  @apply text-lg font-semibold text-gray-900 dark:text-white mb-2;
+.hedis-compact-number {
+  @apply text-xl font-bold text-gray-900 dark:text-white;
 }
 
-.hedis-overview-card-description {
-  @apply text-sm text-gray-600 dark:text-gray-400;
+.hedis-compact-label {
+  @apply text-sm font-medium text-gray-700 dark:text-gray-300;
 }
 
-.hedis-overview-card-badge {
-  @apply flex items-center space-x-2;
-}
-
-.hedis-overview-card-footer {
-  @apply flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700;
-}
-
-.hedis-overview-card-count {
-  @apply text-2xl font-bold text-gray-900 dark:text-white;
-}
-
-/* Badge Styles */
-.hedis-badge-view-only {
-  @apply px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full;
-}
-
-.hedis-badge-continue-editing {
-  @apply px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-xs font-medium rounded-full;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .hedis-dashboard-overview-grid {
-    @apply grid-cols-1;
-  }
-  
-  .hedis-overview-card-header {
-    @apply flex-col items-start space-y-3;
-  }
-  
-  .hedis-overview-card-icon {
-    @apply w-10 h-10;
-  }
-  
-  .hedis-overview-card-content {
-    @apply ml-0 w-full;
-  }
-  
-  .hedis-overview-card-badge {
-    @apply self-start;
-  }
+.hedis-compact-badge {
+  @apply flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium flex-shrink-0;
 }

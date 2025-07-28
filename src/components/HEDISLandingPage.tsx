@@ -525,22 +525,12 @@ function ScreeningDetailsForm({
               name="dateOfScreening"
               value={screeningDetails.dateOfScreening}
               onChange={(date) => handleInputChange('dateOfScreening', date)}
-              placeholder="Date of Screening"
+              placeholder="Select screening date"
               hasError={!!errors.dateOfScreening}
             />
             {errors.dateOfScreening && (
               <p className="mt-1 text-sm text-red-600">{errors.dateOfScreening}</p>
             )}
-          </div>
-
-          {/* Patient Name */}
-          <div>
-            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-              Patient Name
-            </label>
-            <div className="text-gray-900 dark:text-white">
-              {patient.firstName} {patient.lastName}
-            </div>
           </div>
 
           {/* Place of Service */}
@@ -552,17 +542,11 @@ function ScreeningDetailsForm({
               name="placeOfService"
               value={screeningDetails.placeOfService}
               onChange={(e) => handleInputChange('placeOfService', e.target.value)}
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-8 appearance-none bg-white ${
-                errors.placeOfService ? 'border-red-300' : 'border-gray-300'
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                errors.placeOfService ? 'border-red-500' : 'border-gray-300'
               }`}
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
-                backgroundPosition: 'right 0.5rem center',
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: '1.5em 1.5em'
-              }}
             >
-              <option value="">Place of Service</option>
+              <option value="">Select Place of Service</option>
               <option value="11">11 - Doctor's Office</option>
               <option value="12">12 - Patient's Home</option>
               <option value="15">15 - Mobile Unit</option>
@@ -582,21 +566,16 @@ function ScreeningDetailsForm({
               name="pcpLocation"
               value={screeningDetails.pcpLocation}
               onChange={(e) => handleInputChange('pcpLocation', e.target.value)}
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-8 appearance-none bg-white ${
-                errors.pcpLocation ? 'border-red-300' : 'border-gray-300'
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                errors.pcpLocation ? 'border-red-500' : 'border-gray-300'
               }`}
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
-                backgroundPosition: 'right 0.5rem center',
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: '1.5em 1.5em'
-              }}
             >
-              <option value="">PCP Location</option>
-              <option value="Downtown Medical Center">Downtown Medical Center</option>
-              <option value="Westside Clinic">Westside Clinic</option>
+              <option value="">Select PCP Location</option>
               <option value="Northside Hospital">Northside Hospital</option>
-              <option value="Eastside Medical Group">Eastside Medical Group</option>
+              <option value="Southside Medical Center">Southside Medical Center</option>
+              <option value="Downtown Clinic">Downtown Clinic</option>
+              <option value="Community Health Center">Community Health Center</option>
+              <option value="Riverside Medical Group">Riverside Medical Group</option>
             </select>
             {errors.pcpLocation && (
               <p className="mt-1 text-sm text-red-600">{errors.pcpLocation}</p>
@@ -953,107 +932,20 @@ function ScreeningDetailsForm({
 
       {/* Form Actions */}
       <div className="flex justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-700">
-        {/* Left side - Close & Don't Save */}
         <button
-          onClick={() => {
-            // Reset form and go back to dashboard
-            setScreeningDetails({
-              dateOfScreening: '',
-              placeOfService: '',
-              pcpLocation: '',
-              practicePhone: '305-555-5555',
-              practiceFax: '305-555-5556',
-              practiceEmail: 'Contact@gableseyecare.com',
-              practiceName: 'Coral Gables Eye Care',
-              practiceLocation: '2525 Ponce De Leon Blv',
-              officeContact: 'Tom Brady',
-              diabetesMellitus: '',
-              diabetesType: '',
-              lastEyeExam: '',
-              ocularHistory: [],
-              ocularSurgery: [],
-              ocularHistoryOther: '',
-              ocularSurgeryOther: ''
-            })
-            setErrors({})
-            setSelectedPatient(null)
-            setCurrentFormId(undefined)
-            localStorage.removeItem('hedisScreeningState')
-            updateScreeningStep(0, 'dashboard', undefined)
-          }}
+          onClick={onPreviousStep}
           className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
         >
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span>Close & Don't Save</span>
+          <span>Previous</span>
         </button>
-
-        {/* Center - Save for Later */}
         <button
-          onClick={() => {
-            // Save current progress and go back to dashboard
-            const savedForm = {
-              id: currentFormId || `form_${Date.now()}`,
-              patient: selectedPatient,
-              screeningDetails: screeningDetails,
-              currentStep: currentScreeningStep,
-              savedAt: new Date().toISOString(),
-              status: 'saved'
-            }
-            
-            // Add to saved forms list
-            const updatedSavedForms = [...savedForms, savedForm]
-            setSavedForms(updatedSavedForms)
-            
-            // Update dashboard count
-            setDashboardStats((prev: { completedPatientForms: number; savedPatientForms: number }) => ({
-              ...prev,
-              savedPatientForms: prev.savedPatientForms + 1
-            }))
-            
-            // Show success message
-            alert('Form saved for later! You have 5 business days to complete this form.')
-            
-            // Reset and go back to dashboard
-            setScreeningDetails({
-              dateOfScreening: '',
-              placeOfService: '',
-              pcpLocation: '',
-              practicePhone: '305-555-5555',
-              practiceFax: '305-555-5556',
-              practiceEmail: 'Contact@gableseyecare.com',
-              practiceName: 'Coral Gables Eye Care',
-              practiceLocation: '2525 Ponce De Leon Blv',
-              officeContact: 'Tom Brady',
-              diabetesMellitus: '',
-              diabetesType: '',
-              lastEyeExam: '',
-              ocularHistory: [],
-              ocularSurgery: [],
-              ocularHistoryOther: '',
-              ocularSurgeryOther: ''
-            })
-            setErrors({})
-            setSelectedPatient(null)
-            setCurrentFormId(undefined)
-            localStorage.removeItem('hedisScreeningState')
-            updateScreeningStep(0, 'dashboard', undefined)
-          }}
-          className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-          </svg>
-          <span>Save for Later</span>
-        </button>
-
-        {/* Right side - Continue */}
-        <button
-          onClick={handleNextClick}
+          onClick={onNextStep}
           className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          <span>Continue</span>
+          <span>Next</span>
           <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
@@ -1068,177 +960,445 @@ interface RetinalImagesFormProps {
   retinalImages: RetinalImages
   setRetinalImages: (images: RetinalImages) => void
   errors: { [key: string]: string }
+  setErrors: (errors: { [key: string]: string }) => void
   onNextStep: () => void
   onPreviousStep: () => void
+  currentFormId?: string
+  selectedPatient: Patient | null
+  screeningDetails: ScreeningDetails
+  setSavedForms: (forms: any) => void
+  setDashboardStats: (stats: any) => void
+  updateScreeningStep: (step: number, mode?: 'new' | 'edit' | 'view' | 'dashboard', formId?: string) => void
 }
 
 function RetinalImagesForm({ 
   retinalImages, 
   setRetinalImages, 
   errors,
+  setErrors,
   onNextStep,
-  onPreviousStep
+  onPreviousStep,
+  currentFormId,
+  selectedPatient,
+  screeningDetails,
+  setSavedForms,
+  setDashboardStats,
+  updateScreeningStep
 }: RetinalImagesFormProps) {
   const handleInputChange = (field: keyof RetinalImages, value: any) => {
     setRetinalImages({ ...retinalImages, [field]: value })
+    
+    // Clear validation error for this field when user makes a selection
+    if (errors[field]) {
+      const newErrors = { ...errors }
+      delete newErrors[field]
+      setErrors(newErrors)
+    }
   }
 
   const handleImageUpload = (eye: 'right' | 'left', files: FileList | null) => {
-    if (!files) return
-    
-    const newImages = Array.from(files)
-    const currentImages = eye === 'right' ? retinalImages.rightEyeImages : retinalImages.leftEyeImages
-    const updatedImages = [...currentImages, ...newImages].slice(0, 3) // Max 3 images per eye
-    
-    if (eye === 'right') {
-      setRetinalImages({ ...retinalImages, rightEyeImages: updatedImages })
-    } else {
-      setRetinalImages({ ...retinalImages, leftEyeImages: updatedImages })
+    if (files) {
+      const fileArray = Array.from(files)
+      const imageFiles = fileArray.filter(file => file.type.startsWith('image/'))
+      
+      if (eye === 'right') {
+        setRetinalImages({
+          ...retinalImages,
+          rightEyeImages: [...retinalImages.rightEyeImages, ...imageFiles].slice(0, 3)
+        })
+      } else {
+        setRetinalImages({
+          ...retinalImages,
+          leftEyeImages: [...retinalImages.leftEyeImages, ...imageFiles].slice(0, 3)
+        })
+      }
     }
   }
 
   const removeImage = (eye: 'right' | 'left', index: number) => {
-    const currentImages = eye === 'right' ? retinalImages.rightEyeImages : retinalImages.leftEyeImages
-    const updatedImages = currentImages.filter((_, i) => i !== index)
-    
     if (eye === 'right') {
-      setRetinalImages({ ...retinalImages, rightEyeImages: updatedImages })
+      setRetinalImages({
+        ...retinalImages,
+        rightEyeImages: retinalImages.rightEyeImages.filter((_: File, i: number) => i !== index)
+      })
     } else {
-      setRetinalImages({ ...retinalImages, leftEyeImages: updatedImages })
+      setRetinalImages({
+        ...retinalImages,
+        leftEyeImages: retinalImages.leftEyeImages.filter((_: File, i: number) => i !== index)
+      })
     }
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.currentTarget.classList.add('border-blue-400', 'bg-blue-50')
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50')
+  }
+
+  const handleDrop = (e: React.DragEvent, eye: 'right' | 'left') => {
+    e.preventDefault()
+    e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50')
+    handleImageUpload(eye, e.dataTransfer.files)
+  }
+
+  const getIcon = (iconName: string): ReactElement => {
+    const icons: { [key: string]: ReactElement } = {
+      upload: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+      ),
+      eye: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      ),
+      close: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      ),
+      check: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      )
+    }
+    return icons[iconName] || <></>
+  }
+
   return (
-    <div className="screening-form-content">
-      {/* Right Eye Section */}
-      <div className="screening-form-section">
-        <h3 className="screening-form-section-title">Right Eye (OD)</h3>
-        <div className="screening-form-field">
-          <label className="screening-form-label">
-            <input
-              type="checkbox"
-              checked={retinalImages.rightEyeMissing}
-              onChange={(e) => handleInputChange('rightEyeMissing', e.target.checked)}
-              className="mr-2"
-            />
-            Missing Eye
-          </label>
-        </div>
-        
-        {!retinalImages.rightEyeMissing && (
-          <div className="screening-form-image-upload">
-            <label className="screening-form-label">Retinal Images (Max 3)</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={(e) => handleImageUpload('right', e.target.files)}
-              className="screening-form-upload-button"
-              name="rightEyeImages"
-            />
-            <div className="screening-form-image-preview">
-              {retinalImages.rightEyeImages.map((file, index) => (
-                <div key={index} className="screening-form-image">
-                  <img 
-                    src={URL.createObjectURL(file)} 
-                    alt={`Right eye image ${index + 1}`}
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <button
-                    onClick={() => removeImage('right', index)}
-                    className="screening-form-image-remove"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          Retinal Image Upload
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400">
+          Upload retinal images for both eyes. Each eye requires up to 3 images for comprehensive screening.
+        </p>
       </div>
 
-      {/* Left Eye Section */}
-      <div className="screening-form-section">
-        <h3 className="screening-form-section-title">Left Eye (OS)</h3>
-        <div className="screening-form-field">
-          <label className="screening-form-label">
-            <input
-              type="checkbox"
-              checked={retinalImages.leftEyeMissing}
-              onChange={(e) => handleInputChange('leftEyeMissing', e.target.checked)}
-              className="mr-2"
-            />
-            Missing Eye
-          </label>
-        </div>
-        
-        {!retinalImages.leftEyeMissing && (
-          <div className="screening-form-image-upload">
-            <label className="screening-form-label">Retinal Images (Max 3)</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={(e) => handleImageUpload('left', e.target.files)}
-              className="screening-form-upload-button"
-              name="leftEyeImages"
-            />
-            <div className="screening-form-image-preview">
-              {retinalImages.leftEyeImages.map((file, index) => (
-                <div key={index} className="screening-form-image">
-                  <img 
-                    src={URL.createObjectURL(file)} 
-                    alt={`Left eye image ${index + 1}`}
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <button
-                    onClick={() => removeImage('left', index)}
-                    className="screening-form-image-remove"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+      {/* Eyes Container */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Right Eye */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <span className="w-3 h-3 bg-blue-600 rounded-full mr-3"></span>
+              Right Eye (OD)
+            </h4>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500">
+                {retinalImages.rightEyeImages.length}/3 images
+              </span>
+              {retinalImages.rightEyeImages.length === 3 && (
+                <div className="flex items-center text-green-600">
+                  {getIcon('check')}
                 </div>
-              ))}
+              )}
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Technician Comments */}
-      <div className="screening-form-section">
-        <h3 className="screening-form-section-title">Technician Comments</h3>
-        <div className="screening-form-field">
-          <textarea
-            value={retinalImages.technicianComments}
-            onChange={(e) => handleInputChange('technicianComments', e.target.value)}
-            placeholder="Enter any additional comments or observations..."
-            className="screening-form-textarea"
-            rows={4}
-            name="technicianComments"
-          />
-          {errors.technicianComments && (
-            <div className="screening-form-error">{errors.technicianComments}</div>
+          {/* Missing Eye Toggle */}
+          <div className="flex items-center space-x-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={retinalImages.rightEyeMissing}
+                onChange={(e) => handleInputChange('rightEyeMissing', e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                Right eye (OD) images unavailable
+              </span>
+            </label>
+          </div>
+
+          {/* Upload Zone */}
+          {!retinalImages.rightEyeMissing && (
+            <div
+              className={`relative border-2 border-dashed rounded-lg p-6 transition-all duration-200 ${
+                retinalImages.rightEyeImages.length === 0
+                  ? 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
+                  : 'border-green-300 bg-green-50'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'right')}
+            >
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(e) => handleImageUpload('right', e.target.files)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={retinalImages.rightEyeImages.length >= 3}
+              />
+              
+              {retinalImages.rightEyeImages.length === 0 ? (
+                <div className="text-center">
+                  <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    {getIcon('upload')}
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    Drag and drop images here, or click to browse
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Supports JPG, PNG, GIF (max 3 images)
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-green-700 mb-3">
+                    {retinalImages.rightEyeImages.length} image(s) uploaded
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {retinalImages.rightEyeImages.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Right eye (OD) image ${index + 1}`}
+                          className="w-full h-32 object-cover rounded border shadow-sm"
+                        />
+                        {/* Desktop X button */}
+                        <button
+                          onClick={() => removeImage('right', index)}
+                          className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white hidden sm:flex"
+                          title="Remove image"
+                        >
+                          {getIcon('close')}
+                        </button>
+                        <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                          {index + 1}
+                        </div>
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded pointer-events-none"></div>
+                        
+                        {/* Mobile Remove button */}
+                        <button
+                          onClick={() => removeImage('right', index)}
+                          className="w-full mt-2 px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors sm:hidden"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {retinalImages.rightEyeMissing && (
+            <div className="border border-yellow-300 bg-yellow-50 rounded-lg p-4">
+              <p className="text-sm text-yellow-800">
+                Right eye (OD) images marked as unavailable. Please document reason in technician comments below.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Left Eye */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <span className="w-3 h-3 bg-green-600 rounded-full mr-3"></span>
+              Left Eye (OS)
+            </h4>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500">
+                {retinalImages.leftEyeImages.length}/3 images
+              </span>
+              {retinalImages.leftEyeImages.length === 3 && (
+                <div className="flex items-center text-green-600">
+                  {getIcon('check')}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Missing Eye Toggle */}
+          <div className="flex items-center space-x-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={retinalImages.leftEyeMissing}
+                onChange={(e) => handleInputChange('leftEyeMissing', e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                Left eye (OS) images unavailable
+              </span>
+            </label>
+          </div>
+
+          {/* Upload Zone */}
+          {!retinalImages.leftEyeMissing && (
+            <div
+              className={`relative border-2 border-dashed rounded-lg p-6 transition-all duration-200 ${
+                retinalImages.leftEyeImages.length === 0
+                  ? 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
+                  : 'border-green-300 bg-green-50'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'left')}
+            >
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(e) => handleImageUpload('left', e.target.files)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={retinalImages.leftEyeImages.length >= 3}
+              />
+              
+              {retinalImages.leftEyeImages.length === 0 ? (
+                <div className="text-center">
+                  <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    {getIcon('upload')}
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    Drag and drop images here, or click to browse
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Supports JPG, PNG, GIF (max 3 images)
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-green-700 mb-3">
+                    {retinalImages.leftEyeImages.length} image(s) uploaded
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {retinalImages.leftEyeImages.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Left eye (OS) image ${index + 1}`}
+                          className="w-full h-32 object-cover rounded border shadow-sm"
+                        />
+                        {/* Desktop X button */}
+                        <button
+                          onClick={() => removeImage('left', index)}
+                          className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white hidden sm:flex"
+                          title="Remove image"
+                        >
+                          {getIcon('close')}
+                        </button>
+                        <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                          {index + 1}
+                        </div>
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded pointer-events-none"></div>
+                        
+                        {/* Mobile Remove button */}
+                        <button
+                          onClick={() => removeImage('left', index)}
+                          className="w-full mt-2 px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors sm:hidden"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {retinalImages.leftEyeMissing && (
+            <div className="border border-yellow-300 bg-yellow-50 rounded-lg p-4">
+              <p className="text-sm text-yellow-800">
+                Left eye (OS) images marked as unavailable. Please document reason in technician comments below.
+              </p>
+            </div>
           )}
         </div>
       </div>
 
+      {/* Technician Comments */}
+      <div className="space-y-3">
+        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300">
+          Technician Comments
+        </label>
+        <textarea
+          name="technicianComments"
+          value={retinalImages.technicianComments}
+          onChange={(e) => handleInputChange('technicianComments', e.target.value)}
+          placeholder="Add any relevant notes about the image capture process, patient cooperation, or image quality..."
+          rows={4}
+          className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 ${
+            errors.technicianComments ? 'border-red-500' : 'border-gray-300'
+          }`}
+        />
+        {errors.technicianComments && (
+          <p className="text-sm text-red-600">{errors.technicianComments}</p>
+        )}
+      </div>
+
+      {/* Progress Summary */}
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+          Upload Summary
+        </h5>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Right Eye (OD):</span>
+            <span className={`font-medium ${
+              retinalImages.rightEyeMissing 
+                ? 'text-yellow-600' 
+                : retinalImages.rightEyeImages.length > 0 
+                  ? 'text-green-600' 
+                  : 'text-red-600'
+            }`}>
+              {retinalImages.rightEyeMissing 
+                ? 'Marked unavailable' 
+                : `${retinalImages.rightEyeImages.length}/3 images`
+              }
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Left Eye (OS):</span>
+            <span className={`font-medium ${
+              retinalImages.leftEyeMissing 
+                ? 'text-yellow-600' 
+                : retinalImages.leftEyeImages.length > 0 
+                  ? 'text-green-600' 
+                  : 'text-red-600'
+            }`}>
+              {retinalImages.leftEyeMissing 
+                ? 'Marked unavailable' 
+                : `${retinalImages.leftEyeImages.length}/3 images`
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Form Actions */}
-      <div className="screening-form-actions">
+      <div className="flex justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={onPreviousStep}
-          className="screening-form-button screening-form-button-secondary"
+          className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
         >
-          Previous
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Previous</span>
         </button>
         <button
           onClick={onNextStep}
-          className="screening-form-button screening-form-button-primary"
+          className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Next
+          <span>Next</span>
+          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
     </div>
@@ -2312,8 +2472,15 @@ export default function HEDISLandingPage() {
                   retinalImages={retinalImages}
                   setRetinalImages={setRetinalImages}
                   errors={errors}
+                  setErrors={setErrors}
                   onNextStep={() => updateScreeningStep(4, formMode, currentFormId || undefined)}
                   onPreviousStep={() => updateScreeningStep(2, formMode, currentFormId || undefined)}
+                  currentFormId={currentFormId}
+                  selectedPatient={selectedPatient}
+                  screeningDetails={screeningDetails}
+                  setSavedForms={setSavedForms}
+                  setDashboardStats={setDashboardStats}
+                  updateScreeningStep={updateScreeningStep}
                 />
               )}
             </div>

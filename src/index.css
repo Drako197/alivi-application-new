@@ -1185,9 +1185,10 @@ body {
 
 /* HEDIS Integrated Alert Styles */
 .hedis-integrated-alert {
-  @apply w-full mb-6 overflow-hidden transition-all duration-500 ease-in-out;
+  @apply mb-6 overflow-hidden transition-all duration-500 ease-in-out;
   max-height: 0;
   opacity: 0;
+  max-width: 100%;
 }
 
 .hedis-integrated-alert.show {

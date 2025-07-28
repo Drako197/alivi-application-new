@@ -241,32 +241,30 @@ export default function NewScreeningForm({
 
         {/* Progress Indicator */}
         <div className="flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 flex-shrink-0">
-          <div className="flex items-center space-x-4">
-            <div className={`flex items-center ${currentStep >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                currentStep >= 1 ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300'
-              }`}>
-                1
-              </div>
-              <span className="ml-2 text-sm font-medium">Screening Details</span>
+          <div className="hedis-screening-step-indicators">
+            <div className={`hedis-screening-step ${
+              currentStep > 1 ? 'hedis-screening-step-completed' : 
+              currentStep === 1 ? 'hedis-screening-step-active' : 
+              'hedis-screening-step-inactive'
+            }`}>
+              <div className="hedis-screening-step-number">1</div>
+              <div className="hedis-screening-step-label">Screening Details</div>
             </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className={`flex items-center ${currentStep >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                currentStep >= 2 ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300'
-              }`}>
-                2
-              </div>
-              <span className="ml-2 text-sm font-medium">Retinal Images</span>
+            <div className={`hedis-screening-step ${
+              currentStep > 2 ? 'hedis-screening-step-completed' : 
+              currentStep === 2 ? 'hedis-screening-step-active' : 
+              'hedis-screening-step-inactive'
+            }`}>
+              <div className="hedis-screening-step-number">2</div>
+              <div className="hedis-screening-step-label">Retinal Images</div>
             </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className={`flex items-center ${currentStep >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                currentStep >= 3 ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300'
-              }`}>
-                3
-              </div>
-              <span className="ml-2 text-sm font-medium">Review & Submit</span>
+            <div className={`hedis-screening-step ${
+              currentStep > 3 ? 'hedis-screening-step-completed' : 
+              currentStep === 3 ? 'hedis-screening-step-active' : 
+              'hedis-screening-step-inactive'
+            }`}>
+              <div className="hedis-screening-step-number">3</div>
+              <div className="hedis-screening-step-label">Review & Submit</div>
             </div>
           </div>
         </div>

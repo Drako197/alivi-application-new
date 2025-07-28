@@ -1,0 +1,1 @@
+console.log('Clearing localStorage...'); localStorage.removeItem('alivi_completed_screenings'); localStorage.removeItem('alivi_saved_screenings'); localStorage.removeItem('alivi_dashboard_stats'); console.log('localStorage cleared. Please refresh the page.');

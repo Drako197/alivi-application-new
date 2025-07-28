@@ -1200,6 +1200,13 @@ body {
   max-width: 100%;
 }
 
+/* Mobile responsive adjustments for alerts */
+@media (max-width: 1024px) {
+  .hedis-integrated-alert {
+    max-width: 100vw;
+  }
+}
+
 .hedis-integrated-alert.show {
   max-height: 120px;
   opacity: 1;
@@ -2093,7 +2100,7 @@ select {
 }
 
 .hedis-screening-step-indicators {
-  @apply flex items-center justify-center space-x-4;
+  @apply flex items-center justify-center space-x-4 w-full;
 }
 
 .hedis-screening-step {
@@ -2112,12 +2119,37 @@ select {
   @apply bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400;
 }
 
+.hedis-screening-step-completed .hedis-screening-step-number {
+  @apply bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white shadow-lg;
+  animation: completedPulse 2s ease-in-out infinite;
+}
+
+@keyframes completedPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px -3px rgba(34, 197, 94, 0.4);
+  }
+}
+
 .hedis-screening-step-label {
   @apply text-xs font-medium text-gray-600 dark:text-gray-400 text-center;
 }
 
 .hedis-screening-step-active .hedis-screening-step-label {
   @apply text-blue-600 dark:text-blue-400;
+}
+
+.hedis-screening-step-completed .hedis-screening-step-label {
+  @apply text-green-600 dark:text-green-400 font-semibold;
+}
+
+.hedis-screening-step-completed .hedis-screening-step-number::after {
+  content: "✓";
+  @apply absolute -top-3 -left-3 w-5 h-5 bg-white rounded-full flex items-center justify-center text-green-600 font-bold text-xs shadow-sm border border-green-200;
 }
 
 .hedis-screening-content {
@@ -2149,6 +2181,218 @@ select {
   .hedis-screening-step-label {
     @apply text-xs;
   }
+}
+
+/* Enhanced mobile optimizations for step indicators */
+@media (max-width: 768px) {
+  .hedis-screening-progress {
+    @apply mb-4;
+  }
+  
+  .hedis-screening-step-indicators {
+    @apply flex items-center justify-center space-x-2 overflow-x-auto pb-2 w-full;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .hedis-screening-step-indicators::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
+  .hedis-screening-step {
+    @apply flex flex-col items-center space-y-1 flex-shrink-0 min-w-0;
+  }
+  
+  .hedis-screening-step-number {
+    @apply w-6 h-6 text-xs;
+  }
+  
+  .hedis-screening-step-label {
+    @apply text-xs font-medium text-center leading-tight max-w-16;
+    word-wrap: break-word;
+  }
+  
+  /* Adjust checkmark position for smaller screens */
+  .hedis-screening-step-completed .hedis-screening-step-number::after {
+    @apply -top-2 -left-2 w-4 h-4 text-xs;
+  }
+  
+  /* Reduce animation scale for mobile */
+  .hedis-screening-step-completed .hedis-screening-step-number {
+    animation: completedPulseMobile 2s ease-in-out infinite;
+  }
+}
+
+@keyframes completedPulseMobile {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 4px -1px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px -2px rgba(34, 197, 94, 0.4);
+  }
+}
+
+/* Mobile optimizations for screening forms */
+@media (max-width: 768px) {
+  /* Enhanced spacing for mobile form sections */
+  .hedis-screening-content {
+    padding: 1rem;
+  }
+  
+  /* Mobile-optimized form grid */
+  .hedis-screening-content .grid.grid-cols-1.md\:grid-cols-2 {
+    gap: 1rem;
+  }
+  
+  /* Mobile-optimized form fields */
+  .hedis-screening-content input,
+  .hedis-screening-content select,
+  .hedis-screening-content textarea {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Mobile-optimized labels */
+  .hedis-screening-content label {
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Mobile-optimized section headers */
+  .hedis-screening-content h3 {
+    font-size: 1.125rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Mobile-optimized radio button groups */
+  .hedis-screening-content .space-y-3 {
+    gap: 1rem;
+  }
+  
+  /* Mobile-optimized radio button containers */
+  .hedis-screening-content .flex.items-center {
+    padding: 0.5rem 0;
+  }
+  
+  /* Mobile-optimized radio button labels */
+  .hedis-screening-content .text-sm {
+    font-size: 1rem;
+  }
+  
+  /* Mobile-optimized error messages */
+  .hedis-screening-content .text-red-600 {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Mobile-optimized "Other" text inputs */
+  .hedis-screening-content input[type="text"] {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Mobile optimizations for completed screening view */
+@media (max-width: 768px) {
+  .hedis-screening-content {
+    @apply p-4;
+  }
+  
+  .hedis-screening-header {
+    @apply p-4;
+  }
+  
+  .hedis-screening-breadcrumb {
+    @apply mb-4;
+  }
+  
+  .hedis-screening-progress {
+    @apply mb-4;
+  }
+  
+  .hedis-screening-step-indicators {
+    @apply gap-2;
+  }
+  
+  .hedis-screening-step {
+    @apply flex-shrink-0;
+  }
+  
+  .hedis-screening-step-number {
+    @apply w-6 h-6 text-xs;
+  }
+  
+  .hedis-screening-step-label {
+    @apply text-xs;
+  }
+  
+  /* Optimize card spacing in completed screening view */
+  .screening-form-content > div {
+    @apply mb-4;
+  }
+  
+  .screening-form-content > div:last-child {
+    @apply mb-0;
+  }
+  
+  /* Reduce padding in cards */
+  .screening-form-content .bg-white,
+  .screening-form-content .dark\:bg-gray-800 {
+    @apply p-4;
+  }
+  
+  /* Optimize grid layouts for mobile */
+  .screening-form-content .grid {
+    @apply gap-3;
+  }
+  
+  /* Make image grids more compact */
+  .screening-form-content .grid.grid-cols-3 {
+    @apply gap-1;
+  }
+  
+  /* Optimize text sizes for mobile */
+  .screening-form-content h2 {
+    @apply text-xl;
+  }
+  
+  .screening-form-content h3 {
+    @apply text-lg;
+  }
+  
+  .screening-form-content h4 {
+    @apply text-base;
+  }
+  
+  /* Reduce spacing in info grids */
+  .screening-form-content .flex.items-center.space-x-3 {
+    @apply space-x-2;
+  }
+  
+  .screening-form-content .p-3 {
+    @apply p-2;
+  }
+  
+  /* Optimize retinal images section */
+  .screening-form-content .grid.grid-cols-1.md\:grid-cols-2 {
+    @apply gap-4;
+  }
+  
+  /* Make image thumbnails smaller on mobile */
+  .screening-form-content .h-20 {
+    @apply h-16;
+  }
+  
+                /* Optimize modal for mobile */
+              .screening-form-content .fixed.inset-0 {
+                @apply p-2;
+              }
+              
+              .screening-form-content .max-w-4xl {
+                @apply max-w-none mx-2;
+              }
 }
 
 /* HEDIS Patient Search Step Styles */

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import type { ReactElement } from 'react'
 import { createPortal } from 'react-dom'
+import { useAuth } from '../contexts/AuthContext'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import DatePicker from './DatePicker'
+import ScreeningDataService from '../services/ScreeningDataService'
+import type { CompletedScreening, SavedScreening, DashboardStats } from '../services/ScreeningDataService'
 
 // TypeScript Interfaces
 interface Patient {
@@ -43,6 +46,78 @@ interface RetinalImages {
   rightEyeImages: File[]
   leftEyeImages: File[]
   technicianComments: string
+}
+
+// Helper function for responsive alert positioning
+const createResponsiveAlert = (alertMessage: string, alertDescription: string) => {
+  // Create the alert element with the exact same structure as the success alert
+  const alert = document.createElement('div')
+  alert.className = 'hedis-integrated-alert show'
+  
+  // Create the content div
+  const content = document.createElement('div')
+  content.className = 'hedis-integrated-alert-content'
+  
+  // Create the icon div
+  const icon = document.createElement('div')
+  icon.className = 'hedis-integrated-alert-icon'
+  icon.innerHTML = `
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+    </svg>
+  `
+  
+  // Create the message div
+  const messageDiv = document.createElement('div')
+  messageDiv.className = 'hedis-integrated-alert-message'
+  
+  // Create the title
+  const title = document.createElement('h4')
+  title.className = 'hedis-integrated-alert-title'
+  title.textContent = alertMessage
+  
+  // Create the description
+  const description = document.createElement('p')
+  description.className = 'hedis-integrated-alert-description'
+  description.textContent = alertDescription
+  
+  // Create the close button
+  const closeButton = document.createElement('button')
+  closeButton.className = 'hedis-integrated-alert-close'
+  closeButton.setAttribute('aria-label', 'Close alert')
+  closeButton.innerHTML = `
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  `
+  
+  // Assemble the structure
+  messageDiv.appendChild(title)
+  messageDiv.appendChild(description)
+  content.appendChild(icon)
+  content.appendChild(messageDiv)
+  content.appendChild(closeButton)
+  alert.appendChild(content)
+  
+  // Find the dashboard content and insert at the top
+  const dashboardContent = document.querySelector('.dashboard-content')
+  if (dashboardContent) {
+    dashboardContent.insertBefore(alert, dashboardContent.firstChild)
+  } else {
+    document.body.appendChild(alert)
+  }
+  
+  // Add close functionality
+  closeButton.addEventListener('click', () => {
+    alert.remove()
+  })
+  
+  // Remove alert after 10 seconds
+  setTimeout(() => {
+    if (alert.parentNode) {
+      alert.remove()
+    }
+  }, 10000)
 }
 
 // Patient Search Step Component
@@ -162,6 +237,13 @@ function PatientSearchStep({ onPatientSelect, onNextStep }: PatientSearchStepPro
   const handlePatientSelect = (patient: Patient) => {
     onPatientSelect(patient)
     onNextStep()
+    // Mobile scroll to top of next form
+    setTimeout(() => {
+      window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+      })
+    }, 150) // Slightly longer delay to ensure step transition completes
   }
 
   const handleFilterChange = (filterName: string, value: string) => {
@@ -395,12 +477,20 @@ function ScreeningDetailsForm({
     setScreeningDetails({ ...screeningDetails, [field]: value })
   }
 
-  const handleCheckboxChange = (field: 'ocularHistory' | 'ocularSurgery', value: string, checked: boolean) => {
-    const currentValues = screeningDetails[field]
-    const newValues = checked 
-      ? [...currentValues, value]
-      : currentValues.filter(v => v !== value)
-    setScreeningDetails({ ...screeningDetails, [field]: newValues })
+  const handleOcularRadioChange = (field: 'ocularHistory' | 'ocularSurgery', value: string) => {
+    // For radio buttons, we only store the selected value, not an array
+    const updatedScreeningDetails = { ...screeningDetails, [field]: [value] }
+    
+    // Clear "Other" field if user selects something other than "Other"
+    if (value !== 'Other') {
+      if (field === 'ocularHistory') {
+        updatedScreeningDetails.ocularHistoryOther = ''
+      } else if (field === 'ocularSurgery') {
+        updatedScreeningDetails.ocularSurgeryOther = ''
+      }
+    }
+    
+    setScreeningDetails(updatedScreeningDetails)
     
     // Clear validation error for this field when user makes a selection
     if (errors[field]) {
@@ -467,12 +557,33 @@ function ScreeningDetailsForm({
   const handleNextClick = () => {
     if (validateForm()) {
       onNextStep()
+      // Mobile scroll to top of next form
+      setTimeout(() => {
+        window.scrollTo({ 
+          top: 0, 
+          behavior: 'smooth' 
+        })
+      }, 150) // Slightly longer delay to ensure step transition completes
     } else {
-      // Scroll to first error
-      const firstErrorElement = document.querySelector('[data-error="true"]')
-      if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
+      // Mobile-friendly scroll to first error
+      setTimeout(() => {
+        const firstErrorElement = document.querySelector('[data-error="true"]')
+        if (firstErrorElement) {
+          // For mobile, scroll to the element with some offset from top
+          firstErrorElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          })
+          
+          // Add a small delay and scroll up a bit to account for mobile header
+          setTimeout(() => {
+            window.scrollBy({
+              top: -80, // Offset for mobile header/navigation
+              behavior: 'smooth'
+            })
+          }, 300)
+        }
+      }, 100) // Small delay to ensure error states are rendered
     }
   }
 
@@ -829,11 +940,7 @@ function ScreeningDetailsForm({
                     value={option.value}
                     checked={screeningDetails.ocularHistory.includes(option.value)}
                     onChange={(e) => {
-                      if (e.target.checked) {
-                        handleCheckboxChange('ocularHistory', option.value, true)
-                      } else {
-                        handleCheckboxChange('ocularHistory', option.value, false)
-                      }
+                      handleOcularRadioChange('ocularHistory', option.value)
                     }}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
                   />
@@ -879,11 +986,7 @@ function ScreeningDetailsForm({
                     value={option.value}
                     checked={screeningDetails.ocularSurgery.includes(option.value)}
                     onChange={(e) => {
-                      if (e.target.checked) {
-                        handleCheckboxChange('ocularSurgery', option.value, true)
-                      } else {
-                        handleCheckboxChange('ocularSurgery', option.value, false)
-                      }
+                      handleOcularRadioChange('ocularSurgery', option.value)
                     }}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
                   />
@@ -930,102 +1033,158 @@ function ScreeningDetailsForm({
         </div>
       </div>
 
-      {/* Form Actions */}
-      <div className="flex justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex space-x-3">
+      {/* Form Actions - Mobile Optimized */}
+      <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
+        {/* Mobile: Stack buttons vertically */}
+        <div className="flex flex-col space-y-3 md:hidden">
+          {/* Primary Action - Next */}
+          <button
+            onClick={handleNextClick}
+            className="flex items-center justify-center w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base"
+          >
+            <span>Continue to Next Step</span>
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          
+          {/* Secondary Actions */}
+          <div className="flex space-x-2">
+            <button
+              onClick={onPreviousStep}
+              className="flex-1 flex items-center justify-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors border border-gray-300 dark:border-gray-600 rounded-lg"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <button
+              onClick={() => {
+                // Save form data
+                const formData = {
+                  id: currentFormId || `form_${Date.now()}`,
+                  patientId: patient.patientId,
+                  patientName: `${patient.firstName} ${patient.lastName}`,
+                  dateSaved: new Date().toISOString(),
+                  progress: `Step ${currentScreeningStep} of 4`,
+                  screeningDetails,
+                  retinalImages: { rightEyeImages: [], leftEyeImages: [], rightEyeMissing: false, leftEyeMissing: false, technicianComments: '' }
+                }
+                
+                // Add to saved forms
+                const updatedSavedForms = [...savedForms, formData]
+                setSavedForms(updatedSavedForms)
+                
+                // Update dashboard stats
+                setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
+                  ...prev,
+                  savedPatientForms: prev.savedPatientForms + 1
+                }))
+                
+                // Return to dashboard
+                updateScreeningStep(0, 'dashboard')
+                
+                // Show alert
+                createResponsiveAlert(
+                  'Form saved successfully!',
+                  'You have 30 days to complete this form. It will be automatically deleted after 30 days.'
+                )
+              }}
+              className="flex-1 flex items-center justify-center px-4 py-3 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              <span>Save</span>
+            </button>
+          </div>
+          
+          {/* Close button - Full width on mobile */}
           <button
             onClick={() => updateScreeningStep(0, 'dashboard')}
-            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            className="flex items-center justify-center w-full px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors border border-gray-200 dark:border-gray-600 rounded-lg"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-            <span>Close & Don't Save</span>
-          </button>
-          <button
-            onClick={() => {
-              // Save form data
-              const formData = {
-                id: currentFormId || `form_${Date.now()}`,
-                patientId: patient.patientId,
-                patientName: `${patient.firstName} ${patient.lastName}`,
-                dateSaved: new Date().toISOString(),
-                progress: `Step ${currentScreeningStep} of 4`,
-                screeningDetails,
-                retinalImages: { rightEyeImages: [], leftEyeImages: [], rightEyeMissing: false, leftEyeMissing: false, technicianComments: '' }
-              }
-              
-              // Add to saved forms
-              const updatedSavedForms = [...savedForms, formData]
-              setSavedForms(updatedSavedForms)
-              
-              // Update dashboard stats
-              setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
-                ...prev,
-                savedPatientForms: prev.savedPatientForms + 1
-              }))
-              
-              // Return to dashboard
-              updateScreeningStep(0, 'dashboard')
-              
-              // Show alert
-              const alert = document.createElement('div')
-              alert.className = 'fixed top-20 left-0 right-0 z-50 bg-yellow-100 border-b border-yellow-400 text-yellow-800 px-6 py-4 shadow-lg'
-              alert.innerHTML = `
-                <div class="max-w-7xl mx-auto flex items-center justify-between">
-                  <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="font-medium">Form saved successfully!</span>
-                  </div>
-                  <button onclick="this.parentElement.parentElement.remove()" class="text-yellow-800 hover:text-yellow-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                  </button>
-                </div>
-                <div class="max-w-7xl mx-auto mt-2">
-                  <p class="text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
-                </div>
-              `
-              document.body.appendChild(alert)
-              
-              // Remove alert after 10 seconds
-              setTimeout(() => {
-                if (alert.parentNode) {
-                  alert.remove()
-                }
-              }, 10000)
-            }}
-            className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-            </svg>
-            <span>Save for Later</span>
+            <span>Close Form</span>
           </button>
         </div>
         
-        <div className="flex space-x-3">
-          <button
-            onClick={onPreviousStep}
-            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Previous</span>
-          </button>
-          <button
-            onClick={handleNextClick}
-            className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <span>Next</span>
-            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+        {/* Desktop: Original horizontal layout */}
+        <div className="hidden md:flex justify-between items-center">
+          <div className="flex space-x-3">
+            <button
+              onClick={() => updateScreeningStep(0, 'dashboard')}
+              className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span>Close & Don't Save</span>
+            </button>
+            <button
+              onClick={() => {
+                // Save form data
+                const formData = {
+                  id: currentFormId || `form_${Date.now()}`,
+                  patientId: patient.patientId,
+                  patientName: `${patient.firstName} ${patient.lastName}`,
+                  dateSaved: new Date().toISOString(),
+                  progress: `Step ${currentScreeningStep} of 4`,
+                  screeningDetails,
+                  retinalImages: { rightEyeImages: [], leftEyeImages: [], rightEyeMissing: false, leftEyeMissing: false, technicianComments: '' }
+                }
+                
+                // Add to saved forms
+                const updatedSavedForms = [...savedForms, formData]
+                setSavedForms(updatedSavedForms)
+                
+                // Update dashboard stats
+                setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
+                  ...prev,
+                  savedPatientForms: prev.savedPatientForms + 1
+                }))
+                
+                // Return to dashboard
+                updateScreeningStep(0, 'dashboard')
+                
+                // Show alert
+                createResponsiveAlert(
+                  'Form saved successfully!',
+                  'You have 30 days to complete this form. It will be automatically deleted after 30 days.'
+                )
+              }}
+              className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              <span>Save for Later</span>
+            </button>
+          </div>
+          
+          <div className="flex space-x-3">
+            <button
+              onClick={onPreviousStep}
+              className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
+            </button>
+            <button
+              onClick={handleNextClick}
+              className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <span>Next</span>
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1073,6 +1232,32 @@ function RetinalImagesForm({
     if (errors[field]) {
       const newErrors = { ...errors }
       delete newErrors[field]
+      setErrors(newErrors)
+    }
+
+    // Clear errors when user marks eye as missing
+    if (field === 'rightEyeMissing' && value === true) {
+      const newErrors = { ...errors }
+      delete newErrors.rightEyeImages
+      setErrors(newErrors)
+    }
+    if (field === 'leftEyeMissing' && value === true) {
+      const newErrors = { ...errors }
+      delete newErrors.leftEyeImages
+      setErrors(newErrors)
+    }
+
+    // Prevent both eyes from being marked as missing
+    if (field === 'rightEyeMissing' && value === true && retinalImages.leftEyeMissing) {
+      setRetinalImages({ ...retinalImages, leftEyeMissing: false })
+      const newErrors = { ...errors }
+      delete newErrors.leftEyeImages
+      setErrors(newErrors)
+    }
+    if (field === 'leftEyeMissing' && value === true && retinalImages.rightEyeMissing) {
+      setRetinalImages({ ...retinalImages, rightEyeMissing: false })
+      const newErrors = { ...errors }
+      delete newErrors.rightEyeImages
       setErrors(newErrors)
     }
   }
@@ -1133,12 +1318,24 @@ function RetinalImagesForm({
     const rightEyeValid = retinalImages.rightEyeMissing || retinalImages.rightEyeImages.length > 0
     const leftEyeValid = retinalImages.leftEyeMissing || retinalImages.leftEyeImages.length > 0
 
+    // Ensure at least one eye has images (not both marked as missing)
+    const atLeastOneEyeHasImages = (retinalImages.rightEyeImages.length > 0 || retinalImages.leftEyeImages.length > 0) || 
+                                   (retinalImages.rightEyeMissing && !retinalImages.leftEyeMissing) || 
+                                   (!retinalImages.rightEyeMissing && retinalImages.leftEyeMissing)
+
     if (!rightEyeValid) {
       newErrors.rightEyeImages = 'Please upload images for right eye or mark as missing'
     }
 
     if (!leftEyeValid) {
       newErrors.leftEyeImages = 'Please upload images for left eye or mark as missing'
+    }
+
+    // Check that at least one eye has images
+    if (!atLeastOneEyeHasImages) {
+      if (!retinalImages.rightEyeImages.length && !retinalImages.leftEyeImages.length) {
+        newErrors.general = 'At least one eye must have images uploaded. You cannot mark both eyes as missing.'
+      }
     }
 
     // Update errors state
@@ -1150,12 +1347,33 @@ function RetinalImagesForm({
   const handleNextClick = () => {
     if (validateForm()) {
       onNextStep()
+      // Mobile scroll to top of next form
+      setTimeout(() => {
+        window.scrollTo({ 
+          top: 0, 
+          behavior: 'smooth' 
+        })
+      }, 150) // Slightly longer delay to ensure step transition completes
     } else {
-      // Scroll to first error
-      const firstErrorElement = document.querySelector('[data-error="true"]')
-      if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
+      // Mobile-friendly scroll to first error
+      setTimeout(() => {
+        const firstErrorElement = document.querySelector('[data-error="true"]')
+        if (firstErrorElement) {
+          // For mobile, scroll to the element with some offset from top
+          firstErrorElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          })
+          
+          // Add a small delay and scroll up a bit to account for mobile header
+          setTimeout(() => {
+            window.scrollBy({
+              top: -80, // Offset for mobile header/navigation
+              behavior: 'smooth'
+            })
+          }, 300)
+        }
+      }, 100) // Small delay to ensure error states are rendered
     }
   }
 
@@ -1187,28 +1405,35 @@ function RetinalImagesForm({
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="space-y-6 md:space-y-8">
+      {/* Header - Mobile Optimized */}
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">
           Retinal Image Upload
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 px-4 md:px-0">
           Upload retinal images for both eyes. Each eye requires up to 3 images for comprehensive screening.
         </p>
       </div>
 
-      {/* Eyes Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Right Eye */}
-        <div className="space-y-4">
+      {/* General Error Message - Mobile Optimized */}
+      {errors.general && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mx-4 md:mx-0">
+          <p className="text-sm text-red-600 dark:text-red-400">{errors.general}</p>
+        </div>
+      )}
+
+      {/* Eyes Container - Mobile Optimized */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 px-4 md:px-0">
+        {/* Right Eye - Mobile Optimized */}
+        <div className="space-y-4 md:space-y-5">
           <div className="flex items-center justify-between">
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <h4 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
               <span className="w-3 h-3 bg-blue-600 rounded-full mr-3"></span>
               Right Eye (OD)
             </h4>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">
+              <span className="text-xs md:text-sm text-gray-500">
                 {retinalImages.rightEyeImages.length}/3 images
               </span>
               {retinalImages.rightEyeImages.length === 3 && (
@@ -1219,29 +1444,29 @@ function RetinalImagesForm({
             </div>
           </div>
 
-          {/* Missing Eye Toggle */}
+          {/* Missing Eye Toggle - Mobile Optimized */}
           <div className="flex items-center space-x-3">
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={retinalImages.rightEyeMissing}
                 onChange={(e) => handleInputChange('rightEyeMissing', e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 md:h-4 md:w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+              <span className="ml-3 md:ml-2 text-sm md:text-sm text-gray-700 dark:text-gray-300">
                 Right eye (OD) images unavailable
               </span>
             </label>
           </div>
 
-          {/* Upload Zone */}
+          {/* Upload Zone - Mobile Optimized */}
           {!retinalImages.rightEyeMissing && (
             <div
-              className={`relative border-2 border-dashed rounded-lg p-6 transition-all duration-200 ${
+              className={`relative border-2 border-dashed rounded-lg p-4 md:p-6 transition-all duration-200 ${
                 retinalImages.rightEyeImages.length === 0
                   ? 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
                   : 'border-green-300 bg-green-50'
-              }`}
+              } ${errors.rightEyeImages ? 'border-red-300 bg-red-50' : ''}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'right')}
@@ -1257,11 +1482,12 @@ function RetinalImagesForm({
               
               {retinalImages.rightEyeImages.length === 0 ? (
                 <div className="text-center">
-                  <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <div className="mx-auto w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3 md:mb-4">
                     {getIcon('upload')}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    Drag and drop images here, or click to browse
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <span className="md:hidden">Tap to select images</span>
+                    <span className="hidden md:inline">Drag and drop images here, or click to browse</span>
                   </p>
                   <p className="text-xs text-gray-500">
                     Supports JPG, PNG, GIF (max 3 images)
@@ -1269,21 +1495,21 @@ function RetinalImagesForm({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-green-700 mb-3">
+                  <p className="text-xs md:text-sm font-medium text-green-700 mb-3">
                     {retinalImages.rightEyeImages.length} image(s) uploaded
                   </p>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                     {retinalImages.rightEyeImages.map((file, index) => (
                       <div key={index} className="relative group">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Right eye (OD) image ${index + 1}`}
-                          className="w-full h-32 object-cover rounded border shadow-sm"
+                          className="w-full h-24 md:h-32 object-cover rounded border shadow-sm"
                         />
                         {/* Desktop X button */}
                         <button
                           onClick={() => removeImage('right', index)}
-                          className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white hidden sm:flex"
+                          className="absolute -top-2 -right-2 w-6 h-6 md:w-7 md:h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white hidden sm:flex"
                           title="Remove image"
                         >
                           {getIcon('close')}
@@ -1308,6 +1534,13 @@ function RetinalImagesForm({
             </div>
           )}
 
+          {/* Error message for right eye */}
+          {errors.rightEyeImages && (
+            <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+              {errors.rightEyeImages}
+            </p>
+          )}
+
           {retinalImages.rightEyeMissing && (
             <div className="border border-yellow-300 bg-yellow-50 rounded-lg p-4">
               <p className="text-sm text-yellow-800">
@@ -1317,15 +1550,15 @@ function RetinalImagesForm({
           )}
         </div>
 
-        {/* Left Eye */}
-        <div className="space-y-4">
+        {/* Left Eye - Mobile Optimized */}
+        <div className="space-y-4 md:space-y-5">
           <div className="flex items-center justify-between">
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <h4 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
               <span className="w-3 h-3 bg-green-600 rounded-full mr-3"></span>
               Left Eye (OS)
             </h4>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">
+              <span className="text-xs md:text-sm text-gray-500">
                 {retinalImages.leftEyeImages.length}/3 images
               </span>
               {retinalImages.leftEyeImages.length === 3 && (
@@ -1336,29 +1569,29 @@ function RetinalImagesForm({
             </div>
           </div>
 
-          {/* Missing Eye Toggle */}
+          {/* Missing Eye Toggle - Mobile Optimized */}
           <div className="flex items-center space-x-3">
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={retinalImages.leftEyeMissing}
                 onChange={(e) => handleInputChange('leftEyeMissing', e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 md:h-4 md:w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+              <span className="ml-3 md:ml-2 text-sm md:text-sm text-gray-700 dark:text-gray-300">
                 Left eye (OS) images unavailable
               </span>
             </label>
           </div>
 
-          {/* Upload Zone */}
+          {/* Upload Zone - Mobile Optimized */}
           {!retinalImages.leftEyeMissing && (
             <div
-              className={`relative border-2 border-dashed rounded-lg p-6 transition-all duration-200 ${
+              className={`relative border-2 border-dashed rounded-lg p-4 md:p-6 transition-all duration-200 ${
                 retinalImages.leftEyeImages.length === 0
                   ? 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
                   : 'border-green-300 bg-green-50'
-              }`}
+              } ${errors.leftEyeImages ? 'border-red-300 bg-red-50' : ''}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'left')}
@@ -1374,11 +1607,12 @@ function RetinalImagesForm({
               
               {retinalImages.leftEyeImages.length === 0 ? (
                 <div className="text-center">
-                  <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <div className="mx-auto w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center mb-3 md:mb-4">
                     {getIcon('upload')}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    Drag and drop images here, or click to browse
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <span className="md:hidden">Tap to select images</span>
+                    <span className="hidden md:inline">Drag and drop images here, or click to browse</span>
                   </p>
                   <p className="text-xs text-gray-500">
                     Supports JPG, PNG, GIF (max 3 images)
@@ -1386,21 +1620,21 @@ function RetinalImagesForm({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-green-700 mb-3">
+                  <p className="text-xs md:text-sm font-medium text-green-700 mb-3">
                     {retinalImages.leftEyeImages.length} image(s) uploaded
                   </p>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                     {retinalImages.leftEyeImages.map((file, index) => (
                       <div key={index} className="relative group">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Left eye (OS) image ${index + 1}`}
-                          className="w-full h-32 object-cover rounded border shadow-sm"
+                          className="w-full h-24 md:h-32 object-cover rounded border shadow-sm"
                         />
                         {/* Desktop X button */}
                         <button
                           onClick={() => removeImage('left', index)}
-                          className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white hidden sm:flex"
+                          className="absolute -top-2 -right-2 w-6 h-6 md:w-7 md:h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white hidden sm:flex"
                           title="Remove image"
                         >
                           {getIcon('close')}
@@ -1425,6 +1659,13 @@ function RetinalImagesForm({
             </div>
           )}
 
+          {/* Error message for left eye */}
+          {errors.leftEyeImages && (
+            <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+              {errors.leftEyeImages}
+            </p>
+          )}
+
           {retinalImages.leftEyeMissing && (
             <div className="border border-yellow-300 bg-yellow-50 rounded-lg p-4">
               <p className="text-sm text-yellow-800">
@@ -1435,9 +1676,9 @@ function RetinalImagesForm({
         </div>
       </div>
 
-      {/* Technician Comments */}
-      <div className="space-y-3">
-        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300">
+      {/* Technician Comments - Mobile Optimized */}
+      <div className="space-y-3 px-4 md:px-0">
+        <label className="block text-sm md:text-sm font-extrabold text-gray-700 dark:text-gray-300">
           Technician Comments
         </label>
         <textarea
@@ -1446,7 +1687,7 @@ function RetinalImagesForm({
           onChange={(e) => handleInputChange('technicianComments', e.target.value)}
           placeholder="Add any relevant notes about the image capture process, patient cooperation, or image quality..."
           rows={4}
-          className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 ${
+          className={`block w-full px-3 py-3 md:py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 text-sm md:text-sm ${
             errors.technicianComments ? 'border-red-500' : 'border-gray-300'
           }`}
         />
@@ -1455,12 +1696,12 @@ function RetinalImagesForm({
         )}
       </div>
 
-      {/* Progress Summary */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+      {/* Progress Summary - Mobile Optimized */}
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mx-4 md:mx-0">
         <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
           Upload Summary
         </h5>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-gray-600 dark:text-gray-400">Right Eye (OD):</span>
             <span className={`font-medium ${
@@ -1494,102 +1735,158 @@ function RetinalImagesForm({
         </div>
       </div>
 
-      {/* Form Actions */}
-      <div className="flex justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex space-x-3">
+      {/* Form Actions - Mobile Optimized */}
+      <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
+        {/* Mobile: Stack buttons vertically */}
+        <div className="flex flex-col space-y-3 md:hidden">
+          {/* Primary Action - Next */}
+          <button
+            onClick={handleNextClick}
+            className="flex items-center justify-center w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base"
+          >
+            <span>Continue to Review & Submit</span>
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Secondary Actions */}
+          <div className="flex space-x-2">
+            <button
+              onClick={onPreviousStep}
+              className="flex-1 flex items-center justify-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors border border-gray-300 dark:border-gray-600 rounded-lg"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <button
+              onClick={() => {
+                // Save form data
+                const formData = {
+                  id: currentFormId || `form_${Date.now()}`,
+                  patientId: selectedPatient?.patientId || '',
+                  patientName: selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : '',
+                  dateSaved: new Date().toISOString(),
+                  progress: `Step ${currentScreeningStep} of 4`,
+                  screeningDetails,
+                  retinalImages
+                }
+                
+                // Add to saved forms
+                const updatedSavedForms = [...savedForms, formData]
+                setSavedForms(updatedSavedForms)
+                
+                // Update dashboard stats
+                setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
+                  ...prev,
+                  savedPatientForms: prev.savedPatientForms + 1
+                }))
+                
+                // Return to dashboard
+                updateScreeningStep(0, 'dashboard')
+                
+                // Show alert
+                createResponsiveAlert(
+                  'Form saved successfully!',
+                  'You have 30 days to complete this form. It will be automatically deleted after 30 days.'
+                )
+              }}
+              className="flex-1 flex items-center justify-center px-4 py-3 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              <span>Save</span>
+            </button>
+          </div>
+
+          {/* Close button - Full width on mobile */}
           <button
             onClick={() => updateScreeningStep(0, 'dashboard')}
-            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            className="flex items-center justify-center w-full px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors border border-gray-200 dark:border-gray-600 rounded-lg"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-            <span>Close & Don't Save</span>
-          </button>
-          <button
-            onClick={() => {
-              // Save form data
-              const formData = {
-                id: currentFormId || `form_${Date.now()}`,
-                patientId: selectedPatient?.patientId || '',
-                patientName: selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : '',
-                dateSaved: new Date().toISOString(),
-                progress: `Step ${currentScreeningStep} of 4`,
-                screeningDetails,
-                retinalImages
-              }
-              
-              // Add to saved forms
-              const updatedSavedForms = [...savedForms, formData]
-              setSavedForms(updatedSavedForms)
-              
-              // Update dashboard stats
-              setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
-                ...prev,
-                savedPatientForms: prev.savedPatientForms + 1
-              }))
-              
-              // Return to dashboard
-              updateScreeningStep(0, 'dashboard')
-              
-              // Show alert
-              const alert = document.createElement('div')
-              alert.className = 'fixed top-20 left-0 right-0 z-50 bg-yellow-100 border-b border-yellow-400 text-yellow-800 px-6 py-4 shadow-lg'
-              alert.innerHTML = `
-                <div class="max-w-7xl mx-auto flex items-center justify-between">
-                  <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="font-medium">Form saved successfully!</span>
-                  </div>
-                  <button onclick="this.parentElement.parentElement.remove()" class="text-yellow-800 hover:text-yellow-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                  </button>
-                </div>
-                <div class="max-w-7xl mx-auto mt-2">
-                  <p class="text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
-                </div>
-              `
-              document.body.appendChild(alert)
-              
-              // Remove alert after 10 seconds
-              setTimeout(() => {
-                if (alert.parentNode) {
-                  alert.remove()
-                }
-              }, 10000)
-            }}
-            className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-            </svg>
-            <span>Save for Later</span>
+            <span>Close Form</span>
           </button>
         </div>
-        
-        <div className="flex space-x-3">
-          <button
-            onClick={onPreviousStep}
-            className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Previous</span>
-          </button>
-          <button
-            onClick={handleNextClick}
-            className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <span>Next</span>
-            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+
+        {/* Desktop: Original horizontal layout */}
+        <div className="hidden md:flex justify-between items-center">
+          <div className="flex space-x-3">
+            <button
+              onClick={() => updateScreeningStep(0, 'dashboard')}
+              className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span>Close & Don't Save</span>
+            </button>
+            <button
+              onClick={() => {
+                // Save form data
+                const formData = {
+                  id: currentFormId || `form_${Date.now()}`,
+                  patientId: selectedPatient?.patientId || '',
+                  patientName: selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : '',
+                  dateSaved: new Date().toISOString(),
+                  progress: `Step ${currentScreeningStep} of 4`,
+                  screeningDetails,
+                  retinalImages
+                }
+                
+                // Add to saved forms
+                const updatedSavedForms = [...savedForms, formData]
+                setSavedForms(updatedSavedForms)
+                
+                // Update dashboard stats
+                setDashboardStats((prev: { savedPatientForms: number; completedPatientForms: number }) => ({
+                  ...prev,
+                  savedPatientForms: prev.savedPatientForms + 1
+                }))
+                
+                // Return to dashboard
+                updateScreeningStep(0, 'dashboard')
+                
+                // Show alert
+                createResponsiveAlert(
+                  'Form saved successfully!',
+                  'You have 30 days to complete this form. It will be automatically deleted after 30 days.'
+                )
+              }}
+              className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg hover:bg-yellow-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              <span>Save for Later</span>
+            </button>
+          </div>
+          
+          <div className="flex space-x-3">
+            <button
+              onClick={onPreviousStep}
+              className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
+            </button>
+            <button
+              onClick={handleNextClick}
+              className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <span>Next</span>
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1620,6 +1917,24 @@ function ReviewAndSubmitForm({
   onComplete,
   onSave
 }: ReviewAndSubmitFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    // Simulate API call with 5-second delay
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    setIsSubmitting(false)
+    onComplete()
+  }
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    // Simulate API call with 5-second delay
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    setIsSaving(false)
+    onSave()
+  }
   const getIcon = (iconName: string): ReactElement => {
     const iconMap: { [key: string]: ReactElement } = {
       user: (
@@ -1648,7 +1963,28 @@ function ReviewAndSubmitForm({
   }
 
   return (
-    <div className="screening-form-content">
+    <div className="screening-form-content relative">
+      {/* Loading Overlay */}
+      {(isSubmitting || isSaving) && (
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center space-x-4">
+              <svg className="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {isSubmitting ? 'Submitting Screening...' : 'Saving for Later...'}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Please wait while we process your data
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Enhanced Header with Status Indicators */}
       <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-6 mb-6">
         <div className="flex items-center justify-between">
@@ -1685,15 +2021,6 @@ function ReviewAndSubmitForm({
               Complete
             </span>
           </div>
-          <button
-            onClick={() => onEditStep(1)}
-            className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            <span>Edit</span>
-          </button>
         </div>
         
         {/* Patient Info Grid */}
@@ -1827,13 +2154,26 @@ function ReviewAndSubmitForm({
       <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-4">
           <button
-            onClick={onSave}
-            className="flex items-center space-x-2 px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            onClick={handleSave}
+            disabled={isSaving || isSubmitting}
+            className="flex items-center space-x-2 px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-            </svg>
-            <span>Save for Later</span>
+            {isSaving ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                <span>Save for Later</span>
+              </>
+            )}
           </button>
         </div>
         
@@ -1842,13 +2182,26 @@ function ReviewAndSubmitForm({
             All sections completed
           </div>
           <button
-            onClick={onComplete}
-            className="flex items-center space-x-2 px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-lg"
+            onClick={handleSubmit}
+            disabled={isSubmitting || isSaving}
+            className="flex items-center space-x-2 px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Submit Screening</span>
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Submit Screening</span>
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -1947,169 +2300,8 @@ interface CompletedScreeningListModalProps {
 function CompletedScreeningListModal({ isOpen, onClose, onFormSelect }: CompletedScreeningListModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
   
-  // Mock completed screenings data
-  const completedScreenings = [
-    {
-      id: 'completed-001',
-      patientName: 'John Doe',
-      patientId: '12345678',
-      completedDate: '2024-03-15',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-002',
-      patientName: 'Jane Smith',
-      patientId: '87654321',
-      completedDate: '2024-03-14',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-003',
-      patientName: 'Robert Wilson',
-      patientId: '11223344',
-      completedDate: '2024-03-13',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-004',
-      patientName: 'Mary Johnson',
-      patientId: '22334455',
-      completedDate: '2024-03-12',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-005',
-      patientName: 'David Brown',
-      patientId: '33445566',
-      completedDate: '2024-03-11',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-006',
-      patientName: 'Lisa Davis',
-      patientId: '44556677',
-      completedDate: '2024-03-10',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-007',
-      patientName: 'Michael Wilson',
-      patientId: '55667788',
-      completedDate: '2024-03-09',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-008',
-      patientName: 'Jennifer Taylor',
-      patientId: '66778899',
-      completedDate: '2024-03-08',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-009',
-      patientName: 'Christopher Anderson',
-      patientId: '77889900',
-      completedDate: '2024-03-07',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-010',
-      patientName: 'Amanda Martinez',
-      patientId: '88990011',
-      completedDate: '2024-03-06',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-011',
-      patientName: 'Daniel Garcia',
-      patientId: '99001122',
-      completedDate: '2024-03-05',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-012',
-      patientName: 'Nicole Rodriguez',
-      patientId: '00112233',
-      completedDate: '2024-03-04',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-013',
-      patientName: 'Kevin Lopez',
-      patientId: '11223344',
-      completedDate: '2024-03-03',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-014',
-      patientName: 'Stephanie Gonzalez',
-      patientId: '22334455',
-      completedDate: '2024-03-02',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-015',
-      patientName: 'Brian Perez',
-      patientId: '33445566',
-      completedDate: '2024-03-01',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-016',
-      patientName: 'Rachel Torres',
-      patientId: '44556677',
-      completedDate: '2024-02-29',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-017',
-      patientName: 'Thomas Flores',
-      patientId: '55667788',
-      completedDate: '2024-02-28',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-018',
-      patientName: 'Melissa Rivera',
-      patientId: '66778899',
-      completedDate: '2024-02-27',
-      technician: 'Mike Chen',
-      status: 'completed'
-    },
-    {
-      id: 'completed-019',
-      patientName: 'Steven Cooper',
-      patientId: '77889900',
-      completedDate: '2024-02-26',
-      technician: 'Sarah Johnson',
-      status: 'completed'
-    },
-    {
-      id: 'completed-020',
-      patientName: 'Laura Richardson',
-      patientId: '88990011',
-      completedDate: '2024-02-25',
-      technician: 'Mike Chen',
-      status: 'completed'
-    }
-  ]
+  // Get completed screenings from data service
+  const completedScreenings = ScreeningDataService.getCompletedScreenings()
 
   const filteredScreenings = completedScreenings.filter(screening =>
     screening.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -2162,7 +2354,7 @@ function CompletedScreeningListModal({ isOpen, onClose, onFormSelect }: Complete
                       <div className="hedis-list-item-name">{screening.patientName}</div>
                       <div className="hedis-list-item-details">
                         <span>ID: {screening.patientId}</span>
-                        <span>Completed: {screening.completedDate}</span>
+                        <span>Completed: {screening.dateCompleted}</span>
                         <span>Technician: {screening.technician}</span>
                       </div>
                     </div>
@@ -2348,13 +2540,13 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
           )}
 
           <div className="hedis-list-search">
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
               <input
                 type="text"
                 placeholder="Search by patient name or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="hedis-list-search-input flex-1"
+                className="hedis-list-search-input flex-1 w-full"
               />
               <select
                 value={`${sortBy}-${sortOrder}`}
@@ -2363,7 +2555,7 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
                   setSortBy(newSortBy as 'dateSaved' | 'patientName' | 'progress' | 'urgency')
                   setSortOrder(newSortOrder as 'asc' | 'desc')
                 }}
-                className="hedis-list-sort-select"
+                className="hedis-list-sort-select w-full md:w-auto"
               >
                 <option value="urgency-desc">Urgency (Most Urgent First)</option>
                 <option value="dateSaved-desc">Date Saved (Newest)</option>
@@ -2428,11 +2620,624 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
   )
 }
 
+// Completed Screening View Component (Read-only)
+interface CompletedScreeningViewProps {
+  screening: CompletedScreening
+  onClose: () => void
+}
+
+function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewProps) {
+  // Image preview state
+  const [showImagePreview, setShowImagePreview] = useState(false)
+  const [previewImage, setPreviewImage] = useState<{ eye: 'right' | 'left', index: number } | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [allImages, setAllImages] = useState<{ eye: 'right' | 'left', index: number, file: any }[]>([])
+
+  // Function to handle image preview
+  const handleImagePreview = (eye: 'right' | 'left', index: number) => {
+    console.log('handleImagePreview called:', { eye, index })
+    
+    // Create array of all images for navigation
+    const images: { eye: 'right' | 'left', index: number, file: any }[] = []
+    
+    // Add right eye images
+    if (Array.isArray(screening.retinalImages.rightEyeImages)) {
+      console.log('Right eye images:', screening.retinalImages.rightEyeImages)
+      screening.retinalImages.rightEyeImages.forEach((imageData, i) => {
+        images.push({ eye: 'right', index: i, file: imageData })
+      })
+    }
+    
+    // Add left eye images
+    if (Array.isArray(screening.retinalImages.leftEyeImages)) {
+      console.log('Left eye images:', screening.retinalImages.leftEyeImages)
+      screening.retinalImages.leftEyeImages.forEach((imageData, i) => {
+        images.push({ eye: 'left', index: i, file: imageData })
+      })
+    }
+    
+    console.log('All images array:', images)
+    setAllImages(images)
+    
+    // Find the current image index
+    const currentIndex = images.findIndex(img => img.eye === eye && img.index === index)
+    console.log('Current image index:', currentIndex)
+    setCurrentImageIndex(currentIndex >= 0 ? currentIndex : 0)
+    
+    setPreviewImage({ eye, index })
+    setShowImagePreview(true)
+    console.log('Modal should be visible now')
+  }
+
+  // Function to navigate to next image
+  const handleNextImage = () => {
+    if (currentImageIndex < allImages.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1)
+    }
+  }
+
+  // Function to navigate to previous image
+  const handlePreviousImage = () => {
+    if (currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1)
+    }
+  }
+
+  // Function to close image preview
+  const handleCloseImagePreview = () => {
+    setShowImagePreview(false)
+    setPreviewImage(null)
+    setCurrentImageIndex(0)
+    setAllImages([])
+  }
+
+  // Helper function to safely create object URL
+  const createSafeObjectURL = (image: any): string => {
+    try {
+      // Check if it's a valid File object
+      if (image instanceof File) {
+        return URL.createObjectURL(image)
+      }
+      
+      // Check if it's a base64 image object from our data service
+      if (image && typeof image === 'object' && image.base64) {
+        console.log('Using base64 image:', image.filename)
+        return image.base64 // Return the base64 data URL directly
+      }
+      
+      // If it's not a File object or base64 object, it might be a serialized object from localStorage
+      // In this case, we can't create an object URL, so return a placeholder
+      console.warn('Image is not a valid File object or base64 object:', image)
+      return '/images/retinal-imaging-1.jpg' // Fallback to a static image
+    } catch (error) {
+      console.error('Error creating object URL:', error)
+      return '/images/retinal-imaging-1.jpg' // Fallback to a static image
+    }
+  }
+
+  // Keyboard navigation for image preview
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!showImagePreview) return
+      
+      switch (event.key) {
+        case 'Escape':
+          handleCloseImagePreview()
+          break
+        case 'ArrowLeft':
+          if (currentImageIndex > 0) {
+            handlePreviousImage()
+          }
+          break
+        case 'ArrowRight':
+          if (currentImageIndex < allImages.length - 1) {
+            handleNextImage()
+          }
+          break
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showImagePreview, currentImageIndex, allImages.length])
+
+  // Debug modal state
+  useEffect(() => {
+    console.log('Modal state changed:', { showImagePreview, allImagesLength: allImages.length, currentImageIndex })
+  }, [showImagePreview, allImages.length, currentImageIndex])
+  const getIcon = (iconName: string): ReactElement => {
+    const iconMap: { [key: string]: ReactElement } = {
+      'user': (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      'calendar': (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      'phone': (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+      ),
+      'location': (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+      'medical': (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      ),
+      'eye': (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      ),
+      'comment': (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      )
+    }
+    return iconMap[iconName] || <div className="w-5 h-5" />
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  return (
+    <div className="hedis-screening-page">
+      <div className="hedis-screening-header">
+        <div className="hedis-screening-breadcrumb">
+          <button 
+            onClick={onClose}
+            className="hedis-screening-back-button"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Completed Screenings
+          </button>
+        </div>
+        <div className="hedis-screening-progress">
+          <div className="hedis-screening-step-indicators">
+            <div className="hedis-screening-step hedis-screening-step-completed">
+              <div className="hedis-screening-step-number">1</div>
+              <div className="hedis-screening-step-label">Patient Search</div>
+            </div>
+            <div className="hedis-screening-step hedis-screening-step-completed">
+              <div className="hedis-screening-step-number">2</div>
+              <div className="hedis-screening-step-label">Screening Details</div>
+            </div>
+            <div className="hedis-screening-step hedis-screening-step-completed">
+              <div className="hedis-screening-step-number">3</div>
+              <div className="hedis-screening-step-label">Retinal Images</div>
+            </div>
+            <div className="hedis-screening-step hedis-screening-step-completed">
+              <div className="hedis-screening-step-number">4</div>
+              <div className="hedis-screening-step-label">Review & Submit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="hedis-screening-content">
+        <div className="screening-form-content">
+          {/* Enhanced Header with Status Indicators */}
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4 md:p-6 mb-4 md:mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Completed Screening - {screening.patientName}</h2>
+                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Completed on {formatDate(screening.dateCompleted)} by {screening.technician}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="px-2 py-1 md:px-3 md:py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs md:text-sm font-medium rounded-full">
+                  Completed
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Patient Information Card */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 md:p-6 mb-4 md:mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">Patient Information</h3>
+                <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                  Complete
+                </span>
+              </div>
+            </div>
+            
+            {/* Patient Info Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[60px] md:min-w-[80px]">ID:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.patient.patientId}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[60px] md:min-w-[80px]">Name:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.patient.firstName} {screening.patient.lastName}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[60px] md:min-w-[80px]">DOB:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{formatDate(screening.patient.dateOfBirth)}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[60px] md:min-w-[80px]">PCP:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.patient.pcpName}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[60px] md:min-w-[80px]">Location:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.patient.pcpLocation}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[60px] md:min-w-[80px]">Last Visit:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{formatDate(screening.patient.lastVisit)}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[60px] md:min-w-[80px]">Status:</span>
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  screening.patient.status === 'active' 
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' 
+                    : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+                }`}>
+                  {screening.patient.status}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Screening Details Card */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 md:p-6 mb-4 md:mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">Screening Details</h3>
+                <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                  Complete
+                </span>
+              </div>
+            </div>
+            
+            {/* Screening Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Date:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{formatDate(screening.screeningDetails.dateOfScreening)}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Place:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.screeningDetails.placeOfService}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Practice:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.screeningDetails.practiceName}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Location:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.screeningDetails.practiceLocation}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Phone:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.screeningDetails.practicePhone}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Email:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.screeningDetails.practiceEmail}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Contact:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.screeningDetails.officeContact}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Diabetes:</span>
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  screening.screeningDetails.diabetesMellitus === 'yes' 
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' 
+                    : screening.screeningDetails.diabetesMellitus === 'no'
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                }`}>
+                  {screening.screeningDetails.diabetesMellitus || 'Not specified'}
+                </span>
+              </div>
+              {screening.screeningDetails.diabetesMellitus === 'yes' && (
+                <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Type:</span>
+                  <span className="text-xs md:text-sm text-gray-900 dark:text-white">{screening.screeningDetails.diabetesType}</span>
+                </div>
+              )}
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Last Eye Exam:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">{formatDate(screening.screeningDetails.lastEyeExam)}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Ocular History:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">
+                  {screening.screeningDetails.ocularHistory.length > 0 ? screening.screeningDetails.ocularHistory.join(', ') : 'None'}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px] md:min-w-[120px]">Ocular Surgery:</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-white">
+                  {screening.screeningDetails.ocularSurgery.length > 0 ? screening.screeningDetails.ocularSurgery.join(', ') : 'None'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Retinal Images Card */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 md:p-6 mb-4 md:mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">Retinal Images</h3>
+                <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                  Complete
+                </span>
+              </div>
+            </div>
+            
+            {/* Retinal Images Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {/* Right Eye Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm md:text-base font-medium text-gray-900 dark:text-white">Right Eye (OD)</h4>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    screening.retinalImages.rightEyeMissing 
+                      ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200' 
+                      : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                  }`}>
+                    {screening.retinalImages.rightEyeMissing ? 'Missing' : `${screening.retinalImages.rightEyeImages.length} Images`}
+                  </span>
+                </div>
+                
+                {!screening.retinalImages.rightEyeMissing && screening.retinalImages.rightEyeImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-1 md:gap-2">
+                    {Array.isArray(screening.retinalImages.rightEyeImages) && screening.retinalImages.rightEyeImages.map((image, index) => {
+                      console.log('Right eye image data:', image) // Debugging
+                      return (
+                        <div key={index} className="relative group cursor-pointer">
+                          <img
+                            src={createSafeObjectURL(image)}
+                            alt={`Right eye image ${index + 1}`}
+                            className="w-full h-16 md:h-20 object-cover rounded border hover:opacity-80 transition-opacity"
+                            onClick={(e) => { // Modified onClick
+                              e.preventDefault()
+                              e.stopPropagation()
+                              console.log('Image clicked:', { eye: 'right', index }) // Debugging
+                              handleImagePreview('right', index)
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded flex items-center justify-center pointer-events-none"> {/* Added pointer-events-none */}
+                            <svg className="w-4 h-4 md:w-6 md:h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+                
+                {!screening.retinalImages.rightEyeMissing && screening.retinalImages.rightEyeImages.length === 0 && (
+                  <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 italic">
+                    No images uploaded
+                  </div>
+                )}
+              </div>
+
+              {/* Left Eye Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm md:text-base font-medium text-gray-900 dark:text-white">Left Eye (OS)</h4>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    screening.retinalImages.leftEyeMissing 
+                      ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200' 
+                      : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                  }`}>
+                    {screening.retinalImages.leftEyeMissing ? 'Missing' : `${screening.retinalImages.leftEyeImages.length} Images`}
+                  </span>
+                </div>
+                
+                {!screening.retinalImages.leftEyeMissing && screening.retinalImages.leftEyeImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-1 md:gap-2">
+                    {Array.isArray(screening.retinalImages.leftEyeImages) && screening.retinalImages.leftEyeImages.map((image, index) => (
+                      <div key={index} className="relative group cursor-pointer">
+                        <img
+                          src={createSafeObjectURL(image)}
+                          alt={`Left eye image ${index + 1}`}
+                          className="w-full h-16 md:h-20 object-cover rounded border hover:opacity-80 transition-opacity"
+                          onClick={(e) => { // Modified onClick
+                            e.preventDefault()
+                            e.stopPropagation()
+                            console.log('Image clicked:', { eye: 'left', index }) // Debugging
+                            handleImagePreview('left', index)
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded flex items-center justify-center pointer-events-none"> {/* Added pointer-events-none */}
+                          <svg className="w-4 h-4 md:w-6 md:h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {!screening.retinalImages.leftEyeMissing && screening.retinalImages.leftEyeImages.length === 0 && (
+                  <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 italic">
+                    No images uploaded
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Technician Comments */}
+            {screening.retinalImages.technicianComments && (
+              <div className="mt-4 md:mt-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <h4 className="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Technician Comments</h4>
+                <p className="text-xs md:text-sm text-gray-900 dark:text-white">
+                  {screening.retinalImages.technicianComments}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-4">
+            <button 
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Image Preview Modal */}
+      {showImagePreview && allImages.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-2 md:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-none md:max-w-4xl w-full mx-2 md:mx-0 max-h-[95vh] md:max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center space-x-2 md:space-x-3">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
+                    Retinal Image Preview
+                  </h3>
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    {allImages[currentImageIndex]?.eye === 'right' ? 'Right Eye (OD)' : 'Left Eye (OS)'} - Image {allImages[currentImageIndex]?.index + 1}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleCloseImagePreview}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Image Display */}
+            <div className="flex-1 flex items-center justify-center p-3 md:p-4 relative">
+              {allImages[currentImageIndex] && (
+                <div className="relative max-w-full max-h-full">
+                  <img
+                    src={createSafeObjectURL(allImages[currentImageIndex].file)}
+                    alt={`${allImages[currentImageIndex].eye === 'right' ? 'Right' : 'Left'} eye image ${allImages[currentImageIndex].index + 1}`}
+                    className="max-w-full max-h-[50vh] md:max-h-[60vh] object-contain rounded-lg shadow-lg"
+                  />
+                </div>
+              )}
+
+              {/* Navigation Arrows */}
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePreviousImage}
+                    disabled={currentImageIndex === 0}
+                    className="absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 rounded-full p-1.5 md:p-2 shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg className="w-4 h-4 md:w-6 md:h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    disabled={currentImageIndex === allImages.length - 1}
+                    className="absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 rounded-full p-1.5 md:p-2 shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg className="w-4 h-4 md:w-6 md:h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Image Counter */}
+            {allImages.length > 1 && (
+              <div className="flex items-center justify-center p-3 md:p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    {currentImageIndex + 1} of {allImages.length}
+                  </span>
+                  <div className="flex space-x-1">
+                    {allImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-colors ${
+                          index === currentImageIndex
+                            ? 'bg-blue-600'
+                            : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function HEDISLandingPage({ 
   onUpdateBreadcrumb 
 }: { 
   onUpdateBreadcrumb?: (path: string[]) => void 
 }) {
+  const { user } = useAuth()
+  
   // State for current view and breadcrumb
   const [currentView, setCurrentView] = useState<'dashboard' | 'screening'>('dashboard')
   const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([])
@@ -2534,10 +3339,11 @@ export default function HEDISLandingPage({
   const [savedForms, setSavedForms] = useState<any[]>([])
   const [completedForms, setCompletedForms] = useState<any[]>([])
 
-  // State for modals
+  // State for modals and views
   const [showPatientSearchModal, setShowPatientSearchModal] = useState(false)
   const [showCompletedScreeningListModal, setShowCompletedScreeningListModal] = useState(false)
   const [showSavedScreeningListModal, setShowSavedScreeningListModal] = useState(false)
+  const [viewingCompletedScreening, setViewingCompletedScreening] = useState<CompletedScreening | null>(null)
 
   // Update breadcrumbs when step changes
   useEffect(() => {
@@ -2545,10 +3351,23 @@ export default function HEDISLandingPage({
     updateBreadcrumbs(currentScreeningStep, patientName)
   }, [currentScreeningStep, selectedPatient])
 
+  // Initialize data service
+  useEffect(() => {
+    const initializeData = async () => {
+      await ScreeningDataService.initialize()
+      // Update dashboard stats after initialization
+      setDashboardStats(ScreeningDataService.getDashboardStats())
+      // Debug current data after initialization
+      setTimeout(() => {
+        ScreeningDataService.debugCurrentData()
+      }, 1000)
+    }
+    initializeData()
+  }, [])
+
   // Dashboard stats
-  const [dashboardStats, setDashboardStats] = useState({
-    completedPatientForms: 20,
-    savedPatientForms: 12
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>(() => {
+    return ScreeningDataService.getDashboardStats()
   })
 
   // Dashboard cards data
@@ -2575,141 +3394,11 @@ export default function HEDISLandingPage({
 
   // Dashboard state
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [userName, setUserName] = useState('John Smith')
   const [userRole, setUserRole] = useState('Field Technician')
   const [showSaveAlert, setShowSaveAlert] = useState(false)
 
-    // Mock saved screenings data
-  const savedScreenings = [
-    {
-      id: 'saved-001',
-      patientName: 'Alice Johnson',
-      patientId: '55556666',
-      dateSaved: '2025-07-03T21:44:00', // 25 days ago - 5 days until auto-delete
-      progress: 'Step 2 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-002',
-      patientName: 'David Brown',
-      patientId: '77778888',
-      dateSaved: '2025-07-04T01:54:00', // 24 days ago - 6 days until auto-delete
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-003',
-      patientName: 'Emily Davis',
-      patientId: '99990000',
-      dateSaved: '2025-07-05T05:00:00', // 23 days ago - 7 days until auto-delete
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-004',
-      patientName: 'Frank Miller',
-      patientId: '11112222',
-      dateSaved: '2025-07-06T07:49:00', // 22 days ago - 8 days until auto-delete
-      progress: 'Step 4 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-005',
-      patientName: 'Grace Lee',
-      patientId: '33334444',
-      dateSaved: '2025-07-07T03:43:00', // 21 days ago - 9 days until auto-delete
-      progress: 'Step 2 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-006',
-      patientName: 'Henry White',
-      patientId: '55556666',
-      dateSaved: '2025-07-08T18:23:00', // 20 days ago - 10 days until auto-delete
-      progress: 'Step 3 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-007',
-      patientName: 'Isabella Clark',
-      patientId: '77778888',
-      dateSaved: '2025-07-09T17:07:00', // 19 days ago - 11 days until auto-delete (SAFE)
-      progress: 'Step 4 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-008',
-      patientName: 'James Hall',
-      patientId: '99990000',
-      dateSaved: '2025-07-10T06:14:00', // 18 days ago - 12 days until auto-delete (SAFE)
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-009',
-      patientName: 'Katherine Young',
-      patientId: '11112222',
-      dateSaved: '2025-07-11T21:28:00', // 17 days ago - 13 days until auto-delete (SAFE)
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-010',
-      patientName: 'Lucas King',
-      patientId: '33334444',
-      dateSaved: '2025-07-12T14:53:00', // 16 days ago - 14 days until auto-delete (SAFE)
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-011',
-      patientName: 'Mia Wright',
-      patientId: '55556666',
-      dateSaved: '2025-07-13T11:08:00', // 15 days ago - 15 days until auto-delete (SAFE)
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-012',
-      patientName: 'Noah Green',
-      patientId: '77778888',
-      dateSaved: '2025-07-14T06:15:00', // 14 days ago - 16 days until auto-delete (SAFE)
-      progress: 'Step 4 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-013',
-      patientName: 'Olivia Taylor',
-      patientId: '99990000',
-      dateSaved: '2025-07-15T13:54:00', // 13 days ago - 17 days until auto-delete (SAFE)
-      progress: 'Step 2 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-014',
-      patientName: 'Peter Anderson',
-      patientId: '11112222',
-      dateSaved: '2025-07-16T02:08:00', // 12 days ago - 18 days until auto-delete (SAFE)
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-015',
-      patientName: 'Quinn Martinez',
-      patientId: '33334444',
-      dateSaved: '2025-07-17T07:59:00', // 11 days ago - 19 days until auto-delete (SAFE)
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-016',
-      patientName: 'Rachel Wilson',
-      patientId: '55556666',
-      dateSaved: '2025-07-18T15:13:00', // 10 days ago - 20 days until auto-delete (SAFE)
-      progress: 'Step 4 of 4',
-      technician: 'Mike Chen'
-    }
-  ]
+    // Get saved screenings from data service
+  const savedScreenings = ScreeningDataService.getSavedScreenings()
 
   // Update time every minute
   useEffect(() => {
@@ -2840,6 +3529,16 @@ export default function HEDISLandingPage({
 
     const newUrl = `${window.location.pathname}?${urlParams.toString()}`
     window.history.pushState({}, '', newUrl)
+
+    // Mobile scroll to top when navigating to a new step
+    if (step > 0) {
+      setTimeout(() => {
+        window.scrollTo({ 
+          top: 0, 
+          behavior: 'smooth' 
+        })
+      }, 100) // Small delay to ensure DOM updates
+    }
   }
 
   const getGreeting = () => {
@@ -2920,8 +3619,17 @@ export default function HEDISLandingPage({
   }
 
   const handleCompletedFormSelect = (formId: string) => {
-    setShowCompletedScreeningListModal(false)
-    updateScreeningStep(4, 'view', formId)
+    console.log('Selected completed form:', formId)
+    const completedScreening = ScreeningDataService.getCompletedScreeningById(formId)
+    if (completedScreening) {
+      setViewingCompletedScreening(completedScreening)
+      setShowCompletedScreeningListModal(false)
+      
+      // Scroll to top for mobile users to ensure they see the top of the completed form
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100) // Small delay to ensure the form has rendered
+    }
   }
 
   const handleSavedFormSelect = (formId: string) => {
@@ -2930,6 +3638,11 @@ export default function HEDISLandingPage({
     console.log(`Loading saved form ${formId}, navigating to step ${stepToNavigate}`)
     setShowSavedScreeningListModal(false)
     updateScreeningStep(stepToNavigate, 'edit', formId)
+    
+    // Scroll to top for mobile users to ensure they see the top of the form
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 100) // Small delay to ensure the form has rendered
   }
 
   const loadSavedFormData = (formId: string) => {
@@ -3026,11 +3739,32 @@ export default function HEDISLandingPage({
   const handleScreeningFormComplete = () => {
     // Handle form completion
     console.log('Screening form completed')
-    setDashboardStats(prev => ({
-      ...prev,
-      completedPatientForms: prev.completedPatientForms + 1
-    }))
+    
+    // Create completed screening data
+    if (selectedPatient) {
+      const completedScreening: CompletedScreening = {
+        id: `completed-${Date.now()}`,
+        patientName: `${selectedPatient.firstName} ${selectedPatient.lastName}`,
+        patientId: selectedPatient.patientId,
+        dateCompleted: new Date().toISOString(),
+        technician: user?.fullName || 'User', // This comes from user context
+        status: 'Processed',
+        patient: selectedPatient,
+        screeningDetails,
+        retinalImages
+      }
+      
+      // Save to data service
+      ScreeningDataService.saveCompletedScreening(completedScreening)
+      
+      // Update local state
+      setDashboardStats(ScreeningDataService.getDashboardStats())
+    }
+    
     setShowSuccessAlert(true)
+    
+    // Redirect back to dashboard
+    updateScreeningStep(0, 'dashboard')
   }
 
   const handleBackToDashboard = () => {
@@ -3068,6 +3802,16 @@ export default function HEDISLandingPage({
     })
     setErrors({})
     updateScreeningStep(1, 'new')
+  }
+
+  // Render completed screening view if viewing a completed screening
+  if (viewingCompletedScreening) {
+    return (
+      <CompletedScreeningView
+        screening={viewingCompletedScreening}
+        onClose={() => setViewingCompletedScreening(null)}
+      />
+    )
   }
 
   // Render success screen if showing success
@@ -3119,7 +3863,11 @@ export default function HEDISLandingPage({
               {[1, 2, 3, 4].map((step) => (
                 <div 
                   key={step}
-                  className={`hedis-screening-step ${currentScreeningStep >= step ? 'hedis-screening-step-active' : 'hedis-screening-step-inactive'}`}
+                  className={`hedis-screening-step ${
+                    currentScreeningStep > step ? 'hedis-screening-step-completed' : 
+                    currentScreeningStep === step ? 'hedis-screening-step-active' : 
+                    'hedis-screening-step-inactive'
+                  }`}
                 >
                   <div className="hedis-screening-step-number">{step}</div>
                   <div className="hedis-screening-step-label">
@@ -3277,7 +4025,7 @@ export default function HEDISLandingPage({
       {/* Header Section */}
       <div className="hedis-header">
         <div className="hedis-greeting-section">
-          <h1 className="hedis-greeting">{getGreeting()}, {userName}!</h1>
+          <h1 className="hedis-greeting">{getGreeting()}, {user?.fullName || 'User'}!</h1>
           <div className="hedis-role-badge">({userRole})</div>
         </div>
         <div className="hedis-date-section">

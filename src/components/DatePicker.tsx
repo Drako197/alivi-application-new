@@ -202,8 +202,24 @@ export default function DatePicker({
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      {/* Input Field */}
-      <div className="relative">
+      {/* Mobile: Native date input with enhanced calendar dropdown */}
+      <div className="md:hidden">
+        <input
+          type="text"
+          name={name}
+          value={value || ''}
+          placeholder={placeholder}
+          disabled={disabled}
+          readOnly
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          className={`block w-full px-3 py-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 text-base ${
+            disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
+          } ${hasError ? 'border-red-500 focus:border-red-500' : ''}`}
+        />
+      </div>
+
+      {/* Desktop: Custom calendar input */}
+      <div className="hidden md:block relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           {getIcon('calendar')}
         </div>
@@ -221,13 +237,13 @@ export default function DatePicker({
         />
       </div>
 
-      {/* Calendar Dropdown */}
+      {/* Calendar Dropdown - Mobile and Desktop */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 mt-1 w-80 bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+        <div className="absolute z-50 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 p-4 md:w-80 w-full max-w-sm mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <h3 className="text-lg font-semibold text-gray-900 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+              <h3 className="text-lg md:text-lg text-xl font-semibold text-gray-900 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
                 {currentMonth.toLocaleDateString('en-US', { 
                   month: 'long'
                 })}
@@ -236,7 +252,7 @@ export default function DatePicker({
                 <button
                   type="button"
                   onClick={() => setShowYearDropdown(!showYearDropdown)}
-                  className="flex items-center space-x-1 px-2 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded transition-colors"
+                  className="flex items-center space-x-1 px-3 py-2 text-base md:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded transition-colors"
                 >
                   <span>{currentMonth.getFullYear()}</span>
                   {showYearDropdown ? getIcon('chevronUp') : getIcon('chevronDown')}
@@ -265,7 +281,7 @@ export default function DatePicker({
               <button
                 type="button"
                 onClick={() => navigateYear('prev')}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
                 title="Previous year"
               >
                 {getIcon('chevronLeft')}
@@ -273,7 +289,7 @@ export default function DatePicker({
               <button
                 type="button"
                 onClick={() => navigateMonth('prev')}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
                 title="Previous month"
               >
                 {getIcon('chevronLeft')}
@@ -281,7 +297,7 @@ export default function DatePicker({
               <button
                 type="button"
                 onClick={() => navigateMonth('next')}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
                 title="Next month"
               >
                 {getIcon('chevronRight')}
@@ -289,7 +305,7 @@ export default function DatePicker({
               <button
                 type="button"
                 onClick={() => navigateYear('next')}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
                 title="Next year"
               >
                 {getIcon('chevronRight')}
@@ -300,7 +316,7 @@ export default function DatePicker({
           {/* Days of Week */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {weekDays.map((day, index) => (
-              <div key={index} className="text-center text-sm font-medium text-gray-500 py-1">
+              <div key={index} className="text-center text-sm md:text-sm text-base font-medium text-gray-500 py-2 md:py-1">
                 {day}
               </div>
             ))}
@@ -314,7 +330,7 @@ export default function DatePicker({
                 type="button"
                 onClick={() => handleDateSelect(day.date)}
                 className={`
-                  w-10 h-10 text-sm rounded-full flex items-center justify-center transition-colors
+                  w-12 h-12 md:w-10 md:h-10 text-base md:text-sm rounded-full flex items-center justify-center transition-colors
                   ${day.isCurrentMonth 
                     ? 'text-gray-900 hover:bg-gray-100' 
                     : 'text-gray-400'

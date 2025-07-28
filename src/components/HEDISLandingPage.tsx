@@ -970,9 +970,9 @@ function ScreeningDetailsForm({
               
               // Show alert
               const alert = document.createElement('div')
-              alert.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border border-yellow-400 text-yellow-800 px-6 py-4 rounded-lg shadow-lg max-w-md'
+              alert.className = 'fixed top-20 left-0 right-0 z-50 bg-yellow-100 border-b border-yellow-400 text-yellow-800 px-6 py-4 shadow-lg'
               alert.innerHTML = `
-                <div class="flex items-center justify-between">
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
                   <div class="flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
@@ -985,7 +985,9 @@ function ScreeningDetailsForm({
                     </svg>
                   </button>
                 </div>
-                <p class="mt-2 text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
+                <div class="max-w-7xl mx-auto mt-2">
+                  <p class="text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
+                </div>
               `
               document.body.appendChild(alert)
               
@@ -1532,9 +1534,9 @@ function RetinalImagesForm({
               
               // Show alert
               const alert = document.createElement('div')
-              alert.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border border-yellow-400 text-yellow-800 px-6 py-4 rounded-lg shadow-lg max-w-md'
+              alert.className = 'fixed top-20 left-0 right-0 z-50 bg-yellow-100 border-b border-yellow-400 text-yellow-800 px-6 py-4 shadow-lg'
               alert.innerHTML = `
-                <div class="flex items-center justify-between">
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
                   <div class="flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
@@ -1547,7 +1549,9 @@ function RetinalImagesForm({
                     </svg>
                   </button>
                 </div>
-                <p class="mt-2 text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
+                <div class="max-w-7xl mx-auto mt-2">
+                  <p class="text-sm">You have 30 days to complete this form. It will be automatically deleted after 30 days.</p>
+                </div>
               `
               document.body.appendChild(alert)
               
@@ -1600,6 +1604,12 @@ interface ReviewAndSubmitFormProps {
   onEditStep: (step: number) => void
   onComplete: () => void
   onSave: () => void
+}
+
+interface ScreeningSuccessProps {
+  patient: Patient
+  onBackToDashboard: () => void
+  onStartNewScreening: () => void
 }
 
 function ReviewAndSubmitForm({ 
@@ -1841,6 +1851,87 @@ function ReviewAndSubmitForm({
             <span>Submit Screening</span>
           </button>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// Screening Success Component
+function ScreeningSuccess({ patient, onBackToDashboard, onStartNewScreening }: ScreeningSuccessProps) {
+  return (
+    <div className="screening-form-content">
+      {/* Success Header */}
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-8 mb-8 text-center">
+        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-10 h-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Screening Completed Successfully!</h2>
+        <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
+          Patient screening for <span className="font-semibold text-gray-900 dark:text-white">{patient.firstName} {patient.lastName}</span> has been submitted.
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          The screening data has been processed and is now available in the system.
+        </p>
+      </div>
+
+      {/* Success Details */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+          What happens next?
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400">1</span>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-900 dark:text-white">Data Processing</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Your screening data is being processed and validated by our system.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400">2</span>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-900 dark:text-white">Quality Review</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">The screening will undergo quality review by our medical team.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400">3</span>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-900 dark:text-white">Results Available</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Results will be available in the completed screenings section.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center justify-center space-x-4">
+        <button
+          onClick={onBackToDashboard}
+          className="flex items-center space-x-2 px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Dashboard</span>
+        </button>
+        <button
+          onClick={onStartNewScreening}
+          className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-lg"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Start New Screening</span>
+        </button>
       </div>
     </div>
   )
@@ -2344,6 +2435,7 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
 
   // State for screening form
   const [currentScreeningStep, setCurrentScreeningStep] = useState(0)
+  const [showSuccess, setShowSuccess] = useState(false)
   const [screeningFormData, setScreeningFormData] = useState<{
     details: ScreeningDetails
     images: RetinalImages
@@ -2899,7 +2991,72 @@ export default function HEDISLandingPage({ key }: { key?: string }) {
       ...prev,
       completedPatientForms: prev.completedPatientForms + 1
     }))
-    updateScreeningStep(0) // Back to dashboard
+    setShowSuccess(true)
+  }
+
+  const handleBackToDashboard = () => {
+    setShowSuccess(false)
+    updateScreeningStep(0, 'dashboard')
+  }
+
+  const handleStartNewScreening = () => {
+    setShowSuccess(false)
+    setSelectedPatient(null)
+    setScreeningDetails({
+      dateOfScreening: '',
+      placeOfService: '',
+      pcpLocation: '',
+      practicePhone: '305-555-5555',
+      practiceFax: '305-555-5556',
+      practiceEmail: 'Contact@gableseyecare.com',
+      practiceName: 'Coral Gables Eye Care',
+      practiceLocation: '2525 Ponce De Leon Blv',
+      officeContact: 'Tom Brady',
+      diabetesMellitus: '',
+      diabetesType: '',
+      lastEyeExam: '',
+      ocularHistory: [],
+      ocularSurgery: [],
+      ocularHistoryOther: '',
+      ocularSurgeryOther: ''
+    })
+    setRetinalImages({
+      rightEyeMissing: false,
+      leftEyeMissing: false,
+      rightEyeImages: [],
+      leftEyeImages: [],
+      technicianComments: ''
+    })
+    setErrors({})
+    updateScreeningStep(1, 'new')
+  }
+
+  // Render success screen if showing success
+  if (showSuccess && selectedPatient) {
+    return (
+      <div className="hedis-screening-page">
+        <div className="hedis-screening-header">
+          <div className="hedis-screening-breadcrumb">
+            <button 
+              onClick={handleBackToDashboard}
+              className="hedis-screening-back-button"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to HEDIS Dashboard
+            </button>
+          </div>
+        </div>
+        <div className="hedis-screening-content">
+          <ScreeningSuccess
+            patient={selectedPatient}
+            onBackToDashboard={handleBackToDashboard}
+            onStartNewScreening={handleStartNewScreening}
+          />
+        </div>
+      </div>
+    )
   }
 
   // Render screening sub-page if we're in screening flow

@@ -1850,147 +1850,14 @@ interface SavedScreeningListModalProps {
   isOpen: boolean
   onClose: () => void
   onFormSelect: (formId: string) => void
+  savedScreenings: any[]
 }
 
-function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeningListModalProps) {
+function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreenings }: SavedScreeningListModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'dateSaved' | 'patientName' | 'progress' | 'urgency'>('urgency')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   
-
-  
-              // Mock saved screenings data
-  const savedScreenings = [
-    {
-      id: 'saved-001',
-      patientName: 'Alice Johnson',
-      patientId: '55556666',
-      dateSaved: '2025-07-27T03:39:00', // 1 day ago - 5 days until auto-delete
-      progress: 'Step 1 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-002',
-      patientName: 'David Brown',
-      patientId: '77778888',
-      dateSaved: '2025-07-26T10:10:00', // 2 days ago - 4 days until auto-delete
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-003',
-      patientName: 'Emily Davis',
-      patientId: '99990000',
-      dateSaved: '2025-07-25T23:53:00', // 3 days ago - 3 days until auto-delete
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-004',
-      patientName: 'Frank Miller',
-      patientId: '11112222',
-      dateSaved: '2025-07-24T17:12:00', // 4 days ago - 2 days until auto-delete
-      progress: 'Step 4 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-005',
-      patientName: 'Grace Lee',
-      patientId: '33334444',
-      dateSaved: '2025-07-23T01:04:00', // 5 days ago - 1 day until auto-delete
-      progress: 'Step 1 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-006',
-      patientName: 'Henry White',
-      patientId: '55556666',
-      dateSaved: '2025-07-21T23:01:00', // 7 days ago - SAFE
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-007',
-      patientName: 'Isabella Clark',
-      patientId: '77778888',
-      dateSaved: '2025-07-19T06:33:00', // 9 days ago - SAFE
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-008',
-      patientName: 'James Hall',
-      patientId: '99990000',
-      dateSaved: '2025-07-17T04:04:00', // 11 days ago - SAFE
-      progress: 'Step 4 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-009',
-      patientName: 'Katherine Young',
-      patientId: '11112222',
-      dateSaved: '2025-07-15T13:37:00', // 13 days ago - SAFE
-      progress: 'Step 1 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-010',
-      patientName: 'Lucas King',
-      patientId: '33334444',
-      dateSaved: '2025-07-13T07:48:00', // 15 days ago - SAFE
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-011',
-      patientName: 'Mia Wright',
-      patientId: '55556666',
-      dateSaved: '2025-07-11T02:23:00', // 17 days ago - SAFE
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-012',
-      patientName: 'Noah Green',
-      patientId: '77778888',
-      dateSaved: '2025-07-09T13:52:00', // 19 days ago - SAFE
-      progress: 'Step 4 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-013',
-      patientName: 'Olivia Taylor',
-      patientId: '99990000',
-      dateSaved: '2025-07-07T02:38:00', // 21 days ago - SAFE
-      progress: 'Step 1 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-014',
-      patientName: 'Peter Anderson',
-      patientId: '11112222',
-      dateSaved: '2025-07-05T23:38:00', // 23 days ago - SAFE
-      progress: 'Step 2 of 4',
-      technician: 'Mike Chen'
-    },
-    {
-      id: 'saved-015',
-      patientName: 'Quinn Martinez',
-      patientId: '33334444',
-      dateSaved: '2025-07-03T02:48:00', // 25 days ago - SAFE
-      progress: 'Step 3 of 4',
-      technician: 'Sarah Johnson'
-    },
-    {
-      id: 'saved-016',
-      patientName: 'Rachel Wilson',
-      patientId: '55556666',
-      dateSaved: '2025-07-01T18:45:00', // 27 days ago - SAFE
-      progress: 'Step 4 of 4',
-      technician: 'Mike Chen'
-    }
-  ]
-
   const filteredScreenings = savedScreenings.filter(screening =>
     screening.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     screening.patientId.includes(searchTerm)
@@ -2313,6 +2180,138 @@ export default function HEDISLandingPage() {
   const [userRole, setUserRole] = useState('Field Technician')
   const [showSaveAlert, setShowSaveAlert] = useState(false)
 
+  // Mock saved screenings data
+  const savedScreenings = [
+    {
+      id: 'saved-001',
+      patientName: 'Alice Johnson',
+      patientId: '55556666',
+      dateSaved: '2025-07-27T03:39:00', // 1 day ago - 5 days until auto-delete
+      progress: 'Step 2 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-002',
+      patientName: 'David Brown',
+      patientId: '77778888',
+      dateSaved: '2025-07-26T10:10:00', // 2 days ago - 4 days until auto-delete
+      progress: 'Step 2 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-003',
+      patientName: 'Emily Davis',
+      patientId: '99990000',
+      dateSaved: '2025-07-25T23:53:00', // 3 days ago - 3 days until auto-delete
+      progress: 'Step 3 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-004',
+      patientName: 'Frank Miller',
+      patientId: '11112222',
+      dateSaved: '2025-07-24T17:12:00', // 4 days ago - 2 days until auto-delete
+      progress: 'Step 4 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-005',
+      patientName: 'Grace Lee',
+      patientId: '33334444',
+      dateSaved: '2025-07-23T01:04:00', // 5 days ago - 1 day until auto-delete
+      progress: 'Step 2 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-006',
+      patientName: 'Henry White',
+      patientId: '55556666',
+      dateSaved: '2025-07-21T23:01:00', // 7 days ago - SAFE
+      progress: 'Step 3 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-007',
+      patientName: 'Isabella Clark',
+      patientId: '77778888',
+      dateSaved: '2025-07-19T06:33:00', // 9 days ago - SAFE
+      progress: 'Step 4 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-008',
+      patientName: 'James Hall',
+      patientId: '99990000',
+      dateSaved: '2025-07-17T04:04:00', // 11 days ago - SAFE
+      progress: 'Step 2 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-009',
+      patientName: 'Katherine Young',
+      patientId: '11112222',
+      dateSaved: '2025-07-15T13:37:00', // 13 days ago - SAFE
+      progress: 'Step 3 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-010',
+      patientName: 'Lucas King',
+      patientId: '33334444',
+      dateSaved: '2025-07-13T07:48:00', // 15 days ago - SAFE
+      progress: 'Step 4 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-011',
+      patientName: 'Mia Wright',
+      patientId: '55556666',
+      dateSaved: '2025-07-11T02:23:00', // 17 days ago - SAFE
+      progress: 'Step 2 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-012',
+      patientName: 'Noah Green',
+      patientId: '77778888',
+      dateSaved: '2025-07-09T13:52:00', // 19 days ago - SAFE
+      progress: 'Step 3 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-013',
+      patientName: 'Olivia Taylor',
+      patientId: '99990000',
+      dateSaved: '2025-07-07T02:38:00', // 21 days ago - SAFE
+      progress: 'Step 4 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-014',
+      patientName: 'Peter Anderson',
+      patientId: '11112222',
+      dateSaved: '2025-07-05T23:38:00', // 23 days ago - SAFE
+      progress: 'Step 2 of 4',
+      technician: 'Mike Chen'
+    },
+    {
+      id: 'saved-015',
+      patientName: 'Quinn Martinez',
+      patientId: '33334444',
+      dateSaved: '2025-07-03T02:48:00', // 25 days ago - SAFE
+      progress: 'Step 3 of 4',
+      technician: 'Sarah Johnson'
+    },
+    {
+      id: 'saved-016',
+      patientName: 'Rachel Wilson',
+      patientId: '55556666',
+      dateSaved: '2025-07-01T18:45:00', // 27 days ago - SAFE
+      progress: 'Step 4 of 4',
+      technician: 'Mike Chen'
+    }
+  ]
+
   // Update time every minute
   useEffect(() => {
     const timer = setInterval(() => {
@@ -2516,8 +2515,84 @@ export default function HEDISLandingPage() {
   }
 
   const handleSavedFormSelect = (formId: string) => {
+    // Load the saved form data and get the correct step
+    const stepToNavigate = loadSavedFormData(formId)
+    console.log(`Loading saved form ${formId}, navigating to step ${stepToNavigate}`)
     setShowSavedScreeningListModal(false)
-    updateScreeningStep(2, 'edit', formId)
+    updateScreeningStep(stepToNavigate, 'edit', formId)
+  }
+
+  const loadSavedFormData = (formId: string) => {
+    // Find the saved form data from the mock data
+    const savedForm = savedScreenings.find(form => form.id === formId)
+    
+    if (savedForm) {
+      // Create a mock patient object from the saved form data
+      const patient: Patient = {
+        id: savedForm.id,
+        patientId: savedForm.patientId,
+        firstName: savedForm.patientName.split(' ')[0],
+        lastName: savedForm.patientName.split(' ')[1] || '',
+        dateOfBirth: '1985-03-15', // Mock date of birth
+        pcpName: 'Dr. Sarah Wilson',
+        pcpLocation: 'Miami Medical Center',
+        lastVisit: '2025-01-15',
+        status: 'active' as const
+      }
+      
+      // Set the selected patient
+      setSelectedPatient(patient)
+      
+      // Load mock screening details (this would normally come from the saved form)
+      const mockScreeningDetails: ScreeningDetails = {
+        dateOfScreening: '2025-07-28',
+        placeOfService: '11 - Doctor\'s Office',
+        pcpLocation: 'Miami Medical Center',
+        practicePhone: '305-555-5555',
+        practiceFax: '305-555-5556',
+        practiceEmail: 'Contact@gableseyecare.com',
+        practiceName: 'Coral Gables Eye Care',
+        practiceLocation: '2525 Ponce De Leon Blv',
+        officeContact: 'Tom Brady',
+        diabetesMellitus: 'yes',
+        diabetesType: 'type2',
+        lastEyeExam: '2024-12-15',
+        ocularHistory: ['Glaucoma'],
+        ocularSurgery: ['Cataract Surgery'],
+        ocularHistoryOther: '',
+        ocularSurgeryOther: ''
+      }
+      
+      // Set the screening details
+      setScreeningDetails(mockScreeningDetails)
+      
+      // Load mock retinal images data
+      const mockRetinalImages: RetinalImages = {
+        rightEyeMissing: false,
+        leftEyeMissing: false,
+        rightEyeImages: [],
+        leftEyeImages: [],
+        technicianComments: 'Patient cooperative during screening process.'
+      }
+      
+      // Set the retinal images
+      setRetinalImages(mockRetinalImages)
+      
+      // Clear any existing errors
+      setErrors({})
+      
+      // Determine the step based on progress
+      const progressMatch = savedForm.progress.match(/Step (\d+) of \d+/)
+      let progressStep = progressMatch ? parseInt(progressMatch[1]) : 2
+      
+      // Ensure we never return step 1 for saved forms
+      if (progressStep === 1) {
+        progressStep = 2
+      }
+      
+      return progressStep
+    }
+    return 2 // Default to step 2 if form not found
   }
 
   const handlePatientSelect = (patient: Patient) => {
@@ -2876,6 +2951,7 @@ export default function HEDISLandingPage() {
           isOpen={showSavedScreeningListModal}
           onClose={() => setShowSavedScreeningListModal(false)}
           onFormSelect={handleSavedFormSelect}
+          savedScreenings={savedScreenings}
         />
       )}
     </div>

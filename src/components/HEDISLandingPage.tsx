@@ -1854,38 +1854,40 @@ interface SavedScreeningListModalProps {
 
 function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeningListModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
+  const [sortBy, setSortBy] = useState<'dateSaved' | 'patientName' | 'progress' | 'urgency'>('urgency')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   
-  // Mock saved screenings data
+    // Mock saved screenings data
   const savedScreenings = [
     {
       id: 'saved-001',
       patientName: 'Alice Johnson',
       patientId: '55556666',
-      lastModified: '2024-03-15',
-      progress: 'Step 2 of 4',
+      dateSaved: '2025-07-23T01:41:00', // 5 days ago - 5 days until auto-delete
+      progress: 'Step 1 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-002',
       patientName: 'David Brown',
       patientId: '77778888',
-      lastModified: '2024-03-14',
-      progress: 'Step 3 of 4',
+      dateSaved: '2025-07-21T23:33:00', // 7 days ago - SAFE
+      progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
     {
       id: 'saved-003',
       patientName: 'Emily Davis',
       patientId: '99990000',
-      lastModified: '2024-03-13',
-      progress: 'Step 1 of 4',
+      dateSaved: '2025-07-19T17:47:00', // 9 days ago - SAFE
+      progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-004',
       patientName: 'Frank Miller',
       patientId: '11112222',
-      lastModified: '2024-03-12',
+      dateSaved: '2025-07-17T09:28:00', // 11 days ago - SAFE
       progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     },
@@ -1893,64 +1895,64 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
       id: 'saved-005',
       patientName: 'Grace Lee',
       patientId: '33334444',
-      lastModified: '2024-03-11',
-      progress: 'Step 2 of 4',
+      dateSaved: '2025-07-15T22:56:00', // 13 days ago - SAFE
+      progress: 'Step 1 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-006',
       patientName: 'Henry White',
       patientId: '55556666',
-      lastModified: '2024-03-10',
-      progress: 'Step 3 of 4',
+      dateSaved: '2025-07-13T11:43:00', // 15 days ago - SAFE
+      progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
     {
       id: 'saved-007',
       patientName: 'Isabella Clark',
       patientId: '77778888',
-      lastModified: '2024-03-09',
-      progress: 'Step 1 of 4',
+      dateSaved: '2025-07-11T14:08:00', // 17 days ago - SAFE
+      progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-008',
       patientName: 'James Hall',
       patientId: '99990000',
-      lastModified: '2024-03-08',
-      progress: 'Step 2 of 4',
+      dateSaved: '2025-07-09T21:01:00', // 19 days ago - SAFE
+      progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     },
     {
       id: 'saved-009',
       patientName: 'Katherine Young',
       patientId: '11112222',
-      lastModified: '2024-03-07',
-      progress: 'Step 3 of 4',
+      dateSaved: '2025-07-07T14:22:00', // 21 days ago - SAFE
+      progress: 'Step 1 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-010',
       patientName: 'Lucas King',
       patientId: '33334444',
-      lastModified: '2024-03-06',
-      progress: 'Step 1 of 4',
+      dateSaved: '2025-07-05T02:38:00', // 23 days ago - SAFE
+      progress: 'Step 2 of 4',
       technician: 'Mike Chen'
     },
     {
       id: 'saved-011',
       patientName: 'Mia Wright',
       patientId: '55556666',
-      lastModified: '2024-03-05',
-      progress: 'Step 4 of 4',
+      dateSaved: '2025-07-03T16:34:00', // 25 days ago - SAFE
+      progress: 'Step 3 of 4',
       technician: 'Sarah Johnson'
     },
     {
       id: 'saved-012',
       patientName: 'Noah Green',
       patientId: '77778888',
-      lastModified: '2024-03-04',
-      progress: 'Step 2 of 4',
+      dateSaved: '2025-07-01T17:44:00', // 27 days ago - SAFE
+      progress: 'Step 4 of 4',
       technician: 'Mike Chen'
     }
   ]
@@ -1959,6 +1961,110 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
     screening.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     screening.patientId.includes(searchTerm)
   )
+
+  const formatDateSaved = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const getDaysSinceSaved = (dateString: string) => {
+    const savedDate = new Date(dateString)
+    const now = new Date()
+    const diffTime = now.getTime() - savedDate.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
+  const getDaysUntilExpiry = (dateString: string) => {
+    const daysSinceSaved = getDaysSinceSaved(dateString)
+    return Math.max(0, 30 - daysSinceSaved)
+  }
+
+  const getUrgencyLevel = (dateString: string) => {
+    const daysUntilExpiry = getDaysUntilExpiry(dateString)
+    if (daysUntilExpiry <= 5) return 'urgent'
+    if (daysUntilExpiry <= 10) return 'warning'
+    return 'safe'
+  }
+
+  const getUrgencyLabel = (urgencyLevel: string) => {
+    switch (urgencyLevel) {
+      case 'urgent':
+        return 'AUTO-DELETE IN 5 DAYS'
+      case 'warning':
+        return 'DUE SOON'
+      default:
+        return ''
+    }
+  }
+
+  const getUrgencyColor = (urgencyLevel: string) => {
+    switch (urgencyLevel) {
+      case 'urgent':
+        return 'bg-red-100 text-red-800 border-red-200'
+      case 'warning':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      default:
+        return ''
+    }
+  }
+
+  const urgentForms = filteredScreenings.filter(screening => {
+    const urgencyLevel = getUrgencyLevel(screening.dateSaved)
+    return urgencyLevel === 'urgent'
+  })
+
+  const filteredAndSortedScreenings = filteredScreenings.sort((a, b) => {
+    let aValue: any, bValue: any
+
+    switch (sortBy) {
+      case 'dateSaved':
+        aValue = new Date(a.dateSaved).getTime()
+        bValue = new Date(b.dateSaved).getTime()
+        break
+      case 'patientName':
+        aValue = a.patientName.toLowerCase()
+        bValue = b.patientName.toLowerCase()
+        break
+      case 'progress':
+        aValue = a.progress
+        bValue = b.progress
+        break
+      case 'urgency':
+        const aUrgency = getDaysUntilExpiry(a.dateSaved)
+        const bUrgency = getDaysUntilExpiry(b.dateSaved)
+        // Sort by urgency: urgent (1-5 days) first, then warning (6-10 days), then safe (11+ days)
+        const aUrgencyScore = aUrgency <= 5 ? 0 : aUrgency <= 10 ? 1 : 2
+        const bUrgencyScore = bUrgency <= 5 ? 0 : bUrgency <= 10 ? 1 : 2
+        aValue = aUrgencyScore
+        bValue = bUrgencyScore
+        break
+      default:
+        aValue = a.patientName.toLowerCase()
+        bValue = b.patientName.toLowerCase()
+    }
+
+    if (sortOrder === 'asc') {
+      return aValue > bValue ? 1 : -1
+    } else {
+      return aValue < bValue ? 1 : -1
+    }
+  })
+
+  const handleSortChange = (newSortBy: 'dateSaved' | 'patientName' | 'progress' | 'urgency') => {
+    if (sortBy === newSortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(newSortBy)
+      setSortOrder('desc')
+    }
+  }
 
   if (!isOpen) return null
 
@@ -1979,6 +2085,19 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
         </div>
 
         <div className="hedis-list-modal-content">
+          {urgentForms.length > 0 && (
+            <div className="hedis-list-modal-warning">
+              <div className="hedis-list-modal-warning-content">
+                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <span className="hedis-list-modal-warning-text">
+                  Forms not completed within 30 days of saving will be automatically deleted from the system.
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="hedis-list-search">
             <input
               type="text"
@@ -1987,37 +2106,67 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect }: SavedScreeni
               onChange={(e) => setSearchTerm(e.target.value)}
               className="hedis-list-search-input"
             />
+            <select
+              value={`${sortBy}-${sortOrder}`}
+              onChange={(e) => {
+                const [newSortBy, newSortOrder] = e.target.value.split('-')
+                setSortBy(newSortBy as 'dateSaved' | 'patientName' | 'progress' | 'urgency')
+                setSortOrder(newSortOrder as 'asc' | 'desc')
+              }}
+              className="hedis-list-sort-select"
+            >
+              <option value="urgency-desc">Urgency (Most Urgent First)</option>
+              <option value="dateSaved-desc">Date Saved (Newest)</option>
+              <option value="dateSaved-asc">Date Saved (Oldest)</option>
+              <option value="patientName-asc">Patient Name (A-Z)</option>
+              <option value="patientName-desc">Patient Name (Z-A)</option>
+              <option value="progress-asc">Progress (Step 1-4)</option>
+              <option value="progress-desc">Progress (Step 4-1)</option>
+            </select>
           </div>
 
           <div className="hedis-list-results">
-            {filteredScreenings.length === 0 ? (
+            {filteredAndSortedScreenings.length === 0 ? (
               <div className="hedis-list-empty">
                 <p>No saved screenings found.</p>
               </div>
             ) : (
               <div className="hedis-list-items">
-                {filteredScreenings.map((screening) => (
-                  <div 
-                    key={screening.id}
-                    className="hedis-list-item hedis-list-item-saved"
-                    onClick={() => onFormSelect(screening.id)}
-                  >
-                    <div className="hedis-list-item-info">
-                      <div className="hedis-list-item-name">{screening.patientName}</div>
-                      <div className="hedis-list-item-details">
-                        <span>ID: {screening.patientId}</span>
-                        <span>Last Modified: {screening.lastModified}</span>
-                        <span>Progress: {screening.progress}</span>
-                        <span>Technician: {screening.technician}</span>
+                {filteredAndSortedScreenings.map((screening) => {
+                  const urgencyLevel = getUrgencyLevel(screening.dateSaved)
+                  const daysUntilExpiry = getDaysUntilExpiry(screening.dateSaved)
+                  
+                  return (
+                    <div 
+                      key={screening.id}
+                      className={`hedis-list-item hedis-list-item-saved ${urgencyLevel === 'urgent' ? 'hedis-list-item-urgent' : urgencyLevel === 'warning' ? 'hedis-list-item-warning' : ''}`}
+                      onClick={() => onFormSelect(screening.id)}
+                    >
+                      <div className="hedis-list-item-info">
+                        <div className="hedis-list-item-header">
+                          <div className="hedis-list-item-name">{screening.patientName}</div>
+                          {urgencyLevel !== 'safe' && (
+                            <span className={`hedis-list-item-urgency-badge ${getUrgencyColor(urgencyLevel)}`}>
+                              {getUrgencyLabel(urgencyLevel)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="hedis-list-item-details">
+                          <span>ID: {screening.patientId}</span>
+                          <span>Date Saved: {formatDateSaved(screening.dateSaved)}</span>
+                          <span>Days Until Expiry: {daysUntilExpiry}</span>
+                          <span>Progress: {screening.progress}</span>
+                          <span>Technician: {screening.technician}</span>
+                        </div>
+                      </div>
+                      <div className="hedis-list-item-action">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
                       </div>
                     </div>
-                    <div className="hedis-list-item-action">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>

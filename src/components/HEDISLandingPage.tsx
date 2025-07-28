@@ -382,6 +382,13 @@ function ScreeningDetailsForm({
 }: ScreeningDetailsFormProps) {
   const handleInputChange = (field: keyof ScreeningDetails, value: any) => {
     setScreeningDetails({ ...screeningDetails, [field]: value })
+    
+    // Clear validation error for this field when user makes a selection
+    if (errors[field]) {
+      const newErrors = { ...errors }
+      delete newErrors[field]
+      setErrors(newErrors)
+    }
   }
 
   const handleRadioChange = (field: keyof ScreeningDetails, value: any) => {
@@ -394,6 +401,13 @@ function ScreeningDetailsForm({
       ? [...currentValues, value]
       : currentValues.filter(v => v !== value)
     setScreeningDetails({ ...screeningDetails, [field]: newValues })
+    
+    // Clear validation error for this field when user makes a selection
+    if (errors[field]) {
+      const newErrors = { ...errors }
+      delete newErrors[field]
+      setErrors(newErrors)
+    }
   }
 
   // Validation function
@@ -512,7 +526,7 @@ function ScreeningDetailsForm({
               value={screeningDetails.dateOfScreening}
               onChange={(date) => handleInputChange('dateOfScreening', date)}
               placeholder="Date of Screening"
-              className={errors.dateOfScreening ? 'border-red-300' : ''}
+              hasError={!!errors.dateOfScreening}
             />
             {errors.dateOfScreening && (
               <p className="mt-1 text-sm text-red-600">{errors.dateOfScreening}</p>
@@ -724,99 +738,100 @@ function ScreeningDetailsForm({
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* DM (Diabetes Mellitus) */}
-          <div data-error={!!errors.diabetesMellitus || !!errors.diabetesType}>
-            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
-              DM *
+          <div data-error={!!errors.diabetesMellitus}>
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Diabetes Mellitus *
             </label>
-            <div className="space-y-3">
-              {/* DM Toggle Buttons */}
-              <div className="flex space-x-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleInputChange('diabetesMellitus', 'yes')
-                    if (screeningDetails.diabetesMellitus === 'no') {
-                      handleInputChange('diabetesType', '')
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-lg border transition-colors ${
-                    screeningDetails.diabetesMellitus === 'yes'
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleInputChange('diabetesMellitus', 'no')
-                    handleInputChange('diabetesType', '')
-                  }}
-                  className={`px-4 py-2 rounded-lg border transition-colors ${
-                    screeningDetails.diabetesMellitus === 'no'
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  No
-                </button>
-              </div>
-
-              {/* Type Options - Only show when 'yes' is selected */}
-              {screeningDetails.diabetesMellitus === 'yes' && (
-                <div className="ml-6 border-l-2 border-gray-200 dark:border-gray-600 pl-4 animate-slide-down">
-                  <label className="block text-sm font-extrabold text-gray-600 dark:text-gray-400 mb-2">
-                    Type *
-                  </label>
-                  <div className="flex space-x-6">
-                    {[
-                      { value: 'type1', label: 'Type I' },
-                      { value: 'type2', label: 'Type II' }
-                    ].map((option) => (
-                      <label key={option.value} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="diabetesType"
-                          value={option.value}
-                          checked={screeningDetails.diabetesType === option.value}
-                          onChange={(e) => handleInputChange('diabetesType', e.target.value)}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
-                        />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                          {option.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  {errors.diabetesType && (
-                    <p className="mt-1 text-sm text-red-600">{errors.diabetesType}</p>
-                  )}
-                </div>
-              )}
+            <div className="flex space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="diabetesMellitus"
+                  value="yes"
+                  checked={screeningDetails.diabetesMellitus === 'yes'}
+                  onChange={(e) => handleInputChange('diabetesMellitus', e.target.value)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
+                />
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="diabetesMellitus"
+                  value="no"
+                  checked={screeningDetails.diabetesMellitus === 'no'}
+                  onChange={(e) => handleInputChange('diabetesMellitus', e.target.value)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
+                />
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">No</span>
+              </label>
             </div>
             {errors.diabetesMellitus && (
               <p className="mt-1 text-sm text-red-600">{errors.diabetesMellitus}</p>
             )}
           </div>
 
-          {/* Last Eye Exam */}
-          <div>
+          {/* DM Type - To the right of Diabetes Mellitus */}
+          <div data-error={!!errors.diabetesType}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-              Last Eye Exam (Optional)
+              DM Type {screeningDetails.diabetesMellitus === 'yes' ? '*' : '(Disabled)'}
             </label>
-            <DatePicker
-              name="lastEyeExam"
-              value={screeningDetails.lastEyeExam}
-              onChange={(date) => handleInputChange('lastEyeExam', date)}
-              placeholder="Last Eye Exam"
-            />
-            {errors.lastEyeExam && (
-              <p className="mt-1 text-sm text-red-600">{errors.lastEyeExam}</p>
+            <div className="flex space-x-4">
+              <label className={`flex items-center ${
+                screeningDetails.diabetesMellitus !== 'yes' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+              }`}>
+                <input
+                  type="radio"
+                  name="diabetesType"
+                  value="type1"
+                  checked={screeningDetails.diabetesType === 'type1'}
+                  onChange={(e) => {
+                    if (screeningDetails.diabetesMellitus === 'yes') {
+                      handleInputChange('diabetesType', e.target.value)
+                    }
+                  }}
+                  disabled={screeningDetails.diabetesMellitus !== 'yes'}
+                  className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 ${
+                    screeningDetails.diabetesMellitus === 'yes' ? 'cursor-pointer' : 'cursor-not-allowed'
+                  }`}
+                />
+                <span className={`ml-2 text-sm ${
+                  screeningDetails.diabetesMellitus === 'yes'
+                    ? 'text-gray-700 dark:text-gray-300'
+                    : 'text-gray-400 dark:text-gray-500'
+                }`}>Type I</span>
+              </label>
+              <label className={`flex items-center ${
+                screeningDetails.diabetesMellitus !== 'yes' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+              }`}>
+                <input
+                  type="radio"
+                  name="diabetesType"
+                  value="type2"
+                  checked={screeningDetails.diabetesType === 'type2'}
+                  onChange={(e) => {
+                    if (screeningDetails.diabetesMellitus === 'yes') {
+                      handleInputChange('diabetesType', e.target.value)
+                    }
+                  }}
+                  disabled={screeningDetails.diabetesMellitus !== 'yes'}
+                  className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 ${
+                    screeningDetails.diabetesMellitus === 'yes' ? 'cursor-pointer' : 'cursor-not-allowed'
+                  }`}
+                />
+                <span className={`ml-2 text-sm ${
+                  screeningDetails.diabetesMellitus === 'yes'
+                    ? 'text-gray-700 dark:text-gray-300'
+                    : 'text-gray-400 dark:text-gray-500'
+                }`}>Type II</span>
+              </label>
+            </div>
+            {screeningDetails.diabetesMellitus === 'yes' && errors.diabetesType && (
+              <p className="mt-1 text-sm text-red-600">{errors.diabetesType}</p>
             )}
           </div>
 
-          {/* Ocular HX */}
+          {/* Ocular HX - Left column */}
           <div data-error={!!errors.ocularHistory || !!errors.ocularHistoryOther}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
               Ocular HX *
@@ -867,7 +882,7 @@ function ScreeningDetailsForm({
             )}
           </div>
 
-          {/* Ocular SX */}
+          {/* Ocular SX - Right column */}
           <div data-error={!!errors.ocularSurgery || !!errors.ocularSurgeryOther}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
               Ocular SX *
@@ -914,6 +929,23 @@ function ScreeningDetailsForm({
             )}
             {errors.ocularSurgeryOther && (
               <p className="mt-1 text-sm text-red-600">{errors.ocularSurgeryOther}</p>
+            )}
+          </div>
+
+          {/* Last Eye Exam - Full width at the end */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+              Last Eye Exam (Optional)
+            </label>
+            <DatePicker
+              name="lastEyeExam"
+              value={screeningDetails.lastEyeExam}
+              onChange={(date) => handleInputChange('lastEyeExam', date)}
+              placeholder="Last Eye Exam"
+              hasError={!!errors.lastEyeExam}
+            />
+            {errors.lastEyeExam && (
+              <p className="mt-1 text-sm text-red-600">{errors.lastEyeExam}</p>
             )}
           </div>
         </div>
@@ -1950,24 +1982,31 @@ export default function HEDISLandingPage() {
       setFormMode(parsedState.mode || 'new')
       setCurrentFormId(parsedState.formId || undefined)
       setSelectedPatient(parsedState.selectedPatient || null)
-      setScreeningDetails(parsedState.screeningDetails || {
-        dateOfScreening: '',
-        placeOfService: '',
-        pcpLocation: '',
-        practicePhone: '305-555-5555',
-        practiceFax: '305-555-5556',
-        practiceEmail: 'Contact@gableseyecare.com',
-        practiceName: 'Coral Gables Eye Care',
-        practiceLocation: '2525 Ponce De Leon Blv',
-        officeContact: 'Tom Brady',
-        diabetesMellitus: '',
-        diabetesType: '',
-        lastEyeExam: '',
-        ocularHistory: [],
-        ocularSurgery: [],
-        ocularHistoryOther: '',
-        ocularSurgeryOther: ''
-      })
+      
+      // Only restore screening details if we're not actively editing
+      if (!parsedState.screeningDetails || Object.keys(parsedState.screeningDetails).length === 0) {
+        setScreeningDetails({
+          dateOfScreening: '',
+          placeOfService: '',
+          pcpLocation: '',
+          practicePhone: '305-555-5555',
+          practiceFax: '305-555-5556',
+          practiceEmail: 'Contact@gableseyecare.com',
+          practiceName: 'Coral Gables Eye Care',
+          practiceLocation: '2525 Ponce De Leon Blv',
+          officeContact: 'Tom Brady',
+          diabetesMellitus: '',
+          diabetesType: '',
+          lastEyeExam: '',
+          ocularHistory: [],
+          ocularSurgery: [],
+          ocularHistoryOther: '',
+          ocularSurgeryOther: ''
+        })
+      } else {
+        setScreeningDetails(parsedState.screeningDetails)
+      }
+      
       setRetinalImages(parsedState.retinalImages || {
         rightEyeMissing: false,
         leftEyeMissing: false,

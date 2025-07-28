@@ -8,6 +8,7 @@ interface DatePickerProps {
   disabled?: boolean
   className?: string
   name?: string
+  hasError?: boolean
 }
 
 export default function DatePicker({ 
@@ -16,7 +17,8 @@ export default function DatePicker({
   placeholder = "Select date", 
   disabled = false,
   className = "",
-  name
+  name,
+  hasError
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -173,9 +175,9 @@ export default function DatePicker({
           disabled={disabled}
           readOnly
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+          className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 ${
             disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
-          }`}
+          } ${hasError ? 'border-red-500 focus:border-red-500' : ''}`}
         />
       </div>
 

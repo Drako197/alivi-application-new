@@ -552,8 +552,10 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
           <div className="hedis-screening-breadcrumb">
             <button onClick={handleBack} className="hedis-screening-back-button">
               <Icon name="arrow-left" size={20} />
-              <span>Back to P.I.C. Actions</span>
+              <span>P.I.C. Actions</span>
             </button>
+            <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
+            <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
           </div>
         </div>
         
@@ -588,8 +590,10 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
           <div className="hedis-screening-breadcrumb">
             <button onClick={handleBack} className="hedis-screening-back-button">
               <Icon name="arrow-left" size={20} />
-              <span>Back to P.I.C. Actions</span>
+              <span>P.I.C. Actions</span>
             </button>
+            <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
+            <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
           </div>
           <div className="hedis-screening-progress">
             <StepIndicators currentStep={currentStep} />
@@ -607,8 +611,10 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
           <div className="hedis-screening-breadcrumb">
             <button onClick={handleBack} className="hedis-screening-back-button">
               <Icon name="arrow-left" size={20} />
-              <span>Back to P.I.C. Actions</span>
+              <span>P.I.C. Actions</span>
             </button>
+            <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
+            <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
           </div>
         </div>
         
@@ -641,8 +647,10 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
         <div className="hedis-screening-breadcrumb">
           <button onClick={handleBack} className="hedis-screening-back-button">
             <Icon name="arrow-left" size={20} />
-            <span>Back to P.I.C. Actions</span>
+            <span>P.I.C. Actions</span>
           </button>
+          <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
+          <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
         </div>
         <div className="hedis-screening-progress">
           <StepIndicators currentStep={currentStep} />

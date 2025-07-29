@@ -8,6 +8,8 @@ import MobileSideMenu from './MobileSideMenu'
 import MobileProfile from './MobileProfile'
 import PICLandingPage from './PICLandingPage'
 import HEDISLandingPage from './HEDISLandingPage'
+import Icon from './Icon'
+import ScreeningDataService, { type CompletedScreening, type SavedScreening } from '../services/ScreeningDataService'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
@@ -32,6 +34,36 @@ export default function Dashboard() {
   const [mobileSearchTerm, setMobileSearchTerm] = useState('')
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
 
+  // Real data state
+  const [dashboardStats, setDashboardStats] = useState({
+    completedScreenings: 0,
+    savedScreenings: 0,
+    recentCompletedScreenings: [] as CompletedScreening[],
+    recentSavedScreenings: [] as SavedScreening[]
+  })
+
+  // Load real data on component mount
+  useEffect(() => {
+    const loadDashboardData = () => {
+      try {
+        const stats = ScreeningDataService.getDashboardStats()
+        const completedScreenings = ScreeningDataService.getCompletedScreenings()
+        const savedScreenings = ScreeningDataService.getSavedScreenings()
+        
+        setDashboardStats({
+          completedScreenings: stats.completedPatientForms,
+          savedScreenings: stats.savedPatientForms,
+          recentCompletedScreenings: completedScreenings.slice(0, 3), // Last 3 completed
+          recentSavedScreenings: savedScreenings.slice(0, 3) // Last 3 saved
+        })
+      } catch (error) {
+        console.error('Error loading dashboard data:', error)
+      }
+    }
+
+    loadDashboardData()
+  }, [])
+
   // Save tab state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('activeMobileTab', activeMobileTab)
@@ -46,13 +78,13 @@ export default function Dashboard() {
     updateBreadcrumbPath(activeDesktopTab)
   }, [activeDesktopTab])
 
-  // Mobile P.I.C. Action Data
+  // Mobile P.I.C. Action Data - Updated to match actual PIC actions
   const mobileActions = [
     {
       id: 1,
       title: 'Request Patient Eligibility',
       description: 'Check patient eligibility and benefits',
-      icon: 'check-circle',
+      icon: 'user-check',
       category: 'eligibility',
       frequency: 95
     },
@@ -76,7 +108,7 @@ export default function Dashboard() {
       id: 4,
       title: 'Claim Summary',
       description: 'View detailed claim summaries and reports',
-      icon: 'document-report',
+      icon: 'file-text',
       category: 'claims',
       frequency: 82
     },
@@ -84,7 +116,7 @@ export default function Dashboard() {
       id: 5,
       title: 'Job Status Online Entry',
       description: 'Enter job status information online',
-      icon: 'computer-desktop',
+      icon: 'monitor',
       category: 'claims',
       frequency: 55
     },
@@ -92,7 +124,7 @@ export default function Dashboard() {
       id: 6,
       title: 'Job Status Paper Claim',
       description: 'Submit job status via paper claim',
-      icon: 'document-text',
+      icon: 'file-text',
       category: 'claims',
       frequency: 45
     },
@@ -100,7 +132,7 @@ export default function Dashboard() {
       id: 7,
       title: 'Health Plan Details',
       description: 'View health plan information and coverage',
-      icon: 'information-circle',
+      icon: 'info',
       category: 'plans',
       frequency: 85
     },
@@ -108,7 +140,7 @@ export default function Dashboard() {
       id: 8,
       title: 'Explanation of Payments',
       description: 'View detailed payment explanations',
-      icon: 'currency-dollar',
+      icon: 'dollar-sign',
       category: 'plans',
       frequency: 78
     },
@@ -116,7 +148,7 @@ export default function Dashboard() {
       id: 9,
       title: 'Payment Summary Report',
       description: 'Generate payment summary reports',
-      icon: 'chart-bar',
+      icon: 'bar-chart-3',
       category: 'plans',
       frequency: 72
     },
@@ -124,7 +156,7 @@ export default function Dashboard() {
       id: 10,
       title: 'Frame Collections',
       description: 'Access frame collection information',
-      icon: 'collection',
+      icon: 'package',
       category: 'plans',
       frequency: 65
     },
@@ -132,7 +164,7 @@ export default function Dashboard() {
       id: 11,
       title: 'Lens Price List',
       description: 'View current lens pricing information',
-      icon: 'price-tag',
+      icon: 'tag',
       category: 'plans',
       frequency: 58
     },
@@ -156,7 +188,7 @@ export default function Dashboard() {
       id: 14,
       title: 'Manual Eligibility Request',
       description: 'Submit manual eligibility requests',
-      icon: 'pencil',
+      icon: 'edit-3',
       category: 'resources',
       frequency: 68
     },
@@ -164,7 +196,7 @@ export default function Dashboard() {
       id: 15,
       title: 'Provider Resources',
       description: 'Access provider tools and resources',
-      icon: 'academic-cap',
+      icon: 'graduation-cap',
       category: 'resources',
       frequency: 35
     }
@@ -179,142 +211,9 @@ export default function Dashboard() {
     return matchesSearch && matchesCategory
   }).sort((a, b) => b.frequency - a.frequency) // Sort by frequency (highest first)
 
-  // Mobile icon helper function
+  // Mobile icon helper function - Updated to use Icon component
   const getMobileIcon = (iconName: string) => {
-    const icons: { [key: string]: ReactElement } = {
-      document: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      payment: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-        </svg>
-      ),
-      chart: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-      user: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-      appeal: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-      ),
-      resource: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      ),
-      status: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      inquiry: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      upload: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-        </svg>
-      ),
-      records: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      analytics: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-      training: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      ),
-      'check-circle': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      search: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      ),
-      'document-report': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      'computer-desktop': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
-      'document-text': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      'information-circle': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      'currency-dollar': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-        </svg>
-      ),
-      'chart-bar': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-      collection: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      ),
-      'price-tag': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-        </svg>
-      ),
-      'shield-check': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      ),
-      clock: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      pencil: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      ),
-      'academic-cap': (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-        </svg>
-      )
-    }
-    return icons[iconName] || icons.document
+    return <Icon name={iconName} size={24} className="text-gray-600 dark:text-gray-300" />
   }
 
   const toggleDarkMode = () => {
@@ -373,6 +272,28 @@ export default function Dashboard() {
       // The HEDIS component will update the breadcrumb to show just Dashboard > H.E.D.I.S.
     }
     // For future sub-pages, we can add more logic here
+  }
+
+  // Quick action handlers
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'hedis':
+        setActiveDesktopTab('hedis')
+        break
+      case 'pic':
+        setActiveDesktopTab('pic')
+        break
+      case 'eligibility':
+        setActiveDesktopTab('pic')
+        // TODO: Navigate directly to Patient Eligibility form
+        break
+      case 'completed-screenings':
+        setActiveDesktopTab('hedis')
+        // TODO: Navigate to completed screenings view
+        break
+      default:
+        console.log('Quick action clicked:', action)
+    }
   }
 
   // Desktop content based on active tab
@@ -458,23 +379,21 @@ export default function Dashboard() {
             {/* Welcome Section */}
             <div className="welcome-section">
               <h1 className="welcome-title">Welcome back, {user?.fullName?.split(' ')[0] || 'User'}!</h1>
-              <p className="welcome-subtitle">Here's what's happening with your claims today.</p>
+              <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
             </div>
 
-            {/* Stats Grid */}
+            {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-green-100 dark:bg-green-900">
-                      <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <Icon name="check-circle" size={20} className="text-green-600 dark:text-green-400" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="stat-label">Approved</p>
-                    <p className="stat-value">1,234</p>
+                    <p className="stat-label">Completed Screenings</p>
+                    <p className="stat-value">{dashboardStats.completedScreenings}</p>
                   </div>
                 </div>
               </div>
@@ -483,14 +402,26 @@ export default function Dashboard() {
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-blue-100 dark:bg-blue-900">
-                      <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                      </svg>
+                      <Icon name="save" size={20} className="text-blue-600 dark:text-blue-400" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="stat-label">Pending</p>
-                    <p className="stat-value">567</p>
+                    <p className="stat-label">Saved Screenings</p>
+                    <p className="stat-value">{dashboardStats.savedScreenings}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="stat-icon bg-purple-100 dark:bg-purple-900">
+                      <Icon name="user-check" size={20} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <p className="stat-label">Eligibility Requests</p>
+                    <p className="stat-value">24</p>
                   </div>
                 </div>
               </div>
@@ -499,85 +430,109 @@ export default function Dashboard() {
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-yellow-100 dark:bg-yellow-900">
-                      <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                      </svg>
+                      <Icon name="clock" size={20} className="text-yellow-600 dark:text-yellow-400" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="stat-label">Under Review</p>
-                    <p className="stat-value">89</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="stat-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-red-100 dark:bg-red-900">
-                      <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="stat-label">Rejected</p>
-                    <p className="stat-value">91</p>
+                    <p className="stat-label">Pending Actions</p>
+                    <p className="stat-value">{dashboardStats.savedScreenings + 3}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* Quick Actions - Updated with real form links */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="stat-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
-                  <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    Submit New Claim
+                  <button 
+                    onClick={() => handleQuickAction('hedis')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="plus" size={16} className="inline mr-2" />
+                    Start New HEDIS Screening
                   </button>
-                  <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    View Claims History
+                  <button 
+                    onClick={() => handleQuickAction('eligibility')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="user-check" size={16} className="inline mr-2" />
+                    Request Patient Eligibility
                   </button>
-                  <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    Generate Reports
+                  <button 
+                    onClick={() => handleQuickAction('completed-screenings')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="file-text" size={16} className="inline mr-2" />
+                    View Completed Screenings
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="upload" size={16} className="inline mr-2" />
+                    Submit Claims
                   </button>
                 </div>
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Recent Activity</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    <span className="text-gray-600 dark:text-gray-400">Claim #1234 approved</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
-                    <span className="text-gray-600 dark:text-gray-400">Claim #1235 pending review</span>
-                  </div>
+                  {dashboardStats.recentCompletedScreenings.length > 0 ? (
+                    dashboardStats.recentCompletedScreenings.map((screening, index) => (
+                      <div key={screening.id} className="flex items-center text-sm">
+                        <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {screening.patientName} - Screening completed
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      No recent completed screenings
+                    </div>
+                  )}
+                  {dashboardStats.recentSavedScreenings.length > 0 && (
+                    <div className="flex items-center text-sm">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {dashboardStats.recentSavedScreenings.length} saved screening{dashboardStats.recentSavedScreenings.length !== 1 ? 's' : ''} pending
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center text-sm">
                     <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                    <span className="text-gray-600 dark:text-gray-400">New claim submitted</span>
+                    <span className="text-gray-600 dark:text-gray-400">Patient eligibility request submitted</span>
                   </div>
                 </div>
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">System Status</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-r-lg">Popular PIC Actions</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Claims Processing</span>
-                    <span className="text-sm text-green-600 dark:text-green-400">Online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Payment Gateway</span>
-                    <span className="text-sm text-green-600 dark:text-green-400">Online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Database</span>
-                    <span className="text-sm text-green-600 dark:text-green-400">Online</span>
-                  </div>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="user-check" size={16} className="inline mr-2" />
+                    Request Patient Eligibility (95% usage)
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="upload" size={16} className="inline mr-2" />
+                    Claims Submission (92% usage)
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="search" size={16} className="inline mr-2" />
+                    Claim Status (88% usage)
+                  </button>
                 </div>
               </div>
             </div>
@@ -744,23 +699,21 @@ export default function Dashboard() {
             {/* Welcome Section */}
             <div className="welcome-section">
               <h1 className="welcome-title">Welcome back, {user?.fullName?.split(' ')[0] || 'User'}!</h1>
-              <p className="welcome-subtitle">Here's what's happening with your claims today.</p>
+              <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
             </div>
 
-            {/* Stats Grid */}
+            {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-green-100 dark:bg-green-900">
-                      <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <Icon name="check-circle" size={20} className="text-green-600 dark:text-green-400" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="stat-label">Approved</p>
-                    <p className="stat-value">1,234</p>
+                    <p className="stat-label">Completed Screenings</p>
+                    <p className="stat-value">{dashboardStats.completedScreenings}</p>
                   </div>
                 </div>
               </div>
@@ -769,14 +722,26 @@ export default function Dashboard() {
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-blue-100 dark:bg-blue-900">
-                      <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                      </svg>
+                      <Icon name="save" size={20} className="text-blue-600 dark:text-blue-400" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="stat-label">Total Claims</p>
-                    <p className="stat-value">2,847</p>
+                    <p className="stat-label">Saved Screenings</p>
+                    <p className="stat-value">{dashboardStats.savedScreenings}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="stat-icon bg-purple-100 dark:bg-purple-900">
+                      <Icon name="user-check" size={20} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <p className="stat-label">Eligibility Requests</p>
+                    <p className="stat-value">24</p>
                   </div>
                 </div>
               </div>
@@ -785,85 +750,109 @@ export default function Dashboard() {
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-yellow-100 dark:bg-yellow-900">
-                      <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <Icon name="clock" size={20} className="text-yellow-600 dark:text-yellow-400" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="stat-label">Pending</p>
-                    <p className="stat-value">156</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="stat-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-red-100 dark:bg-red-900">
-                      <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="stat-label">Rejected</p>
-                    <p className="stat-value">91</p>
+                    <p className="stat-label">Pending Actions</p>
+                    <p className="stat-value">{dashboardStats.savedScreenings + 3}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* Quick Actions - Updated with real form links */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="stat-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
-                  <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    Submit New Claim
+                  <button 
+                    onClick={() => handleQuickAction('hedis')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="plus" size={16} className="inline mr-2" />
+                    Start New HEDIS Screening
                   </button>
-                  <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    View Claims History
+                  <button 
+                    onClick={() => handleQuickAction('eligibility')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="user-check" size={16} className="inline mr-2" />
+                    Request Patient Eligibility
                   </button>
-                  <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    Generate Reports
+                  <button 
+                    onClick={() => handleQuickAction('completed-screenings')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="file-text" size={16} className="inline mr-2" />
+                    View Completed Screenings
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="upload" size={16} className="inline mr-2" />
+                    Submit Claims
                   </button>
                 </div>
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Recent Activity</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    <span className="text-gray-600 dark:text-gray-400">Claim #1234 approved</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
-                    <span className="text-gray-600 dark:text-gray-400">Claim #1235 pending review</span>
-                  </div>
+                  {dashboardStats.recentCompletedScreenings.length > 0 ? (
+                    dashboardStats.recentCompletedScreenings.map((screening, index) => (
+                      <div key={screening.id} className="flex items-center text-sm">
+                        <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {screening.patientName} - Screening completed
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      No recent completed screenings
+                    </div>
+                  )}
+                  {dashboardStats.recentSavedScreenings.length > 0 && (
+                    <div className="flex items-center text-sm">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {dashboardStats.recentSavedScreenings.length} saved screening{dashboardStats.recentSavedScreenings.length !== 1 ? 's' : ''} pending
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center text-sm">
                     <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                    <span className="text-gray-600 dark:text-gray-400">New claim submitted</span>
+                    <span className="text-gray-600 dark:text-gray-400">Patient eligibility request submitted</span>
                   </div>
                 </div>
               </div>
 
               <div className="stat-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">System Status</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-r-lg">Popular PIC Actions</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Claims Processing</span>
-                    <span className="text-sm text-green-600 dark:text-green-400">Online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Payment Gateway</span>
-                    <span className="text-sm text-green-600 dark:text-green-400">Online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Database</span>
-                    <span className="text-sm text-green-600 dark:text-green-400">Online</span>
-                  </div>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="user-check" size={16} className="inline mr-2" />
+                    Request Patient Eligibility (95% usage)
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="upload" size={16} className="inline mr-2" />
+                    Claims Submission (92% usage)
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="search" size={16} className="inline mr-2" />
+                    Claim Status (88% usage)
+                  </button>
                 </div>
               </div>
             </div>

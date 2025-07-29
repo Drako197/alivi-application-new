@@ -18,7 +18,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
     firstName: '',
     dateOfBirth: '',
     // Track which identification method is being used
-    identificationMethod: 'none' as 'subscriber' | 'name' | 'none',
+    identificationMethod: 'subscriber' as 'subscriber' | 'name' | 'none',
     // Manual input flags
     manualProviderId: false,
     manualSubscriberId: false,
@@ -334,24 +334,24 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <div>
+                    <div data-error={!!errors.providerId}>
                       <label htmlFor="providerId" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
                         Provider ID <span className="text-red-500">*</span>
                       </label>
                       
-                                              {/* Provider ID Manual Input Checkbox */}
-                        <div className="mb-3">
-                          <label className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                            <input
-                              type="checkbox"
-                              name="manualProviderId"
-                              checked={formData.manualProviderId}
-                              onChange={handleCheckboxChange}
-                              className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            Enter Provider ID manually (if not in dropdown)
-                          </label>
-                        </div>
+                      {/* Provider ID Manual Input Checkbox */}
+                      <div className="mb-3">
+                        <label className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                          <input
+                            type="checkbox"
+                            name="manualProviderId"
+                            checked={formData.manualProviderId}
+                            onChange={handleCheckboxChange}
+                            className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          Enter Provider ID manually (if not in dropdown)
+                        </label>
+                      </div>
 
                       {formData.manualProviderId ? (
                         <div className="relative">
@@ -361,9 +361,9 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                             name="providerId"
                             value={formData.providerId}
                             onChange={handleInputChange}
-                            placeholder="Enter your provider ID"
+                            placeholder="Enter provider ID"
                             className="form-input"
-                            required
+                            onClick={() => handleIdentificationMethodChange('subscriber')}
                           />
                           {validations.providerId && !errors.providerId && (
                             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -381,7 +381,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                             className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                               errors.providerId ? 'border-red-500' : 'border-gray-300'
                             }`}
-                            required
+                            onClick={() => handleIdentificationMethodChange('subscriber')}
                           >
                             <option value="">Select a provider...</option>
                             {providerIdOptions.map((option) => (
@@ -398,7 +398,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                         </div>
                       )}
                       {errors.providerId && (
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.providerId}</p>
+                        <p className="mt-1 text-sm text-red-600">{errors.providerId}</p>
                       )}
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         Your unique provider identifier (minimum 3 characters)
@@ -407,7 +407,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                   </div>
 
                   <div className="space-y-3">
-                    <div>
+                    <div data-error={!!errors.effectiveDate}>
                       <label htmlFor="effectiveDate" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
                         Effective as of <span className="text-red-500">*</span>
                       </label>
@@ -425,7 +425,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                         hasError={!!errors.effectiveDate}
                       />
                       {errors.effectiveDate && (
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.effectiveDate}</p>
+                        <p className="mt-1 text-sm text-red-600">{errors.effectiveDate}</p>
                       )}
                     </div>
                   </div>
@@ -439,12 +439,6 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Patient Identification Method
                 </h3>
-                
-                {errors.identificationMethod && (
-                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <p className="text-sm text-red-600 dark:text-red-400">{errors.identificationMethod}</p>
-                  </div>
-                )}
                 
                 {/* Method Selection Tabs */}
                 <div className="flex space-x-1 mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
@@ -473,12 +467,16 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                     Name/DOB Method
                   </button>
                 </div>
+                
+                {errors.identificationMethod && (
+                  <p className="mt-1 text-sm text-red-600">{errors.identificationMethod}</p>
+                )}
 
                 {/* Subscriber ID Method */}
                 {formData.identificationMethod === 'subscriber' && (
                   <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
+                      <div data-error={!!errors.subscriberId}>
                         <label htmlFor="subscriberId" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
                           Subscriber ID:
                         </label>
@@ -542,14 +540,14 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                           </div>
                         )}
                         {errors.subscriberId && (
-                          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.subscriberId}</p>
+                          <p className="mt-1 text-sm text-red-600">{errors.subscriberId}</p>
                         )}
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                           Primary subscriber's ID (typically 9-11 digits)
                         </p>
                       </div>
                       
-                      <div>
+                      <div data-error={!!errors.dependantSequence}>
                         <label htmlFor="dependantSequence" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
                           Dependant Sequence:
                         </label>
@@ -613,7 +611,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                           </div>
                         )}
                         {errors.dependantSequence && (
-                          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.dependantSequence}</p>
+                          <p className="mt-1 text-sm text-red-600">{errors.dependantSequence}</p>
                         )}
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                           Dependent sequence number (00 for primary, 01+ for dependents)
@@ -627,7 +625,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                 {formData.identificationMethod === 'name' && (
                   <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
+                      <div data-error={!!errors.lastName}>
                         <label htmlFor="lastName" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
                           Last Name:
                         </label>
@@ -649,14 +647,14 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                           )}
                         </div>
                         {errors.lastName && (
-                          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.lastName}</p>
+                          <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
                         )}
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                           Patient's last name as it appears on insurance records
                         </p>
                       </div>
                       
-                      <div>
+                      <div data-error={!!errors.firstName}>
                         <label htmlFor="firstName" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
                           First Name:
                         </label>
@@ -678,7 +676,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                           )}
                         </div>
                         {errors.firstName && (
-                          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.firstName}</p>
+                          <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
                         )}
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                           Patient's first name as it appears on insurance records
@@ -686,7 +684,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                       </div>
                     </div>
                     
-                    <div>
+                    <div data-error={!!errors.dateOfBirth}>
                       <label htmlFor="dateOfBirth" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
                         Date of Birth:
                       </label>
@@ -708,7 +706,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                         )}
                       </div>
                       {errors.dateOfBirth && (
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.dateOfBirth}</p>
+                        <p className="mt-1 text-sm text-red-600">{errors.dateOfBirth}</p>
                       )}
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         Patient's date of birth in MM/DD/YYYY format
@@ -724,9 +722,9 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
               <button
                 type="button"
                 onClick={handleViewReservedBenefits}
-                className="btn-secondary"
+                className="btn-tertiary"
               >
-                <Icon name="heart" size={20} className="text-white mr-2" />
+                <Icon name="heart" size={20} className="mr-2" />
                 View Reserved Benefits
               </button>
               <button

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Icon from './Icon'
 import DatePicker from './DatePicker'
+import ReservedBenefitsPageStandalone from './ReservedBenefitsPage'
 
 interface PatientEligibilityFormProps {
   onBack?: () => void
@@ -46,6 +47,7 @@ export default function PatientEligibilityForm({
   const [showEligibilityModal, setShowEligibilityModal] = useState(false)
   const [selectedEligibilityType, setSelectedEligibilityType] = useState<string>('')
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
+  const [showReservedBenefits, setShowReservedBenefits] = useState(false)
 
 
   // Real-world data for dropdowns
@@ -365,8 +367,8 @@ export default function PatientEligibilityForm({
   }
 
   const handleViewReservedBenefits = () => {
-    // Navigate to reserved benefits view
-    console.log('Viewing reserved benefits')
+    // Show standalone reserved benefits page
+    setShowReservedBenefits(true)
   }
 
   // Modal and step handling functions
@@ -429,6 +431,10 @@ export default function PatientEligibilityForm({
     
     // Go back to step 1
     setCurrentStep(1)
+  }
+
+  const handleBackFromReservedBenefits = () => {
+    setShowReservedBenefits(false)
   }
 
   // Helper function to get the display name for the originating page
@@ -680,13 +686,7 @@ export default function PatientEligibilityForm({
               <Icon name="printer" size={16} />
               Print
             </button>
-            <button 
-              onClick={handleBack}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <Icon name="arrow-left" size={16} />
-              Back
-            </button>
+            {/* Back button hidden for step 4 */}
             <button 
               onClick={handleNewSearch}
               className="btn-primary flex items-center gap-2"
@@ -869,7 +869,15 @@ export default function PatientEligibilityForm({
   }
 
   let stepContent: React.ReactNode = null;
-  if (submitted) {
+  
+  if (showReservedBenefits) {
+    stepContent = (
+      <ReservedBenefitsPageStandalone 
+        onBack={handleBackFromReservedBenefits}
+        onNewSearch={handleNewSearch}
+      />
+    );
+  } else if (submitted) {
     stepContent = (
       <div className="hedis-screening-content">
         <div className="text-center py-12">
@@ -1334,6 +1342,14 @@ export default function PatientEligibilityForm({
   }
 
   // Render the header ONCE, and the step content below
+  if (showReservedBenefits) {
+    return (
+      <div className="hedis-screening-page">
+        {stepContent}
+      </div>
+    );
+  }
+
   return (
     <div className="hedis-screening-page">
       <div className="hedis-screening-header">

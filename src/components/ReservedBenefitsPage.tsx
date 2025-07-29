@@ -1,15 +1,12 @@
-import React from 'react'
 import Icon from './Icon'
 
 interface ReservedBenefitsPageProps {
   onBack?: () => void
-  onNewSearch?: () => void
   onPrint?: () => void
 }
 
 export default function ReservedBenefitsPage({ 
   onBack, 
-  onNewSearch, 
   onPrint 
 }: ReservedBenefitsPageProps) {
   // Mock data for reserved benefits page

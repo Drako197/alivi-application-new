@@ -15,7 +15,7 @@ export default function PatientEligibilityForm({
   navigationHistory = []
 }: PatientEligibilityFormProps) {
   // Navigation state
-  const [navigationStack, setNavigationStack] = useState<string[]>([
+  const [navigationStack] = useState<string[]>([
     originatingPage,
     ...navigationHistory
   ])
@@ -400,10 +400,7 @@ export default function PatientEligibilityForm({
     }, 2000)
   }
 
-  const handleBackToForm = () => {
-    setCurrentStep(1)
-    setSelectedEligibilityType('')
-  }
+  // handleBackToForm removed as it's not used
 
   const handleNewSearch = () => {
     // Reset form data
@@ -874,7 +871,6 @@ export default function PatientEligibilityForm({
     stepContent = (
       <ReservedBenefitsPageStandalone 
         onBack={handleBackFromReservedBenefits}
-        onNewSearch={handleNewSearch}
       />
     );
   } else if (submitted) {

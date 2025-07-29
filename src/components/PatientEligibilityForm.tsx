@@ -4,9 +4,21 @@ import DatePicker from './DatePicker'
 
 interface PatientEligibilityFormProps {
   onBack?: () => void
+  originatingPage?: string
+  navigationHistory?: string[]
 }
 
-export default function PatientEligibilityForm({ onBack }: PatientEligibilityFormProps) {
+export default function PatientEligibilityForm({ 
+  onBack, 
+  originatingPage = 'pic',
+  navigationHistory = []
+}: PatientEligibilityFormProps) {
+  // Navigation state
+  const [navigationStack, setNavigationStack] = useState<string[]>([
+    originatingPage,
+    ...navigationHistory
+  ])
+
   const [formData, setFormData] = useState({
     providerId: '',
     effectiveDate: '',
@@ -308,8 +320,47 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
   }
 
   const handleBack = () => {
-    if (onBack) {
-      onBack()
+    // Smart back navigation based on originating page and navigation history
+    const currentOrigin = navigationStack[navigationStack.length - 1]
+    
+    switch (currentOrigin) {
+      case 'pic':
+        // Return to PIC landing page
+        if (onBack) {
+          onBack()
+        }
+        break
+      case 'dashboard':
+        // Return to main dashboard
+        window.location.href = '/'
+        break
+      case 'hedis':
+        // Return to HEDIS landing page
+        window.location.href = '/hedis'
+        break
+      case 'patient-search':
+        // Return to patient search results
+        // This would typically be handled by the parent component
+        if (onBack) {
+          onBack()
+        }
+        break
+      case 'claims':
+        // Return to claims section
+        window.location.href = '/claims'
+        break
+      case 'eligibility':
+        // Return to eligibility section
+        window.location.href = '/eligibility'
+        break
+      default:
+        // Default fallback - try to go back in browser history
+        if (window.history.length > 1) {
+          window.history.back()
+        } else {
+          // If no history, go to dashboard
+          window.location.href = '/'
+        }
     }
   }
 
@@ -350,6 +401,56 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
   const handleBackToForm = () => {
     setCurrentStep(1)
     setSelectedEligibilityType('')
+  }
+
+  const handleNewSearch = () => {
+    // Reset form data
+    setFormData({
+      providerId: '',
+      effectiveDate: '',
+      subscriberId: '',
+      dependantSequence: '',
+      lastName: '',
+      firstName: '',
+      dateOfBirth: '',
+      identificationMethod: 'subscriber',
+      manualProviderId: false,
+      manualSubscriberId: false,
+      manualDependantSequence: false
+    })
+    
+    // Reset all states
+    setIsSubmitting(false)
+    setSubmitted(false)
+    setErrors({})
+    setValidations({})
+    setShowEligibilityModal(false)
+    setSelectedEligibilityType('')
+    
+    // Go back to step 1
+    setCurrentStep(1)
+  }
+
+  // Helper function to get the display name for the originating page
+  const getOriginatingPageDisplayName = () => {
+    const currentOrigin = navigationStack[navigationStack.length - 1]
+    
+    switch (currentOrigin) {
+      case 'pic':
+        return 'P.I.C. Actions'
+      case 'dashboard':
+        return 'Dashboard'
+      case 'hedis':
+        return 'HEDIS Screenings'
+      case 'patient-search':
+        return 'Patient Search'
+      case 'claims':
+        return 'Claims'
+      case 'eligibility':
+        return 'Eligibility'
+      default:
+        return 'Dashboard'
+    }
   }
 
   // Modal Component
@@ -586,7 +687,10 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
               <Icon name="arrow-left" size={16} />
               Back
             </button>
-            <button className="btn-primary flex items-center gap-2">
+            <button 
+              onClick={handleNewSearch}
+              className="btn-primary flex items-center gap-2"
+            >
               <Icon name="search" size={16} />
               New Search
             </button>
@@ -1233,14 +1337,10 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
   return (
     <div className="hedis-screening-page">
       <div className="hedis-screening-header">
-        <div className="hedis-screening-breadcrumb">
-          <button onClick={handleBack} className="hedis-screening-back-button">
-            <Icon name="arrow-left" size={20} />
-            <span>P.I.C. Actions</span>
-          </button>
-          <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
-          <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
-        </div>
+        <button onClick={handleBack} className="hedis-screening-back-button">
+          <Icon name="arrow-left" size={20} />
+          <span>{getOriginatingPageDisplayName()}</span>
+        </button>
         <div className="hedis-screening-progress">
           <StepIndicators currentStep={currentStep} />
         </div>

@@ -270,6 +270,10 @@ export default function Dashboard() {
       // Clicking on H.E.D.I.S. should take us back to HEDIS dashboard
       setActiveDesktopTab('hedis')
       // The HEDIS component will update the breadcrumb to show just Dashboard > H.E.D.I.S.
+    } else if (index === 1 && breadcrumbPath[1] === 'P.I.C.') {
+      // Clicking on P.I.C. should take us back to PIC landing page
+      setActiveDesktopTab('pic')
+      setBreadcrumbPath(['Dashboard', 'P.I.C.'])
     }
     // For future sub-pages, we can add more logic here
   }
@@ -310,7 +314,7 @@ export default function Dashboard() {
       case 'pic':
         return (
           <div className="dashboard-content">
-            <PICLandingPage />
+            <PICLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />
           </div>
         )
       case 'reports':
@@ -878,7 +882,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     {/* Breadcrumb */}
-                    <nav className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                    <nav className="main-header-breadcrumb flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                       {breadcrumbPath.map((item, index) => (
                         <div key={index} className="flex items-center">
                           <span

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import LottieLoader from './LottieLoader'
+import LoadingOverlay from './LoadingOverlay'
 
 interface LoginViewProps {
   onViewChange: (view: 'login' | 'signup' | 'forgot-password') => void
@@ -64,18 +66,22 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
     if (!validateForm()) return
 
     setIsSubmitting(true)
-    try {
-      const result = await login(formData.email, formData.password)
-      
-      if (!result.success) {
-        setErrors({ general: result.error || 'Login failed' })
+    
+    // Simulate a longer loading time for better UX
+    setTimeout(async () => {
+      try {
+        const result = await login(formData.email, formData.password)
+        
+        if (!result.success) {
+          setErrors({ general: result.error || 'Login failed' })
+        }
+        // If successful, the AuthContext will handle the redirect
+      } catch (error) {
+        setErrors({ general: 'An unexpected error occurred' })
+      } finally {
+        setIsSubmitting(false)
       }
-      // If successful, the AuthContext will handle the redirect
-    } catch (error) {
-      setErrors({ general: 'An unexpected error occurred' })
-    } finally {
-      setIsSubmitting(false)
-    }
+                    }, 8000) // 8 second delay
   }
 
   const togglePasswordVisibility = () => {
@@ -97,7 +103,9 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
   }
 
   return (
-    <div className="form-container">
+    <>
+      <LoadingOverlay isVisible={isSubmitting} />
+      <div className="form-container">
       {/* Header */}
       <div className="auth-header">
         <h2 className="auth-title">
@@ -220,10 +228,7 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
         >
           {isSubmitting ? (
             <div className="flex items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <LottieLoader size="small" className="mr-3" />
               Signing in...
             </div>
           ) : (
@@ -261,5 +266,6 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
         </p>
       </div>
     </div>
+    </>
   )
 } 

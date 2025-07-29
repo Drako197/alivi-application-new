@@ -12,7 +12,11 @@ interface ActionItem {
   icon: string
 }
 
-export default function PICLandingPage() {
+interface PICLandingPageProps {
+  onUpdateBreadcrumb?: (path: string[]) => void
+}
+
+export default function PICLandingPage({ onUpdateBreadcrumb }: PICLandingPageProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -66,6 +70,10 @@ export default function PICLandingPage() {
     
     if (action.id === 'request-patient-eligibility') {
       setCurrentView('patient-eligibility')
+      // Update breadcrumb to show P.I.C. > Request Patient Eligibility
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Request Patient Eligibility'])
+      }
     } else {
       // Here you would typically navigate to the specific action or open a modal
       console.log('Navigating to:', action.name)
@@ -74,6 +82,10 @@ export default function PICLandingPage() {
 
   const handleBackToLanding = () => {
     setCurrentView('landing')
+    // Reset breadcrumb to show just Dashboard > P.I.C.
+    if (onUpdateBreadcrumb) {
+      onUpdateBreadcrumb(['Dashboard', 'P.I.C.'])
+    }
   }
 
   const filteredActions = allActions.filter(action => {

@@ -1795,12 +1795,50 @@ select {
   }
 
   .form-select {
-    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 appearance-none cursor-pointer;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.75rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
+    display: block !important;
+    width: 100% !important;
+    border-radius: 0.375rem !important;
+    border: 0 !important;
+    padding: 0.375rem 0.75rem !important;
+    padding-right: 2.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5rem !important;
+    color: #111827 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #d1d5db !important;
+    appearance: none !important;
+    cursor: pointer !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 0.75rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5em 1.5em !important;
+  }
+
+  .dark .form-select {
+    color: #ffffff !important;
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+  }
+
+  .form-select:focus {
+    outline: none !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+  }
+
+  .dark .form-select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  .form-select:hover {
+    border-color: #9ca3af !important;
+  }
+
+  .dark .form-select:hover {
+    border-color: #6b7280 !important;
   }
 
   .form-radio-group {
@@ -2842,6 +2880,83 @@ select {
 
 .hedis-alert-info .hedis-alert-description {
   @apply text-blue-700;
+}
+
+/* Patient Eligibility Form Styles */
+.patient-eligibility-form {
+  @apply max-w-4xl mx-auto p-6 space-y-6;
+}
+
+/* Step Navigation */
+.step-navigation {
+  @apply bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm;
+}
+
+.step-circle {
+  @apply w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center text-sm font-medium;
+}
+
+.step-circle.step-active {
+  @apply bg-blue-600 text-white;
+}
+
+.step-connector {
+  @apply w-12 h-0.5 bg-gray-300 dark:bg-gray-600;
+}
+
+.step-label {
+  @apply ml-2 text-sm font-medium text-gray-600 dark:text-gray-400;
+}
+
+/* Identification Container */
+.identification-container {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6 items-start;
+}
+
+.identification-group {
+  @apply bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-4;
+  @apply border-2 border-transparent transition-all duration-200;
+}
+
+.identification-group.group-active {
+  @apply border-blue-500 bg-blue-50 dark:bg-blue-900/20;
+}
+
+.or-separator {
+  @apply flex items-center justify-center;
+}
+
+.or-text {
+  @apply bg-white dark:bg-gray-800 px-4 py-2 rounded-full text-lg font-bold text-gray-600 dark:text-gray-400;
+  @apply border-2 border-gray-300 dark:border-gray-600;
+}
+
+/* Form Actions */
+.form-actions {
+  @apply flex flex-col sm:flex-row gap-4 justify-end mt-8;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors;
+  @apply flex items-center justify-center;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-medium rounded-lg transition-colors;
+  @apply flex items-center justify-center;
+}
+
+/* Help Section */
+.help-section {
+  @apply bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm;
+}
+
+.help-toggle {
+  @apply transition-colors duration-200;
+}
+
+.help-content {
+  @apply animate-slide-down;
 }
 
 .hedis-alert-close {

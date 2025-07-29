@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ReactElement } from 'react'
 import Icon from './Icon'
+import PatientEligibilityForm from './PatientEligibilityForm'
 
 interface ActionItem {
   id: string
@@ -15,6 +16,7 @@ export default function PICLandingPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility'>('landing')
 
   // Dummy data for actions
   const allActions: ActionItem[] = [
@@ -61,7 +63,17 @@ export default function PICLandingPage() {
 
   const handleActionClick = (action: ActionItem) => {
     console.log('Action clicked:', action.name)
-    // Here you would typically navigate to the specific action or open a modal
+    
+    if (action.id === 'request-patient-eligibility') {
+      setCurrentView('patient-eligibility')
+    } else {
+      // Here you would typically navigate to the specific action or open a modal
+      console.log('Navigating to:', action.name)
+    }
+  }
+
+  const handleBackToLanding = () => {
+    setCurrentView('landing')
   }
 
   const filteredActions = allActions.filter(action => {
@@ -75,6 +87,11 @@ export default function PICLandingPage() {
   const frequentActions = allActions
     .sort((a, b) => b.frequency - a.frequency)
     .slice(0, 3)
+
+  // Show Patient Eligibility Form if currentView is 'patient-eligibility'
+  if (currentView === 'patient-eligibility') {
+    return <PatientEligibilityForm onBack={handleBackToLanding} />
+  }
 
   return (
     <div className="pic-landing-page">

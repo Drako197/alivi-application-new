@@ -146,8 +146,8 @@ export default function DatePicker({
   const generateYearOptions = () => {
     const currentYear = new Date().getFullYear()
     const years = []
-    // Generate years from 30 years ago to 5 years in the future (more focus on past)
-    for (let i = currentYear - 30; i <= currentYear + 5; i++) {
+    // Generate years from 1930 to 5 years in the future (allowing for very old patients)
+    for (let i = 1930; i <= currentYear + 5; i++) {
       years.push(i)
     }
     return years
@@ -242,8 +242,19 @@ export default function DatePicker({
         <div className="absolute z-50 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 p-4 md:w-80 w-full max-w-sm mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <h3 className="text-lg md:text-lg text-xl font-semibold text-gray-900 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+            {/* Left Arrow */}
+            <button
+              type="button"
+              onClick={() => navigateMonth('prev')}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Previous month"
+            >
+              {getIcon('chevronLeft')}
+            </button>
+            
+            {/* Centered Month and Year */}
+            <div className="flex flex-col items-center">
+              <h3 className="text-xl font-bold text-gray-900 mb-1">
                 {currentMonth.toLocaleDateString('en-US', { 
                   month: 'long'
                 })}
@@ -252,7 +263,7 @@ export default function DatePicker({
                 <button
                   type="button"
                   onClick={() => setShowYearDropdown(!showYearDropdown)}
-                  className="flex items-center space-x-1 px-3 py-2 text-base md:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded transition-colors"
+                  className="flex items-center space-x-1 px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:border-gray-400 transition-colors"
                 >
                   <span>{currentMonth.getFullYear()}</span>
                   {showYearDropdown ? getIcon('chevronUp') : getIcon('chevronDown')}
@@ -260,7 +271,7 @@ export default function DatePicker({
                 
                 {/* Year Dropdown */}
                 {showYearDropdown && (
-                  <div className="absolute top-full left-0 mt-1 w-32 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-32 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg z-10">
                     {yearOptions.map((year) => (
                       <button
                         key={year}
@@ -277,40 +288,16 @@ export default function DatePicker({
                 )}
               </div>
             </div>
-            <div className="flex space-x-1">
-              <button
-                type="button"
-                onClick={() => navigateYear('prev')}
-                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                title="Previous year"
-              >
-                {getIcon('chevronLeft')}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigateMonth('prev')}
-                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                title="Previous month"
-              >
-                {getIcon('chevronLeft')}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigateMonth('next')}
-                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                title="Next month"
-              >
-                {getIcon('chevronRight')}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigateYear('next')}
-                className="p-2 md:p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                title="Next year"
-              >
-                {getIcon('chevronRight')}
-              </button>
-            </div>
+            
+            {/* Right Arrow */}
+            <button
+              type="button"
+              onClick={() => navigateMonth('next')}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Next month"
+            >
+              {getIcon('chevronRight')}
+            </button>
           </div>
 
           {/* Days of Week */}

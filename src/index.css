@@ -624,7 +624,7 @@ body {
   
   /* Button Classes */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center;
+    @apply bg-slate-600 hover:bg-slate-700 text-white font-medium py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 flex items-center justify-center;
   }
   
   .btn-secondary {
@@ -641,7 +641,7 @@ body {
   
   /* Input Classes */
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white;
+    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors dark:bg-gray-700 dark:text-white;
   }
   
   .input-field-error {
@@ -1828,13 +1828,13 @@ select {
 
   .form-select:focus {
     outline: none !important;
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    border-color: #475569 !important;
+    box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.1) !important;
   }
 
   .dark .form-select:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    border-color: #64748b !important;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1) !important;
   }
 
   .form-select:hover {
@@ -1886,7 +1886,7 @@ select {
   }
 
   .form-button-primary {
-    @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply bg-slate-600 text-white border-slate-600 hover:bg-slate-700 hover:border-slate-700 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2;
   }
 
   .form-button-secondary {

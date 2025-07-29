@@ -71,6 +71,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setUser(userSession)
       localStorage.setItem('alivi_user', JSON.stringify(userSession))
+      
+      // Clear any saved tab states to ensure user starts on main dashboard
+      localStorage.removeItem('activeDesktopTab')
+      localStorage.removeItem('activeMobileTab')
 
       return { success: true }
     } catch (error) {
@@ -114,6 +118,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setUser(userSession)
       localStorage.setItem('alivi_user', JSON.stringify(userSession))
+      
+      // Clear any saved tab states to ensure user starts on main dashboard
+      localStorage.removeItem('activeDesktopTab')
+      localStorage.removeItem('activeMobileTab')
 
       return { success: true }
     } catch (error) {

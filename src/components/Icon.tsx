@@ -1,1 +1,30 @@
-import React from "react"; import * as LucideIcons from "lucide-react"; interface IconProps { name: string; size?: number; className?: string; [key: string]: any; } const Icon: React.FC<IconProps> = ({ name, size = 24, className = "", ...props }) => { let pascalCaseName = name.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(""); if (pascalCaseName === "Print") { pascalCaseName = "Printer"; } if (pascalCaseName in LucideIcons) { const LucideIconComponent = LucideIcons[pascalCaseName as keyof typeof LucideIcons] as React.ComponentType<any>; return <LucideIconComponent width={size} height={size} className={className} {...props} />; } console.warn(`Icon "${name}" not found.`); return <LucideIcons.Info width={size} height={size} className={className} {...props} />; }; export default Icon;
+import React from "react"
+import * as LucideIcons from "lucide-react"
+
+interface IconProps {
+  name: string
+  size?: number
+  className?: string
+  [key: string]: any
+}
+
+const Icon: React.FC<IconProps> = ({ name, size = 24, className = "", ...props }) => {
+  let pascalCaseName = name
+    .split("-")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("")
+
+  if (pascalCaseName === "Print") {
+    pascalCaseName = "Printer"
+  }
+
+  if (pascalCaseName in LucideIcons) {
+    const LucideIconComponent = LucideIcons[pascalCaseName as keyof typeof LucideIcons] as React.ComponentType<any>
+    return <LucideIconComponent width={size} height={size} className={className} {...props} />
+  }
+
+  console.warn(`Icon "${name}" not found.`)
+  return <LucideIcons.Info width={size} height={size} className={className} {...props} />
+}
+
+export default Icon

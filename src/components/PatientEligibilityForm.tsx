@@ -29,6 +29,11 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [validations, setValidations] = useState<{ [key: string]: boolean }>({})
+  
+  // Modal and step states
+  const [showEligibilityModal, setShowEligibilityModal] = useState(false)
+  const [selectedEligibilityType, setSelectedEligibilityType] = useState<string>('')
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
 
 
   // Real-world data for dropdowns
@@ -98,8 +103,52 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
     { value: '36', label: '36 - Disabled Child 1' },
     { value: '37', label: '37 - Disabled Child 2' },
     { value: '38', label: '38 - Student Child 1' },
-    { value: '39', label: '39 - Student Child 2' }
   ]
+
+  // Eligibility types for modal
+  const eligibilityTypes = [
+    { id: 'medical', label: 'Medical', description: 'Standard medical coverage' },
+    { id: 'dental', label: 'Dental', description: 'Dental and oral health coverage' },
+    { id: 'vision', label: 'Vision', description: 'Vision and eye care coverage' },
+    { id: 'mental-health', label: 'Mental Health', description: 'Mental health and behavioral coverage' },
+    { id: 'prescription', label: 'Prescription', description: 'Prescription drug coverage' }
+  ]
+
+  // Mock eligibility results data
+  const eligibilityResults = {
+    provider: {
+      name: 'Dr. Sarah Johnson',
+      id: '1234567890',
+      specialty: 'Cardiology',
+      phone: '(555) 123-4567',
+      address: '123 Medical Center Dr, Suite 200'
+    },
+    patient: {
+      name: 'John Smith',
+      id: 'S123456789',
+      dob: '1985-03-15',
+      relationship: 'Primary Subscriber',
+      status: 'Active'
+    },
+    primaryCarePhysician: {
+      name: 'Dr. Michael Chen',
+      specialty: 'Internal Medicine',
+      phone: '(555) 987-6543'
+    },
+    availableBenefits: [
+      'Preventive Care - 100% covered',
+      'Specialist Visits - $25 copay',
+      'Emergency Room - $100 copay',
+      'Urgent Care - $15 copay',
+      'Prescription Drugs - Tier 1: $10, Tier 2: $25, Tier 3: $50'
+    ],
+    notes: [
+      'Coverage effective through December 31, 2024',
+      'Prior authorization required for certain procedures',
+      'Network restrictions apply to specialist visits',
+      'Prescription coverage includes 90-day supply option'
+    ]
+  }
 
   // Real-time validation
   useEffect(() => {
@@ -220,6 +269,274 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
     console.log('Viewing reserved benefits')
   }
 
+  // Modal and step handling functions
+  const handleVerifyEligibility = () => {
+    if (validateForm()) {
+      setShowEligibilityModal(true)
+    }
+  }
+
+  const handleEligibilityTypeContinue = (type: string) => {
+    setSelectedEligibilityType(type)
+    setShowEligibilityModal(false)
+    setIsSubmitting(true)
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false)
+      setCurrentStep(3) // Move to results step
+    }, 2000)
+  }
+
+  const handleReserveBenefits = () => {
+    setIsSubmitting(true)
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false)
+      setCurrentStep(4) // Move to success step
+    }, 2000)
+  }
+
+  const handleBackToForm = () => {
+    setCurrentStep(1)
+    setSelectedEligibilityType('')
+  }
+
+  // Modal Component
+  const EligibilityTypeModal = () => {
+    if (!showEligibilityModal) return null
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Select Eligibility Type
+            </h3>
+            <div className="space-y-3">
+              {eligibilityTypes.map((type) => (
+                <button
+                  key={type.id}
+                  onClick={() => handleEligibilityTypeContinue(type.id)}
+                  className="w-full text-left p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    {type.label}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {type.description}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowEligibilityModal(false)}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Step Indicators Component
+  const StepIndicators = ({ currentStep }: { currentStep: number }) => {
+    const steps = [
+      { number: 1, label: 'Patient Information' },
+      { number: 2, label: 'Eligibility Type' },
+      { number: 3, label: 'Results' },
+      { number: 4, label: 'Confirmation' }
+    ]
+
+    return (
+      <div className="hedis-screening-step-indicators">
+        {steps.map((step) => (
+          <div
+            key={step.number}
+            className={`hedis-screening-step ${
+              step.number === currentStep
+                ? 'hedis-screening-step-active'
+                : step.number < currentStep
+                ? 'hedis-screening-step-completed'
+                : 'hedis-screening-step-inactive'
+            }`}
+          >
+            <div className="hedis-screening-step-number">{step.number}</div>
+            <div className="hedis-screening-step-label">{step.label}</div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // Current Eligibility Results Component
+  const CurrentEligibilityResults = () => {
+    return (
+      <div className="hedis-screening-content">
+        <h2 className="hedis-screening-step-title">
+          Current Eligibility based on the information provided
+        </h2>
+
+        {/* Step Progress */}
+        <StepIndicators currentStep={currentStep} />
+
+        <div className="flex justify-end mb-6">
+          <button
+            onClick={handleBackToForm}
+            className="btn-secondary"
+          >
+            <Icon name="arrow-left" size={16} />
+            Back to Form
+          </button>
+        </div>
+
+        {/* Provider Information */}
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+          Provider Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Provider Name</p>
+            <p className="font-medium">{eligibilityResults.provider.name}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Provider ID</p>
+            <p className="font-medium">{eligibilityResults.provider.id}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Specialty</p>
+            <p className="font-medium">{eligibilityResults.provider.specialty}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+            <p className="font-medium">{eligibilityResults.provider.phone}</p>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Address</p>
+            <p className="font-medium">{eligibilityResults.provider.address}</p>
+          </div>
+        </div>
+
+        {/* Patient Information */}
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+          Patient Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Patient Name</p>
+            <p className="font-medium">{eligibilityResults.patient.name}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Patient ID</p>
+            <p className="font-medium">{eligibilityResults.patient.id}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Date of Birth</p>
+            <p className="font-medium">{eligibilityResults.patient.dob}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Relationship</p>
+            <p className="font-medium">{eligibilityResults.patient.relationship}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+            <p className="font-medium text-green-600">{eligibilityResults.patient.status}</p>
+          </div>
+        </div>
+
+        {/* Primary Care Physician */}
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+          Primary Care Physician
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">PCP Name</p>
+            <p className="font-medium">{eligibilityResults.primaryCarePhysician.name}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Specialty</p>
+            <p className="font-medium">{eligibilityResults.primaryCarePhysician.specialty}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+            <p className="font-medium">{eligibilityResults.primaryCarePhysician.phone}</p>
+          </div>
+        </div>
+
+        {/* Available Benefits */}
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+          Available Benefits
+        </h3>
+        <div className="mb-6">
+          <ul className="space-y-2">
+            {eligibilityResults.availableBenefits.map((benefit, index) => (
+              <li key={index} className="flex items-start">
+                <Icon name="check" size={16} className="text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+                <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Notes */}
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
+          Notes
+        </h3>
+        <div className="mb-6">
+          <ul className="space-y-2">
+            {eligibilityResults.notes.map((note, index) => (
+              <li key={index} className="flex items-start">
+                <Icon name="info" size={16} className="text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
+                <span className="text-gray-700 dark:text-gray-300">{note}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t pt-6 mt-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              <p>Eligibility Type: <span className="font-medium text-gray-900 dark:text-white">{selectedEligibilityType}</span></p>
+              <p>Requested on: {new Date().toLocaleDateString()}</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleViewReservedBenefits}
+                className="btn-tertiary"
+              >
+                <Icon name="external-link" size={16} />
+                View Reserved Benefits
+              </button>
+              <button
+                onClick={handleReserveBenefits}
+                disabled={isSubmitting}
+                className="btn-primary"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Icon name="loader-2" size={16} className="animate-spin" />
+                    Reserving Benefits...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="shield-check" size={16} />
+                    Reserve Benefits
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const getInputClassName = (fieldName: string) => {
     const baseClasses = "form-input transition-all duration-200"
     const errorClasses = "border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500"
@@ -283,6 +600,58 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
     )
   }
 
+  // Render different steps based on currentStep
+  if (currentStep === 3) {
+    return (
+      <div className="hedis-screening-page">
+        <div className="hedis-screening-header">
+          <div className="hedis-screening-breadcrumb">
+            <button onClick={handleBack} className="hedis-screening-back-button">
+              <Icon name="arrow-left" size={20} />
+              <span>Back to P.I.C. Actions</span>
+            </button>
+          </div>
+        </div>
+        <CurrentEligibilityResults />
+      </div>
+    )
+  }
+
+  if (currentStep === 4) {
+    return (
+      <div className="hedis-screening-page">
+        <div className="hedis-screening-header">
+          <div className="hedis-screening-breadcrumb">
+            <button onClick={handleBack} className="hedis-screening-back-button">
+              <Icon name="arrow-left" size={20} />
+              <span>Back to P.I.C. Actions</span>
+            </button>
+          </div>
+        </div>
+        
+        <div className="hedis-screening-content">
+          <div className="text-center py-12">
+            <div className="mb-6">
+              <Icon name="check-circle" size={64} className="text-green-500 mx-auto animate-pulse" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Benefits Reserved Successfully
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-8">
+              The {selectedEligibilityType} benefits have been successfully reserved for the patient.
+            </p>
+            <button
+              onClick={handleBack}
+              className="btn-primary"
+            >
+              Return to P.I.C. Actions
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="hedis-screening-page">
       <div className="hedis-screening-header">
@@ -293,24 +662,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
           </button>
         </div>
         <div className="hedis-screening-progress">
-          <div className="hedis-screening-step-indicators">
-            <div className="hedis-screening-step hedis-screening-step-active">
-              <div className="hedis-screening-step-number">1</div>
-              <div className="hedis-screening-step-label">Patient Information</div>
-            </div>
-            <div className="hedis-screening-step hedis-screening-step-inactive">
-              <div className="hedis-screening-step-number">2</div>
-              <div className="hedis-screening-step-label">Benefits Review</div>
-            </div>
-            <div className="hedis-screening-step hedis-screening-step-inactive">
-              <div className="hedis-screening-step-number">3</div>
-              <div className="hedis-screening-step-label">Confirmation</div>
-            </div>
-            <div className="hedis-screening-step hedis-screening-step-inactive">
-              <div className="hedis-screening-step-number">4</div>
-              <div className="hedis-screening-step-label">Submission</div>
-            </div>
-          </div>
+          <StepIndicators currentStep={currentStep} />
         </div>
       </div>
 
@@ -728,7 +1080,8 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
                 View Reserved Benefits
               </button>
               <button
-                type="submit"
+                type="button"
+                onClick={handleVerifyEligibility}
                 disabled={isSubmitting}
                 className="btn-primary"
               >
@@ -748,6 +1101,9 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
           </form>
         </div>
       </div>
+      
+      {/* Modal */}
+      <EligibilityTypeModal />
     </div>
   )
 } 

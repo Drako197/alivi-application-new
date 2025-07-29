@@ -13,6 +13,7 @@
   "dependencies": {
     "@fontsource/lato": "^5.2.6",
     "@fontsource/urbanist": "^5.2.6",
+    "lucide-react": "^0.533.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

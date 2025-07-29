@@ -545,118 +545,56 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
     }
   }
 
+  let stepContent: React.ReactNode = null;
   if (submitted) {
-    return (
-      <div className="hedis-screening-page">
-        <div className="hedis-screening-header">
-          <div className="hedis-screening-breadcrumb">
-            <button onClick={handleBack} className="hedis-screening-back-button">
-              <Icon name="arrow-left" size={20} />
-              <span>P.I.C. Actions</span>
-            </button>
-            <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
-            <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
+    stepContent = (
+      <div className="hedis-screening-content">
+        <div className="text-center py-12">
+          <div className="mb-6">
+            <Icon name="check-circle" size={64} className="text-green-500 mx-auto animate-pulse" />
           </div>
-        </div>
-        
-        <div className="hedis-screening-content">
-          <div className="text-center py-12">
-            <div className="mb-6">
-              <Icon name="check-circle" size={64} className="text-green-500 mx-auto animate-pulse" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Eligibility Request Submitted
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
-              Your patient eligibility request has been successfully submitted. You will receive a response within 24-48 hours.
-            </p>
-            <button
-              onClick={handleBack}
-              className="btn-primary"
-            >
-              Return to P.I.C. Actions
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Render different steps based on currentStep
-  if (currentStep === 3) {
-    return (
-      <div className="hedis-screening-page">
-        <div className="hedis-screening-header">
-          <div className="hedis-screening-breadcrumb">
-            <button onClick={handleBack} className="hedis-screening-back-button">
-              <Icon name="arrow-left" size={20} />
-              <span>P.I.C. Actions</span>
-            </button>
-            <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
-            <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
-          </div>
-          <div className="hedis-screening-progress">
-            <StepIndicators currentStep={currentStep} />
-          </div>
-        </div>
-        <CurrentEligibilityResults />
-      </div>
-    )
-  }
-
-  if (currentStep === 4) {
-    return (
-      <div className="hedis-screening-page">
-        <div className="hedis-screening-header">
-          <div className="hedis-screening-breadcrumb">
-            <button onClick={handleBack} className="hedis-screening-back-button">
-              <Icon name="arrow-left" size={20} />
-              <span>P.I.C. Actions</span>
-            </button>
-            <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
-            <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
-          </div>
-        </div>
-        
-        <div className="hedis-screening-content">
-          <div className="text-center py-12">
-            <div className="mb-6">
-              <Icon name="check-circle" size={64} className="text-green-500 mx-auto animate-pulse" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Benefits Reserved Successfully
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
-              The {selectedEligibilityType} benefits have been successfully reserved for the patient.
-            </p>
-            <button
-              onClick={handleBack}
-              className="btn-primary"
-            >
-              Return to P.I.C. Actions
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="hedis-screening-page">
-      <div className="hedis-screening-header">
-        <div className="hedis-screening-breadcrumb">
-          <button onClick={handleBack} className="hedis-screening-back-button">
-            <Icon name="arrow-left" size={20} />
-            <span>P.I.C. Actions</span>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Eligibility Request Submitted
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Your patient eligibility request has been successfully submitted. You will receive a response within 24-48 hours.
+          </p>
+          <button
+            onClick={handleBack}
+            className="btn-primary"
+          >
+            Return to P.I.C. Actions
           </button>
-          <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
-          <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
-        </div>
-        <div className="hedis-screening-progress">
-          <StepIndicators currentStep={currentStep} />
         </div>
       </div>
-
+    );
+  } else if (currentStep === 3) {
+    stepContent = <CurrentEligibilityResults />;
+  } else if (currentStep === 4) {
+    stepContent = (
+      <div className="hedis-screening-content">
+        <div className="text-center py-12">
+          <div className="mb-6">
+            <Icon name="check-circle" size={64} className="text-green-500 mx-auto animate-pulse" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Benefits Reserved Successfully
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            The {selectedEligibilityType} benefits have been successfully reserved for the patient.
+          </p>
+          <button
+            onClick={handleBack}
+            className="btn-primary"
+          >
+            Return to P.I.C. Actions
+          </button>
+        </div>
+      </div>
+    );
+  } else {
+    // Default: show the form
+    stepContent = (
       <div className="hedis-screening-content">
         <div className="hedis-screening-step-content">
           <h2 className="hedis-screening-step-title">
@@ -665,9 +603,6 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
           <p className="hedis-screening-step-description">
             Submit a patient eligibility request to check benefits and coverage. Please provide the required information below.
           </p>
-
-
-
           <form onSubmit={handleSubmit} className="eligibility-form">
             {/* Required Fields Section */}
             <div className="space-y-6">
@@ -1092,8 +1027,26 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
           </form>
         </div>
       </div>
-      
-      {/* Modal */}
+    );
+  }
+
+  // Render the header ONCE, and the step content below
+  return (
+    <div className="hedis-screening-page">
+      <div className="hedis-screening-header">
+        <div className="hedis-screening-breadcrumb">
+          <button onClick={handleBack} className="hedis-screening-back-button">
+            <Icon name="arrow-left" size={20} />
+            <span>P.I.C. Actions</span>
+          </button>
+          <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
+          <span className="text-gray-600 dark:text-gray-400">Patient Eligibility Request</span>
+        </div>
+        <div className="hedis-screening-progress">
+          <StepIndicators currentStep={currentStep} />
+        </div>
+      </div>
+      {stepContent}
       <EligibilityTypeModal />
     </div>
   )

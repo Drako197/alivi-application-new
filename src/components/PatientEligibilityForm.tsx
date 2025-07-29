@@ -349,7 +349,7 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
     const steps = [
       { number: 1, label: 'Patient Information' },
       { number: 2, label: 'Eligibility Type' },
-      { number: 3, label: 'Results' },
+      { number: 3, label: 'Current Eligibility' },
       { number: 4, label: 'Confirmation' }
     ]
 
@@ -381,19 +381,6 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
         <h2 className="hedis-screening-step-title">
           Current Eligibility based on the information provided
         </h2>
-
-        {/* Step Progress */}
-        <StepIndicators currentStep={currentStep} />
-
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={handleBackToForm}
-            className="btn-secondary"
-          >
-            <Icon name="arrow-left" size={16} />
-            Back to Form
-          </button>
-        </div>
 
         {/* Provider Information */}
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
@@ -505,32 +492,25 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
               <p>Eligibility Type: <span className="font-medium text-gray-900 dark:text-white">{selectedEligibilityType}</span></p>
               <p>Requested on: {new Date().toLocaleDateString()}</p>
             </div>
-            <div className="flex gap-3">
-              <button
-                onClick={handleViewReservedBenefits}
-                className="btn-tertiary"
-              >
-                <Icon name="external-link" size={16} />
-                View Reserved Benefits
-              </button>
-              <button
-                onClick={handleReserveBenefits}
-                disabled={isSubmitting}
-                className="btn-primary"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Icon name="loader-2" size={16} className="animate-spin" />
-                    Reserving Benefits...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="shield-check" size={16} />
-                    Reserve Benefits
-                  </>
-                )}
-              </button>
-            </div>
+                              <div className="flex gap-3">
+                    <button
+                      onClick={handleReserveBenefits}
+                      disabled={isSubmitting}
+                      className="btn-primary"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Icon name="loader-2" size={16} className="animate-spin" />
+                          Reserving Benefits...
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="shield-check" size={16} />
+                          Reserve Benefits
+                        </>
+                      )}
+                    </button>
+                  </div>
           </div>
         </div>
       </div>
@@ -610,6 +590,9 @@ export default function PatientEligibilityForm({ onBack }: PatientEligibilityFor
               <Icon name="arrow-left" size={20} />
               <span>Back to P.I.C. Actions</span>
             </button>
+          </div>
+          <div className="hedis-screening-progress">
+            <StepIndicators currentStep={currentStep} />
           </div>
         </div>
         <CurrentEligibilityResults />

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { ReactElement } from 'react'
 import Icon from './Icon'
 import PatientEligibilityForm from './PatientEligibilityForm'
+import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 
 interface ActionItem {
   id: string
@@ -14,13 +15,24 @@ interface ActionItem {
 
 interface PICLandingPageProps {
   onUpdateBreadcrumb?: (path: string[]) => void
+  resetToLanding?: number
 }
 
-export default function PICLandingPage({ onUpdateBreadcrumb }: PICLandingPageProps) {
+export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 }: PICLandingPageProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility'>('landing')
+  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission'>('landing')
+
+  // Reset to landing page when resetToLanding prop changes
+  useEffect(() => {
+    if (resetToLanding > 0) {
+      setCurrentView('landing')
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'P.I.C.'])
+      }
+    }
+  }, [resetToLanding, onUpdateBreadcrumb])
 
   // Dummy data for actions
   const allActions: ActionItem[] = [
@@ -74,6 +86,12 @@ export default function PICLandingPage({ onUpdateBreadcrumb }: PICLandingPagePro
       if (onUpdateBreadcrumb) {
         onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Request Patient Eligibility'])
       }
+    } else if (action.id === 'claims-submission') {
+      setCurrentView('claims-submission')
+      // Update breadcrumb to show P.I.C. > Claims Submission
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Claims Submission'])
+      }
     } else {
       // Here you would typically navigate to the specific action or open a modal
       console.log('Navigating to:', action.name)
@@ -103,6 +121,11 @@ export default function PICLandingPage({ onUpdateBreadcrumb }: PICLandingPagePro
   // Show Patient Eligibility Form if currentView is 'patient-eligibility'
   if (currentView === 'patient-eligibility') {
     return <PatientEligibilityForm onBack={handleBackToLanding} />
+  }
+
+  // Show Claims Submission Form if currentView is 'claims-submission'
+  if (currentView === 'claims-submission') {
+    return <ClaimsSubmissionForm onBack={handleBackToLanding} />
   }
 
   return (

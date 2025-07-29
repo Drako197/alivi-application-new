@@ -31,6 +31,7 @@ export default function Dashboard() {
   })
   
   const [breadcrumbPath, setBreadcrumbPath] = useState(['Dashboard'])
+  const [picResetCounter, setPICResetCounter] = useState(0)
   const [mobileSearchTerm, setMobileSearchTerm] = useState('')
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
 
@@ -240,6 +241,12 @@ export default function Dashboard() {
   const handleDesktopTabChange = (tab: string) => {
     setActiveDesktopTab(tab)
     updateBreadcrumbPath(tab)
+    
+    // If navigating to PIC, we need to reset any active forms
+    if (tab === 'pic') {
+      // Force a re-render of PICLandingPage to reset its internal state
+      setPICResetCounter(prev => prev + 1)
+    }
   }
 
   const updateBreadcrumbPath = (tab: string) => {
@@ -314,7 +321,10 @@ export default function Dashboard() {
       case 'pic':
         return (
           <div className="dashboard-content">
-            <PICLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />
+            <PICLandingPage 
+              onUpdateBreadcrumb={setBreadcrumbPath} 
+              resetToLanding={picResetCounter}
+            />
           </div>
         )
       case 'reports':

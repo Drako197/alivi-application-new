@@ -8,11 +8,12 @@ redirects = []
 
 [build]
 publish = "/Users/uxdesign/Desktop/Project/alivi-application/dist"
-publishOrigin = "ui"
-commandOrigin = "ui"
-command = "npm run build"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "npm run build:prod"
 
 [build.environment]
+NODE_VERSION = "18"
 
 [build.processing]
 

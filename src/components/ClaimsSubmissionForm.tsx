@@ -3823,12 +3823,15 @@ export default function ClaimsSubmissionForm({
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Job Order Number
                       </label>
-                      <input
-                        type="text"
-                        value={formData.jobOrderNumber}
-                        readOnly
-                        className="form-input w-full border rounded-md pl-2.5 bg-gray-50"
-                      />
+                      <div className="h-10 flex items-center">
+                        <input
+                          type="text"
+                          value={formData.jobOrderNumber}
+                          onChange={(e) => setFormData(prev => ({ ...prev, jobOrderNumber: e.target.value }))}
+                          className="form-input w-full border rounded-md pl-2.5"
+                          placeholder="Enter job order number"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

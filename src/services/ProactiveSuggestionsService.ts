@@ -70,6 +70,9 @@ class ProactiveSuggestionsService {
     // Advanced learning and progressive disclosure
     suggestions.push(...this.getAdvancedLearningSuggestions(context))
 
+    // Compliance and regulatory suggestions
+    suggestions.push(...this.getComplianceSuggestions(context))
+
     return suggestions
       .sort((a, b) => this.getPriorityScore(b.priority) - this.getPriorityScore(a.priority))
       .slice(0, 3) // Limit to top 3 suggestions
@@ -1215,6 +1218,165 @@ class ProactiveSuggestionsService {
         icon: 'keyboard'
       })
     }
+
+    return suggestions
+  }
+
+  /**
+   * Get compliance and regulatory suggestions
+   */
+  private static getComplianceSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // HIPAA compliance suggestions
+    suggestions.push(...this.getHIPAAComplianceSuggestions(context))
+
+    // Billing compliance suggestions
+    suggestions.push(...this.getBillingComplianceSuggestions(context))
+
+    // Documentation suggestions
+    suggestions.push(...this.getDocumentationSuggestions(context))
+
+    return suggestions
+  }
+
+  /**
+   * Get HIPAA compliance suggestions
+   */
+  private static getHIPAAComplianceSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Data security reminders
+    suggestions.push({
+      id: 'hipaa-security',
+      type: 'reminder',
+      title: 'HIPAA Security',
+      content: 'Remember to log out when sharing your screen and ensure patient information is properly secured.',
+      action: 'hipaa_guidance',
+      priority: 'high',
+      category: 'compliance',
+      icon: 'shield'
+    })
+
+    // Patient privacy reminders
+    suggestions.push({
+      id: 'patient-privacy',
+      type: 'reminder',
+      title: 'Patient Privacy',
+      content: 'Make sure patient information is properly secured and only accessed by authorized personnel.',
+      action: 'privacy_guidance',
+      priority: 'high',
+      category: 'compliance',
+      icon: 'user-check'
+    })
+
+    // Session timeout reminders
+    suggestions.push({
+      id: 'session-timeout',
+      type: 'reminder',
+      title: 'Session Management',
+      content: 'Consider logging out after extended periods of inactivity to maintain HIPAA compliance.',
+      action: 'session_guidance',
+      priority: 'medium',
+      category: 'compliance',
+      icon: 'clock'
+    })
+
+    return suggestions
+  }
+
+  /**
+   * Get billing compliance suggestions
+   */
+  private static getBillingComplianceSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Documentation requirements
+    suggestions.push({
+      id: 'documentation-requirements',
+      type: 'reminder',
+      title: 'Documentation Requirements',
+      content: 'Make sure you have proper documentation for this claim. Medical necessity must be clearly documented.',
+      action: 'documentation_help',
+      priority: 'high',
+      category: 'compliance',
+      icon: 'file-text'
+    })
+
+    // Modifier suggestions
+    if (context.currentForm === 'ClaimsSubmissionForm') {
+      suggestions.push({
+        id: 'modifier-suggestions',
+        type: 'reminder',
+        title: 'Modifier Requirements',
+        content: 'Consider adding appropriate modifiers for this procedure. I can help you find the right modifiers.',
+        action: 'modifier_help',
+        priority: 'medium',
+        category: 'compliance',
+        icon: 'tag'
+      })
+    }
+
+    // Coverage verification
+    suggestions.push({
+      id: 'coverage-verification',
+      type: 'reminder',
+      title: 'Coverage Verification',
+      content: 'Have you verified this service is covered under the patient\'s insurance plan?',
+      action: 'coverage_help',
+      priority: 'medium',
+      category: 'compliance',
+      icon: 'check-circle'
+    })
+
+    return suggestions
+  }
+
+  /**
+   * Get documentation suggestions
+   */
+  private static getDocumentationSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Medical necessity documentation
+    if (context.currentForm === 'ClaimsSubmissionForm' || context.currentForm === 'NewScreeningForm') {
+      suggestions.push({
+        id: 'medical-necessity',
+        type: 'reminder',
+        title: 'Medical Necessity',
+        content: 'Ensure medical necessity is clearly documented for this service. This is crucial for claims approval.',
+        action: 'necessity_help',
+        priority: 'high',
+        category: 'compliance',
+        icon: 'stethoscope'
+      })
+    }
+
+    // Signature requirements
+    if (context.currentForm === 'ClaimsSubmissionForm') {
+      suggestions.push({
+        id: 'signature-requirements',
+        type: 'reminder',
+        title: 'Signature Requirements',
+        content: 'Make sure the claim has proper provider signatures. Electronic signatures are acceptable.',
+        action: 'signature_help',
+        priority: 'medium',
+        category: 'compliance',
+        icon: 'edit'
+      })
+    }
+
+    // Audit trail suggestions
+    suggestions.push({
+      id: 'audit-trail',
+      type: 'reminder',
+      title: 'Audit Trail',
+      content: 'Maintain proper audit trails for all billing activities. This helps with compliance and dispute resolution.',
+      action: 'audit_help',
+      priority: 'medium',
+      category: 'compliance',
+      icon: 'list'
+    })
 
     return suggestions
   }

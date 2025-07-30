@@ -99,7 +99,25 @@ export default function ClaimsSubmissionForm({
     eyeSize: '',
     bridge: '',
     vertical: '',
-    ed: ''
+    ed: '',
+    
+    // Step 6: Review & Submit
+    eligibilityNumber: '',
+    procedureCodes: [
+      {
+        id: 1,
+        code: '92012',
+        description: 'Eye Exam Establish Patient, Copy will run...',
+        pos: '',
+        mod: '',
+        diagnosisReference: '',
+        units: '1',
+        uAndCCharge: '$200,000.00',
+        planAllowed: '$10,000.00'
+      }
+    ],
+    totalCharges: '',
+    totalAllowed: ''
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -554,6 +572,19 @@ export default function ClaimsSubmissionForm({
       if (!formData.coating) newErrors.coating = 'Coating is required'
     }
     
+    // Step 6 validation (Review & Submit)
+    if (currentStep === 6) {
+      if (!formData.eligibilityNumber) newErrors.eligibilityNumber = 'Eligibility Number is required'
+      if (!formData.totalCharges) newErrors.totalCharges = 'Total Charges is required'
+      if (!formData.totalAllowed) newErrors.totalAllowed = 'Total Allowed is required'
+      
+      // Validate procedure codes have required fields
+      formData.procedureCodes.forEach((procedure, index) => {
+        if (!procedure.pos) newErrors[`procedure${index}Pos`] = 'POS is required'
+        if (!procedure.diagnosisReference) newErrors[`procedure${index}Diagnosis`] = 'Diagnosis Reference is required'
+      })
+    }
+    
     // If there are errors, set them and don't proceed
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -718,7 +749,23 @@ export default function ClaimsSubmissionForm({
                 eyeSize: '',
                 bridge: '',
                 vertical: '',
-                ed: ''
+                ed: '',
+                eligibilityNumber: '',
+                procedureCodes: [
+                  {
+                    id: 1,
+                    code: '92012',
+                    description: 'Eye Exam Establish Patient, Copy will run...',
+                    pos: '',
+                    mod: '',
+                    diagnosisReference: '',
+                    units: '1',
+                    uAndCCharge: '$200,000.00',
+                    planAllowed: '$10,000.00'
+                  }
+                ],
+                totalCharges: '',
+                totalAllowed: ''
               })
               setCurrentStep(1)
               setSubmitted(false)
@@ -751,7 +798,7 @@ export default function ClaimsSubmissionForm({
       <div className="hedis-screening-content">
         <div className="hedis-screening-step-content">
           <h2 className="hedis-screening-step-title">
-            {currentStep === 2 ? 'Claim Details' : currentStep === 3 ? 'Prescription Details' : currentStep === 4 ? 'Lens Choice' : currentStep === 5 ? 'Frame Selection' : 'Claims Submission'}
+            {currentStep === 2 ? 'Claim Details' : currentStep === 3 ? 'Prescription Details' : currentStep === 4 ? 'Lens Choice' : currentStep === 5 ? 'Frame Selection' : currentStep === 6 ? 'Review & Submit' : 'Claims Submission'}
           </h2>
           <p className="hedis-screening-step-description">
             Submit a new claim for processing. Please provide the required information below.
@@ -3144,45 +3191,251 @@ export default function ClaimsSubmissionForm({
 
             {currentStep === 6 && (
               <div className="space-y-6">
-                <div>
+                {/* Patient Information Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Review Claim Information
+                    Patient Information
                   </h3>
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Provider Information</h4>
-                        <div className="space-y-2 text-sm">
-                          <div><span className="font-medium">Provider ID:</span> {formData.providerId}</div>
-                          <div><span className="font-medium">NPI:</span> {formData.npi}</div>
-                        </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Subscriber ID:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">H254789658</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name (Last, First):</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">Smith, John</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Dependent Sequence:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">02</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Service Date (From):</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">05/16/16</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Service Date (To):</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">05/16/22</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* FOPN Provided Eligibility Number Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    FOPN Provided Eligibility Number
+                  </h3>
+                  <div>
+                    <label htmlFor="eligibilityNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Eligibility Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="eligibilityNumber"
+                      value={formData.eligibilityNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, eligibilityNumber: e.target.value }))}
+                      placeholder="Eligibility Number"
+                      className="form-input w-full border rounded-md pl-2.5"
+                    />
+                    {errors.eligibilityNumber && (
+                      <p className="mt-1 text-sm text-red-600">{errors.eligibilityNumber}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Batch Information Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Batch Information
+                  </h3>
+                  <div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Batch Number:</span>
+                    <div className="text-sm text-gray-900 dark:text-white mt-1">12546958756</div>
+                  </div>
+                </div>
+
+                {/* Diagnosis Codes Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Diagnosis Codes
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="text-sm text-gray-900 dark:text-white">1.) 12345ABC</div>
+                    <div className="text-sm text-gray-900 dark:text-white">2.) 52344BCS</div>
+                    <div className="text-sm text-gray-900 dark:text-white">3.) 55533VVE</div>
+                    <div className="text-sm text-gray-900 dark:text-white">4.) 1543NBG</div>
+                    <div className="text-sm text-gray-900 dark:text-white">5.) 13323VEE</div>
+                    <div className="text-sm text-gray-900 dark:text-white">6.) 45678CBA</div>
+                  </div>
+                </div>
+
+                {/* Procedure Codes Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Procedure Codes
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Please enter the corresponding diagnosis codes and line charges, and any other procedure codes if needed:
+                  </p>
+                  
+                  {/* Procedure Codes Table */}
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 dark:border-gray-700">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-700">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Codes</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Descriptions</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">POS</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">MOD</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Diagnosis Reference</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Units</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">U&C Charge</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Plan Allowed</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formData.procedureCodes.map((procedure, index) => (
+                          <tr key={procedure.id} className="border-b border-gray-200 dark:border-gray-700">
+                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.code}</td>
+                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.description}</td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={procedure.pos}
+                                onChange={(e) => {
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].pos = e.target.value
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="form-input w-full border rounded-md pl-2.5 text-sm"
+                                placeholder="POS"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={procedure.mod}
+                                onChange={(e) => {
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].mod = e.target.value
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="form-input w-full border rounded-md pl-2.5 text-sm"
+                                placeholder="MOD"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <select
+                                value={procedure.diagnosisReference}
+                                onChange={(e) => {
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].diagnosisReference = e.target.value
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="form-select w-full border rounded-md pl-2.5 text-sm"
+                              >
+                                <option value="">Select</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                              </select>
+                            </td>
+                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.units}</td>
+                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.uAndCCharge}</td>
+                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.planAllowed}</td>
+                            <td className="px-3 py-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updatedCodes = formData.procedureCodes.filter((_, i) => i !== index)
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <Icon name="x" size={16} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newCode = {
+                          id: Math.max(...formData.procedureCodes.map(c => c.id)) + 1,
+                          code: '',
+                          description: '',
+                          pos: '',
+                          mod: '',
+                          diagnosisReference: '',
+                          units: '1',
+                          uAndCCharge: '$0.00',
+                          planAllowed: '$0.00'
+                        }
+                        setFormData(prev => ({ ...prev, procedureCodes: [...prev.procedureCodes, newCode] }))
+                      }}
+                      className="btn-primary flex items-center gap-2"
+                    >
+                      <Icon name="plus" size={16} />
+                      + Add New Line
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-secondary flex items-center gap-2"
+                    >
+                      <Icon name="refresh-cw" size={16} />
+                      Retrieve and Recalculate
+                    </button>
+                  </div>
+                  
+                  {/* Summary Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <div>
+                      <label htmlFor="totalCharges" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Total Charges <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          type="text"
+                          id="totalCharges"
+                          value={formData.totalCharges}
+                          onChange={(e) => setFormData(prev => ({ ...prev, totalCharges: e.target.value }))}
+                          className="form-input w-full border rounded-md pl-8"
+                          placeholder="0.00"
+                        />
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Patient Information</h4>
-                        <div className="space-y-2 text-sm">
-                          <div><span className="font-medium">Patient ID:</span> {formData.patientId}</div>
-                          <div><span className="font-medium">Name:</span> {formData.patientName}</div>
-                          <div><span className="font-medium">DOB:</span> {formData.dateOfBirth}</div>
-                          <div><span className="font-medium">Gender:</span> {formData.gender}</div>
-                        </div>
+                      {errors.totalCharges && (
+                        <p className="mt-1 text-sm text-red-600">{errors.totalCharges}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="totalAllowed" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Total Allowed <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          type="text"
+                          id="totalAllowed"
+                          value={formData.totalAllowed}
+                          onChange={(e) => setFormData(prev => ({ ...prev, totalAllowed: e.target.value }))}
+                          className="form-input w-full border rounded-md pl-8"
+                          placeholder="0.00"
+                        />
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Claim Details</h4>
-                        <div className="space-y-2 text-sm">
-                          <div><span className="font-medium">Claim Type:</span> {formData.claimType}</div>
-                          <div><span className="font-medium">Service Date:</span> {formData.serviceDate}</div>
-                          <div><span className="font-medium">Place of Service:</span> {formData.placeOfService}</div>
-                          <div><span className="font-medium">Charges:</span> ${formData.charges}</div>
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Insurance Information</h4>
-                        <div className="space-y-2 text-sm">
-                          <div><span className="font-medium">Primary Insurance:</span> {formData.primaryInsurance}</div>
-                          <div><span className="font-medium">Member ID:</span> {formData.memberId}</div>
-                          <div><span className="font-medium">Group Number:</span> {formData.groupNumber}</div>
-                        </div>
-                      </div>
+                      {errors.totalAllowed && (
+                        <p className="mt-1 text-sm text-red-600">{errors.totalAllowed}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -3283,7 +3536,23 @@ export default function ClaimsSubmissionForm({
                         osVertical: '',
                         osVerticalDirection: '',
                         osPrismType: '',
-                        slabOff: ''
+                        slabOff: '',
+                        eligibilityNumber: '',
+                        procedureCodes: [
+                          {
+                            id: 1,
+                            code: '92012',
+                            description: 'Eye Exam Establish Patient, Copy will run...',
+                            pos: '',
+                            mod: '',
+                            diagnosisReference: '',
+                            units: '1',
+                            uAndCCharge: '$200,000.00',
+                            planAllowed: '$10,000.00'
+                          }
+                        ],
+                        totalCharges: '',
+                        totalAllowed: ''
                       })
                     }
                   }}
@@ -3296,7 +3565,7 @@ export default function ClaimsSubmissionForm({
               
               {/* Right side: Primary actions */}
               <div className="flex gap-3">
-                {currentStep < 5 ? (
+                {currentStep < 6 ? (
                   <button
                     type="button"
                     onClick={handleNext}

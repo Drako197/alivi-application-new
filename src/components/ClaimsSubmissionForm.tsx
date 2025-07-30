@@ -3793,11 +3793,11 @@ export default function ClaimsSubmissionForm({
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Date
                       </label>
-                      <input
-                        type="text"
+                      <DatePicker
+                        name="remakeDate"
                         value={formData.remakeDate}
-                        readOnly
-                        className="form-input w-full border rounded-md pl-2.5 bg-gray-50"
+                        onChange={(date) => setFormData(prev => ({ ...prev, remakeDate: date }))}
+                        placeholder="Select remake date"
                       />
                     </div>
                   </div>

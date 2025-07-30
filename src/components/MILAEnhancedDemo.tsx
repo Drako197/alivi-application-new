@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import AIAssistantButton from './AIAssistantButton'
 import PersonalizationService from '../services/PersonalizationService'
 import ProactiveSuggestionsService from '../services/ProactiveSuggestionsService'
+import ProactiveSuggestionsTest from './ProactiveSuggestionsTest'
 import Icon from './Icon'
 
 interface DemoFeature {
@@ -16,6 +17,7 @@ interface DemoFeature {
 export default function MILAEnhancedDemo() {
   const [activeFeature, setActiveFeature] = useState<string | null>(null)
   const [demoResults, setDemoResults] = useState<any>(null)
+  const [showProactiveTest, setShowProactiveTest] = useState(false)
 
   const features: DemoFeature[] = [
     {
@@ -128,6 +130,16 @@ export default function MILAEnhancedDemo() {
             '"Great work today! I\'m here if you need any last-minute help."'
           ]
         })
+      }
+    },
+    {
+      id: 'proactive-test',
+      title: 'Proactive Suggestions Test',
+      description: 'Comprehensive test of all enhanced proactive suggestion scenarios',
+      icon: 'test-tube',
+      color: 'red',
+      demoAction: () => {
+        setShowProactiveTest(true)
       }
     }
   ]
@@ -306,6 +318,26 @@ export default function MILAEnhancedDemo() {
           </div>
         </div>
       </div>
+
+      {/* Proactive Suggestions Test */}
+      {showProactiveTest && (
+        <div className="mt-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Proactive Suggestions Test
+              </h2>
+              <button
+                onClick={() => setShowProactiveTest(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <Icon name="x" size={20} />
+              </button>
+            </div>
+            <ProactiveSuggestionsTest />
+          </div>
+        </div>
+      )}
 
       {/* M.I.L.A. Assistant Button */}
       <AIAssistantButton

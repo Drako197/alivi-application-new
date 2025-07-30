@@ -4010,7 +4010,7 @@ export default function ClaimsSubmissionForm({
         <div className="hedis-screening-breadcrumb">
           <button
             onClick={handleBackToLanding}
-            className="hedis-screening-back-button flex items-center gap-2"
+            className="hedis-screening-back-button flex items-center gap-2 whitespace-nowrap"
           >
             <Icon name="arrow-left" size={16} />
             {getOriginatingPageDisplayName()}

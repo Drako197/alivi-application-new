@@ -382,7 +382,7 @@ export default function PrescriptionForm({
             <button
               type="button"
               onClick={copyODtoOS}
-              className="btn-secondary text-sm px-3 py-1.5"
+              className="btn-tertiary text-sm px-3 py-1.5"
               title="Copy right eye values to left eye"
             >
               <Icon name="copy" size={16} className="mr-1" />
@@ -391,7 +391,7 @@ export default function PrescriptionForm({
             <button
               type="button"
               onClick={copyOStoOD}
-              className="btn-secondary text-sm px-3 py-1.5"
+              className="btn-tertiary text-sm px-3 py-1.5"
               title="Copy left eye values to right eye"
             >
               <Icon name="copy" size={16} className="mr-1" />

@@ -382,18 +382,24 @@ export default function Dashboard() {
         return (
           <div className="dashboard-content">
             <h1 className="welcome-title">Settings</h1>
-            <p className="welcome-subtitle">Application configuration</p>
+            <p className="welcome-subtitle">Application configuration and M.I.L.A. AI Assistant</p>
+            
+            {/* M.I.L.A. Demo Section */}
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">M.I.L.A. AI Assistant Demo</h2>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <MILAEnhancedDemo />
+              </div>
+            </div>
+            
+            {/* General Settings Section */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">Settings content coming soon...</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">General Settings</h3>
+              <p className="text-gray-600 dark:text-gray-400">Additional settings content coming soon...</p>
             </div>
           </div>
         )
-      case 'mila-demo':
-        return (
-          <div className="dashboard-content">
-            <MILAEnhancedDemo />
-          </div>
-        )
+
       default:
         return (
           <div className="dashboard-content">

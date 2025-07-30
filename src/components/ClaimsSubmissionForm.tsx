@@ -30,11 +30,23 @@ export default function ClaimsSubmissionForm({
   // Reserved Benefits state
   const [showReservedBenefits, setShowReservedBenefits] = useState(false)
 
+  // Help tooltip state
+  const [showHelp, setShowHelp] = useState<string | null>(null)
+
   const loadingMessages = [
     "We are processing your claim... 🏥",
     "Logging medical codes like a pro! 📊",
     "Almost there, just a few more clicks! ✨"
   ]
+
+  // Help tooltips
+  const helpText = {
+    sphere: 'The spherical power of the lens. Positive values correct farsightedness, negative values correct nearsightedness.',
+    cylinder: 'The cylindrical power of the lens. Used to correct astigmatism.',
+    axis: 'The orientation of the cylinder in degrees (0-180).',
+    add: 'Additional power for reading or near vision.',
+    bc: 'Base curve of the lens. Affects the fit and comfort of contact lenses.'
+  }
 
   const [formData, setFormData] = useState({
     // Step 1: Patient Information
@@ -1957,18 +1969,53 @@ export default function ClaimsSubmissionForm({
                         <div className="space-y-4">
                           <div className="h-10 flex items-center">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Sphere <span className="text-red-500">*</span></span>
+                            <button
+                              type="button"
+                              onClick={() => setShowHelp(showHelp === 'sphere' ? null : 'sphere')}
+                              className="ml-2 text-gray-400 hover:text-gray-600"
+                            >
+                              <Icon name="help-circle" size={16} />
+                            </button>
                           </div>
                           <div className="h-10 flex items-center">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Cylinder <span className="text-red-500">*</span></span>
+                            <button
+                              type="button"
+                              onClick={() => setShowHelp(showHelp === 'cylinder' ? null : 'cylinder')}
+                              className="ml-2 text-gray-400 hover:text-gray-600"
+                            >
+                              <Icon name="help-circle" size={16} />
+                            </button>
                           </div>
                           <div className="h-10 flex items-center">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Axis <span className="text-red-500">*</span></span>
+                            <button
+                              type="button"
+                              onClick={() => setShowHelp(showHelp === 'axis' ? null : 'axis')}
+                              className="ml-2 text-gray-400 hover:text-gray-600"
+                            >
+                              <Icon name="help-circle" size={16} />
+                            </button>
                           </div>
                           <div className="h-10 flex items-center">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Add</span>
+                            <button
+                              type="button"
+                              onClick={() => setShowHelp(showHelp === 'add' ? null : 'add')}
+                              className="ml-2 text-gray-400 hover:text-gray-600"
+                            >
+                              <Icon name="help-circle" size={16} />
+                            </button>
                           </div>
                           <div className="h-10 flex items-center">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">BC</span>
+                            <button
+                              type="button"
+                              onClick={() => setShowHelp(showHelp === 'bc' ? null : 'bc')}
+                              className="ml-2 text-gray-400 hover:text-gray-600"
+                            >
+                              <Icon name="help-circle" size={16} />
+                            </button>
                           </div>
                         </div>
                       </div>

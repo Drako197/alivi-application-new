@@ -17,7 +17,6 @@ export default function Sidebar({ isDarkMode, onToggleDarkMode, activeTab, onTab
         { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
         { id: 'hedis', label: 'H.E.D.I.S.', icon: 'document' },
         { id: 'pic', label: 'P.I.C.', icon: 'credit-card' },
-        { id: 'mila-demo', label: 'M.I.L.A. Demo', icon: 'lightbulb' },
         { id: 'reports', label: 'Reports', icon: 'chart-bar' },
         { id: 'analytics', label: 'Analytics', icon: 'chart-pie' }
       ]

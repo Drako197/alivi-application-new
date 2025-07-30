@@ -61,6 +61,9 @@ class ProactiveSuggestionsService {
     // Pattern-based suggestions
     suggestions.push(...this.getPatternBasedSuggestions(context))
 
+    // Workflow-based suggestions
+    suggestions.push(...this.getWorkflowBasedSuggestions(context))
+
     return suggestions
       .sort((a, b) => this.getPriorityScore(b.priority) - this.getPriorityScore(a.priority))
       .slice(0, 3) // Limit to top 3 suggestions
@@ -673,6 +676,182 @@ class ProactiveSuggestionsService {
     actions.push('Medical Terms', 'Code Lookup', 'Provider Search')
 
     return actions
+  }
+
+  /**
+   * Get workflow-based suggestions for multi-step forms and cross-form consistency
+   */
+  private static getWorkflowBasedSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Multi-step form guidance
+    if (context.currentStep && context.currentForm) {
+      suggestions.push(...this.getStepTransitionSuggestions(context))
+    }
+
+    // Cross-form data consistency
+    suggestions.push(...this.getDataConsistencySuggestions(context))
+
+    // Session management
+    suggestions.push(...this.getSessionManagementSuggestions(context))
+
+    return suggestions
+  }
+
+  /**
+   * Get step transition suggestions
+   */
+  private static getStepTransitionSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    if (!context.currentForm || !context.currentStep) return suggestions
+
+    switch (context.currentForm) {
+      case 'ClaimsSubmissionForm':
+        if (context.currentStep === 1) {
+          suggestions.push({
+            id: 'step-1-complete',
+            type: 'reminder',
+            title: 'Step 1 Complete',
+            content: 'Great! You\'ve completed the patient information. Next, we\'ll need diagnosis codes and service details.',
+            action: 'step_guidance',
+            priority: 'medium',
+            category: 'workflow',
+            icon: 'check-circle'
+          })
+        } else if (context.currentStep === 2) {
+          suggestions.push({
+            id: 'step-2-complete',
+            type: 'reminder',
+            title: 'Step 2 Complete',
+            content: 'Excellent! Claim details are ready. Now let\'s move to prescription details.',
+            action: 'step_guidance',
+            priority: 'medium',
+            category: 'workflow',
+            icon: 'check-circle'
+          })
+        } else if (context.currentStep === 3) {
+          suggestions.push({
+            id: 'step-3-complete',
+            type: 'reminder',
+            title: 'Step 3 Complete',
+            content: 'Prescription details look good! Next, we\'ll select lens options.',
+            action: 'step_guidance',
+            priority: 'medium',
+            category: 'workflow',
+            icon: 'check-circle'
+          })
+        }
+        break
+
+      case 'NewScreeningForm':
+        if (context.currentStep === 1) {
+          suggestions.push({
+            id: 'screening-step-1',
+            type: 'reminder',
+            title: 'Screening Details',
+            content: 'Patient screening information complete. Next, we\'ll handle retinal images.',
+            action: 'step_guidance',
+            priority: 'medium',
+            category: 'workflow',
+            icon: 'camera'
+          })
+        } else if (context.currentStep === 2) {
+          suggestions.push({
+            id: 'screening-step-2',
+            type: 'reminder',
+            title: 'Images Uploaded',
+            content: 'Retinal images uploaded successfully. Ready for final review and submission.',
+            action: 'step_guidance',
+            priority: 'medium',
+            category: 'workflow',
+            icon: 'check-circle'
+          })
+        }
+        break
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Get data consistency suggestions
+   */
+  private static getDataConsistencySuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+    const formUsage = PersonalizationService.getFormUsageStats()
+
+    // Check for consistent provider usage
+    if (context.currentForm && formUsage[context.currentForm] > 1) {
+      suggestions.push({
+        id: 'consistent-provider',
+        type: 'predictive',
+        title: 'Provider Consistency',
+        content: 'You often use the same provider across forms. Would you like me to auto-fill provider information?',
+        action: 'auto_fill_provider',
+        priority: 'medium',
+        category: 'consistency',
+        icon: 'repeat'
+      })
+    }
+
+    // Check for common diagnosis patterns
+    const commonQueries = PersonalizationService.getCommonQueries(3)
+    if (commonQueries.some(query => query.toLowerCase().includes('diabetes'))) {
+      suggestions.push({
+        id: 'diabetes-pattern',
+        type: 'predictive',
+        title: 'Diabetes Pattern',
+        content: 'I notice you often work with diabetes cases. I can help you find the right diabetes codes quickly.',
+        action: 'quick_diabetes_codes',
+        priority: 'medium',
+        category: 'consistency',
+        icon: 'activity'
+      })
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Get session management suggestions
+   */
+  private static getSessionManagementSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+    const userStats = PersonalizationService.getUserStats()
+
+    // Long session warning
+    if (userStats.sessionCount > 5) {
+      suggestions.push({
+        id: 'session-break',
+        type: 'reminder',
+        title: 'Take a Break',
+        content: 'You\'ve been working for a while. Consider taking a short break to stay fresh!',
+        action: 'session_break',
+        priority: 'low',
+        category: 'session',
+        icon: 'coffee'
+      })
+    }
+
+    // Form completion progress
+    if (context.currentForm && context.currentStep) {
+      const progress = (context.currentStep / 5) * 100 // Assuming 5 steps max
+      if (progress >= 75) {
+        suggestions.push({
+          id: 'form-completion',
+          type: 'reminder',
+          title: 'Almost Done!',
+          content: `You're ${Math.round(progress)}% through this form. Need help with the final steps?`,
+          action: 'completion_help',
+          priority: 'medium',
+          category: 'workflow',
+          icon: 'target'
+        })
+      }
+    }
+
+    return suggestions
   }
 }
 

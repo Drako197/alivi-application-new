@@ -1,5 +1,8 @@
 // AI Assistant Service for medical billing assistance
-import MedicalAPIService, { type ICD10Code, type CPTCode, type MedicalTerm, type ProviderInfo } from './MedicalAPIService'
+import { MedicalAPIService } from './MedicalAPIService'
+import { PredictiveSuggestionsService } from './PredictiveSuggestionsService'
+import { WorkflowIntegrationService } from './WorkflowIntegrationService'
+import { MobileEnhancementsService } from './MobileEnhancementsService'
 import MedicalSpecialtiesService from './MedicalSpecialtiesService'
 
 export interface CodeLookupResult {
@@ -25,7 +28,7 @@ export interface AIAssistantResponse {
   suggestions?: string[]
 }
 
-class AIAssistantService {
+export class AIAssistantService {
 
   // Local knowledge base for immediate responses
   private static LOCAL_KNOWLEDGE = {
@@ -60,46 +63,76 @@ class AIAssistantService {
     }
   }
 
-  // Process user input and generate appropriate response
-  static async processUserInput(input: string, context?: {
-    currentForm?: string
-    currentField?: string
-    currentStep?: number
-  }): Promise<AIAssistantResponse> {
-    const lowerInput = input.toLowerCase()
+  // Enhanced processUserInput with new capabilities
+  static async processUserInput(
+    input: string,
+    context: {
+      formType?: string
+      currentField?: string
+      currentStep?: number
+      formData?: Record<string, any>
+    } = {}
+  ): Promise<string> {
+    const lowerInput = input.toLowerCase().trim()
 
-    // Check for specialty-specific questions
+    // Track user behavior for predictive suggestions
+    if (context.formType && context.currentField) {
+      PredictiveSuggestionsService.trackUserBehavior({
+        formType: context.formType,
+        fieldName: context.currentField,
+        action: 'input',
+        timestamp: new Date(),
+        value: input
+      })
+    }
+
+    // 1. Handle specific code lookups (ICD-10, CPT, HCPCS, Drug Codes, Lab Codes)
+    if (this.isSpecificCodeLookup(lowerInput)) {
+      return await this.handleSpecificCodeLookup(lowerInput)
+    }
+
+    // 2. Handle medical terminology
+    if (this.isMedicalTerminology(lowerInput)) {
+      return await this.handleMedicalTerminology(lowerInput)
+    }
+
+    // 3. Handle provider searches
+    if (this.isProviderSearch(lowerInput)) {
+      return await this.handleProviderSearch(lowerInput)
+    }
+
+    // 4. Handle eligibility checks
+    if (this.isEligibilityCheck(lowerInput)) {
+      return await this.handleEligibilityCheck(lowerInput)
+    }
+
+    // 5. Handle claims submission
+    if (this.isClaimsSubmission(lowerInput)) {
+      return await this.handleClaimsSubmission(lowerInput)
+    }
+
+    // 6. Handle workflow assistance
+    if (this.isWorkflowAssistance(lowerInput)) {
+      return await this.handleWorkflowAssistance(lowerInput, context)
+    }
+
+    // 7. Handle mobile-specific requests
+    if (this.isMobileRequest(lowerInput)) {
+      return await this.handleMobileRequest(lowerInput)
+    }
+
+    // 8. Handle general medical billing questions
+    if (this.isGeneralQuestion(lowerInput)) {
+      return await this.handleGeneralQuestion(lowerInput)
+    }
+
+    // 9. Handle specialty-specific questions
     if (this.isSpecialtyQuestion(lowerInput)) {
-      return this.handleSpecialtyQuestion(input)
+      return await this.handleSpecialtyQuestion(lowerInput)
     }
 
-    // Check for terminology questions
-    if (this.isTerminologyQuestion(lowerInput)) {
-      return await this.handleTerminologyQuestion(input)
-    }
-
-    // Check for ICD-10 code lookups
-    if (this.isICD10Lookup(lowerInput)) {
-      return await this.handleICD10Lookup(input)
-    }
-
-    // Check for CPT code lookups
-    if (this.isCPTLookup(lowerInput)) {
-      return await this.handleCPTLookup(input)
-    }
-
-    // Check for provider lookups
-    if (this.isProviderLookup(lowerInput)) {
-      return await this.handleProviderLookup(input)
-    }
-
-    // Check for form-specific help
-    if (this.isFormHelp(lowerInput) && context?.currentForm) {
-      return this.handleFormHelp(input, context)
-    }
-
-    // Default to general help
-    return this.handleGeneralQuestion(input)
+    // 10. Default response with enhanced capabilities
+    return this.getEnhancedDefaultResponse(lowerInput, context)
   }
 
   private static isTerminologyQuestion(input: string): boolean {
@@ -548,6 +581,194 @@ class AIAssistantService {
       return formGuidanceData[fieldName as keyof typeof formGuidanceData] || null
     }
     return null
+  }
+
+  // Enhanced specific code lookup with multiple code types
+  private static isSpecificCodeLookup(input: string): boolean {
+    const codePatterns = [
+      /[A-Z]\d{2}\.\d{1,2}/, // ICD-10
+      /\d{5}/, // CPT
+      /[A-Z]\d{4}/, // HCPCS
+      /[A-Z]\d{3}/, // Drug codes
+      /\d{4}/ // Lab codes
+    ]
+    
+    return codePatterns.some(pattern => pattern.test(input)) ||
+           input.includes('icd') ||
+           input.includes('cpt') ||
+           input.includes('hcpcs') ||
+           input.includes('drug') ||
+           input.includes('lab') ||
+           input.includes('code')
+  }
+
+  private static async handleSpecificCodeLookup(input: string): Promise<string> {
+    // Check for specific code patterns
+    const icd10Match = input.match(/[A-Z]\d{2}\.\d{1,2}/)
+    const cptMatch = input.match(/\d{5}/)
+    const hcpcsMatch = input.match(/[A-Z]\d{4}/)
+    const drugMatch = input.match(/[A-Z]\d{3}/)
+    const labMatch = input.match(/\d{4}/)
+
+    if (icd10Match) {
+      const code = icd10Match[0]
+      const result = await MedicalAPIService.searchICD10Codes(code)
+      if (result.length > 0) {
+        return `I'd be happy to help you with that ICD-10 code! **${code}**: ${result[0].description}\n\nThis code is commonly used in medical billing and documentation. Let me know if you need any additional information about it!`
+      }
+    }
+
+    if (cptMatch) {
+      const code = cptMatch[0]
+      const result = await MedicalAPIService.searchCPTCodes(code)
+      if (result.length > 0) {
+        return `I'd be delighted to help you with that CPT code! **${code}**: ${result[0].description}\n\nThis procedure code is essential for billing and documentation. Is there anything specific about this code you'd like me to clarify?`
+      }
+    }
+
+    if (hcpcsMatch) {
+      const code = hcpcsMatch[0]
+      const result = await MedicalAPIService.searchHCPCSCodes(code)
+      if (result.length > 0) {
+        return `I'd be happy to help you with that HCPCS code! **${code}**: ${result[0].description}\n\nThis code is used for Medicare and other insurance billing. Let me know if you need any additional information!`
+      }
+    }
+
+    if (drugMatch) {
+      const code = drugMatch[0]
+      const result = await MedicalAPIService.searchDrugCodes(code)
+      if (result.length > 0) {
+        return `I'd be delighted to help you with that drug code! **${code}**: ${result[0].description}\n\nThis code is used for medication billing and documentation. Is there anything specific about this medication you'd like me to clarify?`
+      }
+    }
+
+    if (labMatch) {
+      const code = labMatch[0]
+      const result = await MedicalAPIService.searchLabCodes(code)
+      if (result.length > 0) {
+        return `I'd be happy to help you with that lab code! **${code}**: ${result[0].description}\n\nThis code is used for laboratory testing billing and documentation. Let me know if you need any additional information!`
+      }
+    }
+
+    // General code search
+    if (input.includes('diabetes') && input.includes('code')) {
+      const codes = await MedicalAPIService.searchICD10Codes('diabetes')
+      return `I'd be delighted to help you with diabetes codes! Here are some commonly used ICD-10 codes for diabetes:\n\n${codes.slice(0, 5).map(c => `• **${c.code}**: ${c.description}`).join('\n')}\n\nThese codes are essential for diabetes care documentation and billing. Would you like me to explain any of these codes in more detail?`
+    }
+
+    if (input.includes('retinopathy') && input.includes('code')) {
+      const codes = await MedicalAPIService.searchICD10Codes('retinopathy')
+      return `I'd be happy to help you with retinopathy codes! Here are some commonly used ICD-10 codes for diabetic retinopathy:\n\n${codes.slice(0, 5).map(c => `• **${c.code}**: ${c.description}`).join('\n')}\n\nThese codes are critical for diabetic eye care documentation. Would you like me to explain any of these codes in more detail?`
+    }
+
+    return `I'd be happy to help you find the right medical codes! Try asking about specific conditions like "diabetes codes" or "retinopathy codes" and I'll search our comprehensive database for you. You can also search for specific codes like "E11.9" or "92250" and I'll provide detailed information.`
+  }
+
+  // Enhanced medical terminology handling
+  private static isMedicalTerminology(input: string): boolean {
+    const medicalTerms = ['od', 'os', 'ou', 'pcp', 'npi', 'hedis', 'icd', 'cpt', 'hcpcs', 'ehr', 'emr']
+    return medicalTerms.some(term => input.includes(term))
+  }
+
+  private static async handleMedicalTerminology(input: string): Promise<string> {
+    const result = await MedicalAPIService.searchMedicalTerms(input)
+    if (result.length > 0) {
+      const term = result[0]
+      return `I'd be delighted to explain that medical term! **${term.term.toUpperCase()}**: ${term.definition}\n\nThis is a common term in medical billing and documentation. Is there anything specific about this term you'd like me to clarify further?`
+    }
+    return `I'd be happy to help you understand medical terminology! Try asking about terms like "OD", "OS", "PCP", "NPI", or "HEDIS" and I'll provide clear explanations.`
+  }
+
+  // Enhanced provider search
+  private static isProviderSearch(input: string): boolean {
+    return input.includes('provider') || input.includes('doctor') || input.includes('physician') || input.includes('npi')
+  }
+
+  private static async handleProviderSearch(input: string): Promise<string> {
+    const result = await MedicalAPIService.searchProviders({ name: input })
+    if (result.length > 0) {
+      const provider = result[0]
+      return `I'd be happy to help you find provider information! Here's what I found:\n\n**${provider.name}**\nSpecialty: ${provider.specialty}\nAddress: ${provider.address}\nPhone: ${provider.phone}\n\nWould you like me to search for more providers or get additional information about this provider?`
+    }
+    return `I'd be delighted to help you find provider information! Try searching by name, specialty, or location and I'll search our provider directory for you.`
+  }
+
+  // Enhanced eligibility check
+  private static isEligibilityCheck(input: string): boolean {
+    return input.includes('eligibility') || input.includes('insurance') || input.includes('coverage')
+  }
+
+  private static async handleEligibilityCheck(input: string): Promise<string> {
+    return `I'd be happy to help you check insurance eligibility! I can verify patient insurance coverage for specific services. To check eligibility, I'll need the patient ID and insurance information. Would you like me to guide you through the eligibility verification process?`
+  }
+
+  // Enhanced claims submission
+  private static isClaimsSubmission(input: string): boolean {
+    return input.includes('claim') || input.includes('submit') || input.includes('billing')
+  }
+
+  private static async handleClaimsSubmission(input: string): Promise<string> {
+    return `I'd be delighted to help you with claims submission! I can assist with preparing and submitting medical claims. To submit a claim, I'll need the patient information, service details, and provider information. Would you like me to guide you through the claims submission process?`
+  }
+
+  // Enhanced workflow assistance
+  private static isWorkflowAssistance(input: string): boolean {
+    return input.includes('workflow') || input.includes('step') || input.includes('form') || input.includes('validation')
+  }
+
+  private static async handleWorkflowAssistance(input: string, context: any): Promise<string> {
+    if (context.formType) {
+      const workflow = WorkflowIntegrationService.initializeWorkflow(context.formType)
+      const currentStep = workflow.find(s => s.id === context.currentField)
+      
+      if (currentStep) {
+        return `I'd be happy to help you with the ${currentStep.title} step! This step involves ${currentStep.description}. Let me know if you need help with any specific fields or validation requirements.`
+      }
+    }
+    
+    return `I'd be delighted to help you with workflow assistance! I can guide you through form steps, validation requirements, and help ensure all required information is complete. What specific aspect of the workflow would you like help with?`
+  }
+
+  // Enhanced mobile request handling
+  private static isMobileRequest(input: string): boolean {
+    return input.includes('mobile') || input.includes('touch') || input.includes('voice') || input.includes('offline')
+  }
+
+  private static async handleMobileRequest(input: string): Promise<string> {
+    if (input.includes('voice')) {
+      return `I'd be happy to help you with voice input! You can use voice commands like "next step", "open mila", "search codes", or "help" to interact with me hands-free. Just tap the microphone icon to start voice input.`
+    }
+    
+    if (input.includes('touch')) {
+      return `I'd be delighted to help you with touch gestures! You can swipe left/right to navigate between steps, swipe up to open me, or long-press on fields for additional help. These gestures make mobile form completion much easier!`
+    }
+    
+    if (input.includes('offline')) {
+      return `I'd be happy to help you with offline capabilities! I can work offline and cache essential data like medical codes and form templates. When you're back online, I'll automatically sync any changes.`
+    }
+    
+    return `I'd be delighted to help you with mobile features! I support touch gestures, voice input, offline capabilities, and mobile-optimized interfaces. What specific mobile feature would you like to learn more about?`
+  }
+
+  // Enhanced general question handling
+  private static isGeneralQuestion(input: string): boolean {
+    return input.includes('what') || input.includes('how') || input.includes('why') || input.includes('when')
+  }
+
+  private static async handleGeneralQuestion(input: string): Promise<string> {
+    return `I'd be happy to help you with your medical billing questions! I can assist with codes, terminology, provider information, eligibility checks, claims submission, and workflow guidance. What specific question do you have?`
+  }
+
+  // Enhanced default response with predictive suggestions
+  private static getEnhancedDefaultResponse(input: string, context: any): string {
+    let response = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with all your medical billing questions! You can ask me about:\n\n• **Medical Terminology** (OD, OS, PCP, etc.)\n• **Diagnosis Codes** (ICD-10)\n• **Procedure Codes** (CPT, HCPCS)\n• **Drug & Lab Codes** (J-codes, 8-series)\n• **Provider Information** (NPI lookup)\n• **Insurance Eligibility** (coverage verification)\n• **Claims Submission** (billing assistance)\n• **Form Field Guidance** (contextual help)\n• **Workflow Assistance** (step-by-step guidance)\n• **Mobile Features** (touch, voice, offline)\n• **General Billing Questions**\n\nWhat would you like to know?`
+
+    // Add context-specific suggestions
+    if (context.formType && context.currentField) {
+      response += `\n\n💡 **Smart Tip**: I can provide predictive suggestions based on your current form and field. Just let me know what you're working on!`
+    }
+
+    return response
   }
 }
 

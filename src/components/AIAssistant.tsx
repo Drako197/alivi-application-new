@@ -3,6 +3,7 @@ import Icon from './Icon'
 import PersonalizationService from '../services/PersonalizationService'
 import ProactiveSuggestionsService, { type ProactiveSuggestion } from '../services/ProactiveSuggestionsService'
 import PersonalizationSettings from './PersonalizationSettings'
+import AIAssistantService from '../services/AIAssistantService'
 
 interface Message {
   id: string
@@ -237,109 +238,26 @@ export default function AIAssistant({
     }, 1000)
   }
 
-  const processUserMessage = async (userInput: string) => {
-    const input = userInput.toLowerCase().trim()
-    
-    // Check for terminology questions
-    if (input.includes('what is') || input.includes('what does') || input.includes('meaning of')) {
-      for (const [term, definition] of Object.entries(MEDICAL_BILLING_KNOWLEDGE.terminology)) {
-        if (input.includes(term.toLowerCase())) {
-          addMessage('assistant', `I'd be delighted to explain that for you! **${term}** stands for "${definition}". This is commonly used in medical billing and documentation to ensure clear communication.\n\nUnderstanding these terms helps make your work more efficient and accurate. Is there anything else you'd like me to clarify?`)
-          return
-        }
-      }
-    }
+  const processUserMessage = async (input: string) => {
+    if (!input.trim()) return
 
-    // Check for specific code requests
-    if (input.includes('diabetes') && input.includes('code')) {
-      addMessage('assistant', `I'd be happy to help you with diabetes diagnosis codes! Here's a comprehensive list of the most commonly used codes for diabetes care:\n\n**Type 2 Diabetes:**\n• **E11.9**: Type 2 diabetes mellitus without complications\n• **E11.21**: Type 2 diabetes mellitus with diabetic nephropathy\n• **E11.22**: Type 2 diabetes mellitus with diabetic chronic kidney disease\n• **E11.29**: Type 2 diabetes mellitus with other diabetic kidney complication\n\n**Type 1 Diabetes:**\n• **E10.9**: Type 1 diabetes mellitus without complications\n• **E10.21**: Type 1 diabetes mellitus with diabetic nephropathy\n• **E10.22**: Type 1 diabetes mellitus with diabetic chronic kidney disease\n\n**Complications:**\n• **Z79.4**: Long term (current) use of insulin\n• **Z79.84**: Long term (current) use of oral hypoglycemic drugs\n\n**Retinopathy Codes:**\n• **H35.00**: Unspecified background retinopathy\n• **H35.01**: Mild nonproliferative diabetic retinopathy\n• **H35.02**: Moderate nonproliferative diabetic retinopathy\n• **H35.03**: Severe nonproliferative diabetic retinopathy\n• **H35.04**: Proliferative diabetic retinopathy\n\nI hope this helps make your coding work a bit easier! Let me know if you need any clarification on these codes.`)
-      return
-    }
-    
-    if (input.includes('retinopathy') && input.includes('code')) {
-      addMessage('assistant', `I'd be delighted to help you with diabetic retinopathy diagnosis codes! Here's a comprehensive list of the codes you'll need for retinal screening and diabetic eye care:\n\n• **H35.00**: Unspecified background retinopathy\n• **H35.01**: Mild nonproliferative diabetic retinopathy\n• **H35.02**: Moderate nonproliferative diabetic retinopathy\n• **H35.03**: Severe nonproliferative diabetic retinopathy\n• **H35.04**: Proliferative diabetic retinopathy\n\n**Related Diabetes Codes:**\n• **E11.9**: Type 2 diabetes mellitus without complications\n• **E11.21**: Type 2 diabetes mellitus with diabetic nephropathy\n• **Z79.4**: Long term (current) use of insulin\n\nThese codes are essential for proper documentation of diabetic eye care. I hope this makes your coding work smoother!`)
-      return
-    }
-    
-    // Check for specific code searches (like "E11.9", "H35.01", etc.) - MUST BE FIRST
-    for (const [code, description] of Object.entries(MEDICAL_BILLING_KNOWLEDGE.commonCodes)) {
-      if (input.includes(code.toLowerCase())) {
-        addMessage('assistant', `I'd be happy to help you with that code! **${code}**: ${description}\n\nThis code is commonly used in medical billing and documentation. Let me know if you need any additional information about it!`, 'fade-in', { lastCode: code, lastTopic: 'code_lookup' })
-        return
-      }
-    }
-    
-    // Check for specific code lookups
-    if (input.includes('code') || input.includes('icd') || input.includes('cpt')) {
-      for (const [code, description] of Object.entries(MEDICAL_BILLING_KNOWLEDGE.commonCodes)) {
-        if (input.includes(code.toLowerCase())) {
-          addMessage('assistant', `I'd be happy to help you with that code! **${code}**: ${description}\n\nThis code is commonly used in medical billing and documentation. Let me know if you need any additional information about it!`)
-          return
-        }
-      }
-    }
+    // Add user message
+    addMessage('user', input, 'slide-in')
 
-    // Check for provider lookups
-    if (input.includes('provider') || input.includes('doctor') || input.includes('npi') || input.includes('physician')) {
-      addMessage('assistant', 'I\'d be happy to help you find provider information! I can assist you with searching by NPI number, provider name, or specialty. This helps ensure accurate billing and proper documentation.\n\nJust let me know what specific provider information you need, and I\'ll guide you through the process!')
-      return
-    }
+    // Process with enhanced AI service
+    try {
+      const response = await AIAssistantService.processUserInput(input, {
+        formType: currentForm,
+        currentField: currentField,
+        currentStep: currentStep,
+        formData: {} // Add form data if available
+      })
 
-    // Check for form-specific help
-    if (input.includes('form') || input.includes('field') || input.includes('help')) {
-      if (currentForm && currentField) {
-        const formGuidance = MEDICAL_BILLING_KNOWLEDGE.formGuidance[currentForm as keyof typeof MEDICAL_BILLING_KNOWLEDGE.formGuidance]
-        if (formGuidance && currentField in formGuidance) {
-          const guidance = formGuidance[currentField as keyof typeof formGuidance]
-          if (guidance) {
-            addMessage('assistant', `I\'d be delighted to help you with that field! 💡 **${currentField} Help**: ${guidance}\n\nThis guidance helps ensure accurate and complete documentation. Let me know if you need any clarification!`)
-            return
-          }
-        }
-      }
-    }
-
-    // Check for follow-up questions about the last discussed code
-    if (conversationContext.lastCode && (
-      input.includes('more') || 
-      input.includes('additional') || 
-      input.includes('tell me more') ||
-      input.includes('yes') ||
-      input.includes('please')
-    )) {
-      const code = conversationContext.lastCode
-      const description = MEDICAL_BILLING_KNOWLEDGE.commonCodes[code as keyof typeof MEDICAL_BILLING_KNOWLEDGE.commonCodes]
-      
-      if (description) {
-        let additionalInfo = ''
-        
-        // Provide additional context based on the code
-        if (code.startsWith('E11')) {
-          additionalInfo = `\n\n**Additional Information for ${code}:**\n\n• **Category**: Type 2 Diabetes Mellitus\n• **Documentation Requirements**: Must specify if with/without complications\n• **Common Comorbidities**: Often used with Z79.4 (insulin use) or Z79.84 (oral medications)\n• **Billing Tips**: This is a primary diagnosis code - list it first on claims\n• **HEDIS Relevance**: Critical for diabetes care quality measures\n\n**Related Codes You Might Need:**\n• **E11.21**: With diabetic nephropathy\n• **E11.22**: With diabetic chronic kidney disease\n• **Z79.4**: Long-term insulin use\n• **Z79.84**: Long-term oral hypoglycemic use`
-        } else if (code.startsWith('H35')) {
-          additionalInfo = `\n\n**Additional Information for ${code}:**\n\n• **Category**: Diabetic Retinopathy\n• **Documentation Requirements**: Must specify severity level and laterality\n• **Common Procedures**: Often billed with 92250 (fundus photography)\n• **Billing Tips**: Use with primary diabetes code (E11.9)\n• **HEDIS Relevance**: Essential for diabetic eye care measures\n\n**Related Codes You Might Need:**\n• **92250**: Fundus photography with interpretation\n• **92227**: Retinal imaging for disease detection\n• **E11.9**: Type 2 diabetes (primary diagnosis)\n• **Z79.4**: Long-term insulin use`
-        } else if (code.startsWith('Z79')) {
-          additionalInfo = `\n\n**Additional Information for ${code}:**\n\n• **Category**: Long-term Drug Therapy\n• **Documentation Requirements**: Must specify current use and medication type\n• **Billing Tips**: Use as secondary diagnosis with primary condition\n• **HEDIS Relevance**: Important for medication adherence measures\n\n**Related Codes You Might Need:**\n• **E11.9**: Type 2 diabetes (primary diagnosis)\n• **H35.01**: Diabetic retinopathy (if applicable)\n• **92250**: Fundus photography (if retinal screening)`
-        } else {
-          additionalInfo = `\n\n**Additional Information for ${code}:**\n\n• **Documentation Requirements**: Ensure complete clinical documentation\n• **Billing Tips**: Verify code is current and appropriate for the service\n• **HEDIS Relevance**: Check if this code impacts quality measures\n\n**Need Help With:**\n• **Related codes** for this condition?\n• **Documentation requirements** for this code?\n• **Billing guidelines** for this service?`
-        }
-        
-        addMessage('assistant', `I'd be delighted to provide more details about **${code}**! ${description}${additionalInfo}\n\nIs there anything specific about this code you'd like me to clarify further?`, 'fade-in', { lastCode: code, lastTopic: 'code_details' })
-        return
-      }
-    }
-
-    // General responses with M.I.L.A.'s personality
-    if (input.includes('hello') || input.includes('hi')) {
-      addMessage('assistant', 'Hello! I\'m M.I.L.A., your Medical Intelligence & Learning Assistant. I\'m here to help make your medical billing experience smoother and more efficient. How can I assist you today?')
-    } else if (input.includes('thank')) {
-      addMessage('assistant', 'You\'re very welcome! I\'m here to help make your work easier. Is there anything else I can assist you with?')
-    } else if (input.includes('codes') || input.includes('icd')) {
-      addMessage('assistant', 'I\'d be happy to help you find the right diagnosis codes! Here are some common categories:\n\n• **Diabetes Codes**: Ask "diabetes codes" for comprehensive diabetes ICD-10 codes\n• **Retinopathy Codes**: Ask "retinopathy codes" for diabetic retinopathy codes\n• **Specific Codes**: Ask about specific codes like "E11.9" or "H35.01"\n\nWhat specific condition or code are you looking for?')
-    } else if (input.includes('terminology') || input.includes('terms')) {
-      addMessage('assistant', 'I love explaining medical terminology! It helps everyone work more efficiently. Try asking about terms like "OD", "OS", "PCP", or "HEDIS" and I\'ll provide clear, helpful explanations.')
-    } else {
-      addMessage('assistant', 'Hi there! I\'m M.I.L.A., your Medical Intelligence & Learning Assistant. I\'m here to help with all your medical billing questions! You can ask me about:\n\n• **Medical Terminology** (OD, OS, PCP, etc.)\n• **Diagnosis Codes** (ICD-10)\n• **Procedure Codes** (CPT)\n• **Provider Information** (NPI lookup)\n• **Form Field Guidance** (contextual help)\n• **General Billing Questions**\n\nWhat would you like to know?')
+      // Add assistant response
+      addMessage('assistant', response, 'fade-in')
+    } catch (error) {
+      console.error('Error processing message:', error)
+      addMessage('assistant', 'I apologize, but I encountered an error processing your request. Please try again.', 'fade-in')
     }
   }
 

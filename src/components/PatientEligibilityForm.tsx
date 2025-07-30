@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Icon from './Icon'
 import DatePicker from './DatePicker'
 import ReservedBenefitsPageStandalone from './ReservedBenefitsPage'
+import AIAssistantButton from './AIAssistantButton'
 
 interface PatientEligibilityFormProps {
   onBack?: () => void
@@ -48,6 +49,7 @@ export default function PatientEligibilityForm({
   const [selectedEligibilityType, setSelectedEligibilityType] = useState<string>('')
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
   const [showReservedBenefits, setShowReservedBenefits] = useState(false)
+  const [currentField, setCurrentField] = useState<string>('')
 
 
   // Real-world data for dropdowns
@@ -234,6 +236,9 @@ export default function PatientEligibilityForm({
       [name]: value
     }))
     
+    // Update current field for AI assistant context
+    setCurrentField(name)
+    
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
@@ -246,6 +251,9 @@ export default function PatientEligibilityForm({
       ...prev,
       [name]: value
     }))
+    
+    // Update current field for AI assistant context
+    setCurrentField(name)
     
     // Clear error when user selects an option
     if (errors[name]) {
@@ -1359,6 +1367,17 @@ export default function PatientEligibilityForm({
       </div>
       {stepContent}
       <EligibilityTypeModal />
+      
+      {/* AI Assistant Button */}
+      <AIAssistantButton
+        currentForm="PatientEligibilityForm"
+        currentField={currentField}
+        currentStep={currentStep}
+        onFieldSuggestion={(fieldName, suggestion) => {
+          console.log(`AI Suggestion for ${fieldName}:`, suggestion)
+          // In a real implementation, you could auto-fill or highlight the field
+        }}
+      />
     </div>
   )
 } 

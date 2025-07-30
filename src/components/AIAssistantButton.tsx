@@ -38,7 +38,7 @@ export default function AIAssistantButton({
           title="Chat with M.I.L.A. - Medical Intelligence & Learning Assistant"
         >
           <div className="flex items-center justify-center w-full h-full">
-            <Icon name="brain" size={24} className="text-white" />
+            <Icon name="bot" size={24} className="text-white" />
           </div>
           
           {/* Pulse animation */}
@@ -46,7 +46,7 @@ export default function AIAssistantButton({
         </button>
         
         {/* M.I.L.A. badge */}
-        <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
           M.I.L.A.
         </div>
       </div>

@@ -6,7 +6,7 @@ import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import DatePicker from './DatePicker'
 import AIAssistantButton from './AIAssistantButton'
-import TestModal from './TestModal'
+
 import ScreeningDataService from '../services/ScreeningDataService'
 import type { CompletedScreening, SavedScreening, DashboardStats } from '../services/ScreeningDataService'
 
@@ -258,13 +258,13 @@ function PatientSearchStep({ onPatientSelect, onNextStep }: PatientSearchStepPro
   return (
     <div className="hedis-patient-search-step">
       {/* M.I.L.A. Assistant Button */}
-      <div className="fixed bottom-6 right-6 z-[999999]">
-        <AIAssistantButton
-          currentForm="PatientSearchStep"
-          currentField="patientId"
-          currentStep={1}
-        />
-      </div>
+      <AIAssistantButton
+        currentForm="PatientSearchStep"
+        currentField="patientId"
+        currentStep={1}
+      />
+      
+
       
       <div className="hedis-search-section">
         <div className="hedis-search-input-group">
@@ -2447,14 +2447,14 @@ function SavedScreeningListModal({ isOpen, onClose, onFormSelect, savedScreening
     const now = new Date()
     const diffTime = now.getTime() - savedDate.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    console.log(`getDaysSinceSaved: ${dateString} -> ${diffDays} days`)
+
     return diffDays
   }
 
   const getDaysUntilExpiry = (dateString: string) => {
     const daysSinceSaved = getDaysSinceSaved(dateString)
     const daysUntilExpiry = Math.max(0, 30 - daysSinceSaved)
-    console.log(`getDaysUntilExpiry: ${dateString} -> ${daysSinceSaved} days since saved, ${daysUntilExpiry} days until expiry`)
+
     return daysUntilExpiry
   }
 
@@ -3068,7 +3068,7 @@ function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewPr
                 {!screening.retinalImages.rightEyeMissing && screening.retinalImages.rightEyeImages.length > 0 && (
                   <div className="grid grid-cols-3 gap-1 md:gap-2">
                     {Array.isArray(screening.retinalImages.rightEyeImages) && screening.retinalImages.rightEyeImages.map((image, index) => {
-                      console.log('Right eye image data:', image) // Debugging
+                  
                       return (
                         <div key={index} className="relative group cursor-pointer">
                           <img
@@ -3078,7 +3078,7 @@ function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewPr
                             onClick={(e) => { // Modified onClick
                               e.preventDefault()
                               e.stopPropagation()
-                              console.log('Image clicked:', { eye: 'right', index }) // Debugging
+      
                               handleImagePreview('right', index)
                             }}
                           />
@@ -3125,7 +3125,7 @@ function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewPr
                           onClick={(e) => { // Modified onClick
                             e.preventDefault()
                             e.stopPropagation()
-                            console.log('Image clicked:', { eye: 'left', index }) // Debugging
+    
                             handleImagePreview('left', index)
                           }}
                         />
@@ -3381,7 +3381,7 @@ export default function HEDISLandingPage({
   const [showPatientSearchModal, setShowPatientSearchModal] = useState(false)
   const [showCompletedScreeningListModal, setShowCompletedScreeningListModal] = useState(false)
   const [showSavedScreeningListModal, setShowSavedScreeningListModal] = useState(false)
-  const [showTestModal, setShowTestModal] = useState(false)
+
   const [viewingCompletedScreening, setViewingCompletedScreening] = useState<CompletedScreening | null>(null)
 
   // Update breadcrumbs when step changes
@@ -4257,35 +4257,7 @@ export default function HEDISLandingPage({
         currentStep={1}
       />
 
-      {/* Test Modal Button */}
-      <div style={{ position: 'fixed', bottom: '20px', left: '20px', zIndex: 99999 }}>
-        <button 
-          onClick={() => {
-            console.log('Test modal button clicked, showTestModal:', showTestModal)
-            alert('🎉 PURPLE BUTTON WORKS! 🎉')
-            setShowTestModal(true)
-            console.log('After setShowTestModal, showTestModal:', !showTestModal)
-          }}
-          style={{ 
-            width: '60px', 
-            height: '60px', 
-            backgroundColor: 'purple', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '50%',
-            fontSize: '20px',
-            fontWeight: 'bold'
-          }}
-        >
-          T
-        </button>
-      </div>
 
-      {/* Test Modal */}
-      <TestModal
-        isOpen={showTestModal}
-        onClose={() => setShowTestModal(false)}
-      />
     </div>
   )
 } 

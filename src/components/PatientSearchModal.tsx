@@ -99,36 +99,18 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
 
   if (!isOpen) return null
 
-  console.log('PatientSearchModal is rendering!')
+
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-      {/* Test Button - BRIGHT AND IMPOSSIBLE TO MISS */}
-      <div className="fixed bottom-6 left-6 z-[999999]">
-        <button
-          onClick={() => alert('Patient Search Modal Test Button Works!')}
-          className="w-20 h-20 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-200 border-4 border-yellow-400"
-          style={{ boxShadow: '0 0 20px rgba(255, 0, 0, 0.8)' }}
-        >
-          <div className="flex items-center justify-center w-full h-full">
-            <span className="text-2xl font-bold">🔥</span>
-          </div>
-        </button>
-        <div className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold shadow-sm border-2 border-red-600">
-          TEST
-        </div>
-      </div>
 
-      {/* M.I.L.A. Assistant Button - BRIGHT AND IMPOSSIBLE TO MISS */}
-      <div className="fixed bottom-6 right-6 z-[999999]">
-        <div className="w-20 h-20 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-200 border-4 border-yellow-400 flex items-center justify-center"
-             style={{ boxShadow: '0 0 20px rgba(0, 255, 0, 0.8)' }}>
-          <span className="text-2xl">🤖</span>
-        </div>
-        <div className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold shadow-sm border-2 border-green-600">
-          MILA
-        </div>
-      </div>
+
+      {/* M.I.L.A. Assistant Button */}
+      <AIAssistantButton
+        currentForm="PatientSearchModal"
+        currentField="searchTerm"
+        currentStep={1}
+      />
 
       {/* Modal Content */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl">

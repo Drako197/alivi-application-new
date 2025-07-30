@@ -3,6 +3,7 @@ import Icon from './Icon'
 import DatePicker from './DatePicker'
 import AIAssistantButton from './AIAssistantButton'
 import ClaimAcceptedView from './ClaimAcceptedView'
+import ReservedBenefitsView from './ReservedBenefitsView'
 
 interface ClaimsSubmissionFormProps {
   onBack?: () => void
@@ -25,6 +26,9 @@ export default function ClaimsSubmissionForm({
   const [showLoadingModal, setShowLoadingModal] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
   const [loadingStep, setLoadingStep] = useState(0)
+
+  // Reserved Benefits state
+  const [showReservedBenefits, setShowReservedBenefits] = useState(false)
 
   const loadingMessages = [
     "We are processing your claim... 🏥",
@@ -814,13 +818,21 @@ export default function ClaimsSubmissionForm({
   // Main form content based on current step
   let stepContent
 
-  if (currentStep === 7) {
+  if (showReservedBenefits) {
+    stepContent = (
+      <ReservedBenefitsView
+        onBack={() => setShowReservedBenefits(false)}
+        onPrint={() => console.log('Print reserved benefits')}
+        onExport={() => console.log('Export reserved benefits')}
+      />
+    )
+  } else if (currentStep === 7) {
     stepContent = (
       <ClaimAcceptedView
         onBack={() => setCurrentStep(6)}
         onPrint={() => console.log('Print claim accepted')}
         onViewReport={() => console.log('View optometric report')}
-        onViewBenefits={() => console.log('View reserved benefits')}
+        onViewBenefits={() => setShowReservedBenefits(true)}
       />
     )
   } else if (submitted && currentStep === 6) {

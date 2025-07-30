@@ -382,19 +382,19 @@ export default function PrescriptionForm({
             <button
               type="button"
               onClick={copyODtoOS}
-              className="btn-tertiary text-sm px-3 py-1.5"
+              className="bg-blue-50 hover:bg-blue-100 border border-blue-300 text-blue-700 text-sm px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
               title="Copy right eye values to left eye"
             >
-              <Icon name="copy" size={16} className="mr-1" />
+              <Icon name="copy" size={16} className="mr-1 text-blue-600" />
               Copy OD→OS
             </button>
             <button
               type="button"
               onClick={copyOStoOD}
-              className="btn-tertiary text-sm px-3 py-1.5"
+              className="bg-green-50 hover:bg-green-100 border border-green-300 text-green-700 text-sm px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center"
               title="Copy left eye values to right eye"
             >
-              <Icon name="copy" size={16} className="mr-1" />
+              <Icon name="copy" size={16} className="mr-1 text-green-600" />
               Copy OS→OD
             </button>
           </div>

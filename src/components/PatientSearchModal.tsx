@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 
 // TypeScript Interfaces
 interface Patient {
@@ -106,7 +106,7 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
 
 
       {/* M.I.L.A. Assistant Button */}
-      <AIAssistantButton
+      <HelperButton
         currentForm="PatientSearchModal"
         currentField="searchTerm"
         currentStep={1}

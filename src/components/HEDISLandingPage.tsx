@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import DatePicker from './DatePicker'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 import Icon from './Icon'
 
 import ScreeningDataService from '../services/ScreeningDataService'
@@ -259,7 +259,7 @@ function PatientSearchStep({ onPatientSelect, onNextStep }: PatientSearchStepPro
   return (
     <div className="hedis-patient-search-step">
       {/* M.I.L.A. Assistant Button */}
-      <AIAssistantButton
+      <HelperButton
         currentForm="PatientSearchStep"
         currentField="patientId"
         currentStep={1}
@@ -635,7 +635,7 @@ function ScreeningDetailsForm({
     <div className="space-y-8">
       {/* M.I.L.A. Assistant Button */}
       <div className="fixed bottom-6 right-6 z-[999999]">
-        <AIAssistantButton
+        <HelperButton
           currentForm="ScreeningDetailsForm"
           currentField="dateOfScreening"
           currentStep={2}
@@ -1429,7 +1429,7 @@ function RetinalImagesForm({
     <div className="space-y-6 md:space-y-8">
       {/* M.I.L.A. Assistant Button */}
       <div className="fixed bottom-6 right-6 z-[999999]">
-        <AIAssistantButton
+        <HelperButton
           currentForm="RetinalImagesForm"
           currentField="rightEyeImages"
           currentStep={3}
@@ -1996,7 +1996,7 @@ function ReviewAndSubmitForm({
     <div className="screening-form-content relative">
       {/* M.I.L.A. Assistant Button */}
       <div className="fixed bottom-6 right-6 z-[999999]">
-        <AIAssistantButton
+        <HelperButton
           currentForm="ReviewAndSubmitForm"
           currentField="review"
           currentStep={4}
@@ -4242,7 +4242,7 @@ export default function HEDISLandingPage({
       )}
 
       {/* M.I.L.A. Assistant Button */}
-      <AIAssistantButton
+      <HelperButton
         currentForm="NewScreeningForm"
         currentField="diabetesMellitus"
         currentStep={1}

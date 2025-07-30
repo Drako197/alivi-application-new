@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Icon from './Icon'
 import DatePicker from './DatePicker'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 import ClaimAcceptedView from './ClaimAcceptedView'
 import ReservedBenefitsView from './ReservedBenefitsView'
 
@@ -4117,7 +4117,7 @@ export default function ClaimsSubmissionForm({
       {stepContent}
       
       {/* M.I.L.A. Assistant */}
-      <AIAssistantButton 
+      <HelperButton 
         currentForm="ClaimsSubmission"
         currentField={getCurrentField()}
         currentStep={currentStep}

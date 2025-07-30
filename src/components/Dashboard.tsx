@@ -14,7 +14,7 @@ import ScreeningDataService, { type CompletedScreening, type SavedScreening } fr
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 
@@ -251,6 +251,10 @@ export default function Dashboard() {
   // Mobile icon helper function - Updated to use Icon component
   const getMobileIcon = (iconName: string) => {
     return <Icon name={iconName} size={24} className="text-gray-600 dark:text-gray-300" />
+  }
+
+  const getMobileFrequentIcon = (iconName: string) => {
+    return <Icon name={iconName} size={24} className="text-white" />
   }
 
   const toggleDarkMode = () => {
@@ -666,7 +670,7 @@ export default function Dashboard() {
                 />
               </div>
             )}
-            <AIAssistantButton currentForm="HEDIS" currentField="mobile" currentStep={1} />
+            <HelperButton currentForm="HEDIS" currentField="mobile" currentStep={1} />
           </div>
         )
       case 'pic':
@@ -675,184 +679,185 @@ export default function Dashboard() {
             {mobilePICView === 'landing' ? (
               <div className="p-4">
                 {/* Mobile P.I.C. Header */}
-                <div className="mb-4">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">P.I.C. Actions</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Quick access to all provider interface center actions</p>
-              
-              {/* Mobile Search */}
-              <div className="relative mb-4">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+                <div className="pic-actions-mobile-header mb-4">
+                  <h2 className="pic-actions-mobile-title text-xl font-bold text-gray-900 dark:text-white mb-3">P.I.C. Actions</h2>
+                  <p className="pic-actions-mobile-subtitle text-sm text-gray-600 dark:text-gray-400 mb-4">Quick access to all provider interface center actions</p>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search actions..."
-                  value={mobileSearchTerm}
-                  onChange={(e) => setMobileSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                {mobileSearchTerm && (
-                  <button
-                    onClick={() => setMobileSearchTerm('')}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                    aria-label="Clear search"
-                  >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              
+                {/* Mobile Search */}
+                <div className="pic-actions-mobile-search relative mb-4">
+                  <div className="pic-actions-mobile-search-icon absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                  </button>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search actions..."
+                    value={mobileSearchTerm}
+                    onChange={(e) => setMobileSearchTerm(e.target.value)}
+                    className="pic-actions-mobile-search-input w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  {mobileSearchTerm && (
+                    <button
+                      onClick={() => setMobileSearchTerm('')}
+                      className="pic-actions-mobile-search-clear absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                      aria-label="Clear search"
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* Mobile Category Filter */}
+                <div className="pic-actions-mobile-categories mb-4">
+                  <select 
+                    value={mobileSelectedCategory}
+                    onChange={(e) => setMobileSelectedCategory(e.target.value)}
+                    className="pic-actions-mobile-category-select w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="eligibility">Eligibility</option>
+                    <option value="claims">Claims</option>
+                    <option value="plans">Health Plans & Payments</option>
+                    <option value="authorization">Authorization</option>
+                    <option value="resources">Resources & Tools</option>
+                  </select>
+                </div>
+
+                {/* Mobile Frequently Used Actions */}
+                {mobileSearchTerm === '' && mobileSelectedCategory === 'all' && (
+                  <div className="pic-actions-mobile-frequent mb-6">
+                    <h3 className="pic-actions-mobile-frequent-title text-lg font-semibold text-gray-900 dark:text-white mb-3">Frequently Used Actions</h3>
+                    <div className="pic-actions-mobile-frequent-list space-y-3">
+                      {mobileActions
+                        .filter(action => action.frequency >= 80)
+                        .slice(0, 3)
+                        .map((action) => (
+                          <div key={action.id} className="pic-actions-mobile-frequent-card bg-blue-50 dark:bg-blue-900/10 border border-blue-300 dark:border-blue-600 rounded-lg shadow-sm p-4">
+                            <div className="flex items-center">
+                              <div className="pic-actions-mobile-frequent-icon flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
+                                {getMobileFrequentIcon(action.icon)}
+                              </div>
+                              <div className="pic-actions-mobile-frequent-content flex-1">
+                                <h3 className="pic-actions-mobile-frequent-title text-sm font-medium text-gray-900 dark:text-white">{action.title}</h3>
+                                <p className="pic-actions-mobile-frequent-description text-xs text-gray-500 dark:text-gray-400 mt-1">{action.description}</p>
+                              </div>
+                              <div className="pic-actions-mobile-frequent-badge flex-shrink-0">
+                                <span className="pic-actions-mobile-frequent-badge-popular inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                  Popular
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
                 )}
-              </div>
 
-              {/* Mobile Category Filter */}
-              <div className="mb-4">
-                <select 
-                  value={mobileSelectedCategory}
-                  onChange={(e) => setMobileSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="eligibility">Eligibility</option>
-                  <option value="claims">Claims</option>
-                  <option value="plans">Health Plans & Payments</option>
-                  <option value="authorization">Authorization</option>
-                  <option value="resources">Resources & Tools</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Mobile Frequently Used Actions */}
-            {mobileSearchTerm === '' && mobileSelectedCategory === 'all' && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Frequently Used Actions</h3>
-                <div className="space-y-3">
-                  {mobileActions
-                    .filter(action => action.frequency >= 80)
-                    .slice(0, 3)
-                    .map((action) => (
-                      <div key={action.id} className="bg-blue-50 dark:bg-blue-900/10 border border-blue-300 dark:border-blue-600 rounded-lg shadow-sm p-4">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-4 text-white">
-                            {getMobileIcon(action.icon)}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">{action.title}</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{action.description}</p>
-                          </div>
-                          <div className="flex-shrink-0">
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                {/* Mobile Action Cards */}
+                <div className="pic-actions-mobile-cards space-y-3">
+                  {filteredMobileActions.map((action) => (
+                    <div 
+                      key={action.id} 
+                      className="pic-actions-mobile-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => handleMobileAction(action.id)}
+                    >
+                      <div className="flex items-center">
+                        <div className="pic-actions-mobile-card-icon flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
+                          {getMobileIcon(action.icon)}
+                        </div>
+                        <div className="pic-actions-mobile-card-content flex-1">
+                          <h3 className="pic-actions-mobile-card-title text-sm font-medium text-gray-900 dark:text-white">{action.title}</h3>
+                          <p className="pic-actions-mobile-card-description text-xs text-gray-500 dark:text-gray-400 mt-1">{action.description}</p>
+                        </div>
+                        <div className="pic-actions-mobile-card-badge flex-shrink-0">
+                          {action.frequency >= 80 ? (
+                            <span className="pic-actions-mobile-card-badge-popular inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
                               Popular
                             </span>
-                          </div>
+                          ) : action.frequency >= 60 ? (
+                            <span className="pic-actions-mobile-card-badge-active inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                              </svg>
+                              Active
+                            </span>
+                          ) : action.frequency >= 40 ? (
+                            <span className="pic-actions-mobile-card-badge-regular inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                              </svg>
+                              Regular
+                            </span>
+                          ) : (
+                            <span className="pic-actions-mobile-card-badge-new">
+                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                              </svg>
+                              New
+                            </span>
+                          )}
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-
-            {/* Mobile Action Cards */}
-            <div className="space-y-3">
-              {filteredMobileActions.map((action) => (
-                <div 
-                  key={action.id} 
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  onClick={() => handleMobileAction(action.id)}
-                >
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
-                      {getMobileIcon(action.icon)}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">{action.title}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{action.description}</p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {action.frequency >= 80 ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          Popular
-                        </span>
-                      ) : action.frequency >= 60 ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                          </svg>
-                          Active
-                        </span>
-                      ) : action.frequency >= 40 ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                          </svg>
-                          Regular
-                        </span>
-                      ) : (
-                        <span className="pic-badge-new">
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                          </svg>
-                          New
-                        </span>
-                      )}
-                    </div>
-                  </div>
+            ) : mobilePICView === 'patient-eligibility' ? (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => setMobilePICView('landing')}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Eligibility</h2>
                 </div>
-              ))}
-            </div>
+                <PatientEligibilityForm />
+                                              <HelperButton currentForm="PatientEligibility" currentField="mobile" currentStep={1} />
+                            </div>
+                          ) : mobilePICView === 'claims-submission' ? (
+                            <div className="p-4">
+                              <div className="flex items-center mb-4">
+                                <button
+                                  onClick={() => setMobilePICView('landing')}
+                                  className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                >
+                                  <Icon name="arrow-left" size={20} />
+                                </button>
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Claims Submission</h2>
+                              </div>
+                              <ClaimsSubmissionForm />
+                              <HelperButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} />
+                            </div>
+                          ) : mobilePICView === 'prescription' ? (
+                            <div className="p-4">
+                              <div className="flex items-center mb-4">
+                                <button
+                                  onClick={() => setMobilePICView('landing')}
+                                  className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                >
+                                  <Icon name="arrow-left" size={20} />
+                                </button>
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Entry</h2>
+                              </div>
+                              <PrescriptionForm />
+                              <HelperButton currentForm="Prescription" currentField="mobile" currentStep={1} />
+                            </div>
+                          ) : null}
+                          <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} />
           </div>
-        ) : mobilePICView === 'patient-eligibility' ? (
-          <div className="p-4">
-            <div className="flex items-center mb-4">
-              <button
-                onClick={() => setMobilePICView('landing')}
-                className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-              >
-                <Icon name="arrow-left" size={20} />
-              </button>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Eligibility</h2>
-            </div>
-            <PatientEligibilityForm />
-            <AIAssistantButton currentForm="PatientEligibility" currentField="mobile" currentStep={1} />
-          </div>
-        ) : mobilePICView === 'claims-submission' ? (
-          <div className="p-4">
-            <div className="flex items-center mb-4">
-              <button
-                onClick={() => setMobilePICView('landing')}
-                className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-              >
-                <Icon name="arrow-left" size={20} />
-              </button>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Claims Submission</h2>
-            </div>
-            <ClaimsSubmissionForm />
-            <AIAssistantButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} />
-          </div>
-        ) : mobilePICView === 'prescription' ? (
-          <div className="p-4">
-            <div className="flex items-center mb-4">
-              <button
-                onClick={() => setMobilePICView('landing')}
-                className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-              >
-                <Icon name="arrow-left" size={20} />
-              </button>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Entry</h2>
-            </div>
-            <PrescriptionForm />
-            <AIAssistantButton currentForm="Prescription" currentField="mobile" currentStep={1} />
-          </div>
-        )}
-        <AIAssistantButton currentForm="PIC" currentField="mobile" currentStep={1} />
-      </div>
+        )
       case 'reports':
         return (
           <div className="p-6">

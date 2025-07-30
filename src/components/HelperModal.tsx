@@ -22,7 +22,7 @@ interface Message {
   animation?: 'typing' | 'fade-in' | 'slide-in'
 }
 
-interface AIAssistantProps {
+interface HelperModalProps {
   isOpen: boolean
   onClose: () => void
   currentForm?: string
@@ -89,14 +89,14 @@ const MEDICAL_BILLING_KNOWLEDGE = {
   }
 }
 
-export default function AIAssistant({ 
+export default function HelperModal({ 
   isOpen, 
   onClose, 
   currentForm, 
   currentField, 
   currentStep,
   onFieldSuggestion 
-}: AIAssistantProps) {
+}: HelperModalProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -575,31 +575,31 @@ export default function AIAssistant({
   return (
     <>
       {isOpen && createPortal(
-        <div className="fixed inset-0 z-[99999] flex items-end justify-end p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+        <div className="ai-helper-modal fixed inset-0 z-[99999] flex items-end justify-end p-4">
+          <div className="ai-helper-overlay absolute inset-0 bg-black/50" onClick={onClose} />
           
-          <div className="relative w-full max-w-md h-[600px] bg-white dark:bg-gray-900 rounded-t-xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col">
+          <div className="ai-helper-container relative w-full max-w-md h-[600px] bg-white dark:bg-gray-900 rounded-t-xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-xl">
+            <div className="ai-helper-header flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-xl">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                <div className="ai-helper-icon w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                   <Icon name="bot" size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">M.I.L.A.</h3>
-                  <p className="text-white/80 text-xs">Medical Intelligence & Learning Assistant</p>
+                  <h3 className="ai-helper-title text-white font-semibold">M.I.L.A.</h3>
+                  <p className="ai-helper-subtitle text-white/80 text-xs">Medical Intelligence & Learning Assistant</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setShowSettings(true)}
-                  className="p-2 text-white/80 hover:text-white transition-colors"
+                  className="ai-helper-settings-btn p-2 text-white/80 hover:text-white transition-colors"
                 >
                   <Icon name="settings" size={16} />
                 </button>
                 <button
                   onClick={onClose}
-                  className="p-2 text-white/80 hover:text-white transition-colors"
+                  className="ai-helper-close-btn p-2 text-white/80 hover:text-white transition-colors"
                 >
                   <Icon name="x" size={16} />
                 </button>
@@ -608,16 +608,16 @@ export default function AIAssistant({
 
             {/* Quick Actions */}
             {currentForm && currentField && (
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+              <div className="ai-helper-quick-actions p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <div className="ai-helper-quick-actions-title text-xs text-gray-600 dark:text-gray-400 mb-2">
                   Quick Actions for {currentField}
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="ai-helper-quick-actions-grid grid grid-cols-2 gap-2">
                   {quickActions.map((action) => (
                     <button
                       key={action.id}
                       onClick={action.action}
-                      className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 text-xs"
+                      className="ai-helper-quick-action-btn flex items-center space-x-2 p-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 text-xs"
                     >
                       <Icon name={action.icon} size={14} className="text-blue-500" />
                       <span className="text-gray-700 dark:text-gray-300">{action.label}</span>
@@ -628,7 +628,7 @@ export default function AIAssistant({
             )}
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="ai-helper-messages flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message, index) => (
                 <div
                   key={message.id}
@@ -751,20 +751,20 @@ export default function AIAssistant({
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-              <form onSubmit={handleSubmit} className="flex space-x-2">
+            <div className="ai-helper-input p-4 border-t border-gray-200 dark:border-gray-700">
+              <form onSubmit={handleSubmit} className="ai-helper-form flex space-x-2">
                 <input
                   ref={inputRef}
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask M.I.L.A. anything..."
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-200"
+                  className="ai-helper-input-field flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-200"
                 />
                 <button
                   type="submit"
                   disabled={!inputValue.trim()}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+                  className="ai-helper-send-btn px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
                 >
                   <Icon name="send" size={16} />
                 </button>

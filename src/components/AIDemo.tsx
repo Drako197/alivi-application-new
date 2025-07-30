@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 import MedicalAPIService from '../services/MedicalAPIService'
 import Icon from './Icon'
 
@@ -196,7 +196,7 @@ export default function AIDemo() {
       </div>
 
       {/* AI Assistant Button */}
-      <AIAssistantButton
+      <HelperButton
         currentForm="AIDemo"
         currentField="demo"
         currentStep={1}

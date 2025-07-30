@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Icon from './Icon'
 import DatePicker from './DatePicker'
 import ReservedBenefitsPageStandalone from './ReservedBenefitsPage'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 
 interface PatientEligibilityFormProps {
   onBack?: () => void
@@ -1369,7 +1369,7 @@ export default function PatientEligibilityForm({
       <EligibilityTypeModal />
       
       {/* AI Assistant Button */}
-      <AIAssistantButton
+      <HelperButton
         currentForm="PatientEligibilityForm"
         currentField={currentField}
         currentStep={currentStep}

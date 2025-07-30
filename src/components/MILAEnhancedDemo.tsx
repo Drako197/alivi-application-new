@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 import PersonalizationService from '../services/PersonalizationService'
 import ProactiveSuggestionsService from '../services/ProactiveSuggestionsService'
 import ProactiveSuggestionsTest from './ProactiveSuggestionsTest'
@@ -340,7 +340,7 @@ export default function MILAEnhancedDemo() {
       )}
 
       {/* M.I.L.A. Assistant Button */}
-      <AIAssistantButton
+      <HelperButton
         currentForm="PatientEligibilityForm"
         currentField="providerId"
         currentStep={1}

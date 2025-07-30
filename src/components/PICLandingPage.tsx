@@ -4,7 +4,7 @@ import Icon from './Icon'
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
-import AIAssistantButton from './AIAssistantButton'
+import HelperButton from './HelperButton'
 
 interface ActionItem {
   id: string
@@ -143,23 +143,23 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   }
 
   return (
-    <div className="pic-landing-page">
+    <div className="pic-actions-page">
       {/* Header */}
-      <div className="pic-header">
+      <div className="pic-actions-header">
         <div>
-          <h1 className="pic-title">P.I.C. Actions</h1>
-          <p className="pic-subtitle">Quick access to all provider interface center actions</p>
+          <h1 className="pic-actions-title">P.I.C. Actions</h1>
+          <p className="pic-actions-subtitle">Quick access to all provider interface center actions</p>
         </div>
-        <div className="pic-view-toggle">
+        <div className="pic-actions-view-toggle">
           <button
             onClick={() => setViewMode('grid')}
-            className={`pic-toggle-btn ${viewMode === 'grid' ? 'pic-toggle-active' : ''}`}
+            className={`pic-actions-toggle-btn ${viewMode === 'grid' ? 'pic-actions-toggle-active' : ''}`}
           >
             <Icon name="grid" size={16} />
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={`pic-toggle-btn ${viewMode === 'list' ? 'pic-toggle-active' : ''}`}
+            className={`pic-actions-toggle-btn ${viewMode === 'list' ? 'pic-actions-toggle-active' : ''}`}
           >
             <Icon name="list" size={16} />
           </button>
@@ -167,15 +167,15 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       </div>
 
       {/* Search */}
-      <div className="pic-search">
-        <div className="pic-search-container">
-          <Icon name="search" size={20} className="pic-search-icon" />
+      <div className="pic-actions-search">
+        <div className="pic-actions-search-container">
+          <Icon name="search" size={20} className="pic-actions-search-icon" />
           <input
             type="text"
             placeholder="Search actions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pic-search-input"
+            className="pic-actions-search-input"
           />
           {searchTerm && (
             <button
@@ -190,16 +190,16 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       </div>
 
       {/* Category Filters */}
-      <div className="pic-categories">
-        <div className="pic-categories-container">
+      <div className="pic-actions-categories">
+        <div className="pic-actions-categories-container">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`pic-category-btn ${selectedCategory === category.id ? 'pic-category-active' : ''}`}
+              className={`pic-actions-category-btn ${selectedCategory === category.id ? 'pic-actions-category-active' : ''}`}
             >
               <span>{category.name}</span>
-              <span className="pic-category-count">{category.count}</span>
+              <span className="pic-actions-category-count">{category.count}</span>
             </button>
           ))}
         </div>
@@ -207,43 +207,43 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
 
       {/* Frequently Used Actions */}
       {searchTerm === '' && selectedCategory === 'all' && (
-        <div className="pic-section">
-          <h2 className="pic-section-title">Frequently Used Actions</h2>
+        <div className="pic-actions-section">
+          <h2 className="pic-actions-section-title">Frequently Used Actions</h2>
           <div className={`pic-actions-grid ${viewMode === 'list' ? 'pic-actions-list' : ''}`}>
             {frequentActions.map((action) => (
               <div
                 key={action.id}
                 onClick={() => handleActionClick(action)}
-                className={`pic-action-card group pic-frequent-action ${viewMode === 'list' ? 'flex items-center space-x-4 p-4' : ''}`}
+                className={`pic-actions-card group pic-actions-frequent ${viewMode === 'list' ? 'flex items-center space-x-4 p-4' : ''}`}
               >
-                <div className={`pic-action-icon ${viewMode === 'list' ? 'flex-shrink-0' : ''}`}>
+                <div className={`pic-actions-icon ${viewMode === 'list' ? 'flex-shrink-0' : ''}`}>
                   {getFrequentIcon(action.icon)}
                 </div>
-                <div className={`pic-action-content ${viewMode === 'list' ? 'flex-1 min-w-0' : ''}`}>
-                  <div className="pic-action-badge">
+                <div className={`pic-actions-content ${viewMode === 'list' ? 'flex-1 min-w-0' : ''}`}>
+                  <div className="pic-actions-badge">
                     {action.frequency >= 80 ? (
-                      <span className="pic-badge-popular">
+                      <span className="pic-actions-badge-popular">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                         Popular
                       </span>
                     ) : action.frequency >= 60 ? (
-                      <span className="pic-badge-active">
+                      <span className="pic-actions-badge-active">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                         </svg>
                         Active
                       </span>
                     ) : action.frequency >= 40 ? (
-                      <span className="pic-badge-regular">
+                      <span className="pic-actions-badge-regular">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                         </svg>
                         Regular
                       </span>
                     ) : (
-                      <span className="pic-badge-new">
+                      <span className="pic-actions-badge-new">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                         </svg>
@@ -251,8 +251,8 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
                       </span>
                     )}
                   </div>
-                  <h3 className={`pic-action-title ${viewMode === 'list' ? 'text-base font-medium mb-1' : ''}`}>{action.name}</h3>
-                  <p className={`pic-action-description ${viewMode === 'list' ? 'text-sm text-gray-600 dark:text-gray-400' : ''}`}>{action.description}</p>
+                  <h3 className={`pic-actions-title ${viewMode === 'list' ? 'text-base font-medium mb-1' : ''}`}>{action.name}</h3>
+                  <p className={`pic-actions-description ${viewMode === 'list' ? 'text-sm text-gray-600 dark:text-gray-400' : ''}`}>{action.description}</p>
                 </div>
               </div>
             ))}
@@ -261,8 +261,8 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       )}
 
       {/* All Actions */}
-      <div className="pic-section">
-        <h2 className="pic-section-title">
+      <div className="pic-actions-section">
+        <h2 className="pic-actions-section-title">
           {searchTerm || selectedCategory !== 'all' ? 'Search Results' : 'All Actions'}
         </h2>
         {filteredActions.length > 0 ? (
@@ -271,36 +271,36 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
               <div
                 key={action.id}
                 onClick={() => handleActionClick(action)}
-                className={`pic-action-card group ${viewMode === 'list' ? 'flex items-center space-x-4 p-4' : ''}`}
+                className={`pic-actions-card group ${viewMode === 'list' ? 'flex items-center space-x-4 p-4' : ''}`}
               >
-                <div className={`pic-action-icon ${viewMode === 'list' ? 'flex-shrink-0' : ''}`}>
+                <div className={`pic-actions-icon ${viewMode === 'list' ? 'flex-shrink-0' : ''}`}>
                   {getIcon(action.icon)}
                 </div>
-                <div className={`pic-action-content ${viewMode === 'list' ? 'flex-1 min-w-0' : ''}`}>
-                  <div className="pic-action-badge">
+                <div className={`pic-actions-content ${viewMode === 'list' ? 'flex-1 min-w-0' : ''}`}>
+                  <div className="pic-actions-badge">
                     {action.frequency >= 80 ? (
-                      <span className="pic-badge-popular">
+                      <span className="pic-actions-badge-popular">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                         Popular
                       </span>
                     ) : action.frequency >= 60 ? (
-                      <span className="pic-badge-active">
+                      <span className="pic-actions-badge-active">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                         </svg>
                         Active
                       </span>
                     ) : action.frequency >= 40 ? (
-                      <span className="pic-badge-regular">
+                      <span className="pic-actions-badge-regular">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                         </svg>
                         Regular
                       </span>
                     ) : (
-                      <span className="pic-badge-new">
+                      <span className="pic-actions-badge-new">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                         </svg>
@@ -308,19 +308,19 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
                       </span>
                     )}
                   </div>
-                  <h3 className={`pic-action-title ${viewMode === 'list' ? 'text-base font-medium mb-1' : ''}`}>{action.name}</h3>
-                  <p className={`pic-action-description ${viewMode === 'list' ? 'text-sm text-gray-600 dark:text-gray-400' : ''}`}>{action.description}</p>
+                  <h3 className={`pic-actions-title ${viewMode === 'list' ? 'text-base font-medium mb-1' : ''}`}>{action.name}</h3>
+                  <p className={`pic-actions-description ${viewMode === 'list' ? 'text-sm text-gray-600 dark:text-gray-400' : ''}`}>{action.description}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="pic-empty-state">
-            <svg className="pic-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="pic-actions-empty-state">
+            <svg className="pic-actions-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <h3 className="pic-empty-title">No actions found</h3>
-            <p className="pic-empty-description">
+            <h3 className="pic-actions-empty-title">No actions found</h3>
+            <p className="pic-actions-empty-description">
               Try adjusting your search terms or category filter
             </p>
           </div>
@@ -328,7 +328,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       </div>
       
       {/* M.I.L.A. AI Assistant */}
-      <AIAssistantButton 
+      <HelperButton 
         currentForm="PIC"
         currentField="landing"
         currentStep={1}

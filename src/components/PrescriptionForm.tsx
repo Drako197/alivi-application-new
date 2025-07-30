@@ -927,7 +927,7 @@ export default function PrescriptionForm({
             <button
               type="button"
               onClick={handleSave}
-              className="btn-secondary flex items-center gap-2"
+              className="flex items-center gap-2 px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isSubmitting}
             >
               <Icon name="save" size={16} />

@@ -4,6 +4,7 @@ import Icon from './Icon'
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
+import AIAssistantButton from './AIAssistantButton'
 
 interface ActionItem {
   id: string
@@ -325,6 +326,13 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
           </div>
         )}
       </div>
+      
+      {/* M.I.L.A. AI Assistant */}
+      <AIAssistantButton 
+        currentForm="PIC"
+        currentField="landing"
+        currentStep={1}
+      />
     </div>
   )
 } 

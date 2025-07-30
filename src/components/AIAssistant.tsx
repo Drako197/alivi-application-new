@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import Icon from './Icon'
 import PersonalizationService from '../services/PersonalizationService'
 import ProactiveSuggestionsService, { type ProactiveSuggestion } from '../services/ProactiveSuggestionsService'
+import { PredictiveSuggestionsService } from '../services/PredictiveSuggestionsService'
 import PersonalizationSettings from './PersonalizationSettings'
 import AIAssistantService from '../services/AIAssistantService'
+import { createPortal } from 'react-dom'
 
 interface Message {
   id: string
@@ -101,6 +103,8 @@ export default function AIAssistant({
   const [proactiveSuggestions, setProactiveSuggestions] = useState<ProactiveSuggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [predictiveSuggestions, setPredictiveSuggestions] = useState<any[]>([])
+  const [showPredictiveSuggestions, setShowPredictiveSuggestions] = useState(false)
   const [conversationContext, setConversationContext] = useState<{
     lastCode?: string
     lastTopic?: string
@@ -148,6 +152,77 @@ export default function AIAssistant({
       // }, 2000)
     }
   }, [isOpen, messages.length])
+
+  // Add predictive suggestions when assistant opens
+  useEffect(() => {
+    if (isOpen && currentForm && currentField) {
+      loadPredictiveSuggestions()
+    }
+  }, [isOpen, currentForm, currentField, currentStep])
+
+  const loadPredictiveSuggestions = async () => {
+    try {
+      console.log('Loading predictive suggestions for:', { currentForm, currentField, currentStep })
+      
+      const suggestions = await PredictiveSuggestionsService.generatePredictiveSuggestions(
+        currentForm || '',
+        currentField || '',
+        currentStep || 1,
+        {} // Add form data if available
+      )
+      
+      console.log('Generated suggestions:', suggestions)
+      
+      if (suggestions.length > 0) {
+        setPredictiveSuggestions(suggestions)
+        setShowPredictiveSuggestions(true)
+        
+        // Add a welcome message with suggestions
+        const welcomeMessage = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. Here are some suggestions for the ${currentField} field:`
+        addMessage('assistant', welcomeMessage, 'fade-in')
+      } else {
+        // Add a general welcome message if no specific suggestions
+        const generalWelcome = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
+        addMessage('assistant', generalWelcome, 'fade-in')
+      }
+    } catch (error) {
+      console.error('Error loading predictive suggestions:', error)
+      // Add fallback welcome message
+      const fallbackMessage = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your medical billing questions!`
+      addMessage('assistant', fallbackMessage, 'fade-in')
+    }
+  }
+
+  const handlePredictiveSuggestionClick = async (suggestion: any) => {
+    try {
+      // Process the suggestion action
+      let response = ''
+      
+      switch (suggestion.action.type) {
+        case 'search':
+          response = await AIAssistantService.processUserInput(suggestion.action.data.query, {
+            formType: currentForm,
+            currentField: currentField,
+            currentStep: currentStep
+          })
+          break
+        case 'explain':
+          response = await AIAssistantService.processUserInput(`explain ${suggestion.action.data.topic}`, {
+            formType: currentForm,
+            currentField: currentField,
+            currentStep: currentStep
+          })
+          break
+        default:
+          response = `I'd be happy to help you with ${suggestion.title}! ${suggestion.description}`
+      }
+      
+      addMessage('assistant', response, 'fade-in')
+      setShowPredictiveSuggestions(false)
+    } catch (error) {
+      console.error('Error handling predictive suggestion:', error)
+    }
+  }
 
   // Provide contextual help when field changes
   useEffect(() => {
@@ -305,173 +380,256 @@ export default function AIAssistant({
     }
   }
 
+  // Quick actions for common form field tasks
+  const quickActions = [
+    {
+      id: 'field-help',
+      label: 'Field Help',
+      icon: 'help-circle',
+      action: () => {
+        if (currentField) {
+          processUserMessage(`Help me with the ${currentField} field`)
+        }
+      }
+    },
+    {
+      id: 'search-codes',
+      label: 'Search Codes',
+      icon: 'search',
+      action: () => {
+        processUserMessage('Search for medical codes')
+      }
+    },
+    {
+      id: 'validate-field',
+      label: 'Validate',
+      icon: 'check-circle',
+      action: () => {
+        if (currentField) {
+          processUserMessage(`Validate the ${currentField} field`)
+        }
+      }
+    },
+    {
+      id: 'next-step',
+      label: 'Next Step',
+      icon: 'arrow-right',
+      action: () => {
+        processUserMessage('What is the next step?')
+      }
+    }
+  ]
+
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md h-[600px] flex flex-col animate-slide-up">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-              <Icon name="brain" size={18} className="text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">M.I.L.A.</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">Medical Intelligence & Learning Assistant</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Your friendly medical billing companion</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setShowSettings(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title="M.I.L.A. Settings"
-            >
-              <Icon name="settings" size={20} className="text-gray-500 dark:text-gray-400" />
-            </button>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <Icon name="x" size={20} className="text-gray-500 dark:text-gray-400" />
-            </button>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex space-x-2">
-            <button
-              onClick={() => handleQuickAction('terminology')}
-              className="flex-1 px-3 py-2 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 hover:scale-105"
-            >
-              Terminology
-            </button>
-            <button
-              onClick={() => handleQuickAction('codes')}
-              className="flex-1 px-3 py-2 text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-all duration-200 hover:scale-105"
-            >
-              Codes
-            </button>
-            <button
-              onClick={() => handleQuickAction('form-help')}
-              className="flex-1 px-3 py-2 text-xs font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-all duration-200 hover:scale-105"
-            >
-              Form Help
-            </button>
-          </div>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((message, index) => (
-            <div
-              key={message.id}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-${message.animation || 'fade-in'}`}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div
-                className={`max-w-[80%] rounded-lg px-4 py-2 transition-all duration-300 ${
-                  message.type === 'user'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
-                    : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white shadow-md'
-                }`}
-              >
-                <div className="whitespace-pre-wrap text-sm">{message.content}</div>
-                <div className={`text-xs mt-1 ${
-                  message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
-                }`}>
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-            </div>
-          ))}
+    <>
+      {isOpen && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-end justify-end p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={onClose} />
           
-          {isTyping && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-lg px-4 py-2 shadow-md">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          <div className="relative w-full max-w-md h-[600px] bg-white dark:bg-gray-900 rounded-t-xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-xl">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <Icon name="bot" size={20} className="text-white" />
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">M.I.L.A. is typing...</div>
+                <div>
+                  <h3 className="text-white font-semibold">M.I.L.A.</h3>
+                  <p className="text-white/80 text-xs">Medical Intelligence & Learning Assistant</p>
+                </div>
               </div>
-            </div>
-          )}
-
-          {/* Proactive Suggestions - DISABLED */}
-          {/* {showSuggestions && proactiveSuggestions.length > 0 && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 shadow-md border border-blue-200 dark:border-blue-700">
-                <div className="flex items-center space-x-2 mb-3">
-                  <Icon name="lightbulb" size={16} className="text-yellow-500" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">M.I.L.A. Suggestions</span>
-                </div>
-                <div className="space-y-2">
-                  {proactiveSuggestions.map((suggestion) => (
-                    <button
-                      key={suggestion.id}
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-md"
-                    >
-                      <div className="flex items-start space-x-3">
-                        {suggestion.icon && (
-                          <Icon name={suggestion.icon} size={16} className="text-blue-500 mt-0.5" />
-                        )}
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                            {suggestion.title}
-                          </div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">
-                            {suggestion.content}
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => setShowSuggestions(false)}
-                  className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-2"
+                  onClick={() => setShowSettings(true)}
+                  className="p-2 text-white/80 hover:text-white transition-colors"
                 >
-                  Dismiss
+                  <Icon name="settings" size={16} />
+                </button>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-white/80 hover:text-white transition-colors"
+                >
+                  <Icon name="x" size={16} />
                 </button>
               </div>
             </div>
-          )} */}
-          
-          <div ref={messagesEndRef} />
-        </div>
 
-        {/* Input */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <form onSubmit={handleSubmit} className="flex space-x-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask M.I.L.A. anything..."
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-200"
-            />
-            <button
-              type="submit"
-              disabled={!inputValue.trim()}
-              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
-            >
-              <Icon name="send" size={16} />
-            </button>
-          </form>
-        </div>
-      </div>
+            {/* Quick Actions */}
+            {currentForm && currentField && (
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  Quick Actions for {currentField}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickActions.map((action) => (
+                    <button
+                      key={action.id}
+                      onClick={action.action}
+                      className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 text-xs"
+                    >
+                      <Icon name={action.icon} size={14} className="text-blue-500" />
+                      <span className="text-gray-700 dark:text-gray-300">{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-${message.animation || 'fade-in'}`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-lg px-4 py-2 transition-all duration-300 ${
+                      message.type === 'user'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+                        : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white shadow-md'
+                    }`}
+                  >
+                    <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                    <div className={`text-xs mt-1 ${
+                      message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {isTyping && (
+                <div className="flex justify-start animate-fade-in">
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-lg px-4 py-2 shadow-md">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">M.I.L.A. is typing...</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Proactive Suggestions - DISABLED */}
+              {/* {showSuggestions && proactiveSuggestions.length > 0 && (
+                <div className="flex justify-start animate-fade-in">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 shadow-md border border-blue-200 dark:border-blue-700">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Icon name="lightbulb" size={16} className="text-yellow-500" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">M.I.L.A. Suggestions</span>
+                    </div>
+                    <div className="space-y-2">
+                      {proactiveSuggestions.map((suggestion) => (
+                        <button
+                          key={suggestion.id}
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-md"
+                        >
+                          <div className="flex items-start space-x-3">
+                            {suggestion.icon && (
+                              <Icon name={suggestion.icon} size={16} className="text-blue-500 mt-0.5" />
+                            )}
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                {suggestion.title}
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                                {suggestion.content}
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setShowSuggestions(false)}
+                      className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-2"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              )} */}
+              
+              {/* Predictive Suggestions */}
+              {showPredictiveSuggestions && predictiveSuggestions.length > 0 && (
+                <div className="flex justify-start animate-fade-in">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 shadow-md border border-blue-200 dark:border-blue-700">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Icon name="lightbulb" size={16} className="text-yellow-500" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">M.I.L.A. Predictive Suggestions</span>
+                    </div>
+                    <div className="space-y-2">
+                      {predictiveSuggestions.map((suggestion) => (
+                        <button
+                          key={suggestion.id}
+                          onClick={() => handlePredictiveSuggestionClick(suggestion)}
+                          className="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-md"
+                        >
+                          <div className="flex items-start space-x-3">
+                            {suggestion.icon && (
+                              <Icon name={suggestion.icon} size={16} className="text-blue-500 mt-0.5" />
+                            )}
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                {suggestion.title}
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                                {suggestion.description}
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setShowPredictiveSuggestions(false)}
+                      className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-2"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+              <form onSubmit={handleSubmit} className="flex space-x-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Ask M.I.L.A. anything..."
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-200"
+                />
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim()}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+                >
+                  <Icon name="send" size={16} />
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Personalization Settings Modal */}
       <PersonalizationSettings
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
       />
-    </div>
+    </>
   )
 } 

@@ -73,6 +73,9 @@ class ProactiveSuggestionsService {
     // Compliance and regulatory suggestions
     suggestions.push(...this.getComplianceSuggestions(context))
 
+    // Integration and workflow optimization suggestions
+    suggestions.push(...this.getIntegrationSuggestions(context))
+
     return suggestions
       .sort((a, b) => this.getPriorityScore(b.priority) - this.getPriorityScore(a.priority))
       .slice(0, 3) // Limit to top 3 suggestions
@@ -1376,6 +1379,166 @@ class ProactiveSuggestionsService {
       priority: 'medium',
       category: 'compliance',
       icon: 'list'
+    })
+
+    return suggestions
+  }
+
+  /**
+   * Get integration and workflow optimization suggestions
+   */
+  private static getIntegrationSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // External system integration suggestions
+    suggestions.push(...this.getExternalSystemSuggestions(context))
+
+    // Workflow optimization suggestions
+    suggestions.push(...this.getWorkflowOptimizationSuggestions(context))
+
+    // Performance optimization suggestions
+    suggestions.push(...this.getPerformanceOptimizationSuggestions(context))
+
+    return suggestions
+  }
+
+  /**
+   * Get external system integration suggestions
+   */
+  private static getExternalSystemSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Insurance verification integration
+    suggestions.push({
+      id: 'insurance-verification',
+      type: 'predictive',
+      title: 'Insurance Verification',
+      content: 'I can help you verify insurance coverage in real-time. Would you like to check eligibility?',
+      action: 'verify_insurance',
+      priority: 'medium',
+      category: 'integration',
+      icon: 'shield-check'
+    })
+
+    // Provider lookup integration
+    if (context.currentField === 'providerId') {
+      suggestions.push({
+        id: 'provider-lookup',
+        type: 'predictive',
+        title: 'Provider Lookup',
+        content: 'Need to find a provider\'s NPI number? I can search the official CMS database for you.',
+        action: 'lookup_provider',
+        priority: 'high',
+        category: 'integration',
+        icon: 'search'
+      })
+    }
+
+    // Code updates integration
+    suggestions.push({
+      id: 'code-updates',
+      type: 'reminder',
+      title: 'Code Updates',
+      content: 'This code was updated in the latest ICD-10 release. I can help you find the current version.',
+      action: 'update_codes',
+      priority: 'medium',
+      category: 'integration',
+      icon: 'refresh-cw'
+    })
+
+    return suggestions
+  }
+
+  /**
+   * Get workflow optimization suggestions
+   */
+  private static getWorkflowOptimizationSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Batch processing suggestions
+    const userStats = PersonalizationService.getUserStats()
+    if (userStats.sessionCount > 3) {
+      suggestions.push({
+        id: 'batch-processing-opt',
+        type: 'predictive',
+        title: 'Batch Processing',
+        content: 'You have 5 similar claims. Would you like to process them together to save time?',
+        action: 'batch_process',
+        priority: 'medium',
+        category: 'optimization',
+        icon: 'layers'
+      })
+    }
+
+    // Template usage suggestions
+    if (userStats.sessionCount > 5) {
+      suggestions.push({
+        id: 'template-usage',
+        type: 'predictive',
+        title: 'Template Usage',
+        content: 'I can help you create templates for frequently used information to speed up your workflow.',
+        action: 'create_template',
+        priority: 'medium',
+        category: 'optimization',
+        icon: 'file-text'
+      })
+    }
+
+    // Shortcut suggestions
+    suggestions.push({
+      id: 'keyboard-shortcuts-opt',
+      type: 'reminder',
+      title: 'Keyboard Shortcuts',
+      content: 'Use Ctrl+S to save, Ctrl+N for new forms, and Ctrl+F to search. These shortcuts can speed up your work.',
+      action: 'show_shortcuts',
+      priority: 'low',
+      category: 'optimization',
+      icon: 'keyboard'
+    })
+
+    return suggestions
+  }
+
+  /**
+   * Get performance optimization suggestions
+   */
+  private static getPerformanceOptimizationSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Auto-save suggestions
+    suggestions.push({
+      id: 'auto-save',
+      type: 'reminder',
+      title: 'Auto-Save Enabled',
+      content: 'Your work is automatically saved every 30 seconds. You can safely navigate away and return later.',
+      action: 'auto_save_info',
+      priority: 'low',
+      category: 'performance',
+      icon: 'save'
+    })
+
+    // Offline mode suggestions
+    suggestions.push({
+      id: 'offline-mode',
+      type: 'reminder',
+      title: 'Offline Capability',
+      content: 'You can work offline and sync when you reconnect. Your data is stored locally for security.',
+      action: 'offline_info',
+      priority: 'low',
+      category: 'performance',
+      icon: 'wifi-off'
+    })
+
+    // Cache optimization
+    suggestions.push({
+      id: 'cache-optimization',
+      type: 'reminder',
+      title: 'Smart Caching',
+      content: 'I cache frequently used codes and information to make your searches faster.',
+      action: 'cache_info',
+      priority: 'low',
+      category: 'performance',
+      icon: 'zap'
     })
 
     return suggestions

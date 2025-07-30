@@ -20,108 +20,87 @@ export default function ClaimsSubmissionForm({
   ])
 
   const [formData, setFormData] = useState({
-    // Provider Information
+    // Step 1: Patient Information
     providerId: '',
-    providerName: '',
-    npi: '',
-    taxId: '',
-    
-    // Patient Information
-    patientId: '',
-    patientName: '',
-    dateOfBirth: '',
-    gender: '',
-    
-    // Claim Information
-    claimType: '',
-    serviceDate: '',
-    placeOfService: '',
-    procedureCodes: '',
-    charges: '',
-    
-    // Insurance Information
-    primaryInsurance: '',
-    secondaryInsurance: '',
-    groupNumber: '',
-    memberId: '',
-    
-    // Additional Information
-    authorizationNumber: '',
-    notes: '',
-    
-    // Patient Identification (from Patient Eligibility form)
     subscriberId: '',
+    fullName: '',
     dependantSequence: '',
-    lastName: '',
-    firstName: '',
-    identificationMethod: 'subscriber' as 'subscriber' | 'name' | 'none',
-    manualProviderId: false,
-    manualSubscriberId: false,
-    manualDependantSequence: false,
-    effectiveDate: '',
+    identificationMethod: 'subscriber',
     
-    // Step 2 - Patient Information
+    // Step 2: Claim Details
     serviceDateFrom: '',
     serviceDateTo: '',
     lab: '',
     submissionForm: '',
-    
-    // Step 2 - Procedure / Exam Codes
-    routineExams: '',
-    contactLensFittings: '',
-    postCataractExam: '',
     isDiabetic: '',
     diabetesType: '',
     manifestation: '',
     wasDilated: '',
     reasonForNotDilating: '',
     reasonOther: '',
-    diagnosisCodes1: '',
-    diagnosisCodes2: '',
-    diagnosisCodes3: '',
-    diagnosisCodes4: '',
-    diagnosisCodes5: '',
-    diagnosisCodes6: '',
+    doctorSignatureAgreement: false,
+    diagnosisCodes: [{ id: 1, code: '', description: '', isPrimary: true }],
     
-      // Step 2 - Doctor's Signature Agreement
-  doctorSignatureAgreement: false,
-  // Dynamic diagnosis codes
-  diagnosisCodes: [
-    { id: 1, code: '', description: '', isPrimary: true }
-  ],
-  
-  // Step 3 - Prescription Details
-  // Refractive Correction - OD (Right Eye)
-  odSphere: '',
-  odCylinder: '',
-  odAxis: '',
-  odAdd: '',
-  odBC: '',
-  
-  // Refractive Correction - OS (Left Eye)
-  osSphere: '',
-  osCylinder: '',
-  osAxis: '',
-  osAdd: '',
-  osBC: '',
-  
-  // Prism Correction - OD (Right Eye)
-  odHorizontal: '',
-  odHorizontalDirection: '',
-  odVertical: '',
-  odVerticalDirection: '',
-  odPrismType: '',
-  
-  // Prism Correction - OS (Left Eye)
-  osHorizontal: '',
-  osHorizontalDirection: '',
-  osVertical: '',
-  osVerticalDirection: '',
-  osPrismType: '',
-  
-  // Slab Off
-  slabOff: ''
-})
+    // Step 3: Prescription Details
+    odSphere: '',
+    osSphere: '',
+    odCylinder: '',
+    osCylinder: '',
+    odAxis: '',
+    osAxis: '',
+    odAdd: '',
+    osAdd: '',
+    odBC: '',
+    osBC: '',
+    odHorizontal: '',
+    osHorizontal: '',
+    odHorizontalDirection: '',
+    osHorizontalDirection: '',
+    odVertical: '',
+    osVertical: '',
+    odVerticalDirection: '',
+    osVerticalDirection: '',
+    odPrismType: '',
+    osPrismType: '',
+    slabOff: '',
+    
+    // Step 4: Lens Choice
+    visionType: '',
+    lensType: '',
+    pdType: '',
+    material: '',
+    binocularFarPD: '',
+    binocularNearPD: '',
+    monocularFarPDOD: '',
+    monocularFarPDOS: '',
+    monocularNearPDOD: '',
+    monocularNearPDOS: '',
+    segmentHeightOD: '',
+    segmentHeightOS: '',
+    edge: '',
+    thickness: '',
+    coating: '',
+    tintShade: '',
+    tintType: '',
+    tintType2: '',
+    uvScratchResistant: false,
+    uvCoating: false,
+    scratchCoating: false,
+    td2ScratchCoating: false,
+    heatTempering: false,
+    chemicalTempering: false,
+    
+    // Step 5: Frame Selection
+    frameSource: '',
+    frameType: '',
+    rimlessType: '',
+    frameName: '',
+    frameColor: '',
+    eyeSize: '',
+    bridge: '',
+    vertical: '',
+    ed: ''
+  })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -129,7 +108,7 @@ export default function ClaimsSubmissionForm({
   const [showDiagnosisCheatSheet, setShowDiagnosisCheatSheet] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [validations, setValidations] = useState<{ [key: string]: boolean }>({})
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5 | 6>(1)
 
   // Real-world data for dropdowns
   const providerIdOptions = [
@@ -392,19 +371,8 @@ export default function ClaimsSubmissionForm({
     // Step 1 validation (Provider & Patient Info)
     if (currentStep === 1) {
       if (!formData.providerId) newErrors.providerId = 'Provider ID is required'
-      if (!formData.effectiveDate) newErrors.effectiveDate = 'Effective date is required'
-      
-      // Validate based on identification method
-      if (formData.identificationMethod === 'subscriber') {
-        if (!formData.subscriberId) newErrors.subscriberId = 'Subscriber ID is required'
-        if (!formData.dependantSequence) newErrors.dependantSequence = 'Dependent sequence is required'
-      } else if (formData.identificationMethod === 'name') {
-        if (!formData.lastName) newErrors.lastName = 'Last name is required'
-        if (!formData.firstName) newErrors.firstName = 'First name is required'
-        if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required'
-      } else {
-        newErrors.identificationMethod = 'Please select an identification method'
-      }
+      if (!formData.subscriberId) newErrors.subscriberId = 'Subscriber ID is required'
+      if (!formData.dependantSequence) newErrors.dependantSequence = 'Dependent sequence is required'
     }
     
     // Step 2 validation (Claim Details)
@@ -453,19 +421,8 @@ export default function ClaimsSubmissionForm({
     // Step 1 validation (Provider & Patient Info)
     if (currentStep === 1) {
       if (!formData.providerId) newErrors.providerId = 'Provider ID is required'
-      if (!formData.effectiveDate) newErrors.effectiveDate = 'Effective date is required'
-      
-      // Validate based on identification method
-      if (formData.identificationMethod === 'subscriber') {
-        if (!formData.subscriberId) newErrors.subscriberId = 'Subscriber ID is required'
-        if (!formData.dependantSequence) newErrors.dependantSequence = 'Dependent sequence is required'
-      } else if (formData.identificationMethod === 'name') {
-        if (!formData.lastName) newErrors.lastName = 'Last name is required'
-        if (!formData.firstName) newErrors.firstName = 'First name is required'
-        if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required'
-      } else {
-        newErrors.identificationMethod = 'Please select an identification method'
-      }
+      if (!formData.subscriberId) newErrors.subscriberId = 'Subscriber ID is required'
+      if (!formData.dependantSequence) newErrors.dependantSequence = 'Dependent sequence is required'
     }
     
     // Step 2 validation (Claim Details)
@@ -497,12 +454,6 @@ export default function ClaimsSubmissionForm({
       if (!formData.doctorSignatureAgreement) newErrors.doctorSignatureAgreement = 'Doctor signature agreement is required'
     }
     
-    // Step 3 validation (Insurance Info)
-    if (currentStep === 3) {
-      if (!formData.primaryInsurance) newErrors.primaryInsurance = 'Primary insurance is required'
-      if (!formData.memberId) newErrors.memberId = 'Member ID is required'
-    }
-    
     return Object.keys(newErrors).length === 0
   }, [currentStep, formData])
 
@@ -521,7 +472,7 @@ export default function ClaimsSubmissionForm({
     
     setIsSubmitting(false)
     setSubmitted(true)
-    setCurrentStep(4)
+    setCurrentStep(5)
   }
 
   const handleNext = () => {
@@ -534,19 +485,8 @@ export default function ClaimsSubmissionForm({
     // Step 1 validation (Provider & Patient Info)
     if (currentStep === 1) {
       if (!formData.providerId) newErrors.providerId = 'Provider ID is required'
-      if (!formData.effectiveDate) newErrors.effectiveDate = 'Effective date is required'
-      
-      // Validate based on identification method
-      if (formData.identificationMethod === 'subscriber') {
-        if (!formData.subscriberId) newErrors.subscriberId = 'Subscriber ID is required'
-        if (!formData.dependantSequence) newErrors.dependantSequence = 'Dependent sequence is required'
-      } else if (formData.identificationMethod === 'name') {
-        if (!formData.lastName) newErrors.lastName = 'Last name is required'
-        if (!formData.firstName) newErrors.firstName = 'First name is required'
-        if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required'
-      } else {
-        newErrors.identificationMethod = 'Please select an identification method'
-      }
+      if (!formData.subscriberId) newErrors.subscriberId = 'Subscriber ID is required'
+      if (!formData.dependantSequence) newErrors.dependantSequence = 'Dependent sequence is required'
     }
     
           // Step 2 validation (Claim Details)
@@ -578,10 +518,40 @@ export default function ClaimsSubmissionForm({
         if (!formData.doctorSignatureAgreement) newErrors.doctorSignatureAgreement = 'Doctor signature agreement is required'
       }
     
-    // Step 3 validation (Insurance Info)
+    // Step 3 validation (Prescription Details)
     if (currentStep === 3) {
-      if (!formData.primaryInsurance) newErrors.primaryInsurance = 'Primary insurance is required'
-      if (!formData.memberId) newErrors.memberId = 'Member ID is required'
+      // At least one eye must have sphere values
+      if (!formData.odSphere && !formData.osSphere) {
+        newErrors.odSphere = 'At least one eye sphere value is required'
+        newErrors.osSphere = 'At least one eye sphere value is required'
+      }
+      
+      // If OD sphere is selected, other OD fields should be filled
+      if (formData.odSphere && !formData.odCylinder) {
+        newErrors.odCylinder = 'Cylinder is required when sphere is selected'
+      }
+      if (formData.odSphere && !formData.odAxis) {
+        newErrors.odAxis = 'Axis is required when sphere is selected'
+      }
+      
+      // If OS sphere is selected, other OS fields should be filled
+      if (formData.osSphere && !formData.osCylinder) {
+        newErrors.osCylinder = 'Cylinder is required when sphere is selected'
+      }
+      if (formData.osSphere && !formData.osAxis) {
+        newErrors.osAxis = 'Axis is required when sphere is selected'
+      }
+    }
+    
+    // Step 4 validation (Lens Choice)
+    if (currentStep === 4) {
+      if (!formData.visionType) newErrors.visionType = 'Vision Type is required'
+      if (!formData.lensType) newErrors.lensType = 'Lens Type is required'
+      if (!formData.pdType) newErrors.pdType = 'PD Type is required'
+      if (!formData.material) newErrors.material = 'Material is required'
+      if (!formData.binocularFarPD) newErrors.binocularFarPD = 'Far PD is required'
+      if (!formData.binocularNearPD) newErrors.binocularNearPD = 'Near PD is required'
+      if (!formData.coating) newErrors.coating = 'Coating is required'
     }
     
     // If there are errors, set them and don't proceed
@@ -593,13 +563,13 @@ export default function ClaimsSubmissionForm({
     // If validation passes, show loading and proceed to next step
     setIsTransitioning(true)
     setTimeout(() => {
-      setCurrentStep(prev => Math.min(prev + 1, 4) as 1 | 2 | 3 | 4)
+      setCurrentStep(prev => Math.min(prev + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6)
       setIsTransitioning(false)
     }, 500) // 500ms delay to show loading animation
   }
 
   const handleBack = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1) as 1 | 2 | 3 | 4)
+    setCurrentStep(prev => Math.max(prev - 1, 1) as 1 | 2 | 3 | 4 | 5 | 6)
   }
 
   const handleBackToLanding = () => {
@@ -625,26 +595,38 @@ export default function ClaimsSubmissionForm({
       { number: 1, label: 'Patient Information' },
       { number: 2, label: 'Claim Details' },
       { number: 3, label: 'Prescription Details' },
-      { number: 4, label: 'Review & Submit' }
+      { number: 4, label: 'Lens Choice' },
+      { number: 5, label: 'Frame Selection' },
+      { number: 6, label: 'Review & Submit' }
     ]
 
     return (
       <div className="hedis-screening-step-indicators">
-        {steps.map((step) => (
-          <div
-            key={step.number}
-            className={`hedis-screening-step ${
-              step.number === currentStep
-                ? 'hedis-screening-step-active'
-                : step.number < currentStep
-                ? 'hedis-screening-step-completed'
-                : 'hedis-screening-step-inactive'
-            }`}
-          >
-            <div className="hedis-screening-step-number">{step.number}</div>
-            <div className="hedis-screening-step-label">{step.label}</div>
-          </div>
-        ))}
+        {steps.map((step, index) => {
+          let stepClass = 'hedis-screening-step'
+          if (currentStep > step.number) {
+            stepClass += ' hedis-screening-step-completed'
+          } else if (currentStep === step.number) {
+            stepClass += ' hedis-screening-step-active'
+          } else {
+            stepClass += ' hedis-screening-step-inactive'
+          }
+
+          return (
+            <div key={step.number} className={stepClass}>
+              <div className="hedis-screening-step-number">
+                {currentStep > step.number ? (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  step.number
+                )}
+              </div>
+              <div className="hedis-screening-step-label">{step.label}</div>
+            </div>
+          )
+        })}
       </div>
     )
   }
@@ -652,137 +634,108 @@ export default function ClaimsSubmissionForm({
   // Success Message Component
   const ClaimsSubmissionSuccess = () => {
     return (
-      <div className="hedis-screening-content">
-        <div className="text-center py-12">
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-            <Icon name="check-circle" size={32} className="text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Claim Submitted Successfully!
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
-            Your claim has been submitted and is being processed. You will receive a confirmation email with the claim reference number.
-          </p>
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Claim Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-700 dark:text-gray-300">Claim Reference:</span>
-                <span className="ml-2 text-gray-900 dark:text-white">CLM-2024-001234</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700 dark:text-gray-300">Patient:</span>
-                <span className="ml-2 text-gray-900 dark:text-white">{formData.patientName}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700 dark:text-gray-300">Service Date:</span>
-                <span className="ml-2 text-gray-900 dark:text-white">{formData.serviceDate}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700 dark:text-gray-300">Claim Type:</span>
-                <span className="ml-2 text-gray-900 dark:text-white">{formData.claimType}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={handleBackToLanding}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <Icon name="arrow-left" size={16} />
-              Back to P.I.C. Actions
-            </button>
-            <button
-              onClick={() => {
-                setFormData({
-                  providerId: '',
-                  providerName: '',
-                  npi: '',
-                  taxId: '',
-                  patientId: '',
-                  patientName: '',
-                  dateOfBirth: '',
-                  gender: '',
-                  claimType: '',
-                  serviceDate: '',
-                  placeOfService: '',
-                  procedureCodes: '',
-                  charges: '',
-                  primaryInsurance: '',
-                  secondaryInsurance: '',
-                  groupNumber: '',
-                  memberId: '',
-                  authorizationNumber: '',
-                  notes: '',
-                  subscriberId: '',
-                  dependantSequence: '',
-                  lastName: '',
-                  firstName: '',
-                  identificationMethod: 'subscriber',
-                  manualProviderId: false,
-                  manualSubscriberId: false,
-                  manualDependantSequence: false,
-                  effectiveDate: '',
-                  serviceDateFrom: '',
-                  serviceDateTo: '',
-                  lab: '',
-                  submissionForm: '',
-                  routineExams: '',
-                  contactLensFittings: '',
-                  postCataractExam: '',
-                  isDiabetic: '',
-                  diabetesType: '',
-                  manifestation: '',
-                  wasDilated: '',
-                  reasonForNotDilating: '',
-                  reasonOther: '',
-                  diagnosisCodes1: '',
-                  diagnosisCodes2: '',
-                  diagnosisCodes3: '',
-                  diagnosisCodes4: '',
-                  diagnosisCodes5: '',
-                  diagnosisCodes6: '',
-                  doctorSignatureAgreement: false,
-                  diagnosisCodes: [
-                    { id: 1, code: '', description: '', isPrimary: true }
-                  ],
-                  
-                  // Step 3 - Prescription Details
-                  odSphere: '',
-                  odCylinder: '',
-                  odAxis: '',
-                  odAdd: '',
-                  odBC: '',
-                  osSphere: '',
-                  osCylinder: '',
-                  osAxis: '',
-                  osAdd: '',
-                  osBC: '',
-                  odHorizontal: '',
-                  odHorizontalDirection: '',
-                  odVertical: '',
-                  odVerticalDirection: '',
-                  odPrismType: '',
-                  osHorizontal: '',
-                  osHorizontalDirection: '',
-                  osVertical: '',
-                  osVerticalDirection: '',
-                  osPrismType: '',
-                  slabOff: ''
-                })
-                setCurrentStep(1)
-                setSubmitted(false)
-                setErrors({})
-                setValidations({})
-              }}
-              className="btn-primary flex items-center gap-2"
-            >
-              <Icon name="plus" size={16} />
-              Submit Another Claim
-            </button>
-          </div>
+      <div className="hedis-screening-success">
+        <div className="hedis-screening-success-icon">
+          <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <h3 className="hedis-screening-success-title">Claim Submitted Successfully!</h3>
+        <p className="hedis-screening-success-description">
+          Your claim has been submitted and is being processed. You will receive a confirmation email shortly.
+        </p>
+        <div className="hedis-screening-success-actions">
+          <button
+            onClick={() => {
+              setFormData({
+                providerId: '',
+                subscriberId: '',
+                fullName: '',
+                dependantSequence: '',
+                identificationMethod: 'subscriber',
+                serviceDateFrom: '',
+                serviceDateTo: '',
+                lab: '',
+                submissionForm: '',
+                isDiabetic: '',
+                diabetesType: '',
+                manifestation: '',
+                wasDilated: '',
+                reasonForNotDilating: '',
+                reasonOther: '',
+                doctorSignatureAgreement: false,
+                diagnosisCodes: [{ id: 1, code: '', description: '', isPrimary: true }],
+                odSphere: '',
+                osSphere: '',
+                odCylinder: '',
+                osCylinder: '',
+                odAxis: '',
+                osAxis: '',
+                odAdd: '',
+                osAdd: '',
+                odBC: '',
+                osBC: '',
+                odHorizontal: '',
+                osHorizontal: '',
+                odHorizontalDirection: '',
+                osHorizontalDirection: '',
+                odVertical: '',
+                osVertical: '',
+                odVerticalDirection: '',
+                osVerticalDirection: '',
+                odPrismType: '',
+                osPrismType: '',
+                slabOff: '',
+                visionType: '',
+                lensType: '',
+                pdType: '',
+                material: '',
+                binocularFarPD: '',
+                binocularNearPD: '',
+                monocularFarPDOD: '',
+                monocularFarPDOS: '',
+                monocularNearPDOD: '',
+                monocularNearPDOS: '',
+                segmentHeightOD: '',
+                segmentHeightOS: '',
+                edge: '',
+                thickness: '',
+                coating: '',
+                tintShade: '',
+                tintType: '',
+                tintType2: '',
+                uvScratchResistant: false,
+                uvCoating: false,
+                scratchCoating: false,
+                td2ScratchCoating: false,
+                heatTempering: false,
+                chemicalTempering: false,
+                frameSource: '',
+                frameType: '',
+                rimlessType: '',
+                frameName: '',
+                frameColor: '',
+                eyeSize: '',
+                bridge: '',
+                vertical: '',
+                ed: ''
+              })
+              setCurrentStep(1)
+              setSubmitted(false)
+              setErrors({})
+              setValidations({})
+              setShowDiagnosisCheatSheet(false)
+            }}
+            className="hedis-screening-success-button"
+          >
+            Submit Another Claim
+          </button>
+          <button
+            onClick={handleBackToLanding}
+            className="hedis-screening-success-button-secondary"
+          >
+            Back to Dashboard
+          </button>
         </div>
       </div>
     )
@@ -791,14 +744,14 @@ export default function ClaimsSubmissionForm({
   // Main form content based on current step
   let stepContent
 
-  if (submitted && currentStep === 4) {
+  if (submitted && currentStep === 6) {
     stepContent = <ClaimsSubmissionSuccess />
   } else {
     stepContent = (
       <div className="hedis-screening-content">
         <div className="hedis-screening-step-content">
           <h2 className="hedis-screening-step-title">
-            Claims Submission
+            {currentStep === 2 ? 'Claim Details' : currentStep === 3 ? 'Prescription Details' : currentStep === 4 ? 'Lens Choice' : currentStep === 5 ? 'Frame Selection' : 'Claims Submission'}
           </h2>
           <p className="hedis-screening-step-description">
             Submit a new claim for processing. Please provide the required information below.
@@ -954,7 +907,7 @@ export default function ClaimsSubmissionForm({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div data-error={!!errors.subscriberId}>
                             <label htmlFor="subscriberId" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                              Subscriber ID:
+                              Subscriber ID <span className="text-red-500">*</span>
                             </label>
                             
                             {/* Subscriber ID Manual Input Checkbox */}
@@ -1023,7 +976,7 @@ export default function ClaimsSubmissionForm({
                           
                           <div data-error={!!errors.dependantSequence}>
                             <label htmlFor="dependantSequence" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                              Dependant Sequence:
+                              Dependant Sequence <span className="text-red-500">*</span>
                             </label>
                             
                             {/* Dependant Sequence Manual Input Checkbox */}
@@ -1219,7 +1172,7 @@ export default function ClaimsSubmissionForm({
 
                     <div data-error={!!errors.serviceDateTo}>
                       <label htmlFor="serviceDateTo" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Service Date (To)
+                        Service Date (To) <span className="text-red-500">*</span>
                       </label>
                       <DatePicker
                         value={formData.serviceDateTo}
@@ -1239,7 +1192,7 @@ export default function ClaimsSubmissionForm({
 
                     <div data-error={!!errors.serviceDateFrom}>
                       <label htmlFor="serviceDateFrom" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Service Date (From)
+                        Service Date (From) <span className="text-red-500">*</span>
                       </label>
                       <DatePicker
                         value={formData.serviceDateFrom}
@@ -1259,7 +1212,7 @@ export default function ClaimsSubmissionForm({
 
                     <div data-error={!!errors.lab}>
                       <label htmlFor="lab" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Lab
+                        Lab <span className="text-red-500">*</span>
                       </label>
                       <select
                         id="lab"
@@ -1283,7 +1236,7 @@ export default function ClaimsSubmissionForm({
 
                     <div data-error={!!errors.submissionForm}>
                       <label htmlFor="submissionForm" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Submission Form
+                        Submission Form <span className="text-red-500">*</span>
                       </label>
                       <select
                         id="submissionForm"
@@ -1421,7 +1374,7 @@ export default function ClaimsSubmissionForm({
                       {formData.isDiabetic === 'yes' && (
                         <div data-error={!!errors.diabetesType}>
                           <label htmlFor="diabetesType" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                            What Type of Diabetes?
+                            What Type of Diabetes? <span className="text-red-500">*</span>
                           </label>
                           <select
                             id="diabetesType"
@@ -1447,7 +1400,7 @@ export default function ClaimsSubmissionForm({
                       {formData.isDiabetic === 'yes' && (
                         <div data-error={!!errors.manifestation}>
                           <label htmlFor="manifestation" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                            What is the manifestation?
+                            What is the manifestation? <span className="text-red-500">*</span>
                           </label>
                           <select
                             id="manifestation"
@@ -1505,7 +1458,7 @@ export default function ClaimsSubmissionForm({
                       {formData.wasDilated === 'no' && (
                         <div data-error={!!errors.reasonForNotDilating}>
                           <label htmlFor="reasonForNotDilating" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                            Reason for not Dilating?
+                            Reason for not Dilating? <span className="text-red-500">*</span>
                           </label>
                           <select
                             id="reasonForNotDilating"
@@ -1531,7 +1484,7 @@ export default function ClaimsSubmissionForm({
                       {formData.reasonForNotDilating === 'other' && (
                         <div data-error={!!errors.reasonOther}>
                           <label htmlFor="reasonOther" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                            Reason (Other)
+                            Reason (Other) <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="text"
@@ -1551,7 +1504,7 @@ export default function ClaimsSubmissionForm({
 
                     <div>
                       <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Diagnosis Codes <span className="text-gray-500 text-xs">({formData.diagnosisCodes.length}/6)</span>
+                        Diagnosis Codes <span className="text-red-500">*</span> <span className="text-gray-500 text-xs">({formData.diagnosisCodes.length}/6)</span>
                       </label>
                       
                       <div className="space-y-4">
@@ -1834,7 +1787,7 @@ export default function ClaimsSubmissionForm({
                       className="mt-1 mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <label htmlFor="doctorSignatureAgreement" className="text-sm font-medium text-gray-900 dark:text-white">
-                      I attest that i have performed this eye exam, in full scope and in accordance to my State of Florida Physician's License
+                      I attest that i have performed this eye exam, in full scope and in accordance to my State of Florida Physician's License <span className="text-red-500">*</span>
                     </label>
                   </div>
                   {errors.doctorSignatureAgreement && (
@@ -1907,18 +1860,45 @@ export default function ClaimsSubmissionForm({
                     </h4>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-5 md:grid-cols-3 gap-4">
+                      {/* Parameter Labels */}
+                      <div className="lg:col-span-1">
+                        <div className="h-10"></div> {/* Spacer for header */}
+                        <div className="space-y-4">
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Sphere <span className="text-red-500">*</span></span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Cylinder <span className="text-red-500">*</span></span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Axis <span className="text-red-500">*</span></span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Add</span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">BC</span>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* OD (Right Eye) - Blue theme */}
                       <div className="lg:col-span-2 md:col-span-1">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                          <span className="font-medium text-blue-700 dark:text-blue-300">OD (Right Eye)</span>
+                        <div className="h-10 flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 rounded-t-lg border border-blue-200 dark:border-blue-800">
+                          <Icon name="eye" size={16} className="text-blue-600 dark:text-blue-400 mr-2" />
+                          <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Right Eye (OD)</span>
                         </div>
-                        <div className="grid grid-cols-1 gap-3">
+                        <div className="space-y-4 border border-blue-200 dark:border-blue-800 rounded-b-lg p-4">
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.odSphere}
-                              onChange={(e) => setFormData(prev => ({ ...prev, odSphere: e.target.value }))}
-                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, odSphere: e.target.value }))
+                                if (e.target.value && errors.odSphere) {
+                                  setErrors(prev => ({ ...prev, odSphere: '' }))
+                                }
+                              }}
+                              className={`form-select w-full border rounded-md pl-2.5 ${errors.odSphere ? 'border-red-500' : 'border-blue-300'}`}
                             >
                               <option value="">Select Sphere</option>
                               <option value="-6.00">-6.00</option>
@@ -1972,11 +1952,19 @@ export default function ClaimsSubmissionForm({
                               <option value="+6.00">+6.00</option>
                             </select>
                           </div>
+                          {errors.odSphere && (
+                            <p className="mt-1 text-sm text-red-600">{errors.odSphere}</p>
+                          )}
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.odCylinder}
-                              onChange={(e) => setFormData(prev => ({ ...prev, odCylinder: e.target.value }))}
-                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, odCylinder: e.target.value }))
+                                if (e.target.value && errors.odCylinder) {
+                                  setErrors(prev => ({ ...prev, odCylinder: '' }))
+                                }
+                              }}
+                              className={`form-select w-full border rounded-md pl-2.5 ${errors.odCylinder ? 'border-red-500' : 'border-blue-300'}`}
                             >
                               <option value="">Select Cylinder</option>
                               <option value="-6.00">-6.00</option>
@@ -2033,12 +2021,17 @@ export default function ClaimsSubmissionForm({
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.odAxis}
-                              onChange={(e) => setFormData(prev => ({ ...prev, odAxis: e.target.value }))}
-                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, odAxis: e.target.value }))
+                                if (e.target.value && errors.odAxis) {
+                                  setErrors(prev => ({ ...prev, odAxis: '' }))
+                                }
+                              }}
+                              className={`form-select w-full border rounded-md pl-2.5 ${errors.odAxis ? 'border-red-500' : 'border-blue-300'}`}
                             >
                               <option value="">Select Axis</option>
-                              {Array.from({ length: 181 }, (_, i) => (
-                                <option key={i} value={i.toString()}>{i}</option>
+                              {Array.from({ length: 180 }, (_, i) => i + 1).map(num => (
+                                <option key={num} value={num.toString()}>{num}</option>
                               ))}
                             </select>
                           </div>
@@ -2059,10 +2052,6 @@ export default function ClaimsSubmissionForm({
                               <option value="+2.50">+2.50</option>
                               <option value="+2.75">+2.75</option>
                               <option value="+3.00">+3.00</option>
-                              <option value="+3.25">+3.25</option>
-                              <option value="+3.50">+3.50</option>
-                              <option value="+3.75">+3.75</option>
-                              <option value="+4.00">+4.00</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2072,27 +2061,17 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-blue-300"
                             >
                               <option value="">Select BC</option>
-                              <option value="8.0">8.0</option>
-                              <option value="8.1">8.1</option>
-                              <option value="8.2">8.2</option>
-                              <option value="8.3">8.3</option>
-                              <option value="8.4">8.4</option>
-                              <option value="8.5">8.5</option>
-                              <option value="8.6">8.6</option>
-                              <option value="8.7">8.7</option>
-                              <option value="8.8">8.8</option>
-                              <option value="8.9">8.9</option>
-                              <option value="9.0">9.0</option>
-                              <option value="9.1">9.1</option>
-                              <option value="9.2">9.2</option>
-                              <option value="9.3">9.3</option>
-                              <option value="9.4">9.4</option>
-                              <option value="9.5">9.5</option>
-                              <option value="9.6">9.6</option>
-                              <option value="9.7">9.7</option>
-                              <option value="9.8">9.8</option>
-                              <option value="9.9">9.9</option>
-                              <option value="10.0">10.0</option>
+                              <option value="0.50">0.50</option>
+                              <option value="0.75">0.75</option>
+                              <option value="1.00">1.00</option>
+                              <option value="1.25">1.25</option>
+                              <option value="1.50">1.50</option>
+                              <option value="1.75">1.75</option>
+                              <option value="2.00">2.00</option>
+                              <option value="2.25">2.25</option>
+                              <option value="2.50">2.50</option>
+                              <option value="2.75">2.75</option>
+                              <option value="3.00">3.00</option>
                             </select>
                           </div>
                         </div>
@@ -2100,16 +2079,21 @@ export default function ClaimsSubmissionForm({
 
                       {/* OS (Left Eye) - Green theme */}
                       <div className="lg:col-span-2 md:col-span-1">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                          <span className="font-medium text-green-700 dark:text-green-300">OS (Left Eye)</span>
+                        <div className="h-10 flex items-center justify-center bg-green-50 dark:bg-green-900/20 rounded-t-lg border border-green-200 dark:border-green-800">
+                          <Icon name="eye" size={16} className="text-green-600 dark:text-green-400 mr-2" />
+                          <span className="text-sm font-semibold text-green-700 dark:text-green-300">Left Eye (OS)</span>
                         </div>
-                        <div className="grid grid-cols-1 gap-3">
+                        <div className="space-y-4 border border-green-200 dark:border-green-800 rounded-b-lg p-4">
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.osSphere}
-                              onChange={(e) => setFormData(prev => ({ ...prev, osSphere: e.target.value }))}
-                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, osSphere: e.target.value }))
+                                if (e.target.value && errors.osSphere) {
+                                  setErrors(prev => ({ ...prev, osSphere: '' }))
+                                }
+                              }}
+                              className={`form-select w-full border rounded-md pl-2.5 ${errors.osSphere ? 'border-red-500' : 'border-green-300'}`}
                             >
                               <option value="">Select Sphere</option>
                               <option value="-6.00">-6.00</option>
@@ -2166,8 +2150,13 @@ export default function ClaimsSubmissionForm({
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.osCylinder}
-                              onChange={(e) => setFormData(prev => ({ ...prev, osCylinder: e.target.value }))}
-                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, osCylinder: e.target.value }))
+                                if (e.target.value && errors.osCylinder) {
+                                  setErrors(prev => ({ ...prev, osCylinder: '' }))
+                                }
+                              }}
+                              className={`form-select w-full border rounded-md pl-2.5 ${errors.osCylinder ? 'border-red-500' : 'border-green-300'}`}
                             >
                               <option value="">Select Cylinder</option>
                               <option value="-6.00">-6.00</option>
@@ -2224,12 +2213,17 @@ export default function ClaimsSubmissionForm({
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.osAxis}
-                              onChange={(e) => setFormData(prev => ({ ...prev, osAxis: e.target.value }))}
-                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, osAxis: e.target.value }))
+                                if (e.target.value && errors.osAxis) {
+                                  setErrors(prev => ({ ...prev, osAxis: '' }))
+                                }
+                              }}
+                              className={`form-select w-full border rounded-md pl-2.5 ${errors.osAxis ? 'border-red-500' : 'border-green-300'}`}
                             >
                               <option value="">Select Axis</option>
-                              {Array.from({ length: 181 }, (_, i) => (
-                                <option key={i} value={i.toString()}>{i}</option>
+                              {Array.from({ length: 180 }, (_, i) => i + 1).map(num => (
+                                <option key={num} value={num.toString()}>{num}</option>
                               ))}
                             </select>
                           </div>
@@ -2250,10 +2244,6 @@ export default function ClaimsSubmissionForm({
                               <option value="+2.50">+2.50</option>
                               <option value="+2.75">+2.75</option>
                               <option value="+3.00">+3.00</option>
-                              <option value="+3.25">+3.25</option>
-                              <option value="+3.50">+3.50</option>
-                              <option value="+3.75">+3.75</option>
-                              <option value="+4.00">+4.00</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2263,27 +2253,17 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-green-300"
                             >
                               <option value="">Select BC</option>
-                              <option value="8.0">8.0</option>
-                              <option value="8.1">8.1</option>
-                              <option value="8.2">8.2</option>
-                              <option value="8.3">8.3</option>
-                              <option value="8.4">8.4</option>
-                              <option value="8.5">8.5</option>
-                              <option value="8.6">8.6</option>
-                              <option value="8.7">8.7</option>
-                              <option value="8.8">8.8</option>
-                              <option value="8.9">8.9</option>
-                              <option value="9.0">9.0</option>
-                              <option value="9.1">9.1</option>
-                              <option value="9.2">9.2</option>
-                              <option value="9.3">9.3</option>
-                              <option value="9.4">9.4</option>
-                              <option value="9.5">9.5</option>
-                              <option value="9.6">9.6</option>
-                              <option value="9.7">9.7</option>
-                              <option value="9.8">9.8</option>
-                              <option value="9.9">9.9</option>
-                              <option value="10.0">10.0</option>
+                              <option value="0.50">0.50</option>
+                              <option value="0.75">0.75</option>
+                              <option value="1.00">1.00</option>
+                              <option value="1.25">1.25</option>
+                              <option value="1.50">1.50</option>
+                              <option value="1.75">1.75</option>
+                              <option value="2.00">2.00</option>
+                              <option value="2.25">2.25</option>
+                              <option value="2.50">2.50</option>
+                              <option value="2.75">2.75</option>
+                              <option value="3.00">3.00</option>
                             </select>
                           </div>
                         </div>
@@ -2298,13 +2278,35 @@ export default function ClaimsSubmissionForm({
                     </h4>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-5 md:grid-cols-3 gap-4">
+                      {/* Parameter Labels */}
+                      <div className="lg:col-span-1">
+                        <div className="h-10"></div> {/* Spacer for header */}
+                        <div className="space-y-4">
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Horizontal</span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Direction</span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Vertical</span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Direction</span>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Prism Type</span>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* OD (Right Eye) - Blue theme */}
                       <div className="lg:col-span-2 md:col-span-1">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                          <span className="font-medium text-blue-700 dark:text-blue-300">OD (Right Eye)</span>
+                        <div className="h-10 flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 rounded-t-lg border border-blue-200 dark:border-blue-800">
+                          <Icon name="eye" size={16} className="text-blue-600 dark:text-blue-400 mr-2" />
+                          <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Right Eye (OD)</span>
                         </div>
-                        <div className="grid grid-cols-1 gap-3">
+                        <div className="space-y-4 border border-blue-200 dark:border-blue-800 rounded-b-lg p-4">
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.odHorizontal}
@@ -2312,16 +2314,16 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-blue-300"
                             >
                               <option value="">Select Horizontal</option>
-                              <option value="0.5">0.5</option>
-                              <option value="1.0">1.0</option>
-                              <option value="1.5">1.5</option>
-                              <option value="2.0">2.0</option>
-                              <option value="2.5">2.5</option>
-                              <option value="3.0">3.0</option>
-                              <option value="3.5">3.5</option>
-                              <option value="4.0">4.0</option>
-                              <option value="4.5">4.5</option>
-                              <option value="5.0">5.0</option>
+                              <option value="0.50">0.50</option>
+                              <option value="1.00">1.00</option>
+                              <option value="1.50">1.50</option>
+                              <option value="2.00">2.00</option>
+                              <option value="2.50">2.50</option>
+                              <option value="3.00">3.00</option>
+                              <option value="3.50">3.50</option>
+                              <option value="4.00">4.00</option>
+                              <option value="4.50">4.50</option>
+                              <option value="5.00">5.00</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2331,8 +2333,8 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-blue-300"
                             >
                               <option value="">Select Direction</option>
-                              <option value="BI">BI (Base In)</option>
-                              <option value="BO">BO (Base Out)</option>
+                              <option value="In">In</option>
+                              <option value="Out">Out</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2342,16 +2344,16 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-blue-300"
                             >
                               <option value="">Select Vertical</option>
-                              <option value="0.5">0.5</option>
-                              <option value="1.0">1.0</option>
-                              <option value="1.5">1.5</option>
-                              <option value="2.0">2.0</option>
-                              <option value="2.5">2.5</option>
-                              <option value="3.0">3.0</option>
-                              <option value="3.5">3.5</option>
-                              <option value="4.0">4.0</option>
-                              <option value="4.5">4.5</option>
-                              <option value="5.0">5.0</option>
+                              <option value="0.50">0.50</option>
+                              <option value="1.00">1.00</option>
+                              <option value="1.50">1.50</option>
+                              <option value="2.00">2.00</option>
+                              <option value="2.50">2.50</option>
+                              <option value="3.00">3.00</option>
+                              <option value="3.50">3.50</option>
+                              <option value="4.00">4.00</option>
+                              <option value="4.50">4.50</option>
+                              <option value="5.00">5.00</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2361,8 +2363,8 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-blue-300"
                             >
                               <option value="">Select Direction</option>
-                              <option value="BU">BU (Base Up)</option>
-                              <option value="BD">BD (Base Down)</option>
+                              <option value="Up">Up</option>
+                              <option value="Down">Down</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2372,9 +2374,9 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-blue-300"
                             >
                               <option value="">Select Prism Type</option>
-                              <option value="Fresnel">Fresnel</option>
-                              <option value="Ground">Ground</option>
-                              <option value="Molded">Molded</option>
+                              <option value="Decentered">Decentered</option>
+                              <option value="Ground In">Ground In</option>
+                              <option value="Slab Off">Slab Off</option>
                             </select>
                           </div>
                         </div>
@@ -2382,11 +2384,11 @@ export default function ClaimsSubmissionForm({
 
                       {/* OS (Left Eye) - Green theme */}
                       <div className="lg:col-span-2 md:col-span-1">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                          <span className="font-medium text-green-700 dark:text-green-300">OS (Left Eye)</span>
+                        <div className="h-10 flex items-center justify-center bg-green-50 dark:bg-green-900/20 rounded-t-lg border border-green-200 dark:border-green-800">
+                          <Icon name="eye" size={16} className="text-green-600 dark:text-green-400 mr-2" />
+                          <span className="text-sm font-semibold text-green-700 dark:text-green-300">Left Eye (OS)</span>
                         </div>
-                        <div className="grid grid-cols-1 gap-3">
+                        <div className="space-y-4 border border-green-200 dark:border-green-800 rounded-b-lg p-4">
                           <div className="h-10 flex items-center">
                             <select
                               value={formData.osHorizontal}
@@ -2394,16 +2396,16 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-green-300"
                             >
                               <option value="">Select Horizontal</option>
-                              <option value="0.5">0.5</option>
-                              <option value="1.0">1.0</option>
-                              <option value="1.5">1.5</option>
-                              <option value="2.0">2.0</option>
-                              <option value="2.5">2.5</option>
-                              <option value="3.0">3.0</option>
-                              <option value="3.5">3.5</option>
-                              <option value="4.0">4.0</option>
-                              <option value="4.5">4.5</option>
-                              <option value="5.0">5.0</option>
+                              <option value="0.50">0.50</option>
+                              <option value="1.00">1.00</option>
+                              <option value="1.50">1.50</option>
+                              <option value="2.00">2.00</option>
+                              <option value="2.50">2.50</option>
+                              <option value="3.00">3.00</option>
+                              <option value="3.50">3.50</option>
+                              <option value="4.00">4.00</option>
+                              <option value="4.50">4.50</option>
+                              <option value="5.00">5.00</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2413,8 +2415,8 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-green-300"
                             >
                               <option value="">Select Direction</option>
-                              <option value="BI">BI (Base In)</option>
-                              <option value="BO">BO (Base Out)</option>
+                              <option value="In">In</option>
+                              <option value="Out">Out</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2424,16 +2426,16 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-green-300"
                             >
                               <option value="">Select Vertical</option>
-                              <option value="0.5">0.5</option>
-                              <option value="1.0">1.0</option>
-                              <option value="1.5">1.5</option>
-                              <option value="2.0">2.0</option>
-                              <option value="2.5">2.5</option>
-                              <option value="3.0">3.0</option>
-                              <option value="3.5">3.5</option>
-                              <option value="4.0">4.0</option>
-                              <option value="4.5">4.5</option>
-                              <option value="5.0">5.0</option>
+                              <option value="0.50">0.50</option>
+                              <option value="1.00">1.00</option>
+                              <option value="1.50">1.50</option>
+                              <option value="2.00">2.00</option>
+                              <option value="2.50">2.50</option>
+                              <option value="3.00">3.00</option>
+                              <option value="3.50">3.50</option>
+                              <option value="4.00">4.00</option>
+                              <option value="4.50">4.50</option>
+                              <option value="5.00">5.00</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2443,8 +2445,8 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-green-300"
                             >
                               <option value="">Select Direction</option>
-                              <option value="BU">BU (Base Up)</option>
-                              <option value="BD">BD (Base Down)</option>
+                              <option value="Up">Up</option>
+                              <option value="Down">Down</option>
                             </select>
                           </div>
                           <div className="h-10 flex items-center">
@@ -2454,9 +2456,9 @@ export default function ClaimsSubmissionForm({
                               className="form-select w-full border rounded-md pl-2.5 border-green-300"
                             >
                               <option value="">Select Prism Type</option>
-                              <option value="Fresnel">Fresnel</option>
-                              <option value="Ground">Ground</option>
-                              <option value="Molded">Molded</option>
+                              <option value="Decentered">Decentered</option>
+                              <option value="Ground In">Ground In</option>
+                              <option value="Slab Off">Slab Off</option>
                             </select>
                           </div>
                         </div>
@@ -2488,6 +2490,659 @@ export default function ClaimsSubmissionForm({
             )}
 
             {currentStep === 4 && (
+              <div className="space-y-6">
+                {/* Lens Choice Form */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+                    Lens Choice Details
+                  </h3>
+                  
+                  {/* General Lens Properties */}
+                  <div className="mb-8">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      General Lens Properties
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Vision Type <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.visionType}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, visionType: e.target.value }))
+                            if (e.target.value && errors.visionType) {
+                              setErrors(prev => ({ ...prev, visionType: '' }))
+                            }
+                          }}
+                          className={`form-select w-full border rounded-md pl-2.5 ${errors.visionType ? 'border-red-500' : 'border-blue-300'}`}
+                        >
+                          <option value="">Select Vision Type</option>
+                          <option value="Single Vision">Single Vision</option>
+                          <option value="Bi-Focal">Bi-Focal</option>
+                          <option value="Progressive">Progressive</option>
+                          <option value="Trifocal">Trifocal</option>
+                        </select>
+                        {errors.visionType && (
+                          <p className="mt-1 text-sm text-red-600">{errors.visionType}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Lens Type <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.lensType}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, lensType: e.target.value }))
+                            if (e.target.value && errors.lensType) {
+                              setErrors(prev => ({ ...prev, lensType: '' }))
+                            }
+                          }}
+                          className={`form-select w-full border rounded-md pl-2.5 ${errors.lensType ? 'border-red-500' : 'border-blue-300'}`}
+                        >
+                          <option value="">Select Lens Type</option>
+                          <option value="Blended 25">Blended 25</option>
+                          <option value="Blended 28">Blended 28</option>
+                          <option value="Executive">Executive</option>
+                          <option value="Round Seg">Round Seg</option>
+                          <option value="Flat Top">Flat Top</option>
+                        </select>
+                        {errors.lensType && (
+                          <p className="mt-1 text-sm text-red-600">{errors.lensType}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          PD Type <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.pdType}
+                          onChange={(e) => setFormData(prev => ({ ...prev, pdType: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select PD Type</option>
+                          <option value="CR-39">CR-39</option>
+                          <option value="Polycarbonate">Polycarbonate</option>
+                          <option value="High Index 1.67">High Index 1.67</option>
+                          <option value="High Index 1.74">High Index 1.74</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Material <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.material}
+                          onChange={(e) => setFormData(prev => ({ ...prev, material: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Material</option>
+                          <option value="CR-39">CR-39</option>
+                          <option value="Polycarbonate">Polycarbonate</option>
+                          <option value="High Index 1.67">High Index 1.67</option>
+                          <option value="High Index 1.74">High Index 1.74</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Binocular Section */}
+                  <div className="mb-8">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Binocular Measurements
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Far PD <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.binocularFarPD}
+                          onChange={(e) => setFormData(prev => ({ ...prev, binocularFarPD: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Far PD</option>
+                          {Array.from({ length: 20 }, (_, i) => (30 + i * 0.5).toFixed(1)).map(pd => (
+                            <option key={pd} value={`${pd} MM`}>{pd} MM</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Near PD <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.binocularNearPD}
+                          onChange={(e) => setFormData(prev => ({ ...prev, binocularNearPD: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Near PD</option>
+                          {Array.from({ length: 20 }, (_, i) => (27 + i * 0.5).toFixed(1)).map(pd => (
+                            <option key={pd} value={`${pd} MM`}>{pd} MM</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Monocular Section */}
+                  <div className="mb-8">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Monocular Measurements
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Far</h5>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">OD</label>
+                            <select
+                              value={formData.monocularFarPDOD}
+                              onChange={(e) => setFormData(prev => ({ ...prev, monocularFarPDOD: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5"
+                            >
+                              <option value="">Select Far PD OD</option>
+                              {Array.from({ length: 21 }, (_, i) => (25 + i * 0.5).toFixed(1)).map(pd => (
+                                <option key={pd} value={`${pd} MM`}>{pd} MM</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">OS</label>
+                            <select
+                              value={formData.monocularFarPDOS}
+                              onChange={(e) => setFormData(prev => ({ ...prev, monocularFarPDOS: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5"
+                            >
+                              <option value="">Select Far PD OS</option>
+                              {Array.from({ length: 21 }, (_, i) => (25 + i * 0.5).toFixed(1)).map(pd => (
+                                <option key={pd} value={`${pd} MM`}>{pd} MM</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Near</h5>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">OD</label>
+                            <select
+                              value={formData.monocularNearPDOD}
+                              onChange={(e) => setFormData(prev => ({ ...prev, monocularNearPDOD: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5"
+                            >
+                              <option value="">Select Near PD OD</option>
+                              {Array.from({ length: 21 }, (_, i) => (22 + i * 0.5).toFixed(1)).map(pd => (
+                                <option key={pd} value={`${pd} MM`}>{pd} MM</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">OS</label>
+                            <select
+                              value={formData.monocularNearPDOS}
+                              onChange={(e) => setFormData(prev => ({ ...prev, monocularNearPDOS: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5"
+                            >
+                              <option value="">Select Near PD OS</option>
+                              {Array.from({ length: 21 }, (_, i) => (22 + i * 0.5).toFixed(1)).map(pd => (
+                                <option key={pd} value={`${pd} MM`}>{pd} MM</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Segment Height Section */}
+                  <div className="mb-8">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Segment Height
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          OD Segment Height
+                        </label>
+                        <select
+                          value={formData.segmentHeightOD}
+                          onChange={(e) => setFormData(prev => ({ ...prev, segmentHeightOD: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Height</option>
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map(height => (
+                            <option key={height} value={`${height} MM`}>{height} MM</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          OS Segment Height
+                        </label>
+                        <select
+                          value={formData.segmentHeightOS}
+                          onChange={(e) => setFormData(prev => ({ ...prev, segmentHeightOS: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Height</option>
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map(height => (
+                            <option key={height} value={`${height} MM`}>{height} MM</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Lens Finishing and Tinting Section */}
+                  <div className="mb-8">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Lens Finishing & Tinting
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Edge
+                        </label>
+                        <select
+                          value={formData.edge}
+                          onChange={(e) => setFormData(prev => ({ ...prev, edge: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Edge</option>
+                          <option value="Standard">Standard</option>
+                          <option value="Polished">Polished</option>
+                          <option value="Beveled">Beveled</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Thickness
+                        </label>
+                        <select
+                          value={formData.thickness}
+                          onChange={(e) => setFormData(prev => ({ ...prev, thickness: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Thickness</option>
+                          <option value="Standard">Standard</option>
+                          <option value="Thin">Thin</option>
+                          <option value="Ultra Thin">Ultra Thin</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Coating <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.coating}
+                          onChange={(e) => setFormData(prev => ({ ...prev, coating: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Coating</option>
+                          <option value="Standard ARC">Standard ARC</option>
+                          <option value="Premium ARC">Premium ARC</option>
+                          <option value="Blue Light Filter">Blue Light Filter</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Tint Shade
+                        </label>
+                        <select
+                          value={formData.tintShade}
+                          onChange={(e) => setFormData(prev => ({ ...prev, tintShade: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Shade</option>
+                          <option value="1/4">1/4</option>
+                          <option value="1/2">1/2</option>
+                          <option value="3/4">3/4</option>
+                          <option value="Full">Full</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Tint Type
+                        </label>
+                        <select
+                          value={formData.tintType}
+                          onChange={(e) => setFormData(prev => ({ ...prev, tintType: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Tint Type</option>
+                          <option value="Gray">Gray</option>
+                          <option value="Brown">Brown</option>
+                          <option value="Green">Green</option>
+                          <option value="Blue">Blue</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                          Tint Style
+                        </label>
+                        <select
+                          value={formData.tintType2}
+                          onChange={(e) => setFormData(prev => ({ ...prev, tintType2: e.target.value }))}
+                          className="form-select w-full border rounded-md pl-2.5"
+                        >
+                          <option value="">Select Style</option>
+                          <option value="Solid">Solid</option>
+                          <option value="Gradient">Gradient</option>
+                          <option value="Photochromic">Photochromic</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Optional Features Section */}
+                  <div>
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Optional Features & Coatings
+                    </h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="uvScratchResistant"
+                          checked={formData.uvScratchResistant}
+                          onChange={(e) => setFormData(prev => ({ ...prev, uvScratchResistant: e.target.checked }))}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="uvScratchResistant" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                          UV Scratch Resistant and Tint Package
+                        </label>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="uvCoating"
+                            checked={formData.uvCoating}
+                            onChange={(e) => setFormData(prev => ({ ...prev, uvCoating: e.target.checked }))}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="uvCoating" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            UV Coating
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="scratchCoating"
+                            checked={formData.scratchCoating}
+                            onChange={(e) => setFormData(prev => ({ ...prev, scratchCoating: e.target.checked }))}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="scratchCoating" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Scratch Coating
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="td2ScratchCoating"
+                            checked={formData.td2ScratchCoating}
+                            onChange={(e) => setFormData(prev => ({ ...prev, td2ScratchCoating: e.target.checked }))}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="td2ScratchCoating" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            TD-2 Scratch Coating
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="heatTempering"
+                            checked={formData.heatTempering}
+                            onChange={(e) => setFormData(prev => ({ ...prev, heatTempering: e.target.checked }))}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="heatTempering" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Heat Tempering
+                          </label>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="chemicalTempering"
+                          checked={formData.chemicalTempering}
+                          onChange={(e) => setFormData(prev => ({ ...prev, chemicalTempering: e.target.checked }))}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="chemicalTempering" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                          Chemical Tempering
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 5 && (
+              <div className="space-y-6">
+                {/* Frame Selection Form */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+                    Frame Selection Details
+                  </h3>
+                  
+                  {/* Row 1 */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <label htmlFor="frameSource" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Frame Source
+                      </label>
+                      <select
+                        id="frameSource"
+                        value={formData.frameSource}
+                        onChange={(e) => setFormData(prev => ({ ...prev, frameSource: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Frame Source</option>
+                        <option value="insurance-supplied-gran">Insurance Supplied - Gran</option>
+                        <option value="patient-choice">Patient Choice</option>
+                        <option value="provider-selection">Provider Selection</option>
+                        <option value="custom-order">Custom Order</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="frameType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Frame Type
+                      </label>
+                      <select
+                        id="frameType"
+                        value={formData.frameType}
+                        onChange={(e) => setFormData(prev => ({ ...prev, frameType: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Frame Type</option>
+                        <option value="zyl">ZYL</option>
+                        <option value="metal">Metal</option>
+                        <option value="rimless">Rimless</option>
+                        <option value="semi-rimless">Semi-Rimless</option>
+                        <option value="plastic">Plastic</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="rimlessType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Rimless Type
+                      </label>
+                      <select
+                        id="rimlessType"
+                        value={formData.rimlessType}
+                        onChange={(e) => setFormData(prev => ({ ...prev, rimlessType: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Rimless Type</option>
+                        <option value="4-hole">4 Hole</option>
+                        <option value="3-hole">3 Hole</option>
+                        <option value="drill-mount">Drill Mount</option>
+                        <option value="groove-mount">Groove Mount</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="frameName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Name
+                      </label>
+                      <select
+                        id="frameName"
+                        value={formData.frameName}
+                        onChange={(e) => setFormData(prev => ({ ...prev, frameName: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Frame Name</option>
+                        <option value="u-20-tortoise">U-20 Tortoise</option>
+                        <option value="u-21-black">U-21 Black</option>
+                        <option value="u-22-brown">U-22 Brown</option>
+                        <option value="u-23-gunmetal">U-23 Gunmetal</option>
+                        <option value="u-24-silver">U-24 Silver</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  {/* Row 2 */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <label htmlFor="frameColor" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Color
+                      </label>
+                      <select
+                        id="frameColor"
+                        value={formData.frameColor}
+                        onChange={(e) => setFormData(prev => ({ ...prev, frameColor: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Color</option>
+                        <option value="tortoise">Tortoise</option>
+                        <option value="black">Black</option>
+                        <option value="brown">Brown</option>
+                        <option value="gunmetal">Gunmetal</option>
+                        <option value="silver">Silver</option>
+                        <option value="gold">Gold</option>
+                        <option value="rose-gold">Rose Gold</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="eyeSize" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Eye Size
+                      </label>
+                      <select
+                        id="eyeSize"
+                        value={formData.eyeSize}
+                        onChange={(e) => setFormData(prev => ({ ...prev, eyeSize: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Eye Size</option>
+                        <option value="40-mm">40 MM</option>
+                        <option value="42-mm">42 MM</option>
+                        <option value="44-mm">44 MM</option>
+                        <option value="46-mm">46 MM</option>
+                        <option value="48-mm">48 MM</option>
+                        <option value="50-mm">50 MM</option>
+                        <option value="52-mm">52 MM</option>
+                        <option value="54-mm">54 MM</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="bridge" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Bridge
+                      </label>
+                      <select
+                        id="bridge"
+                        value={formData.bridge}
+                        onChange={(e) => setFormData(prev => ({ ...prev, bridge: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Bridge</option>
+                        <option value="18-mm">18 MM</option>
+                        <option value="20-mm">20 MM</option>
+                        <option value="22-mm">22 MM</option>
+                        <option value="24-mm">24 MM</option>
+                        <option value="26-mm">26 MM</option>
+                        <option value="28-mm">28 MM</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="vertical" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Vertical
+                      </label>
+                      <select
+                        id="vertical"
+                        value={formData.vertical}
+                        onChange={(e) => setFormData(prev => ({ ...prev, vertical: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Vertical</option>
+                        <option value="24-mm">24 MM</option>
+                        <option value="26-mm">26 MM</option>
+                        <option value="28-mm">28 MM</option>
+                        <option value="30-mm">30 MM</option>
+                        <option value="32-mm">32 MM</option>
+                        <option value="34-mm">34 MM</option>
+                        <option value="36-mm">36 MM</option>
+                        <option value="38-mm">38 MM</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  {/* Row 3 */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label htmlFor="ed" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        ED
+                      </label>
+                      <select
+                        id="ed"
+                        value={formData.ed}
+                        onChange={(e) => setFormData(prev => ({ ...prev, ed: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select ED</option>
+                        <option value="44-mm">44 MM</option>
+                        <option value="46-mm">46 MM</option>
+                        <option value="48-mm">48 MM</option>
+                        <option value="50-mm">50 MM</option>
+                        <option value="52-mm">52 MM</option>
+                        <option value="54-mm">54 MM</option>
+                        <option value="56-mm">56 MM</option>
+                        <option value="58-mm">58 MM</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 6 && (
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -2641,7 +3296,7 @@ export default function ClaimsSubmissionForm({
               
               {/* Right side: Primary actions */}
               <div className="flex gap-3">
-                {currentStep < 4 ? (
+                {currentStep < 5 ? (
                   <button
                     type="button"
                     onClick={handleNext}
@@ -2655,7 +3310,7 @@ export default function ClaimsSubmissionForm({
                       </>
                     ) : (
                       <>
-                        {currentStep === 1 ? 'Start Claim' : currentStep === 2 ? 'Continue' : currentStep === 3 ? 'Continue to Review' : 'Next'}
+                        {currentStep === 1 ? 'Start Claim' : currentStep === 2 ? 'Continue' : currentStep === 3 ? 'Continue to Lens Choice' : currentStep === 4 ? 'Continue to Frame Selection' : currentStep === 5 ? 'Continue to Review' : 'Next'}
                         <Icon name="arrow-right" size={16} />
                       </>
                     )}
@@ -2702,7 +3357,7 @@ export default function ClaimsSubmissionForm({
           </button>
         </div>
         
-        {currentStep < 4 && (
+        {currentStep < 6 && (
           <StepIndicators currentStep={currentStep} />
         )}
       </div>

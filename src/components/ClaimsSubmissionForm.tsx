@@ -3666,7 +3666,7 @@ export default function ClaimsSubmissionForm({
           </button>
         </div>
         
-        {currentStep < 6 && (
+        {currentStep <= 6 && (
           <StepIndicators currentStep={currentStep} />
         )}
       </div>

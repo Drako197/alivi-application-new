@@ -28,7 +28,7 @@ export default function ClaimAcceptedView({
                             <div className="flex gap-3">
                   <button
                     onClick={onPrint}
-                    className="btn-primary flex items-center gap-2"
+                    className="btn-tertiary flex items-center gap-2"
                   >
                     <Icon name="printer" size={16} />
                     Print
@@ -42,7 +42,7 @@ export default function ClaimAcceptedView({
                   </button>
                   <button
                     onClick={onViewBenefits}
-                    className="btn-tertiary flex items-center gap-2"
+                    className="btn-primary flex items-center gap-2"
                   >
                     <Icon name="check-circle" size={16} />
                     View Reserved Benefits
@@ -416,7 +416,7 @@ export default function ClaimAcceptedView({
                         <div className="mt-8 flex justify-center gap-4">
                   <button
                     onClick={onPrint}
-                    className="btn-primary flex items-center gap-2"
+                    className="btn-tertiary flex items-center gap-2"
                   >
                     <Icon name="printer" size={16} />
                     Print
@@ -430,7 +430,7 @@ export default function ClaimAcceptedView({
                   </button>
                   <button
                     onClick={onViewBenefits}
-                    className="btn-tertiary flex items-center gap-2"
+                    className="btn-primary flex items-center gap-2"
                   >
                     <Icon name="check-circle" size={16} />
                     View Reserved Benefits

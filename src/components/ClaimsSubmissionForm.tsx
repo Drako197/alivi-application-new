@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import Icon from './Icon'
 import DatePicker from './DatePicker'
 import AIAssistantButton from './AIAssistantButton'
+import ClaimAcceptedView from './ClaimAcceptedView'
 
 interface ClaimsSubmissionFormProps {
   onBack?: () => void
@@ -19,6 +20,17 @@ export default function ClaimsSubmissionForm({
     originatingPage,
     ...navigationHistory
   ])
+
+  // Loading modal state
+  const [showLoadingModal, setShowLoadingModal] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('')
+  const [loadingStep, setLoadingStep] = useState(0)
+
+  const loadingMessages = [
+    "We are processing your claim... 🏥",
+    "Logging medical codes like a pro! 📊",
+    "Almost there, just a few more clicks! ✨"
+  ]
 
   const [formData, setFormData] = useState({
     // Step 1: Patient Information
@@ -128,7 +140,7 @@ export default function ClaimsSubmissionForm({
   const [showDiagnosisCheatSheet, setShowDiagnosisCheatSheet] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [validations, setValidations] = useState<{ [key: string]: boolean }>({})
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5 | 6>(1)
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7>(1)
 
   // Real-world data for dropdowns
   const providerIdOptions = [
@@ -486,13 +498,21 @@ export default function ClaimsSubmissionForm({
     }
     
     setIsSubmitting(true)
+    setShowLoadingModal(true)
+    setLoadingStep(0)
+    setLoadingMessage(loadingMessages[0])
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Simulate loading steps with different messages
+    for (let i = 0; i < loadingMessages.length; i++) {
+      setLoadingStep(i)
+      setLoadingMessage(loadingMessages[i])
+      await new Promise(resolve => setTimeout(resolve, 2000)) // 2 seconds per message
+    }
     
     setIsSubmitting(false)
+    setShowLoadingModal(false)
     setSubmitted(true)
-    setCurrentStep(5)
+    setCurrentStep(7) // Navigate to Claim Accepted View
   }
 
   const handleNext = () => {
@@ -794,7 +814,16 @@ export default function ClaimsSubmissionForm({
   // Main form content based on current step
   let stepContent
 
-  if (submitted && currentStep === 6) {
+  if (currentStep === 7) {
+    stepContent = (
+      <ClaimAcceptedView
+        onBack={() => setCurrentStep(6)}
+        onPrint={() => console.log('Print claim accepted')}
+        onViewReport={() => console.log('View optometric report')}
+        onViewBenefits={() => console.log('View reserved benefits')}
+      />
+    )
+  } else if (submitted && currentStep === 6) {
     stepContent = <ClaimsSubmissionSuccess />
   } else {
     stepContent = (
@@ -4031,6 +4060,41 @@ export default function ClaimsSubmissionForm({
         currentField={getCurrentField()}
         currentStep={currentStep}
       />
+
+      {/* Loading Modal */}
+      {showLoadingModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[99999]">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4 shadow-xl">
+            <div className="text-center">
+              {/* Spinner */}
+              <div className="mb-6">
+                <Icon name="loader-2" size={48} className="animate-spin text-blue-500 mx-auto" />
+              </div>
+              
+              {/* Loading Message */}
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Processing Your Claim
+              </h3>
+              
+              <p className="text-gray-600 dark:text-gray-300 text-lg mb-2">
+                {loadingMessage}
+              </p>
+              
+              {/* Progress Indicator */}
+              <div className="flex justify-center space-x-2 mt-6">
+                {loadingMessages.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                      index <= loadingStep ? 'bg-blue-500' : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
   

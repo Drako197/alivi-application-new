@@ -30,7 +30,7 @@ export default function AIAssistantButton({
   return (
     <>
       {/* Floating M.I.L.A. Assistant Button */}
-      <div className="fixed bottom-6 right-6 z-[9999]">
+      <div className="fixed bottom-6 right-6 z-[99999]">
         <button
           onClick={handleOpenAssistant}
           className={`w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 ${className}`}

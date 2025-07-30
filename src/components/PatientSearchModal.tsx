@@ -2,11 +2,6 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
 import AIAssistantButton from './AIAssistantButton'
-import ProactiveSuggestionsService from '../services/ProactiveSuggestionsService'
-
-// NOTE: Using React Portal to ensure modal overlay covers entire viewport
-// This fixes the issue where modals don't start from the top of the page
-// Apply this pattern to all future modals in the application
 
 // TypeScript Interfaces
 interface Patient {
@@ -19,14 +14,6 @@ interface Patient {
   pcpLocation: string
   lastVisit: string
   status: 'active' | 'inactive'
-}
-
-interface PCP {
-  id: string
-  name: string
-  location: string
-  specialty: string
-  patientCount: number
 }
 
 interface PatientSearchModalProps {
@@ -47,108 +34,12 @@ const mockPatients: Patient[] = [
     pcpLocation: 'Downtown Medical Center',
     lastVisit: '2024-01-15',
     status: 'active'
-  },
-  {
-    id: '2',
-    patientId: '87654321',
-    firstName: 'Maria',
-    lastName: 'Garcia',
-    dateOfBirth: '1992-07-22',
-    pcpName: 'Dr. Michael Chen',
-    pcpLocation: 'Westside Clinic',
-    lastVisit: '2024-02-03',
-    status: 'active'
-  },
-  {
-    id: '3',
-    patientId: '11223344',
-    firstName: 'Robert',
-    lastName: 'Wilson',
-    dateOfBirth: '1978-11-08',
-    pcpName: 'Dr. Sarah Johnson',
-    pcpLocation: 'Downtown Medical Center',
-    lastVisit: '2024-01-28',
-    status: 'active'
-  },
-  {
-    id: '4',
-    patientId: '55667788',
-    firstName: 'Lisa',
-    lastName: 'Thompson',
-    dateOfBirth: '1990-05-12',
-    pcpName: 'Dr. Emily Davis',
-    pcpLocation: 'Northside Family Practice',
-    lastVisit: '2024-02-10',
-    status: 'active'
-  },
-  {
-    id: '5',
-    patientId: '99887766',
-    firstName: 'David',
-    lastName: 'Brown',
-    dateOfBirth: '1983-09-30',
-    pcpName: 'Dr. Michael Chen',
-    pcpLocation: 'Westside Clinic',
-    lastVisit: '2024-01-20',
-    status: 'inactive'
-  }
-]
-
-const mockPCPs: PCP[] = [
-  {
-    id: '1',
-    name: 'Dr. Sarah Johnson',
-    location: 'Downtown Medical Center',
-    specialty: 'Family Medicine',
-    patientCount: 245
-  },
-  {
-    id: '2',
-    name: 'Dr. Michael Chen',
-    location: 'Westside Clinic',
-    specialty: 'Internal Medicine',
-    patientCount: 189
-  },
-  {
-    id: '3',
-    name: 'Dr. Emily Davis',
-    location: 'Northside Family Practice',
-    specialty: 'Family Medicine',
-    patientCount: 312
-  },
-  {
-    id: '4',
-    name: 'Dr. James Wilson',
-    location: 'Eastside Medical Group',
-    specialty: 'Internal Medicine',
-    patientCount: 156
-  },
-  {
-    id: '5',
-    name: 'Dr. Jennifer Martinez',
-    location: 'Southside Healthcare',
-    specialty: 'Family Medicine',
-    patientCount: 203
   }
 ]
 
 export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }: PatientSearchModalProps) {
-  const [activeTab, setActiveTab] = useState<'patient-id' | 'pcp'>('patient-id')
-  const [patientIdSearchTerm, setPatientIdSearchTerm] = useState('')
-  const [pcpSearchTerm, setPcpSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState<Patient[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPCPAutocomplete, setShowPCPAutocomplete] = useState(false)
-  const [filteredPCPs, setFilteredPCPs] = useState<PCP[]>([])
-  const [selectedFilters, setSelectedFilters] = useState({
-    location: '',
-    specialty: '',
-    status: 'all'
-  })
-  const [debouncedPatientIdSearchTerm, setDebouncedPatientIdSearchTerm] = useState('')
-  const [debouncedPcpSearchTerm, setDebouncedPcpSearchTerm] = useState('')
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
-  const [proactiveSuggestions, setProactiveSuggestions] = useState<any[]>([])
 
   // Close modal on escape key
   useEffect(() => {
@@ -177,190 +68,16 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
     }
   }, [isOpen])
 
-  // Debounce patient ID search term
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedPatientIdSearchTerm(patientIdSearchTerm)
-    }, 300) // 300ms delay
-
-    return () => clearTimeout(timer)
-  }, [patientIdSearchTerm])
-
-  // Debounce PCP search term
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedPcpSearchTerm(pcpSearchTerm)
-    }, 300) // 300ms delay
-
-    return () => clearTimeout(timer)
-  }, [pcpSearchTerm])
-
-  // Auto-complete for PCP names
-  useEffect(() => {
-    if (activeTab === 'pcp' && pcpSearchTerm.trim()) {
-      const filtered = mockPCPs.filter(pcp => 
-        pcp.name.toLowerCase().includes(pcpSearchTerm.toLowerCase())
-      )
-      setFilteredPCPs(filtered)
-      setShowPCPAutocomplete(filtered.length > 0)
-    } else {
-      setShowPCPAutocomplete(false)
-    }
-  }, [pcpSearchTerm, activeTab])
-
-  // Generate proactive suggestions
-  useEffect(() => {
-    const currentSearchTerm = activeTab === 'patient-id' ? patientIdSearchTerm : pcpSearchTerm
-    if (currentSearchTerm.trim().length > 2) {
-      const suggestions = ProactiveSuggestionsService.getProactiveSuggestions({
-        currentForm: 'PatientSearchModal',
-        currentField: activeTab === 'patient-id' ? 'patientId' : 'pcpName',
-        userInput: currentSearchTerm
-      })
-      setProactiveSuggestions(suggestions)
-    } else {
-      setProactiveSuggestions([])
-    }
-  }, [patientIdSearchTerm, pcpSearchTerm, activeTab])
-
-  // Get all patients with filters applied
-  const getAllPatients = () => {
-    let results = [...mockPatients]
-
-    // Apply filters
-    if (selectedFilters.location) {
-      results = results.filter(patient => 
-        patient.pcpLocation.toLowerCase().includes(selectedFilters.location.toLowerCase())
-      )
-    }
-
-    if (selectedFilters.specialty) {
-      const pcpSpecialties = mockPCPs.filter(pcp => 
-        pcp.specialty.toLowerCase().includes(selectedFilters.specialty.toLowerCase())
-      )
-      results = results.filter(patient => 
-        pcpSpecialties.some(pcp => pcp.name === patient.pcpName)
-      )
-    }
-
-    if (selectedFilters.status !== 'all') {
-      results = results.filter(patient => patient.status === selectedFilters.status)
-    }
-
-    return results
-  }
-
-  // Real-time search effect
-  useEffect(() => {
-    const currentSearchTerm = activeTab === 'patient-id' ? debouncedPatientIdSearchTerm : debouncedPcpSearchTerm
-    
-    if (!currentSearchTerm.trim()) {
-      setSearchResults([])
-      return
-    }
-
-    setIsLoading(true)
-
-    // Simulate API delay
-    const timer = setTimeout(() => {
-      let results: Patient[] = []
-
-      if (activeTab === 'patient-id') {
-        results = mockPatients.filter(patient =>
-          patient.patientId.includes(currentSearchTerm) ||
-          `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(currentSearchTerm.toLowerCase())
-        )
-      } else {
-        const matchingPCPs = mockPCPs.filter(pcp =>
-          pcp.name.toLowerCase().includes(currentSearchTerm.toLowerCase())
-        )
-        results = mockPatients.filter(patient =>
-          matchingPCPs.some(pcp => pcp.name === patient.pcpName)
-        )
-      }
-
-      // Apply filters
-      if (selectedFilters.location) {
-        results = results.filter(patient =>
-          patient.pcpLocation.toLowerCase().includes(selectedFilters.location.toLowerCase())
-        )
-      }
-
-      if (selectedFilters.specialty) {
-        const pcpSpecialties = mockPCPs.filter(pcp =>
-          pcp.specialty.toLowerCase().includes(selectedFilters.specialty.toLowerCase())
-        )
-        results = results.filter(patient =>
-          pcpSpecialties.some(pcp => pcp.name === patient.pcpName)
-        )
-      }
-
-      if (selectedFilters.status !== 'all') {
-        results = results.filter(patient => patient.status === selectedFilters.status)
-      }
-
-      setSearchResults(results)
-      setIsLoading(false)
-    }, 200) // Shorter delay for real-time search
-
-    return () => clearTimeout(timer)
-  }, [debouncedPatientIdSearchTerm, debouncedPcpSearchTerm, activeTab, selectedFilters])
-
-    const handlePCPSelect = (pcp: PCP) => {
-    setPcpSearchTerm(pcp.name)
-    setShowPCPAutocomplete(false)
-  }
-
   const handleSearch = () => {
-    const currentSearchTerm = activeTab === 'patient-id' ? patientIdSearchTerm : pcpSearchTerm
-    
-    if (!currentSearchTerm.trim()) return
-
-    setIsLoading(true)
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      let results: Patient[] = []
-      
-      if (activeTab === 'patient-id') {
-        results = mockPatients.filter(patient => 
-          patient.patientId.includes(currentSearchTerm) ||
-          `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(currentSearchTerm.toLowerCase())
-        )
-      } else {
-        // Search by PCP - find patients under the searched PCP
-        const matchingPCPs = mockPCPs.filter(pcp => 
-          pcp.name.toLowerCase().includes(currentSearchTerm.toLowerCase())
-        )
-        
-        results = mockPatients.filter(patient => 
-          matchingPCPs.some(pcp => pcp.name === patient.pcpName)
-        )
-      }
-
-      // Apply filters
-      if (selectedFilters.location) {
-        results = results.filter(patient => 
-          patient.pcpLocation.toLowerCase().includes(selectedFilters.location.toLowerCase())
-        )
-      }
-
-      if (selectedFilters.specialty) {
-        const pcpSpecialties = mockPCPs.filter(pcp => 
-          pcp.specialty.toLowerCase().includes(selectedFilters.specialty.toLowerCase())
-        )
-        results = results.filter(patient => 
-          pcpSpecialties.some(pcp => pcp.name === patient.pcpName)
-        )
-      }
-
-      if (selectedFilters.status !== 'all') {
-        results = results.filter(patient => patient.status === selectedFilters.status)
-      }
-
+    if (searchTerm.trim()) {
+      const results = mockPatients.filter(patient => 
+        patient.patientId.includes(searchTerm) ||
+        `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
+      )
       setSearchResults(results)
-      setIsLoading(false)
-    }, 500)
+    } else {
+      setSearchResults([])
+    }
   }
 
   const handlePatientSelect = (patient: Patient) => {
@@ -370,34 +87,9 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
 
   const getIcon = (iconName: string): ReactElement => {
     const iconMap: { [key: string]: ReactElement } = {
-      'search': (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      ),
       'close': (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      ),
-      'plus': (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-      ),
-      'chevron-down': (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      ),
-      'chevron-up': (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-        </svg>
-      ),
-      'copy': (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
         </svg>
       )
     }
@@ -407,15 +99,44 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
 
   if (!isOpen) return null
 
-  // Create portal to render modal at root level
+  console.log('PatientSearchModal is rendering!')
+
   return createPortal(
-    <div className="patient-search-modal-overlay">
-      <div className="patient-search-modal">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+      {/* Test Button - BRIGHT AND IMPOSSIBLE TO MISS */}
+      <div className="fixed bottom-6 left-6 z-[999999]">
+        <button
+          onClick={() => alert('Patient Search Modal Test Button Works!')}
+          className="w-20 h-20 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-200 border-4 border-yellow-400"
+          style={{ boxShadow: '0 0 20px rgba(255, 0, 0, 0.8)' }}
+        >
+          <div className="flex items-center justify-center w-full h-full">
+            <span className="text-2xl font-bold">🔥</span>
+          </div>
+        </button>
+        <div className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold shadow-sm border-2 border-red-600">
+          TEST
+        </div>
+      </div>
+
+      {/* M.I.L.A. Assistant Button - BRIGHT AND IMPOSSIBLE TO MISS */}
+      <div className="fixed bottom-6 right-6 z-[999999]">
+        <div className="w-20 h-20 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-200 border-4 border-yellow-400 flex items-center justify-center"
+             style={{ boxShadow: '0 0 20px rgba(0, 255, 0, 0.8)' }}>
+          <span className="text-2xl">🤖</span>
+        </div>
+        <div className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold shadow-sm border-2 border-green-600">
+          MILA
+        </div>
+      </div>
+
+      {/* Modal Content */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl">
         {/* Modal Header */}
-        <div className="patient-search-modal-header">
-          <h2 className="patient-search-modal-title">Patient Search</h2>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Patient Search</h2>
           <button 
-            className="patient-search-modal-close"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
             onClick={onClose}
             aria-label="Close modal"
           >
@@ -423,322 +144,69 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
           </button>
         </div>
 
-        {/* Search Tabs */}
-        <div className="patient-search-modal-tabs">
-          <button
-            className={`patient-search-tab ${activeTab === 'patient-id' ? 'patient-search-tab-active' : ''}`}
-            onClick={() => setActiveTab('patient-id')}
-          >
-            Search By Patient ID
-          </button>
-          <button
-            className={`patient-search-tab ${activeTab === 'pcp' ? 'patient-search-tab-active' : ''}`}
-            onClick={() => setActiveTab('pcp')}
-          >
-            Search By PCP
-          </button>
-        </div>
-
         {/* Search Input */}
-        <div className="patient-search-input-section">
-          <label className="patient-search-input-label">
-            {activeTab === 'patient-id' ? 'Search Patient ID' : 'Search by PCP Name'}
+        <div className="p-6">
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+            Search Patient ID or Name
           </label>
-          {activeTab === 'patient-id' && (
-            <div className="patient-search-input-hint">
-              <p>Patient ID format: 8 digits (e.g., 12345678)</p>
-            </div>
-          )}
-          {activeTab === 'pcp' && (
-            <div className="patient-search-input-hint">
-              <p>Search by PCP name to find all patients under that provider</p>
-            </div>
-          )}
-                      <div className="patient-search-input-container">
-              <input
-                type="text"
-                className="patient-search-input"
-                placeholder={activeTab === 'patient-id' ? 'Enter 8-digit ID (e.g., 12345678) or patient name...' : 'Enter PCP name...'}
-                value={activeTab === 'patient-id' ? patientIdSearchTerm : pcpSearchTerm}
-                onChange={(e) => {
-                  if (activeTab === 'patient-id') {
-                    setPatientIdSearchTerm(e.target.value)
-                  } else {
-                    setPcpSearchTerm(e.target.value)
-                  }
-                }}
-              />
-              {isLoading && (
-                <div className="patient-search-loading-container">
-                  <div className="patient-search-loading"></div>
-                </div>
-              )}
-              {(activeTab === 'patient-id' ? patientIdSearchTerm : pcpSearchTerm) && !isLoading && (
-                <button
-                  className="patient-search-clear-button"
-                  onClick={() => {
-                    if (activeTab === 'patient-id') {
-                      setPatientIdSearchTerm('')
-                    } else {
-                      setPcpSearchTerm('')
-                    }
-                  }}
-                  title="Clear search"
-                >
-                  {getIcon('close')}
-                </button>
-              )}
-            </div>
-          
-          {/* Proactive Suggestions */}
-          {proactiveSuggestions.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-700 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
-                💡 M.I.L.A. Suggestions
-              </h4>
-              <div className="space-y-2">
-                {proactiveSuggestions.slice(0, 3).map((suggestion, index) => (
-                  <div key={index} className="text-sm text-blue-700 dark:text-blue-300">
-                    • {suggestion.message}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* PCP Auto-complete */}
-          {showPCPAutocomplete && (
-            <div className="patient-search-autocomplete">
-              {filteredPCPs.map((pcp) => (
-                <div
-                  key={pcp.id}
-                  className="patient-search-autocomplete-item"
-                  onClick={() => handlePCPSelect(pcp)}
-                >
-                  <div className="patient-search-autocomplete-name">{pcp.name}</div>
-                  <div className="patient-search-autocomplete-details">
-                    {pcp.specialty} • {pcp.location} • {pcp.patientCount} patients
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Advanced Filters */}
-        <div className="patient-search-filters">
-          <div className="patient-search-filters-header">
-            <div 
-              className="patient-search-filters-title-section"
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  setShowAdvancedFilters(!showAdvancedFilters)
-                }
-              }}
-              title={showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
+          <div className="flex gap-3">
+            <input
+              type="text"
+              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              placeholder="Enter patient ID or name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button
+              className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+              onClick={handleSearch}
             >
-              <h3 className="patient-search-filters-title px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Advanced Filters</h3>
-              <div className="patient-search-filters-toggle">
-                {getIcon(showAdvancedFilters ? 'chevron-up' : 'chevron-down')}
-              </div>
-            </div>
-            {showAdvancedFilters && (
-              <button
-                className="patient-search-filters-clear"
-                onClick={() => setSelectedFilters({ location: '', specialty: '', status: 'all' })}
-              >
-                Clear All
-              </button>
-            )}
+              Search
+            </button>
           </div>
-          {showAdvancedFilters && (
-            <div className="patient-search-filters-grid">
-              <div className="patient-search-filter-group">
-                <label className="patient-search-filter-label">Location</label>
-                <input
-                  type="text"
-                  className="patient-search-filter-input"
-                  placeholder="Filter by location..."
-                  value={selectedFilters.location}
-                  onChange={(e) => setSelectedFilters(prev => ({ ...prev, location: e.target.value }))}
-                />
-              </div>
-              <div className="patient-search-filter-group">
-                <label className="patient-search-filter-label">Specialty</label>
-                <input
-                  type="text"
-                  className="patient-search-filter-input"
-                  placeholder="Filter by specialty..."
-                  value={selectedFilters.specialty}
-                  onChange={(e) => setSelectedFilters(prev => ({ ...prev, specialty: e.target.value }))}
-                />
-              </div>
-              <div className="patient-search-filter-group">
-                <label className="patient-search-filter-label">Status</label>
-                <select
-                  className="patient-search-filter-select"
-                  value={selectedFilters.status}
-                  onChange={(e) => setSelectedFilters(prev => ({ ...prev, status: e.target.value }))}
-                >
-                  <option value="all">All Patients</option>
-                  <option value="active">Active Only</option>
-                  <option value="inactive">Inactive Only</option>
-                </select>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Search Results */}
-        <div className="patient-search-results">
+        <div className="p-6 pt-0">
           {searchResults.length > 0 ? (
-            <div className="patient-search-table">
-              <div className="patient-search-table-header">
-                <div className="patient-search-table-cell">#</div>
-                {activeTab === 'patient-id' ? (
-                  <>
-                    <div className="patient-search-table-cell">Patient ID</div>
-                    <div className="patient-search-table-cell">Patient Name</div>
-                    <div className="patient-search-table-cell">PCP Name</div>
-                    <div className="patient-search-table-cell">PCP Location</div>
-                  </>
-                ) : (
-                  <>
-                    <div className="patient-search-table-cell">PCP Name</div>
-                    <div className="patient-search-table-cell">Patient Name</div>
-                    <div className="patient-search-table-cell">Patient ID</div>
-                    <div className="patient-search-table-cell">PCP Location</div>
-                  </>
-                )}
-                <div className="patient-search-table-cell">Actions</div>
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
+              <div className="bg-blue-100 dark:bg-blue-900 text-gray-900 dark:text-white p-4 font-semibold text-sm uppercase tracking-wide">
+                Search Results
               </div>
-              <div className="patient-search-table-body">
+              <div className="bg-white dark:bg-gray-800">
                 {searchResults.map((patient, index) => (
-                  <div key={patient.id} className="patient-search-table-row">
-                    <div className="patient-search-table-cell">
-                      <span className="md:hidden">#</span>
-                      {index + 1}
-                    </div>
-                    {activeTab === 'patient-id' ? (
-                      <>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">Patient ID: </span>
-                          {patient.patientId}
-                        </div>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">Patient Name: </span>
+                  <div key={patient.id} className="p-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-gray-900 dark:text-white font-medium">
                           {patient.firstName} {patient.lastName}
-                          <span className={`patient-status-badge patient-status-${patient.status}`}>
-                            {patient.status}
-                          </span>
                         </div>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">PCP Name: </span>
-                          {patient.pcpName}
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          ID: {patient.patientId} • PCP: {patient.pcpName}
                         </div>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">PCP Location: </span>
-                          {patient.pcpLocation}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">PCP Name: </span>
-                          {patient.pcpName}
-                        </div>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">Patient Name: </span>
-                          {patient.firstName} {patient.lastName}
-                          <span className={`patient-status-badge patient-status-${patient.status}`}>
-                            {patient.status}
-                          </span>
-                        </div>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">Patient ID: </span>
-                          {patient.patientId}
-                        </div>
-                        <div className="patient-search-table-cell">
-                          <span className="md:hidden">PCP Location: </span>
-                          {patient.pcpLocation}
-                        </div>
-                      </>
-                    )}
-                    <div className="patient-search-table-cell">
+                      </div>
                       <button
-                        className="patient-search-select-button"
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
                         onClick={() => handlePatientSelect(patient)}
-                        title="Start Screening"
                       >
-                        <span className="text-sm font-medium">Start Screening</span>
+                        Select
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          ) : (activeTab === 'patient-id' ? patientIdSearchTerm : pcpSearchTerm) && !isLoading ? (
-            <div className="patient-search-empty">
-              <p>No patients found matching your search criteria.</p>
-            </div>
-          ) : (activeTab === 'patient-id' ? patientIdSearchTerm : pcpSearchTerm) && isLoading ? (
-            <div className="patient-search-empty">
-              <p>Searching...</p>
+          ) : searchTerm ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400">No patients found matching your search criteria.</p>
             </div>
           ) : (
-            <div className="patient-search-table">
-              <div className="patient-search-table-header">
-                <div className="patient-search-table-cell">#</div>
-                {activeTab === 'patient-id' ? (
-                  <>
-                    <div className="patient-search-table-cell">Patient ID</div>
-                    <div className="patient-search-table-cell">Patient Name</div>
-                    <div className="patient-search-table-cell">PCP Name</div>
-                    <div className="patient-search-table-cell">PCP Location</div>
-                  </>
-                ) : (
-                  <>
-                    <div className="patient-search-table-cell">PCP Name</div>
-                    <div className="patient-search-table-cell">Patient Name</div>
-                    <div className="patient-search-table-cell">Patient ID</div>
-                    <div className="patient-search-table-cell">PCP Location</div>
-                  </>
-                )}
-                <div className="patient-search-table-cell">Actions</div>
-              </div>
-              <div className="patient-search-table-body">
-                {/* Empty state - no data shown by default */}
-              </div>
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400">Enter search criteria to find patients.</p>
             </div>
           )}
         </div>
       </div>
-
-      {/* Test Button for Debugging */}
-      <div className="fixed bottom-6 left-6 z-[9999]">
-        <button
-          onClick={() => alert('Test Button Clicked!')}
-          className="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200"
-        >
-          <div className="flex items-center justify-center w-full h-full">
-            <span className="text-lg font-bold">T</span>
-          </div>
-        </button>
-        <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
-          TEST
-        </div>
-      </div>
-
-      {/* M.I.L.A. Assistant Button */}
-      <AIAssistantButton
-        currentForm="PatientSearchModal"
-        currentField="patientId"
-        currentStep={1}
-      />
     </div>,
     document.body
   )

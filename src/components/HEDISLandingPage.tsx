@@ -6,6 +6,7 @@ import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import DatePicker from './DatePicker'
 import AIAssistantButton from './AIAssistantButton'
+import TestModal from './TestModal'
 import ScreeningDataService from '../services/ScreeningDataService'
 import type { CompletedScreening, SavedScreening, DashboardStats } from '../services/ScreeningDataService'
 
@@ -256,6 +257,15 @@ function PatientSearchStep({ onPatientSelect, onNextStep }: PatientSearchStepPro
 
   return (
     <div className="hedis-patient-search-step">
+      {/* M.I.L.A. Assistant Button */}
+      <div className="fixed bottom-6 right-6 z-[999999]">
+        <AIAssistantButton
+          currentForm="PatientSearchStep"
+          currentField="patientId"
+          currentStep={1}
+        />
+      </div>
+      
       <div className="hedis-search-section">
         <div className="hedis-search-input-group">
           <label className="hedis-search-label">Search by Patient ID or Name</label>
@@ -622,6 +632,15 @@ function ScreeningDetailsForm({
 
   return (
     <div className="space-y-8">
+      {/* M.I.L.A. Assistant Button */}
+      <div className="fixed bottom-6 right-6 z-[999999]">
+        <AIAssistantButton
+          currentForm="ScreeningDetailsForm"
+          currentField="dateOfScreening"
+          currentStep={2}
+        />
+      </div>
+      
       {/* Patient Screening Details */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
@@ -1407,6 +1426,15 @@ function RetinalImagesForm({
 
   return (
     <div className="space-y-6 md:space-y-8">
+      {/* M.I.L.A. Assistant Button */}
+      <div className="fixed bottom-6 right-6 z-[999999]">
+        <AIAssistantButton
+          currentForm="RetinalImagesForm"
+          currentField="rightEyeImages"
+          currentStep={3}
+        />
+      </div>
+      
       {/* Header - Mobile Optimized */}
       <div className="text-center">
         <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">
@@ -1965,6 +1993,15 @@ function ReviewAndSubmitForm({
 
   return (
     <div className="screening-form-content relative">
+      {/* M.I.L.A. Assistant Button */}
+      <div className="fixed bottom-6 right-6 z-[999999]">
+        <AIAssistantButton
+          currentForm="ReviewAndSubmitForm"
+          currentField="review"
+          currentStep={4}
+        />
+      </div>
+      
       {/* Loading Overlay */}
       {(isSubmitting || isSaving) && (
         <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -3344,6 +3381,7 @@ export default function HEDISLandingPage({
   const [showPatientSearchModal, setShowPatientSearchModal] = useState(false)
   const [showCompletedScreeningListModal, setShowCompletedScreeningListModal] = useState(false)
   const [showSavedScreeningListModal, setShowSavedScreeningListModal] = useState(false)
+  const [showTestModal, setShowTestModal] = useState(false)
   const [viewingCompletedScreening, setViewingCompletedScreening] = useState<CompletedScreening | null>(null)
 
   // Update breadcrumbs when step changes
@@ -4217,6 +4255,36 @@ export default function HEDISLandingPage({
         currentForm="NewScreeningForm"
         currentField="diabetesMellitus"
         currentStep={1}
+      />
+
+      {/* Test Modal Button */}
+      <div style={{ position: 'fixed', bottom: '20px', left: '20px', zIndex: 99999 }}>
+        <button 
+          onClick={() => {
+            console.log('Test modal button clicked, showTestModal:', showTestModal)
+            alert('🎉 PURPLE BUTTON WORKS! 🎉')
+            setShowTestModal(true)
+            console.log('After setShowTestModal, showTestModal:', !showTestModal)
+          }}
+          style={{ 
+            width: '60px', 
+            height: '60px', 
+            backgroundColor: 'purple', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '50%',
+            fontSize: '20px',
+            fontWeight: 'bold'
+          }}
+        >
+          T
+        </button>
+      </div>
+
+      {/* Test Modal */}
+      <TestModal
+        isOpen={showTestModal}
+        onClose={() => setShowTestModal(false)}
       />
     </div>
   )

@@ -376,6 +376,21 @@ export default function NewScreeningForm({
     <>
       {modalJSX}
       
+      {/* Test Button for Debugging */}
+      <div className="fixed bottom-6 left-6 z-[9999]">
+        <button
+          onClick={() => alert('NewScreeningForm Test Button Clicked!')}
+          className="w-16 h-16 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200"
+        >
+          <div className="flex items-center justify-center w-full h-full">
+            <span className="text-lg font-bold">N</span>
+          </div>
+        </button>
+        <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+          TEST
+        </div>
+      </div>
+
       {/* M.I.L.A. Assistant Button - Outside modal for proper z-index */}
       <AIAssistantButton
         currentForm="NewScreeningForm"

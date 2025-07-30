@@ -369,17 +369,22 @@ export default function NewScreeningForm({
           </div>
         </div>
       </div>
+    </div>
+  )
 
-      {/* M.I.L.A. Assistant Button */}
+  return createPortal(
+    <>
+      {modalJSX}
+      
+      {/* M.I.L.A. Assistant Button - Outside modal for proper z-index */}
       <AIAssistantButton
         currentForm="NewScreeningForm"
         currentField="diabetesMellitus"
         currentStep={currentStep}
       />
-    </div>
+    </>,
+    document.body
   )
-
-  return createPortal(modalJSX, document.body)
 }
 
 // Screening Details Form Component

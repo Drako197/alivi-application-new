@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
+import AIAssistantButton from './AIAssistantButton'
+import ProactiveSuggestionsService from '../services/ProactiveSuggestionsService'
 
 // NOTE: Using React Portal to ensure modal overlay covers entire viewport
 // This fixes the issue where modals don't start from the top of the page
@@ -146,6 +148,7 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
   const [debouncedPatientIdSearchTerm, setDebouncedPatientIdSearchTerm] = useState('')
   const [debouncedPcpSearchTerm, setDebouncedPcpSearchTerm] = useState('')
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [proactiveSuggestions, setProactiveSuggestions] = useState<any[]>([])
 
   // Close modal on escape key
   useEffect(() => {
@@ -204,6 +207,21 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
       setShowPCPAutocomplete(false)
     }
   }, [pcpSearchTerm, activeTab])
+
+  // Generate proactive suggestions
+  useEffect(() => {
+    const currentSearchTerm = activeTab === 'patient-id' ? patientIdSearchTerm : pcpSearchTerm
+    if (currentSearchTerm.trim().length > 2) {
+      const suggestions = ProactiveSuggestionsService.getProactiveSuggestions({
+        currentForm: 'PatientSearchModal',
+        currentField: activeTab === 'patient-id' ? 'patientId' : 'pcpName',
+        userInput: currentSearchTerm
+      })
+      setProactiveSuggestions(suggestions)
+    } else {
+      setProactiveSuggestions([])
+    }
+  }, [patientIdSearchTerm, pcpSearchTerm, activeTab])
 
   // Get all patients with filters applied
   const getAllPatients = () => {
@@ -472,6 +490,22 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
               )}
             </div>
           
+          {/* Proactive Suggestions */}
+          {proactiveSuggestions.length > 0 && (
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-700 rounded-lg">
+              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                💡 M.I.L.A. Suggestions
+              </h4>
+              <div className="space-y-2">
+                {proactiveSuggestions.slice(0, 3).map((suggestion, index) => (
+                  <div key={index} className="text-sm text-blue-700 dark:text-blue-300">
+                    • {suggestion.message}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {/* PCP Auto-complete */}
           {showPCPAutocomplete && (
             <div className="patient-search-autocomplete">
@@ -683,6 +717,13 @@ export default function PatientSearchModal({ isOpen, onClose, onPatientSelect }:
           )}
         </div>
       </div>
+
+      {/* M.I.L.A. Assistant Button */}
+      <AIAssistantButton
+        currentForm="PatientSearchModal"
+        currentField="patientId"
+        currentStep={1}
+      />
     </div>,
     document.body
   )

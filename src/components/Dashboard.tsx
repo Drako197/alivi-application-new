@@ -11,6 +11,12 @@ import HEDISLandingPage from './HEDISLandingPage'
 import MILAEnhancedDemo from './MILAEnhancedDemo'
 import Icon from './Icon'
 import ScreeningDataService, { type CompletedScreening, type SavedScreening } from '../services/ScreeningDataService'
+import PatientEligibilityForm from './PatientEligibilityForm'
+import ClaimsSubmissionForm from './ClaimsSubmissionForm'
+import PrescriptionForm from './PrescriptionForm'
+import AIAssistantButton from './AIAssistantButton'
+import PatientSearchModal from './PatientSearchModal'
+import NewScreeningForm from './NewScreeningForm'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
@@ -35,6 +41,10 @@ export default function Dashboard() {
   const [picResetCounter, setPICResetCounter] = useState(0)
   const [mobileSearchTerm, setMobileSearchTerm] = useState('')
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
+  
+  // Mobile form state management
+  const [mobilePICView, setMobilePICView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription'>('landing')
+  const [mobileHEDISView, setMobileHEDISView] = useState<'landing' | 'patient-search' | 'screening-form'>('landing')
 
   // Real data state
   const [dashboardStats, setDashboardStats] = useState({
@@ -80,10 +90,27 @@ export default function Dashboard() {
     updateBreadcrumbPath(activeDesktopTab)
   }, [activeDesktopTab])
 
+  // Mobile action handlers
+  const handleMobileAction = (actionId: string) => {
+    switch (actionId) {
+      case 'request-patient-eligibility':
+        setMobilePICView('patient-eligibility')
+        break
+      case 'claims-submission':
+        setMobilePICView('claims-submission')
+        break
+      case 'prescription':
+        setMobilePICView('prescription')
+        break
+      default:
+        console.log('Mobile action clicked:', actionId)
+    }
+  }
+
   // Mobile P.I.C. Action Data - Updated to match actual PIC actions
   const mobileActions = [
     {
-      id: 1,
+      id: 'request-patient-eligibility',
       title: 'Request Patient Eligibility',
       description: 'Check patient eligibility and benefits',
       icon: 'user-check',
@@ -91,7 +118,7 @@ export default function Dashboard() {
       frequency: 95
     },
     {
-      id: 2,
+      id: 'claims-submission',
       title: 'Claims Submission',
       description: 'Submit new claims for processing',
       icon: 'upload',
@@ -99,7 +126,15 @@ export default function Dashboard() {
       frequency: 92
     },
     {
-      id: 3,
+      id: 'prescription',
+      title: 'Prescription Entry',
+      description: 'Enter detailed prescription parameters',
+      icon: 'eye',
+      category: 'claims',
+      frequency: 89
+    },
+    {
+      id: 'claim-status',
       title: 'Claim Status',
       description: 'View real-time claim processing status',
       icon: 'search',
@@ -107,7 +142,7 @@ export default function Dashboard() {
       frequency: 88
     },
     {
-      id: 4,
+      id: 'claim-summary',
       title: 'Claim Summary',
       description: 'View detailed claim summaries and reports',
       icon: 'file-text',
@@ -115,7 +150,7 @@ export default function Dashboard() {
       frequency: 82
     },
     {
-      id: 5,
+      id: 'job-status-online',
       title: 'Job Status Online Entry',
       description: 'Enter job status information online',
       icon: 'monitor',
@@ -123,7 +158,7 @@ export default function Dashboard() {
       frequency: 55
     },
     {
-      id: 6,
+      id: 'job-status-paper',
       title: 'Job Status Paper Claim',
       description: 'Submit job status via paper claim',
       icon: 'file-text',
@@ -131,7 +166,7 @@ export default function Dashboard() {
       frequency: 45
     },
     {
-      id: 7,
+      id: 'health-plan-details',
       title: 'Health Plan Details',
       description: 'View health plan information and coverage',
       icon: 'info',
@@ -139,7 +174,7 @@ export default function Dashboard() {
       frequency: 85
     },
     {
-      id: 8,
+      id: 'explanation-of-payments',
       title: 'Explanation of Payments',
       description: 'View detailed payment explanations',
       icon: 'dollar-sign',
@@ -147,7 +182,7 @@ export default function Dashboard() {
       frequency: 78
     },
     {
-      id: 9,
+      id: 'payment-summary-report',
       title: 'Payment Summary Report',
       description: 'Generate payment summary reports',
       icon: 'bar-chart-3',
@@ -155,7 +190,7 @@ export default function Dashboard() {
       frequency: 72
     },
     {
-      id: 10,
+      id: 'frame-collections',
       title: 'Frame Collections',
       description: 'Access frame collection information',
       icon: 'package',
@@ -163,7 +198,7 @@ export default function Dashboard() {
       frequency: 65
     },
     {
-      id: 11,
+      id: 'lens-price-list',
       title: 'Lens Price List',
       description: 'View current lens pricing information',
       icon: 'tag',
@@ -171,7 +206,7 @@ export default function Dashboard() {
       frequency: 58
     },
     {
-      id: 12,
+      id: 'um-prior-authorization',
       title: 'UM Prior Authorization',
       description: 'Submit utilization management authorizations',
       icon: 'shield-check',
@@ -179,7 +214,7 @@ export default function Dashboard() {
       frequency: 82
     },
     {
-      id: 13,
+      id: 'um-authorization-status',
       title: 'UM Authorization Status',
       description: 'Check authorization request status',
       icon: 'clock',
@@ -187,7 +222,7 @@ export default function Dashboard() {
       frequency: 75
     },
     {
-      id: 14,
+      id: 'manual-eligibility-request',
       title: 'Manual Eligibility Request',
       description: 'Submit manual eligibility requests',
       icon: 'edit-3',
@@ -195,7 +230,7 @@ export default function Dashboard() {
       frequency: 68
     },
     {
-      id: 15,
+      id: 'provider-resources',
       title: 'Provider Resources',
       description: 'Access provider tools and resources',
       icon: 'graduation-cap',
@@ -574,14 +609,75 @@ export default function Dashboard() {
       case 'profile':
         return <MobileProfile />
       case 'hedis':
-        return <HEDISLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />
+        return (
+          <div className="mobile-main-content">
+            {mobileHEDISView === 'landing' ? (
+              <HEDISLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />
+            ) : mobileHEDISView === 'patient-search' ? (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => setMobileHEDISView('landing')}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Search</h2>
+                </div>
+                <PatientSearchModal 
+                  isOpen={true} 
+                  onClose={() => setMobileHEDISView('landing')}
+                  onPatientSelect={(patient) => {
+                    console.log('Patient selected:', patient)
+                    setMobileHEDISView('screening-form')
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => setMobileHEDISView('landing')}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">HEDIS Screening</h2>
+                </div>
+                <NewScreeningForm 
+                  patient={{ 
+                    id: '1', 
+                    patientId: 'P001', 
+                    firstName: 'Test', 
+                    lastName: 'Patient', 
+                    dateOfBirth: '1990-01-01',
+                    pcpName: 'Dr. Smith',
+                    pcpLocation: 'Primary Care Clinic',
+                    lastVisit: '2024-01-15',
+                    status: 'active'
+                  }}
+                  isOpen={true}
+                  onClose={() => setMobileHEDISView('landing')}
+                  onSave={(data) => console.log('Screening saved:', data)}
+                  onComplete={(data) => {
+                    console.log('Screening completed:', data)
+                    setMobileHEDISView('landing')
+                  }}
+                />
+              </div>
+            )}
+            <AIAssistantButton currentForm="HEDIS" currentField="mobile" currentStep={1} />
+          </div>
+        )
       case 'pic':
         return (
-          <div className="p-4">
-            {/* Mobile P.I.C. Header */}
-            <div className="mb-4">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">P.I.C. Actions</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Quick access to all provider interface center actions</p>
+          <div className="mobile-main-content">
+            {mobilePICView === 'landing' ? (
+              <div className="p-4">
+                {/* Mobile P.I.C. Header */}
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">P.I.C. Actions</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Quick access to all provider interface center actions</p>
               
               {/* Mobile Search */}
               <div className="relative mb-4">
@@ -663,7 +759,11 @@ export default function Dashboard() {
             {/* Mobile Action Cards */}
             <div className="space-y-3">
               {filteredMobileActions.map((action) => (
-                <div key={action.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                <div 
+                  key={action.id} 
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  onClick={() => handleMobileAction(action.id)}
+                >
                   <div className="flex items-center">
                     <div className="flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
                       {getMobileIcon(action.icon)}
@@ -707,16 +807,79 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-
-
           </div>
-        )
+        ) : mobilePICView === 'patient-eligibility' ? (
+          <div className="p-4">
+            <div className="flex items-center mb-4">
+              <button
+                onClick={() => setMobilePICView('landing')}
+                className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                <Icon name="arrow-left" size={20} />
+              </button>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Eligibility</h2>
+            </div>
+            <PatientEligibilityForm />
+            <AIAssistantButton currentForm="PatientEligibility" currentField="mobile" currentStep={1} />
+          </div>
+        ) : mobilePICView === 'claims-submission' ? (
+          <div className="p-4">
+            <div className="flex items-center mb-4">
+              <button
+                onClick={() => setMobilePICView('landing')}
+                className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                <Icon name="arrow-left" size={20} />
+              </button>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Claims Submission</h2>
+            </div>
+            <ClaimsSubmissionForm />
+            <AIAssistantButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} />
+          </div>
+        ) : mobilePICView === 'prescription' ? (
+          <div className="p-4">
+            <div className="flex items-center mb-4">
+              <button
+                onClick={() => setMobilePICView('landing')}
+                className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                <Icon name="arrow-left" size={20} />
+              </button>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Entry</h2>
+            </div>
+            <PrescriptionForm />
+            <AIAssistantButton currentForm="Prescription" currentField="mobile" currentStep={1} />
+          </div>
+        )}
+        <AIAssistantButton currentForm="PIC" currentField="mobile" currentStep={1} />
+      </div>
       case 'reports':
         return (
           <div className="p-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Reports</h2>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <p className="text-gray-600 dark:text-gray-400">Reports content coming soon...</p>
+            </div>
+          </div>
+        )
+      case 'settings':
+        return (
+          <div className="p-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Settings</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Application configuration and M.I.L.A. AI Assistant</p>
+            
+            {/* M.I.L.A. Demo Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">M.I.L.A. AI Assistant Demo</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <MILAEnhancedDemo />
+              </div>
+            </div>
+            
+            {/* General Settings Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">General Settings</h3>
+              <p className="text-gray-600 dark:text-gray-400">Additional settings content coming soon...</p>
             </div>
           </div>
         )

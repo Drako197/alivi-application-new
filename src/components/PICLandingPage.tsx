@@ -3,6 +3,7 @@ import type { ReactElement } from 'react'
 import Icon from './Icon'
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
+import PrescriptionForm from './PrescriptionForm'
 
 interface ActionItem {
   id: string
@@ -22,7 +23,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission'>('landing')
+  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription'>('landing')
 
   // Reset to landing page when resetToLanding prop changes
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
     // Claims & Eligibility
     { id: 'request-patient-eligibility', name: 'Request Patient Eligibility', description: 'Check patient eligibility and benefits', category: 'eligibility', frequency: 95, icon: 'user-check' },
     { id: 'claims-submission', name: 'Claims Submission', description: 'Submit new claims for processing', category: 'claims', frequency: 92, icon: 'upload' },
+    { id: 'prescription', name: 'Prescription Entry', description: 'Enter detailed prescription parameters', category: 'claims', frequency: 89, icon: 'eye' },
     { id: 'claim-status', name: 'Claim Status', description: 'View real-time claim processing status', category: 'claims', frequency: 88, icon: 'search' },
     { id: 'claim-summary', name: 'Claim Summary', description: 'View detailed claim summaries and reports', category: 'claims', frequency: 82, icon: 'file-text' },
     { id: 'job-status-online', name: 'Job Status Online Entry', description: 'Enter job status information online', category: 'claims', frequency: 55, icon: 'monitor' },
@@ -92,6 +94,12 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       if (onUpdateBreadcrumb) {
         onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Claims Submission'])
       }
+    } else if (action.id === 'prescription') {
+      setCurrentView('prescription')
+      // Update breadcrumb to show P.I.C. > Prescription Entry
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Prescription Entry'])
+      }
     } else {
       // Here you would typically navigate to the specific action or open a modal
       console.log('Navigating to:', action.name)
@@ -126,6 +134,11 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   // Show Claims Submission Form if currentView is 'claims-submission'
   if (currentView === 'claims-submission') {
     return <ClaimsSubmissionForm onBack={handleBackToLanding} />
+  }
+
+  // Show Prescription Form if currentView is 'prescription'
+  if (currentView === 'prescription') {
+    return <PrescriptionForm onBack={handleBackToLanding} />
   }
 
   return (

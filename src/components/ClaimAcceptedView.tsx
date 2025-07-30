@@ -25,29 +25,29 @@ export default function ClaimAcceptedView({
             </h1>
             
             {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={onViewBenefits}
-                className="btn-primary flex items-center gap-2"
-              >
-                <Icon name="check-circle" size={16} />
-                View Reserved Benefits
-              </button>
-              <button
-                onClick={onViewReport}
-                className="btn-secondary flex items-center gap-2"
-              >
-                <Icon name="file-text" size={16} />
-                Optometric Report
-              </button>
-              <button
-                onClick={onPrint}
-                className="btn-tertiary flex items-center gap-2"
-              >
-                <Icon name="printer" size={16} />
-                Print
-              </button>
-            </div>
+                            <div className="flex gap-3">
+                  <button
+                    onClick={onPrint}
+                    className="btn-primary flex items-center gap-2"
+                  >
+                    <Icon name="printer" size={16} />
+                    Print
+                  </button>
+                  <button
+                    onClick={onViewReport}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Icon name="file-text" size={16} />
+                    Optometric Report
+                  </button>
+                  <button
+                    onClick={onViewBenefits}
+                    className="btn-tertiary flex items-center gap-2"
+                  >
+                    <Icon name="check-circle" size={16} />
+                    View Reserved Benefits
+                  </button>
+                </div>
           </div>
         </div>
       </div>
@@ -413,29 +413,29 @@ export default function ClaimAcceptedView({
         </div>
 
         {/* Bottom Action Buttons */}
-        <div className="mt-8 flex justify-center gap-4">
-          <button
-            onClick={onViewBenefits}
-            className="btn-primary flex items-center gap-2"
-          >
-            <Icon name="check-circle" size={16} />
-            View Reserved Benefits
-          </button>
-          <button
-            onClick={onViewReport}
-            className="btn-secondary flex items-center gap-2"
-          >
-            <Icon name="file-text" size={16} />
-            Optometric Report
-          </button>
-          <button
-            onClick={onPrint}
-            className="btn-tertiary flex items-center gap-2"
-          >
-            <Icon name="printer" size={16} />
-            Print
-          </button>
-        </div>
+                        <div className="mt-8 flex justify-center gap-4">
+                  <button
+                    onClick={onPrint}
+                    className="btn-primary flex items-center gap-2"
+                  >
+                    <Icon name="printer" size={16} />
+                    Print
+                  </button>
+                  <button
+                    onClick={onViewReport}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Icon name="file-text" size={16} />
+                    Optometric Report
+                  </button>
+                  <button
+                    onClick={onViewBenefits}
+                    className="btn-tertiary flex items-center gap-2"
+                  >
+                    <Icon name="check-circle" size={16} />
+                    View Reserved Benefits
+                  </button>
+                </div>
       </div>
     </div>
   )

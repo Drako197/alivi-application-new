@@ -3499,8 +3499,32 @@ export default function ClaimsSubmissionForm({
                               </div>
                             </td>
                             <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.units}</td>
-                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.uAndCCharge}</td>
-                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.planAllowed}</td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={procedure.uAndCCharge}
+                                onChange={(e) => {
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].uAndCCharge = e.target.value
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="form-input w-full border rounded-md pl-2.5 text-sm"
+                                placeholder="$0.00"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={procedure.planAllowed}
+                                onChange={(e) => {
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].planAllowed = e.target.value
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="form-input w-full border rounded-md pl-2.5 text-sm"
+                                placeholder="$0.00"
+                              />
+                            </td>
                             <td className="px-3 py-2">
                               <button
                                 type="button"

@@ -27,25 +27,25 @@ export default function ClaimAcceptedView({
             {/* Action Buttons */}
             <div className="flex gap-3">
               <button
-                onClick={onPrint}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                onClick={onViewBenefits}
+                className="btn-primary flex items-center gap-2"
               >
-                <Icon name="printer" size={16} />
-                Print
+                <Icon name="check-circle" size={16} />
+                View Reserved Benefits
               </button>
               <button
                 onClick={onViewReport}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn-secondary flex items-center gap-2"
               >
                 <Icon name="file-text" size={16} />
                 Optometric Report
               </button>
               <button
-                onClick={onViewBenefits}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                onClick={onPrint}
+                className="btn-tertiary flex items-center gap-2"
               >
-                <Icon name="check-circle" size={16} />
-                View Reserved Benefits
+                <Icon name="printer" size={16} />
+                Print
               </button>
             </div>
           </div>
@@ -415,25 +415,25 @@ export default function ClaimAcceptedView({
         {/* Bottom Action Buttons */}
         <div className="mt-8 flex justify-center gap-4">
           <button
-            onClick={onPrint}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            onClick={onViewBenefits}
+            className="btn-primary flex items-center gap-2"
           >
-            <Icon name="printer" size={16} />
-            Print
+            <Icon name="check-circle" size={16} />
+            View Reserved Benefits
           </button>
           <button
             onClick={onViewReport}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="btn-secondary flex items-center gap-2"
           >
             <Icon name="file-text" size={16} />
             Optometric Report
           </button>
           <button
-            onClick={onViewBenefits}
-            className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            onClick={onPrint}
+            className="btn-tertiary flex items-center gap-2"
           >
-            <Icon name="check-circle" size={16} />
-            View Reserved Benefits
+            <Icon name="printer" size={16} />
+            Print
           </button>
         </div>
       </div>

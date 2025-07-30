@@ -64,6 +64,9 @@ class ProactiveSuggestionsService {
     // Workflow-based suggestions
     suggestions.push(...this.getWorkflowBasedSuggestions(context))
 
+    // Error prevention and data quality suggestions
+    suggestions.push(...this.getErrorPreventionSuggestions(context))
+
     return suggestions
       .sort((a, b) => this.getPriorityScore(b.priority) - this.getPriorityScore(a.priority))
       .slice(0, 3) // Limit to top 3 suggestions
@@ -852,6 +855,193 @@ class ProactiveSuggestionsService {
     }
 
     return suggestions
+  }
+
+  /**
+   * Get error prevention and data quality suggestions
+   */
+  private static getErrorPreventionSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Common mistakes prevention
+    suggestions.push(...this.getCommonMistakesSuggestions(context))
+
+    // Data quality suggestions
+    suggestions.push(...this.getDataQualitySuggestions(context))
+
+    // Format validation suggestions
+    suggestions.push(...this.getFormatValidationSuggestions(context))
+
+    return suggestions
+  }
+
+  /**
+   * Get common mistakes prevention suggestions
+   */
+  private static getCommonMistakesSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // NPI validation
+    if (context.currentField === 'providerId') {
+      suggestions.push({
+        id: 'npi-validation',
+        type: 'reminder',
+        title: 'NPI Format Check',
+        content: 'NPI numbers must be exactly 10 digits. I can help you verify this in real-time.',
+        action: 'validate_npi',
+        priority: 'high',
+        category: 'validation',
+        icon: 'shield-check'
+      })
+    }
+
+    // Date format validation
+    if (context.currentField?.includes('Date') || context.currentField === 'dateOfBirth') {
+      suggestions.push({
+        id: 'date-format-validation',
+        type: 'reminder',
+        title: 'Date Format',
+        content: 'Use MM/DD/YYYY format (e.g., 01/15/1985). Future dates are not allowed.',
+        action: 'validate_date',
+        priority: 'medium',
+        category: 'validation',
+        icon: 'calendar'
+      })
+    }
+
+    // Required field reminders
+    if (context.currentField && this.isRequiredField(context.currentForm, context.currentField)) {
+      suggestions.push({
+        id: 'required-field',
+        type: 'reminder',
+        title: 'Required Field',
+        content: 'This field is required for claims processing. Make sure to fill it out completely.',
+        action: 'required_field_help',
+        priority: 'high',
+        category: 'validation',
+        icon: 'alert-circle'
+      })
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Get data quality suggestions
+   */
+  private static getDataQualitySuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Duplicate entry detection
+    if (context.currentField?.includes('diagnosisCodes')) {
+      suggestions.push({
+        id: 'duplicate-codes',
+        type: 'reminder',
+        title: 'Duplicate Codes',
+        content: 'Make sure you haven\'t entered the same diagnosis code twice. Each code should be unique.',
+        action: 'check_duplicates',
+        priority: 'medium',
+        category: 'quality',
+        icon: 'copy'
+      })
+    }
+
+    // Inconsistent data detection
+    if (context.currentField?.includes('Sphere') || context.currentField?.includes('Cylinder')) {
+      suggestions.push({
+        id: 'prescription-consistency',
+        type: 'reminder',
+        title: 'Prescription Consistency',
+        content: 'Check that your sphere and cylinder values are consistent. I can help you verify the calculations.',
+        action: 'verify_prescription',
+        priority: 'medium',
+        category: 'quality',
+        icon: 'calculator'
+      })
+    }
+
+    // Phone number format
+    if (context.currentField?.includes('phone') || context.currentField?.includes('Phone')) {
+      suggestions.push({
+        id: 'phone-format',
+        type: 'reminder',
+        title: 'Phone Number Format',
+        content: 'Use (XXX) XXX-XXXX format for phone numbers. This ensures proper formatting.',
+        action: 'format_phone',
+        priority: 'low',
+        category: 'quality',
+        icon: 'phone'
+      })
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Get format validation suggestions
+   */
+  private static getFormatValidationSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Email format validation
+    if (context.currentField?.includes('email') || context.currentField?.includes('Email')) {
+      suggestions.push({
+        id: 'email-format',
+        type: 'reminder',
+        title: 'Email Format',
+        content: 'Please use a valid email format (e.g., user@domain.com). This is required for communications.',
+        action: 'validate_email',
+        priority: 'medium',
+        category: 'validation',
+        icon: 'mail'
+      })
+    }
+
+    // Fax number format
+    if (context.currentField?.includes('fax') || context.currentField?.includes('Fax')) {
+      suggestions.push({
+        id: 'fax-format',
+        type: 'reminder',
+        title: 'Fax Number Format',
+        content: 'Use (XXX) XXX-XXXX format for fax numbers. Include area code.',
+        action: 'format_fax',
+        priority: 'low',
+        category: 'validation',
+        icon: 'printer'
+      })
+    }
+
+    // ZIP code format
+    if (context.currentField?.includes('zip') || context.currentField?.includes('ZIP')) {
+      suggestions.push({
+        id: 'zip-format',
+        type: 'reminder',
+        title: 'ZIP Code Format',
+        content: 'Use 5-digit ZIP code format (e.g., 12345) or 9-digit format (e.g., 12345-6789).',
+        action: 'format_zip',
+        priority: 'low',
+        category: 'validation',
+        icon: 'map-pin'
+      })
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Check if a field is required
+   */
+  private static isRequiredField(formName?: string, fieldName?: string): boolean {
+    if (!formName || !fieldName) return false
+
+    const requiredFields: Record<string, string[]> = {
+      'PatientEligibilityForm': ['providerId', 'subscriberId', 'lastName', 'firstName', 'dateOfBirth'],
+      'ClaimsSubmissionForm': ['providerId', 'serviceDateFrom', 'serviceDateTo', 'diagnosisCodes'],
+      'NewScreeningForm': ['dateOfScreening', 'placeOfService', 'diabetesMellitus'],
+      'PrescriptionForm': ['odSphere', 'osSphere', 'odCylinder', 'osCylinder']
+    }
+
+    return requiredFields[formName]?.includes(fieldName) || false
   }
 }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Icon from './Icon'
 import DatePicker from './DatePicker'
+import AIAssistantButton from './AIAssistantButton'
 
 interface ClaimsSubmissionFormProps {
   onBack?: () => void
@@ -4023,6 +4024,33 @@ export default function ClaimsSubmissionForm({
 
       {/* Main content */}
       {stepContent}
+      
+      {/* M.I.L.A. Assistant */}
+      <AIAssistantButton 
+        currentForm="ClaimsSubmission"
+        currentField={getCurrentField()}
+        currentStep={currentStep}
+      />
     </div>
   )
+  
+  // Helper function to determine current field based on step
+  function getCurrentField(): string {
+    switch (currentStep) {
+      case 1:
+        return 'patient-information'
+      case 2:
+        return 'claim-details'
+      case 3:
+        return 'prescription-details'
+      case 4:
+        return 'lens-choice'
+      case 5:
+        return 'frame-selection'
+      case 6:
+        return 'review-submit'
+      default:
+        return 'general'
+    }
+  }
 } 

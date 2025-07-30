@@ -67,6 +67,9 @@ class ProactiveSuggestionsService {
     // Error prevention and data quality suggestions
     suggestions.push(...this.getErrorPreventionSuggestions(context))
 
+    // Advanced learning and progressive disclosure
+    suggestions.push(...this.getAdvancedLearningSuggestions(context))
+
     return suggestions
       .sort((a, b) => this.getPriorityScore(b.priority) - this.getPriorityScore(a.priority))
       .slice(0, 3) // Limit to top 3 suggestions
@@ -1042,6 +1045,178 @@ class ProactiveSuggestionsService {
     }
 
     return requiredFields[formName]?.includes(fieldName) || false
+  }
+
+  /**
+   * Get advanced learning and progressive disclosure suggestions
+   */
+  private static getAdvancedLearningSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+    const userStats = PersonalizationService.getUserStats()
+
+    // Experience-based suggestions
+    suggestions.push(...this.getExperienceBasedSuggestions(userStats))
+
+    // Progressive disclosure suggestions
+    suggestions.push(...this.getProgressiveDisclosureSuggestions(context))
+
+    // Advanced feature suggestions
+    suggestions.push(...this.getAdvancedFeatureSuggestions(userStats))
+
+    return suggestions
+  }
+
+  /**
+   * Get experience-based suggestions
+   */
+  private static getExperienceBasedSuggestions(userStats: any): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // New users (1-3 sessions)
+    if (userStats.sessionCount <= 3) {
+      suggestions.push({
+        id: 'new-user-tips',
+        type: 'educational',
+        title: 'Getting Started',
+        content: 'Try asking me about medical terms like "OD", "OS", or diagnosis codes like "diabetes". I\'m here to help you learn!',
+        action: 'basic_tutorial',
+        priority: 'high',
+        category: 'education',
+        icon: 'graduation-cap'
+      })
+    }
+
+    // Experienced users (4-10 sessions)
+    else if (userStats.sessionCount <= 10) {
+      suggestions.push({
+        id: 'intermediate-tips',
+        type: 'educational',
+        title: 'Intermediate Features',
+        content: 'I can help you with complex code combinations and advanced billing scenarios. Try asking about multiple diagnosis codes.',
+        action: 'intermediate_tutorial',
+        priority: 'medium',
+        category: 'education',
+        icon: 'zap'
+      })
+    }
+
+    // Expert users (10+ sessions)
+    else {
+      suggestions.push({
+        id: 'expert-tips',
+        type: 'educational',
+        title: 'Expert Features',
+        content: 'Need help with advanced billing scenarios, audits, or compliance issues? I can assist with complex cases.',
+        action: 'expert_tutorial',
+        priority: 'medium',
+        category: 'education',
+        icon: 'award'
+      })
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Get progressive disclosure suggestions
+   */
+  private static getProgressiveDisclosureSuggestions(context: SuggestionContext): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Basic help for new users
+    if (context.userExperience === 'new') {
+      suggestions.push({
+        id: 'basic-help',
+        type: 'educational',
+        title: 'Basic Help',
+        content: 'I can explain medical terminology and help you find simple diagnosis codes.',
+        action: 'basic_help',
+        priority: 'high',
+        category: 'education',
+        icon: 'help-circle'
+      })
+    }
+
+    // Intermediate help for experienced users
+    else if (context.userExperience === 'experienced') {
+      suggestions.push({
+        id: 'intermediate-help',
+        type: 'educational',
+        title: 'Intermediate Help',
+        content: 'I can help you find diagnosis and procedure codes, and assist with form validation.',
+        action: 'intermediate_help',
+        priority: 'medium',
+        category: 'education',
+        icon: 'search'
+      })
+    }
+
+    // Advanced help for expert users
+    else if (context.userExperience === 'expert') {
+      suggestions.push({
+        id: 'advanced-help',
+        type: 'educational',
+        title: 'Advanced Help',
+        content: 'I can help you with complex billing scenarios, compliance issues, and advanced form features.',
+        action: 'advanced_help',
+        priority: 'medium',
+        category: 'education',
+        icon: 'settings'
+      })
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Get advanced feature suggestions
+   */
+  private static getAdvancedFeatureSuggestions(userStats: any): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Suggest advanced features for experienced users
+    if (userStats.sessionCount > 5) {
+      suggestions.push({
+        id: 'batch-processing',
+        type: 'predictive',
+        title: 'Batch Processing',
+        content: 'You have multiple similar claims. Would you like to learn about batch processing to save time?',
+        action: 'batch_processing_help',
+        priority: 'medium',
+        category: 'advanced',
+        icon: 'layers'
+      })
+    }
+
+    // Suggest templates for frequent users
+    if (userStats.sessionCount > 10) {
+      suggestions.push({
+        id: 'template-creation',
+        type: 'predictive',
+        title: 'Template Creation',
+        content: 'I can help you create templates for frequently used information to speed up your workflow.',
+        action: 'template_help',
+        priority: 'medium',
+        category: 'advanced',
+        icon: 'file-text'
+      })
+    }
+
+    // Suggest shortcuts for power users
+    if (userStats.sessionCount > 15) {
+      suggestions.push({
+        id: 'keyboard-shortcuts',
+        type: 'predictive',
+        title: 'Keyboard Shortcuts',
+        content: 'Learn keyboard shortcuts to navigate forms faster. Ctrl+S to save, Ctrl+N for new forms.',
+        action: 'shortcuts_help',
+        priority: 'low',
+        category: 'advanced',
+        icon: 'keyboard'
+      })
+    }
+
+    return suggestions
   }
 }
 

@@ -2607,8 +2607,13 @@ export default function ClaimsSubmissionForm({
                         </label>
                         <select
                           value={formData.pdType}
-                          onChange={(e) => setFormData(prev => ({ ...prev, pdType: e.target.value }))}
-                          className="form-select w-full border rounded-md pl-2.5"
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, pdType: e.target.value }))
+                            if (e.target.value && errors.pdType) {
+                              setErrors(prev => ({ ...prev, pdType: '' }))
+                            }
+                          }}
+                          className={`form-select w-full border rounded-md pl-2.5 ${errors.pdType ? 'border-red-500' : 'border-blue-300'}`}
                         >
                           <option value="">Select PD Type</option>
                           <option value="CR-39">CR-39</option>
@@ -2616,6 +2621,9 @@ export default function ClaimsSubmissionForm({
                           <option value="High Index 1.67">High Index 1.67</option>
                           <option value="High Index 1.74">High Index 1.74</option>
                         </select>
+                        {errors.pdType && (
+                          <p className="mt-1 text-sm text-red-600">{errors.pdType}</p>
+                        )}
                       </div>
                       
                       <div>
@@ -2624,16 +2632,24 @@ export default function ClaimsSubmissionForm({
                         </label>
                         <select
                           value={formData.material}
-                          onChange={(e) => setFormData(prev => ({ ...prev, material: e.target.value }))}
-                          className="form-select w-full border rounded-md pl-2.5"
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, material: e.target.value }))
+                            if (e.target.value && errors.material) {
+                              setErrors(prev => ({ ...prev, material: '' }))
+                            }
+                          }}
+                          className={`form-select w-full border rounded-md pl-2.5 ${errors.material ? 'border-red-500' : 'border-blue-300'}`}
                         >
                           <option value="">Select Material</option>
                           <option value="CR-39">CR-39</option>
                           <option value="Polycarbonate">Polycarbonate</option>
-                          <option value="High Index 1.67">High Index 1.67</option>
-                          <option value="High Index 1.74">High Index 1.74</option>
-                        </select>
-                      </div>
+                                                      <option value="High Index 1.67">High Index 1.67</option>
+                            <option value="High Index 1.74">High Index 1.74</option>
+                          </select>
+                          {errors.material && (
+                            <p className="mt-1 text-sm text-red-600">{errors.material}</p>
+                          )}
+                        </div>
                     </div>
                   </div>
                   
@@ -2649,14 +2665,22 @@ export default function ClaimsSubmissionForm({
                         </label>
                         <select
                           value={formData.binocularFarPD}
-                          onChange={(e) => setFormData(prev => ({ ...prev, binocularFarPD: e.target.value }))}
-                          className="form-select w-full border rounded-md pl-2.5"
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, binocularFarPD: e.target.value }))
+                            if (e.target.value && errors.binocularFarPD) {
+                              setErrors(prev => ({ ...prev, binocularFarPD: '' }))
+                            }
+                          }}
+                          className={`form-select w-full border rounded-md pl-2.5 ${errors.binocularFarPD ? 'border-red-500' : 'border-blue-300'}`}
                         >
                           <option value="">Select Far PD</option>
                           {Array.from({ length: 20 }, (_, i) => (30 + i * 0.5).toFixed(1)).map(pd => (
                             <option key={pd} value={`${pd} MM`}>{pd} MM</option>
                           ))}
                         </select>
+                        {errors.binocularFarPD && (
+                          <p className="mt-1 text-sm text-red-600">{errors.binocularFarPD}</p>
+                        )}
                       </div>
                       
                       <div>
@@ -2665,14 +2689,22 @@ export default function ClaimsSubmissionForm({
                         </label>
                         <select
                           value={formData.binocularNearPD}
-                          onChange={(e) => setFormData(prev => ({ ...prev, binocularNearPD: e.target.value }))}
-                          className="form-select w-full border rounded-md pl-2.5"
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, binocularNearPD: e.target.value }))
+                            if (e.target.value && errors.binocularNearPD) {
+                              setErrors(prev => ({ ...prev, binocularNearPD: '' }))
+                            }
+                          }}
+                          className={`form-select w-full border rounded-md pl-2.5 ${errors.binocularNearPD ? 'border-red-500' : 'border-blue-300'}`}
                         >
                           <option value="">Select Near PD</option>
                           {Array.from({ length: 20 }, (_, i) => (27 + i * 0.5).toFixed(1)).map(pd => (
                             <option key={pd} value={`${pd} MM`}>{pd} MM</option>
                           ))}
                         </select>
+                        {errors.binocularNearPD && (
+                          <p className="mt-1 text-sm text-red-600">{errors.binocularNearPD}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2833,14 +2865,22 @@ export default function ClaimsSubmissionForm({
                         </label>
                         <select
                           value={formData.coating}
-                          onChange={(e) => setFormData(prev => ({ ...prev, coating: e.target.value }))}
-                          className="form-select w-full border rounded-md pl-2.5"
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, coating: e.target.value }))
+                            if (e.target.value && errors.coating) {
+                              setErrors(prev => ({ ...prev, coating: '' }))
+                            }
+                          }}
+                          className={`form-select w-full border rounded-md pl-2.5 ${errors.coating ? 'border-red-500' : 'border-blue-300'}`}
                         >
                           <option value="">Select Coating</option>
-                          <option value="Standard ARC">Standard ARC</option>
-                          <option value="Premium ARC">Premium ARC</option>
-                          <option value="Blue Light Filter">Blue Light Filter</option>
-                        </select>
+                                                      <option value="Standard ARC">Standard ARC</option>
+                            <option value="Premium ARC">Premium ARC</option>
+                            <option value="Blue Light Filter">Blue Light Filter</option>
+                          </select>
+                          {errors.coating && (
+                            <p className="mt-1 text-sm text-red-600">{errors.coating}</p>
+                          )}
                       </div>
                       
                       <div>

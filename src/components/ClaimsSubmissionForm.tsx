@@ -3479,6 +3479,150 @@ export default function ClaimsSubmissionForm({
                     </div>
                   </div>
                 </div>
+
+                {/* Frame Selection Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Frame Selection
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Frame Source:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">Insurance Supplied - Grand Lux Collection</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Frame Type:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">1</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Rimless Type:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">XYL</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Name:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">U 20</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Color:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">Tortoise</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Eye Size:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">46</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Bridge:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">20</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Vertical:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">20</div>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">ED:</span>
+                      <div className="text-sm text-gray-900 dark:text-white mt-1">46</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Remake Section */}
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Remake
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Reason
+                      </label>
+                      <select
+                        value={formData.remakeReason}
+                        onChange={(e) => setFormData(prev => ({ ...prev, remakeReason: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Reason</option>
+                        <option value="Incorrect Order">Incorrect Order</option>
+                        <option value="Damaged">Damaged</option>
+                        <option value="Wrong Size">Wrong Size</option>
+                        <option value="Patient Request">Patient Request</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Job Order Number
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.jobOrderNumber}
+                        readOnly
+                        className="form-input w-full border rounded-md pl-2.5 bg-gray-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Date
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.remakeDate}
+                        readOnly
+                        className="form-input w-full border rounded-md pl-2.5 bg-gray-50"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Claim Notes Section */}
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Claim Notes
+                  </h3>
+                  <div>
+                    <label htmlFor="claimNotes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Notes
+                    </label>
+                    <textarea
+                      id="claimNotes"
+                      value={formData.claimNotes}
+                      onChange={(e) => setFormData(prev => ({ ...prev, claimNotes: e.target.value }))}
+                      rows={4}
+                      className="form-textarea w-full border rounded-md pl-2.5 resize-y"
+                      placeholder="Enter any additional notes about this claim..."
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-center gap-4 pt-6">
+                  <button
+                    type="button"
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Icon name="printer" size={16} />
+                    Print
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Icon name="save" size={16} />
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Icon name="rotate-ccw" size={16} />
+                    Edit Claim
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-success flex items-center gap-2"
+                  >
+                    <Icon name="check" size={16} />
+                    Accept and Submit
+                  </button>
+                </div>
               </div>
             )}
 
@@ -3592,7 +3736,13 @@ export default function ClaimsSubmissionForm({
                           }
                         ],
                         totalCharges: '',
-                        totalAllowed: ''
+                        totalAllowed: '',
+                        
+                        // Step 6 - Additional fields
+                        remakeReason: '',
+                        jobOrderNumber: '000122544552',
+                        remakeDate: '07/16/2016',
+                        claimNotes: ''
                       })
                     }
                   }}

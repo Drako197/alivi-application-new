@@ -77,50 +77,323 @@ class ProactiveSuggestionsService {
     // Form-specific suggestions
     switch (context.currentForm) {
       case 'PatientEligibilityForm':
-        if (context.currentField === 'providerId') {
-          suggestions.push({
-            id: 'provider-verification',
-            type: 'contextual',
-            title: 'Provider Verification',
-            content: 'I can help you verify NPI numbers in real-time. Just ask me to check any provider!',
-            action: 'verify_provider',
-            priority: 'high',
-            category: 'provider',
-            icon: 'user-check'
-          })
-        }
-        if (context.currentField === 'diagnosisCodes') {
-          suggestions.push({
-            id: 'diagnosis-codes',
-            type: 'contextual',
-            title: 'Diagnosis Code Lookup',
-            content: 'Need help finding the right ICD-10 codes? I can search our comprehensive database for you.',
-            action: 'search_codes',
-            priority: 'high',
-            category: 'codes',
-            icon: 'search'
-          })
-        }
+        suggestions.push(...this.getPatientEligibilitySuggestions(context.currentField))
         break
 
       case 'ClaimsSubmissionForm':
-        if (context.currentField?.includes('Sphere') || context.currentField?.includes('Cylinder')) {
-          suggestions.push({
-            id: 'eye-terminology',
-            type: 'contextual',
-            title: 'Eye Terminology Help',
-            content: 'OD = Right Eye, OS = Left Eye, OU = Both Eyes. Need help with other terms?',
-            action: 'explain_terminology',
-            priority: 'medium',
-            category: 'terminology',
-            icon: 'eye'
-          })
-        }
+        suggestions.push(...this.getClaimsSubmissionSuggestions(context.currentField))
+        break
+
+      case 'NewScreeningForm':
+        suggestions.push(...this.getScreeningFormSuggestions(context.currentField))
+        break
+
+      case 'PrescriptionForm':
+        suggestions.push(...this.getPrescriptionFormSuggestions(context.currentField))
         break
     }
 
     return suggestions
   }
+
+  /**
+   * Get PatientEligibilityForm specific suggestions
+   */
+  private static getPatientEligibilitySuggestions(field: string): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    switch (field) {
+      case 'providerId':
+        suggestions.push({
+          id: 'provider-verification',
+          type: 'contextual',
+          title: 'Provider Verification',
+          content: 'I can help you verify NPI numbers in real-time using the official CMS database. Just ask me to check any provider!',
+          action: 'verify_provider',
+          priority: 'high',
+          category: 'provider',
+          icon: 'user-check'
+        })
+        break
+
+      case 'subscriberId':
+        suggestions.push({
+          id: 'subscriber-help',
+          type: 'contextual',
+          title: 'Subscriber ID Help',
+          content: 'This should match the member ID on the patient\'s insurance card. It\'s typically found on the front of the card.',
+          action: 'explain_field',
+          priority: 'medium',
+          category: 'form',
+          icon: 'credit-card'
+        })
+        break
+
+      case 'dependantSequence':
+        suggestions.push({
+          id: 'dependent-sequence',
+          type: 'contextual',
+          title: 'Dependent Sequence',
+          content: '00 = Primary Subscriber, 01 = Spouse, 02+ = Children in birth order. Need help determining the right sequence?',
+          action: 'explain_field',
+          priority: 'medium',
+          category: 'form',
+          icon: 'users'
+        })
+        break
+
+      case 'lastName':
+      case 'firstName':
+        suggestions.push({
+          id: 'name-format',
+          type: 'contextual',
+          title: 'Name Format',
+          content: 'Enter the legal name exactly as it appears on the insurance card. This is crucial for claims processing.',
+          action: 'explain_field',
+          priority: 'medium',
+          category: 'form',
+          icon: 'user'
+        })
+        break
+
+      case 'dateOfBirth':
+        suggestions.push({
+          id: 'date-format',
+          type: 'contextual',
+          title: 'Date Format',
+          content: 'Use MM/DD/YYYY format (e.g., 01/15/1985). This must match the insurance card exactly.',
+          action: 'explain_field',
+          priority: 'medium',
+          category: 'form',
+          icon: 'calendar'
+        })
+        break
+
+      case 'diagnosisCodes':
+        suggestions.push({
+          id: 'diagnosis-codes',
+          type: 'contextual',
+          title: 'Diagnosis Code Lookup',
+          content: 'Need help finding the right ICD-10 codes? I can search our comprehensive database for you.',
+          action: 'search_codes',
+          priority: 'high',
+          category: 'codes',
+          icon: 'search'
+        })
+        break
+    }
+
+    return suggestions
+  }
+
+  /**
+   * Get ClaimsSubmissionForm specific suggestions
+   */
+  private static getClaimsSubmissionSuggestions(field: string): ProactiveSuggestion[] {
+    const suggestions: ProactiveSuggestion[] = []
+
+    // Eye prescription fields
+    if (field.includes('Sphere') || field.includes('Cylinder') || field.includes('Axis')) {
+      suggestions.push({
+        id: 'eye-terminology',
+        type: 'contextual',
+        title: 'Eye Terminology Help',
+        content: 'OD = Right Eye, OS = Left Eye, OU = Both Eyes. Negative values for myopia, positive for hyperopia.',
+        action: 'explain_terminology',
+        priority: 'medium',
+        category: 'terminology',
+        icon: 'eye'
+      })
+    }
+
+    // Service date fields
+    if (field.includes('Date')) {
+      suggestions.push({
+        id: 'service-dates',
+        type: 'contextual',
+        title: 'Service Date Help',
+        content: 'Enter the date range when services were provided. For single-day services, use the same date for both fields.',
+        action: 'explain_field',
+        priority: 'medium',
+        category: 'form',
+        icon: 'calendar'
+      })
+    }
+
+    // Diagnosis codes
+    if (field.includes('diagnosisCodes')) {
+      suggestions.push({
+        id: 'diagnosis-codes-claims',
+        type: 'contextual',
+        title: 'Diagnosis Code Order',
+        content: 'Start with the primary diagnosis code first, then add secondary codes. I can help you find the right codes!',
+        action: 'search_codes',
+        priority: 'high',
+        category: 'codes',
+        icon: 'list'
+      })
+    }
+
+    // Lens selection fields
+    if (field.includes('lens') || field.includes('material') || field.includes('coating')) {
+      suggestions.push({
+        id: 'lens-selection',
+        type: 'contextual',
+        title: 'Lens Selection Help',
+        content: 'I can help you find the right lens codes, materials, and coatings for optimal patient care.',
+        action: 'lens_help',
+        priority: 'medium',
+          category: 'lens',
+          icon: 'glasses'
+        })
+      }
+
+      // Frame selection fields
+      if (field.includes('frame') || field.includes('size') || field.includes('bridge')) {
+        suggestions.push({
+          id: 'frame-selection',
+          type: 'contextual',
+          title: 'Frame Selection Help',
+          content: 'Need help with frame measurements, lens coatings, or finding the right frame codes?',
+          action: 'frame_help',
+          priority: 'medium',
+          category: 'frame',
+          icon: 'square'
+        })
+      }
+
+      return suggestions
+    }
+
+    /**
+     * Get NewScreeningForm specific suggestions
+     */
+    private static getScreeningFormSuggestions(field: string): ProactiveSuggestion[] {
+      const suggestions: ProactiveSuggestion[] = []
+
+      // Diabetes-related fields
+      if (field.includes('diabetes') || field.includes('diabetic')) {
+        suggestions.push({
+          id: 'diabetes-codes',
+          type: 'contextual',
+          title: 'Diabetes Diagnosis Codes',
+          content: 'I can help you find the right diabetes diagnosis codes: E11.9, E11.21, E11.22, and more.',
+          action: 'search_codes',
+          priority: 'high',
+          category: 'codes',
+          icon: 'activity'
+        })
+      }
+
+      // Ocular history fields
+      if (field.includes('ocular') || field.includes('history')) {
+        suggestions.push({
+          id: 'ocular-history',
+          type: 'contextual',
+          title: 'Ocular History Help',
+          content: 'Common conditions: diabetic retinopathy, glaucoma, cataracts. I can help you find the right codes.',
+          action: 'search_codes',
+          priority: 'medium',
+          category: 'codes',
+          icon: 'eye'
+        })
+      }
+
+      // Retinal imaging fields
+      if (field.includes('retinal') || field.includes('image')) {
+        suggestions.push({
+          id: 'retinal-imaging',
+          type: 'contextual',
+          title: 'Retinal Imaging Help',
+          content: 'I can help you verify image quality requirements and find the right CPT codes for retinal photography.',
+          action: 'imaging_help',
+          priority: 'medium',
+          category: 'imaging',
+          icon: 'camera'
+        })
+      }
+
+      // Practice information fields
+      if (field.includes('practice') || field.includes('phone') || field.includes('fax')) {
+        suggestions.push({
+          id: 'practice-info',
+          type: 'contextual',
+          title: 'Practice Information',
+          content: 'Need help finding your practice\'s NPI number or verifying contact information?',
+          action: 'practice_help',
+          priority: 'low',
+          category: 'practice',
+          icon: 'building'
+        })
+      }
+
+      return suggestions
+    }
+
+    /**
+     * Get PrescriptionForm specific suggestions
+     */
+    private static getPrescriptionFormSuggestions(field: string): ProactiveSuggestion[] {
+      const suggestions: ProactiveSuggestion[] = []
+
+      // Sphere/Cylinder fields
+      if (field.includes('Sphere') || field.includes('Cylinder')) {
+        suggestions.push({
+          id: 'prescription-conversion',
+          type: 'contextual',
+          title: 'Prescription Conversion',
+          content: 'I can help you convert between different prescription formats and verify your calculations.',
+          action: 'prescription_help',
+          priority: 'medium',
+          category: 'prescription',
+          icon: 'calculator'
+        })
+      }
+
+      // Axis fields
+      if (field.includes('Axis')) {
+        suggestions.push({
+          id: 'axis-help',
+          type: 'contextual',
+          title: 'Axis Values',
+          content: 'Axis values range from 0-180 degrees. I can help you determine the correct axis for astigmatism correction.',
+          action: 'explain_field',
+          priority: 'medium',
+          category: 'prescription',
+          icon: 'compass'
+        })
+      }
+
+      // Prism fields
+      if (field.includes('Prism') || field.includes('Horizontal') || field.includes('Vertical')) {
+        suggestions.push({
+          id: 'prism-help',
+          type: 'contextual',
+          title: 'Prism Correction',
+          content: 'I can help you calculate prism corrections and determine the right prism values for your patient.',
+          action: 'prism_help',
+          priority: 'medium',
+          category: 'prescription',
+          icon: 'triangle'
+        })
+      }
+
+      // Add power fields
+      if (field.includes('Add')) {
+        suggestions.push({
+          id: 'add-power',
+          type: 'contextual',
+          title: 'Add Power Help',
+          content: 'Add power is typically +0.75 to +3.50 for reading glasses. I can help you determine the right value.',
+          action: 'explain_field',
+          priority: 'medium',
+          category: 'prescription',
+          icon: 'plus'
+        })
+      }
+
+      return suggestions
+    }
 
   /**
    * Get predictive suggestions based on user patterns

@@ -88,7 +88,39 @@ export default function ClaimsSubmissionForm({
   // Dynamic diagnosis codes
   diagnosisCodes: [
     { id: 1, code: '', description: '', isPrimary: true }
-  ]
+  ],
+  
+  // Step 3 - Prescription Details
+  // Refractive Correction - OD (Right Eye)
+  odSphere: '',
+  odCylinder: '',
+  odAxis: '',
+  odAdd: '',
+  odBC: '',
+  
+  // Refractive Correction - OS (Left Eye)
+  osSphere: '',
+  osCylinder: '',
+  osAxis: '',
+  osAdd: '',
+  osBC: '',
+  
+  // Prism Correction - OD (Right Eye)
+  odHorizontal: '',
+  odHorizontalDirection: '',
+  odVertical: '',
+  odVerticalDirection: '',
+  odPrismType: '',
+  
+  // Prism Correction - OS (Left Eye)
+  osHorizontal: '',
+  osHorizontalDirection: '',
+  osVertical: '',
+  osVerticalDirection: '',
+  osPrismType: '',
+  
+  // Slab Off
+  slabOff: ''
 })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -377,14 +409,31 @@ export default function ClaimsSubmissionForm({
     
     // Step 2 validation (Claim Details)
     if (currentStep === 2) {
-      if (!formData.claimType) newErrors.claimType = 'Claim type is required'
-      if (!formData.serviceDate) newErrors.serviceDate = 'Service date is required'
-      if (!formData.placeOfService) newErrors.placeOfService = 'Place of service is required'
+      if (!formData.serviceDateFrom) newErrors.serviceDateFrom = 'Service date (from) is required'
+      if (!formData.serviceDateTo) newErrors.serviceDateTo = 'Service date (to) is required'
+      if (!formData.lab) newErrors.lab = 'Lab is required'
+      if (!formData.submissionForm) newErrors.submissionForm = 'Submission form is required'
+      
+      // Diabetes-related validation
+      if (formData.isDiabetic === 'yes') {
+        if (!formData.diabetesType) newErrors.diabetesType = 'Diabetes type is required'
+        if (!formData.manifestation) newErrors.manifestation = 'Manifestation is required'
+      }
+      
+      // Dilation-related validation
+      if (formData.wasDilated === 'no') {
+        if (!formData.reasonForNotDilating) newErrors.reasonForNotDilating = 'Reason for not dilating is required'
+        if (formData.reasonForNotDilating === 'other' && !formData.reasonOther) {
+          newErrors.reasonOther = 'Please specify the reason'
+        }
+      }
+      
       // Check if at least one diagnosis code has a value
       const hasDiagnosisCodes = formData.diagnosisCodes.some(dc => dc.code.trim() !== '')
       if (!hasDiagnosisCodes) newErrors.diagnosisCodes = 'At least one diagnosis code is required'
-      if (!formData.procedureCodes) newErrors.procedureCodes = 'Procedure codes are required'
-      if (!formData.charges) newErrors.charges = 'Charges are required'
+      
+      // Doctor signature agreement is required
+      if (!formData.doctorSignatureAgreement) newErrors.doctorSignatureAgreement = 'Doctor signature agreement is required'
     }
     
     // Step 3 validation (Insurance Info)
@@ -421,14 +470,31 @@ export default function ClaimsSubmissionForm({
     
     // Step 2 validation (Claim Details)
     if (currentStep === 2) {
-      if (!formData.claimType) newErrors.claimType = 'Claim type is required'
-      if (!formData.serviceDate) newErrors.serviceDate = 'Service date is required'
-      if (!formData.placeOfService) newErrors.placeOfService = 'Place of service is required'
+      if (!formData.serviceDateFrom) newErrors.serviceDateFrom = 'Service date (from) is required'
+      if (!formData.serviceDateTo) newErrors.serviceDateTo = 'Service date (to) is required'
+      if (!formData.lab) newErrors.lab = 'Lab is required'
+      if (!formData.submissionForm) newErrors.submissionForm = 'Submission form is required'
+      
+      // Diabetes-related validation
+      if (formData.isDiabetic === 'yes') {
+        if (!formData.diabetesType) newErrors.diabetesType = 'Diabetes type is required'
+        if (!formData.manifestation) newErrors.manifestation = 'Manifestation is required'
+      }
+      
+      // Dilation-related validation
+      if (formData.wasDilated === 'no') {
+        if (!formData.reasonForNotDilating) newErrors.reasonForNotDilating = 'Reason for not dilating is required'
+        if (formData.reasonForNotDilating === 'other' && !formData.reasonOther) {
+          newErrors.reasonOther = 'Please specify the reason'
+        }
+      }
+      
       // Check if at least one diagnosis code has a value
       const hasDiagnosisCodes = formData.diagnosisCodes.some(dc => dc.code.trim() !== '')
       if (!hasDiagnosisCodes) newErrors.diagnosisCodes = 'At least one diagnosis code is required'
-      if (!formData.procedureCodes) newErrors.procedureCodes = 'Procedure codes are required'
-      if (!formData.charges) newErrors.charges = 'Charges are required'
+      
+      // Doctor signature agreement is required
+      if (!formData.doctorSignatureAgreement) newErrors.doctorSignatureAgreement = 'Doctor signature agreement is required'
     }
     
     // Step 3 validation (Insurance Info)
@@ -485,14 +551,31 @@ export default function ClaimsSubmissionForm({
     
           // Step 2 validation (Claim Details)
       if (currentStep === 2) {
-        if (!formData.claimType) newErrors.claimType = 'Claim type is required'
-        if (!formData.serviceDate) newErrors.serviceDate = 'Service date is required'
-        if (!formData.placeOfService) newErrors.placeOfService = 'Place of service is required'
+        if (!formData.serviceDateFrom) newErrors.serviceDateFrom = 'Service date (from) is required'
+        if (!formData.serviceDateTo) newErrors.serviceDateTo = 'Service date (to) is required'
+        if (!formData.lab) newErrors.lab = 'Lab is required'
+        if (!formData.submissionForm) newErrors.submissionForm = 'Submission form is required'
+        
+        // Diabetes-related validation
+        if (formData.isDiabetic === 'yes') {
+          if (!formData.diabetesType) newErrors.diabetesType = 'Diabetes type is required'
+          if (!formData.manifestation) newErrors.manifestation = 'Manifestation is required'
+        }
+        
+        // Dilation-related validation
+        if (formData.wasDilated === 'no') {
+          if (!formData.reasonForNotDilating) newErrors.reasonForNotDilating = 'Reason for not dilating is required'
+          if (formData.reasonForNotDilating === 'other' && !formData.reasonOther) {
+            newErrors.reasonOther = 'Please specify the reason'
+          }
+        }
+        
         // Check if at least one diagnosis code has a value
         const hasDiagnosisCodes = formData.diagnosisCodes.some(dc => dc.code.trim() !== '')
         if (!hasDiagnosisCodes) newErrors.diagnosisCodes = 'At least one diagnosis code is required'
-        if (!formData.procedureCodes) newErrors.procedureCodes = 'Procedure codes are required'
-        if (!formData.charges) newErrors.charges = 'Charges are required'
+        
+        // Doctor signature agreement is required
+        if (!formData.doctorSignatureAgreement) newErrors.doctorSignatureAgreement = 'Doctor signature agreement is required'
       }
     
     // Step 3 validation (Insurance Info)
@@ -541,7 +624,7 @@ export default function ClaimsSubmissionForm({
     const steps = [
       { number: 1, label: 'Patient Information' },
       { number: 2, label: 'Claim Details' },
-      { number: 3, label: 'Insurance Info' },
+      { number: 3, label: 'Prescription Details' },
       { number: 4, label: 'Review & Submit' }
     ]
 
@@ -664,7 +747,30 @@ export default function ClaimsSubmissionForm({
                   doctorSignatureAgreement: false,
                   diagnosisCodes: [
                     { id: 1, code: '', description: '', isPrimary: true }
-                  ]
+                  ],
+                  
+                  // Step 3 - Prescription Details
+                  odSphere: '',
+                  odCylinder: '',
+                  odAxis: '',
+                  odAdd: '',
+                  odBC: '',
+                  osSphere: '',
+                  osCylinder: '',
+                  osAxis: '',
+                  osAdd: '',
+                  osBC: '',
+                  odHorizontal: '',
+                  odHorizontalDirection: '',
+                  odVertical: '',
+                  odVerticalDirection: '',
+                  odPrismType: '',
+                  osHorizontal: '',
+                  osHorizontalDirection: '',
+                  osVertical: '',
+                  osVerticalDirection: '',
+                  osPrismType: '',
+                  slabOff: ''
                 })
                 setCurrentStep(1)
                 setSubmitted(false)
@@ -1731,117 +1837,651 @@ export default function ClaimsSubmissionForm({
                       I attest that i have performed this eye exam, in full scope and in accordance to my State of Florida Physician's License
                     </label>
                   </div>
+                  {errors.doctorSignatureAgreement && (
+                    <p className="mt-2 text-sm text-red-600">{errors.doctorSignatureAgreement}</p>
+                  )}
                 </div>
               </div>
             )}
 
             {currentStep === 3 && (
-              <div className="space-y-6">
+              <div className="space-y-8">
+                {/* Prescription Details */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Insurance Information
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+                    Prescription Details
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div data-error={!!errors.primaryInsurance}>
-                      <label htmlFor="primaryInsurance" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Primary Insurance <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="primaryInsurance"
-                        name="primaryInsurance"
-                        value={formData.primaryInsurance}
-                        onChange={handleInputChange}
-                        placeholder="Enter primary insurance"
-                        className={`form-input ${errors.primaryInsurance ? 'border-red-500' : ''}`}
-                      />
-                      {errors.primaryInsurance && (
-                        <p className="mt-1 text-sm text-red-600">{errors.primaryInsurance}</p>
-                      )}
-                    </div>
+                  
+                  {/* Smart Actions */}
+                  <div className="flex flex-wrap gap-3 mb-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          osSphere: prev.odSphere,
+                          osCylinder: prev.odCylinder,
+                          osAxis: prev.odAxis,
+                          osAdd: prev.odAdd,
+                          osBC: prev.odBC,
+                          osHorizontal: prev.odHorizontal,
+                          osHorizontalDirection: prev.odHorizontalDirection,
+                          osVertical: prev.odVertical,
+                          osVerticalDirection: prev.odVerticalDirection,
+                          osPrismType: prev.odPrismType
+                        }))
+                      }}
+                      className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors flex items-center gap-2"
+                    >
+                      <Icon name="copy" size={16} />
+                      Copy OD→OS
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          odSphere: prev.osSphere,
+                          odCylinder: prev.osCylinder,
+                          odAxis: prev.osAxis,
+                          odAdd: prev.osAdd,
+                          odBC: prev.osBC,
+                          odHorizontal: prev.osHorizontal,
+                          odHorizontalDirection: prev.osHorizontalDirection,
+                          odVertical: prev.osVertical,
+                          odVerticalDirection: prev.osVerticalDirection,
+                          odPrismType: prev.osPrismType
+                        }))
+                      }}
+                      className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors flex items-center gap-2"
+                    >
+                      <Icon name="copy" size={16} />
+                      Copy OS→OD
+                    </button>
+                  </div>
 
-                    <div>
-                      <label htmlFor="secondaryInsurance" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Secondary Insurance
-                      </label>
-                      <input
-                        type="text"
-                        id="secondaryInsurance"
-                        name="secondaryInsurance"
-                        value={formData.secondaryInsurance}
-                        onChange={handleInputChange}
-                        placeholder="Enter secondary insurance"
-                        className="form-input"
-                      />
-                    </div>
+                  {/* Refractive Correction Section */}
+                  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Refractive Correction
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-5 md:grid-cols-3 gap-4">
+                      {/* OD (Right Eye) - Blue theme */}
+                      <div className="lg:col-span-2 md:col-span-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                          <span className="font-medium text-blue-700 dark:text-blue-300">OD (Right Eye)</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odSphere}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odSphere: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Sphere</option>
+                              <option value="-6.00">-6.00</option>
+                              <option value="-5.75">-5.75</option>
+                              <option value="-5.50">-5.50</option>
+                              <option value="-5.25">-5.25</option>
+                              <option value="-5.00">-5.00</option>
+                              <option value="-4.75">-4.75</option>
+                              <option value="-4.50">-4.50</option>
+                              <option value="-4.25">-4.25</option>
+                              <option value="-4.00">-4.00</option>
+                              <option value="-3.75">-3.75</option>
+                              <option value="-3.50">-3.50</option>
+                              <option value="-3.25">-3.25</option>
+                              <option value="-3.00">-3.00</option>
+                              <option value="-2.75">-2.75</option>
+                              <option value="-2.50">-2.50</option>
+                              <option value="-2.25">-2.25</option>
+                              <option value="-2.00">-2.00</option>
+                              <option value="-1.75">-1.75</option>
+                              <option value="-1.50">-1.50</option>
+                              <option value="-1.25">-1.25</option>
+                              <option value="-1.00">-1.00</option>
+                              <option value="-0.75">-0.75</option>
+                              <option value="-0.50">-0.50</option>
+                              <option value="-0.25">-0.25</option>
+                              <option value="0.00">0.00</option>
+                              <option value="+0.25">+0.25</option>
+                              <option value="+0.50">+0.50</option>
+                              <option value="+0.75">+0.75</option>
+                              <option value="+1.00">+1.00</option>
+                              <option value="+1.25">+1.25</option>
+                              <option value="+1.50">+1.50</option>
+                              <option value="+1.75">+1.75</option>
+                              <option value="+2.00">+2.00</option>
+                              <option value="+2.25">+2.25</option>
+                              <option value="+2.50">+2.50</option>
+                              <option value="+2.75">+2.75</option>
+                              <option value="+3.00">+3.00</option>
+                              <option value="+3.25">+3.25</option>
+                              <option value="+3.50">+3.50</option>
+                              <option value="+3.75">+3.75</option>
+                              <option value="+4.00">+4.00</option>
+                              <option value="+4.25">+4.25</option>
+                              <option value="+4.50">+4.50</option>
+                              <option value="+4.75">+4.75</option>
+                              <option value="+5.00">+5.00</option>
+                              <option value="+5.25">+5.25</option>
+                              <option value="+5.50">+5.50</option>
+                              <option value="+5.75">+5.75</option>
+                              <option value="+6.00">+6.00</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odCylinder}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odCylinder: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Cylinder</option>
+                              <option value="-6.00">-6.00</option>
+                              <option value="-5.75">-5.75</option>
+                              <option value="-5.50">-5.50</option>
+                              <option value="-5.25">-5.25</option>
+                              <option value="-5.00">-5.00</option>
+                              <option value="-4.75">-4.75</option>
+                              <option value="-4.50">-4.50</option>
+                              <option value="-4.25">-4.25</option>
+                              <option value="-4.00">-4.00</option>
+                              <option value="-3.75">-3.75</option>
+                              <option value="-3.50">-3.50</option>
+                              <option value="-3.25">-3.25</option>
+                              <option value="-3.00">-3.00</option>
+                              <option value="-2.75">-2.75</option>
+                              <option value="-2.50">-2.50</option>
+                              <option value="-2.25">-2.25</option>
+                              <option value="-2.00">-2.00</option>
+                              <option value="-1.75">-1.75</option>
+                              <option value="-1.50">-1.50</option>
+                              <option value="-1.25">-1.25</option>
+                              <option value="-1.00">-1.00</option>
+                              <option value="-0.75">-0.75</option>
+                              <option value="-0.50">-0.50</option>
+                              <option value="-0.25">-0.25</option>
+                              <option value="0.00">0.00</option>
+                              <option value="+0.25">+0.25</option>
+                              <option value="+0.50">+0.50</option>
+                              <option value="+0.75">+0.75</option>
+                              <option value="+1.00">+1.00</option>
+                              <option value="+1.25">+1.25</option>
+                              <option value="+1.50">+1.50</option>
+                              <option value="+1.75">+1.75</option>
+                              <option value="+2.00">+2.00</option>
+                              <option value="+2.25">+2.25</option>
+                              <option value="+2.50">+2.50</option>
+                              <option value="+2.75">+2.75</option>
+                              <option value="+3.00">+3.00</option>
+                              <option value="+3.25">+3.25</option>
+                              <option value="+3.50">+3.50</option>
+                              <option value="+3.75">+3.75</option>
+                              <option value="+4.00">+4.00</option>
+                              <option value="+4.25">+4.25</option>
+                              <option value="+4.50">+4.50</option>
+                              <option value="+4.75">+4.75</option>
+                              <option value="+5.00">+5.00</option>
+                              <option value="+5.25">+5.25</option>
+                              <option value="+5.50">+5.50</option>
+                              <option value="+5.75">+5.75</option>
+                              <option value="+6.00">+6.00</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odAxis}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odAxis: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Axis</option>
+                              {Array.from({ length: 181 }, (_, i) => (
+                                <option key={i} value={i.toString()}>{i}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odAdd}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odAdd: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Add</option>
+                              <option value="+0.75">+0.75</option>
+                              <option value="+1.00">+1.00</option>
+                              <option value="+1.25">+1.25</option>
+                              <option value="+1.50">+1.50</option>
+                              <option value="+1.75">+1.75</option>
+                              <option value="+2.00">+2.00</option>
+                              <option value="+2.25">+2.25</option>
+                              <option value="+2.50">+2.50</option>
+                              <option value="+2.75">+2.75</option>
+                              <option value="+3.00">+3.00</option>
+                              <option value="+3.25">+3.25</option>
+                              <option value="+3.50">+3.50</option>
+                              <option value="+3.75">+3.75</option>
+                              <option value="+4.00">+4.00</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odBC}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odBC: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select BC</option>
+                              <option value="8.0">8.0</option>
+                              <option value="8.1">8.1</option>
+                              <option value="8.2">8.2</option>
+                              <option value="8.3">8.3</option>
+                              <option value="8.4">8.4</option>
+                              <option value="8.5">8.5</option>
+                              <option value="8.6">8.6</option>
+                              <option value="8.7">8.7</option>
+                              <option value="8.8">8.8</option>
+                              <option value="8.9">8.9</option>
+                              <option value="9.0">9.0</option>
+                              <option value="9.1">9.1</option>
+                              <option value="9.2">9.2</option>
+                              <option value="9.3">9.3</option>
+                              <option value="9.4">9.4</option>
+                              <option value="9.5">9.5</option>
+                              <option value="9.6">9.6</option>
+                              <option value="9.7">9.7</option>
+                              <option value="9.8">9.8</option>
+                              <option value="9.9">9.9</option>
+                              <option value="10.0">10.0</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
 
-                    <div>
-                      <label htmlFor="groupNumber" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Group Number
-                      </label>
-                      <input
-                        type="text"
-                        id="groupNumber"
-                        name="groupNumber"
-                        value={formData.groupNumber}
-                        onChange={handleInputChange}
-                        placeholder="Enter group number"
-                        className="form-input"
-                      />
-                    </div>
-
-                    <div data-error={!!errors.memberId}>
-                      <label htmlFor="memberId" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Member ID <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="memberId"
-                        name="memberId"
-                        value={formData.memberId}
-                        onChange={handleInputChange}
-                        placeholder="Enter member ID"
-                        className={`form-input ${errors.memberId ? 'border-red-500' : ''}`}
-                      />
-                      {errors.memberId && (
-                        <p className="mt-1 text-sm text-red-600">{errors.memberId}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label htmlFor="authorizationNumber" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                        Authorization Number
-                      </label>
-                      <input
-                        type="text"
-                        id="authorizationNumber"
-                        name="authorizationNumber"
-                        value={formData.authorizationNumber}
-                        onChange={handleInputChange}
-                        placeholder="Enter authorization number"
-                        className="form-input"
-                      />
+                      {/* OS (Left Eye) - Green theme */}
+                      <div className="lg:col-span-2 md:col-span-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                          <span className="font-medium text-green-700 dark:text-green-300">OS (Left Eye)</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osSphere}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osSphere: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Sphere</option>
+                              <option value="-6.00">-6.00</option>
+                              <option value="-5.75">-5.75</option>
+                              <option value="-5.50">-5.50</option>
+                              <option value="-5.25">-5.25</option>
+                              <option value="-5.00">-5.00</option>
+                              <option value="-4.75">-4.75</option>
+                              <option value="-4.50">-4.50</option>
+                              <option value="-4.25">-4.25</option>
+                              <option value="-4.00">-4.00</option>
+                              <option value="-3.75">-3.75</option>
+                              <option value="-3.50">-3.50</option>
+                              <option value="-3.25">-3.25</option>
+                              <option value="-3.00">-3.00</option>
+                              <option value="-2.75">-2.75</option>
+                              <option value="-2.50">-2.50</option>
+                              <option value="-2.25">-2.25</option>
+                              <option value="-2.00">-2.00</option>
+                              <option value="-1.75">-1.75</option>
+                              <option value="-1.50">-1.50</option>
+                              <option value="-1.25">-1.25</option>
+                              <option value="-1.00">-1.00</option>
+                              <option value="-0.75">-0.75</option>
+                              <option value="-0.50">-0.50</option>
+                              <option value="-0.25">-0.25</option>
+                              <option value="0.00">0.00</option>
+                              <option value="+0.25">+0.25</option>
+                              <option value="+0.50">+0.50</option>
+                              <option value="+0.75">+0.75</option>
+                              <option value="+1.00">+1.00</option>
+                              <option value="+1.25">+1.25</option>
+                              <option value="+1.50">+1.50</option>
+                              <option value="+1.75">+1.75</option>
+                              <option value="+2.00">+2.00</option>
+                              <option value="+2.25">+2.25</option>
+                              <option value="+2.50">+2.50</option>
+                              <option value="+2.75">+2.75</option>
+                              <option value="+3.00">+3.00</option>
+                              <option value="+3.25">+3.25</option>
+                              <option value="+3.50">+3.50</option>
+                              <option value="+3.75">+3.75</option>
+                              <option value="+4.00">+4.00</option>
+                              <option value="+4.25">+4.25</option>
+                              <option value="+4.50">+4.50</option>
+                              <option value="+4.75">+4.75</option>
+                              <option value="+5.00">+5.00</option>
+                              <option value="+5.25">+5.25</option>
+                              <option value="+5.50">+5.50</option>
+                              <option value="+5.75">+5.75</option>
+                              <option value="+6.00">+6.00</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osCylinder}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osCylinder: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Cylinder</option>
+                              <option value="-6.00">-6.00</option>
+                              <option value="-5.75">-5.75</option>
+                              <option value="-5.50">-5.50</option>
+                              <option value="-5.25">-5.25</option>
+                              <option value="-5.00">-5.00</option>
+                              <option value="-4.75">-4.75</option>
+                              <option value="-4.50">-4.50</option>
+                              <option value="-4.25">-4.25</option>
+                              <option value="-4.00">-4.00</option>
+                              <option value="-3.75">-3.75</option>
+                              <option value="-3.50">-3.50</option>
+                              <option value="-3.25">-3.25</option>
+                              <option value="-3.00">-3.00</option>
+                              <option value="-2.75">-2.75</option>
+                              <option value="-2.50">-2.50</option>
+                              <option value="-2.25">-2.25</option>
+                              <option value="-2.00">-2.00</option>
+                              <option value="-1.75">-1.75</option>
+                              <option value="-1.50">-1.50</option>
+                              <option value="-1.25">-1.25</option>
+                              <option value="-1.00">-1.00</option>
+                              <option value="-0.75">-0.75</option>
+                              <option value="-0.50">-0.50</option>
+                              <option value="-0.25">-0.25</option>
+                              <option value="0.00">0.00</option>
+                              <option value="+0.25">+0.25</option>
+                              <option value="+0.50">+0.50</option>
+                              <option value="+0.75">+0.75</option>
+                              <option value="+1.00">+1.00</option>
+                              <option value="+1.25">+1.25</option>
+                              <option value="+1.50">+1.50</option>
+                              <option value="+1.75">+1.75</option>
+                              <option value="+2.00">+2.00</option>
+                              <option value="+2.25">+2.25</option>
+                              <option value="+2.50">+2.50</option>
+                              <option value="+2.75">+2.75</option>
+                              <option value="+3.00">+3.00</option>
+                              <option value="+3.25">+3.25</option>
+                              <option value="+3.50">+3.50</option>
+                              <option value="+3.75">+3.75</option>
+                              <option value="+4.00">+4.00</option>
+                              <option value="+4.25">+4.25</option>
+                              <option value="+4.50">+4.50</option>
+                              <option value="+4.75">+4.75</option>
+                              <option value="+5.00">+5.00</option>
+                              <option value="+5.25">+5.25</option>
+                              <option value="+5.50">+5.50</option>
+                              <option value="+5.75">+5.75</option>
+                              <option value="+6.00">+6.00</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osAxis}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osAxis: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Axis</option>
+                              {Array.from({ length: 181 }, (_, i) => (
+                                <option key={i} value={i.toString()}>{i}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osAdd}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osAdd: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Add</option>
+                              <option value="+0.75">+0.75</option>
+                              <option value="+1.00">+1.00</option>
+                              <option value="+1.25">+1.25</option>
+                              <option value="+1.50">+1.50</option>
+                              <option value="+1.75">+1.75</option>
+                              <option value="+2.00">+2.00</option>
+                              <option value="+2.25">+2.25</option>
+                              <option value="+2.50">+2.50</option>
+                              <option value="+2.75">+2.75</option>
+                              <option value="+3.00">+3.00</option>
+                              <option value="+3.25">+3.25</option>
+                              <option value="+3.50">+3.50</option>
+                              <option value="+3.75">+3.75</option>
+                              <option value="+4.00">+4.00</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osBC}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osBC: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select BC</option>
+                              <option value="8.0">8.0</option>
+                              <option value="8.1">8.1</option>
+                              <option value="8.2">8.2</option>
+                              <option value="8.3">8.3</option>
+                              <option value="8.4">8.4</option>
+                              <option value="8.5">8.5</option>
+                              <option value="8.6">8.6</option>
+                              <option value="8.7">8.7</option>
+                              <option value="8.8">8.8</option>
+                              <option value="8.9">8.9</option>
+                              <option value="9.0">9.0</option>
+                              <option value="9.1">9.1</option>
+                              <option value="9.2">9.2</option>
+                              <option value="9.3">9.3</option>
+                              <option value="9.4">9.4</option>
+                              <option value="9.5">9.5</option>
+                              <option value="9.6">9.6</option>
+                              <option value="9.7">9.7</option>
+                              <option value="9.8">9.8</option>
+                              <option value="9.9">9.9</option>
+                              <option value="10.0">10.0</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Additional Information
-                  </h3>
-                  <div>
-                    <label htmlFor="notes" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-                      Notes
-                    </label>
-                    <textarea
-                      id="notes"
-                      name="notes"
-                      value={formData.notes}
-                      onChange={handleTextareaChange}
-                      placeholder="Enter any additional notes..."
-                      rows={4}
-                      className="form-input"
-                    />
+                  {/* Prism Correction Section */}
+                  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Prism Correction
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-5 md:grid-cols-3 gap-4">
+                      {/* OD (Right Eye) - Blue theme */}
+                      <div className="lg:col-span-2 md:col-span-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                          <span className="font-medium text-blue-700 dark:text-blue-300">OD (Right Eye)</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odHorizontal}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odHorizontal: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Horizontal</option>
+                              <option value="0.5">0.5</option>
+                              <option value="1.0">1.0</option>
+                              <option value="1.5">1.5</option>
+                              <option value="2.0">2.0</option>
+                              <option value="2.5">2.5</option>
+                              <option value="3.0">3.0</option>
+                              <option value="3.5">3.5</option>
+                              <option value="4.0">4.0</option>
+                              <option value="4.5">4.5</option>
+                              <option value="5.0">5.0</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odHorizontalDirection}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odHorizontalDirection: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Direction</option>
+                              <option value="BI">BI (Base In)</option>
+                              <option value="BO">BO (Base Out)</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odVertical}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odVertical: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Vertical</option>
+                              <option value="0.5">0.5</option>
+                              <option value="1.0">1.0</option>
+                              <option value="1.5">1.5</option>
+                              <option value="2.0">2.0</option>
+                              <option value="2.5">2.5</option>
+                              <option value="3.0">3.0</option>
+                              <option value="3.5">3.5</option>
+                              <option value="4.0">4.0</option>
+                              <option value="4.5">4.5</option>
+                              <option value="5.0">5.0</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odVerticalDirection}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odVerticalDirection: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Direction</option>
+                              <option value="BU">BU (Base Up)</option>
+                              <option value="BD">BD (Base Down)</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.odPrismType}
+                              onChange={(e) => setFormData(prev => ({ ...prev, odPrismType: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-blue-300"
+                            >
+                              <option value="">Select Prism Type</option>
+                              <option value="Fresnel">Fresnel</option>
+                              <option value="Ground">Ground</option>
+                              <option value="Molded">Molded</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* OS (Left Eye) - Green theme */}
+                      <div className="lg:col-span-2 md:col-span-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                          <span className="font-medium text-green-700 dark:text-green-300">OS (Left Eye)</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osHorizontal}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osHorizontal: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Horizontal</option>
+                              <option value="0.5">0.5</option>
+                              <option value="1.0">1.0</option>
+                              <option value="1.5">1.5</option>
+                              <option value="2.0">2.0</option>
+                              <option value="2.5">2.5</option>
+                              <option value="3.0">3.0</option>
+                              <option value="3.5">3.5</option>
+                              <option value="4.0">4.0</option>
+                              <option value="4.5">4.5</option>
+                              <option value="5.0">5.0</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osHorizontalDirection}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osHorizontalDirection: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Direction</option>
+                              <option value="BI">BI (Base In)</option>
+                              <option value="BO">BO (Base Out)</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osVertical}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osVertical: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Vertical</option>
+                              <option value="0.5">0.5</option>
+                              <option value="1.0">1.0</option>
+                              <option value="1.5">1.5</option>
+                              <option value="2.0">2.0</option>
+                              <option value="2.5">2.5</option>
+                              <option value="3.0">3.0</option>
+                              <option value="3.5">3.5</option>
+                              <option value="4.0">4.0</option>
+                              <option value="4.5">4.5</option>
+                              <option value="5.0">5.0</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osVerticalDirection}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osVerticalDirection: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Direction</option>
+                              <option value="BU">BU (Base Up)</option>
+                              <option value="BD">BD (Base Down)</option>
+                            </select>
+                          </div>
+                          <div className="h-10 flex items-center">
+                            <select
+                              value={formData.osPrismType}
+                              onChange={(e) => setFormData(prev => ({ ...prev, osPrismType: e.target.value }))}
+                              className="form-select w-full border rounded-md pl-2.5 border-green-300"
+                            >
+                              <option value="">Select Prism Type</option>
+                              <option value="Fresnel">Fresnel</option>
+                              <option value="Ground">Ground</option>
+                              <option value="Molded">Molded</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Slab Off Section */}
+                  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Slab Off
+                    </h4>
+                    <div className="w-full md:w-1/2">
+                      <select
+                        value={formData.slabOff}
+                        onChange={(e) => setFormData(prev => ({ ...prev, slabOff: e.target.value }))}
+                        className="form-select w-full border border-gray-300 rounded-md pl-2.5"
+                      >
+                        <option value="">Select Slab Off</option>
+                        <option value="None">None</option>
+                        <option value="OD">OD (Right Eye)</option>
+                        <option value="OS">OS (Left Eye)</option>
+                        <option value="Both">Both Eyes</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1965,7 +2605,30 @@ export default function ClaimsSubmissionForm({
                         diagnosisCodes4: '',
                         diagnosisCodes5: '',
                         diagnosisCodes6: '',
-                        doctorSignatureAgreement: false
+                        doctorSignatureAgreement: false,
+                        
+                        // Step 3 - Prescription Details
+                        odSphere: '',
+                        odCylinder: '',
+                        odAxis: '',
+                        odAdd: '',
+                        odBC: '',
+                        osSphere: '',
+                        osCylinder: '',
+                        osAxis: '',
+                        osAdd: '',
+                        osBC: '',
+                        odHorizontal: '',
+                        odHorizontalDirection: '',
+                        odVertical: '',
+                        odVerticalDirection: '',
+                        odPrismType: '',
+                        osHorizontal: '',
+                        osHorizontalDirection: '',
+                        osVertical: '',
+                        osVerticalDirection: '',
+                        osPrismType: '',
+                        slabOff: ''
                       })
                     }
                   }}
@@ -1992,7 +2655,7 @@ export default function ClaimsSubmissionForm({
                       </>
                     ) : (
                       <>
-                        {currentStep === 1 ? 'Start Claim' : currentStep === 2 ? 'Continue to Review' : 'Next'}
+                        {currentStep === 1 ? 'Start Claim' : currentStep === 2 ? 'Continue' : currentStep === 3 ? 'Continue to Review' : 'Next'}
                         <Icon name="arrow-right" size={16} />
                       </>
                     )}

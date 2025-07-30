@@ -3337,8 +3337,32 @@ export default function ClaimsSubmissionForm({
                       <tbody>
                         {formData.procedureCodes.map((procedure, index) => (
                           <tr key={procedure.id} className="border-b border-gray-200 dark:border-gray-700">
-                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.code}</td>
-                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.description}</td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={procedure.code}
+                                onChange={(e) => {
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].code = e.target.value
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="form-input w-full border rounded-md pl-2.5 text-sm"
+                                placeholder="Code"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={procedure.description}
+                                onChange={(e) => {
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].description = e.target.value
+                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                }}
+                                className="form-input w-full border rounded-md pl-2.5 text-sm"
+                                placeholder="Description"
+                              />
+                            </td>
                             <td className="px-3 py-2">
                               <input
                                 type="text"
@@ -3367,15 +3391,16 @@ export default function ClaimsSubmissionForm({
                             </td>
                             <td className="px-3 py-2">
                               <select
-                                value={procedure.diagnosisReference}
+                                multiple
+                                value={procedure.diagnosisReference ? procedure.diagnosisReference.split(',') : []}
                                 onChange={(e) => {
+                                  const selectedOptions = Array.from(e.target.selectedOptions, option => option.value)
                                   const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].diagnosisReference = e.target.value
+                                  updatedCodes[index].diagnosisReference = selectedOptions.join(',')
                                   setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
                                 }}
-                                className="form-select w-full border rounded-md pl-2.5 text-sm"
+                                className="form-select w-full border rounded-md pl-2.5 text-sm min-h-[80px]"
                               >
-                                <option value="">Select</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -3426,7 +3451,7 @@ export default function ClaimsSubmissionForm({
                       className="btn-primary flex items-center gap-2"
                     >
                       <Icon name="plus" size={16} />
-                      + Add New Line
+                      Add New Line
                     </button>
                     <button
                       type="button"
@@ -3476,6 +3501,97 @@ export default function ClaimsSubmissionForm({
                       {errors.totalAllowed && (
                         <p className="mt-1 text-sm text-red-600">{errors.totalAllowed}</p>
                       )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Prescription Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Prescription
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 dark:border-gray-700">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-700">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b"></th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Sphere</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Cylinder</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Axis</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Add</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">BC</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Segment Hgt</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OD</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">+4.25</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">-0.50</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">2.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.50</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">8MM</td>
+                        </tr>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OS</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">+4.00</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">-0.75</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">2.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.50</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">8MM</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Prescription Detail Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Prescription Detail
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 dark:border-gray-700">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-700">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b"></th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Horizontal</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Direction</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Vertical</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Direction</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Prism Type</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OD</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.5</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">In</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.5</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Up</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Decentered</td>
+                        </tr>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OS</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.75</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">In</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.75</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Up</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Ground In</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Far:</span>
+                      <span className="text-sm text-gray-900 dark:text-white ml-2">40MM</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Near:</span>
+                      <span className="text-sm text-gray-900 dark:text-white ml-2">37MM</span>
                     </div>
                   </div>
                 </div>
@@ -3592,37 +3708,7 @@ export default function ClaimsSubmissionForm({
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-center gap-4 pt-6">
-                  <button
-                    type="button"
-                    className="btn-secondary flex items-center gap-2"
-                  >
-                    <Icon name="printer" size={16} />
-                    Print
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-secondary flex items-center gap-2"
-                  >
-                    <Icon name="save" size={16} />
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-secondary flex items-center gap-2"
-                  >
-                    <Icon name="rotate-ccw" size={16} />
-                    Edit Claim
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn-success flex items-center gap-2"
-                  >
-                    <Icon name="check" size={16} />
-                    Accept and Submit
-                  </button>
-                </div>
+
               </div>
             )}
 

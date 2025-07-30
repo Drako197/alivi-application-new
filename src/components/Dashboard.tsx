@@ -8,6 +8,7 @@ import MobileSideMenu from './MobileSideMenu'
 import MobileProfile from './MobileProfile'
 import PICLandingPage from './PICLandingPage'
 import HEDISLandingPage from './HEDISLandingPage'
+import MILAEnhancedDemo from './MILAEnhancedDemo'
 import Icon from './Icon'
 import ScreeningDataService, { type CompletedScreening, type SavedScreening } from '../services/ScreeningDataService'
 
@@ -385,6 +386,12 @@ export default function Dashboard() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <p className="text-gray-600 dark:text-gray-400">Settings content coming soon...</p>
             </div>
+          </div>
+        )
+      case 'mila-demo':
+        return (
+          <div className="dashboard-content">
+            <MILAEnhancedDemo />
           </div>
         )
       default:

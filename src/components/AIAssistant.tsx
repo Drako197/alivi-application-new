@@ -105,6 +105,7 @@ export default function AIAssistant({
   const [showSettings, setShowSettings] = useState(false)
   const [predictiveSuggestions, setPredictiveSuggestions] = useState<any[]>([])
   const [showPredictiveSuggestions, setShowPredictiveSuggestions] = useState(false)
+  const [hasShownSuggestions, setHasShownSuggestions] = useState(false)
   const [conversationContext, setConversationContext] = useState<{
     lastCode?: string
     lastTopic?: string
@@ -153,31 +154,35 @@ export default function AIAssistant({
     }
   }, [isOpen, messages.length])
 
-  // Add predictive suggestions when assistant opens
+  // Reset suggestions when modal closes
   useEffect(() => {
-    if (isOpen && currentForm && currentField) {
-      loadPredictiveSuggestions()
+    if (!isOpen) {
+      setHasShownSuggestions(false)
+      setShowPredictiveSuggestions(false)
+      setPredictiveSuggestions([])
     }
-  }, [isOpen, currentForm, currentField, currentStep])
+  }, [isOpen])
+
+  // Add predictive suggestions when assistant opens (only once per session)
+  useEffect(() => {
+    if (isOpen && currentForm && currentField && !hasShownSuggestions) {
+      loadPredictiveSuggestions()
+      setHasShownSuggestions(true)
+    }
+  }, [isOpen, currentForm, currentField, currentStep, hasShownSuggestions])
 
   const loadPredictiveSuggestions = async () => {
     try {
       console.log('Loading predictive suggestions for:', { currentForm, currentField, currentStep })
       
-      const suggestions = await PredictiveSuggestionsService.generatePredictiveSuggestions(
-        currentForm || '',
-        currentField || '',
-        currentStep || 1,
-        {} // Add form data if available
-      )
+      // Generate contextual suggestions based on current form and field
+      const contextualSuggestions = generateContextualSuggestions()
       
-      console.log('Generated suggestions:', suggestions)
-      
-      if (suggestions.length > 0) {
-        setPredictiveSuggestions(suggestions)
+      if (contextualSuggestions.length > 0) {
+        setPredictiveSuggestions(contextualSuggestions)
         setShowPredictiveSuggestions(true)
         
-        // Add a welcome message with suggestions
+        // Add a contextual welcome message
         const welcomeMessage = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. Here are some suggestions for the ${currentField} field:`
         addMessage('assistant', welcomeMessage, 'fade-in')
       } else {
@@ -191,6 +196,151 @@ export default function AIAssistant({
       const fallbackMessage = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your medical billing questions!`
       addMessage('assistant', fallbackMessage, 'fade-in')
     }
+  }
+
+  const generateContextualSuggestions = () => {
+    const suggestions = []
+    
+    // Contextual suggestions based on form and field
+    if (currentForm === 'ClaimsSubmission') {
+      switch (currentField) {
+        case 'patient-information':
+          suggestions.push({
+            id: 'provider-validation',
+            title: 'Validate Provider ID',
+            description: 'Check NPI format and provider credentials',
+            icon: 'user-check',
+            action: { type: 'search', data: { query: 'validate provider NPI' } }
+          })
+          suggestions.push({
+            id: 'patient-search',
+            title: 'Search Patient Records',
+            description: 'Find existing patient information',
+            icon: 'search',
+            action: { type: 'search', data: { query: 'search patient records' } }
+          })
+          break
+        case 'claim-details':
+          suggestions.push({
+            id: 'diagnosis-codes',
+            title: 'Search Diagnosis Codes',
+            description: 'Find relevant ICD-10 codes for this claim',
+            icon: 'file-text',
+            action: { type: 'search', data: { query: 'diagnosis codes diabetes retinopathy' } }
+          })
+          suggestions.push({
+            id: 'service-dates',
+            title: 'Validate Service Dates',
+            description: 'Check date format and coverage period',
+            icon: 'calendar',
+            action: { type: 'explain', data: { topic: 'service date validation' } }
+          })
+          break
+        case 'prescription-details':
+          suggestions.push({
+            id: 'prescription-help',
+            title: 'Prescription Guidance',
+            description: 'Get help with OD/OS sphere and cylinder values',
+            icon: 'eye',
+            action: { type: 'explain', data: { topic: 'prescription parameters OD OS' } }
+          })
+          suggestions.push({
+            id: 'calculation-help',
+            title: 'Calculation Tools',
+            description: 'Help with prescription calculations',
+            icon: 'calculator',
+            action: { type: 'search', data: { query: 'prescription calculation help' } }
+          })
+          break
+        case 'lens-choice':
+          suggestions.push({
+            id: 'lens-selection',
+            title: 'Lens Selection Guide',
+            description: 'Choose the right lens type and coatings',
+            icon: 'glasses',
+            action: { type: 'explain', data: { topic: 'lens types and coatings' } }
+          })
+          suggestions.push({
+            id: 'pd-measurements',
+            title: 'PD Measurements',
+            description: 'Calculate pupillary distance correctly',
+            icon: 'ruler',
+            action: { type: 'explain', data: { topic: 'PD measurement calculation' } }
+          })
+          break
+        case 'frame-selection':
+          suggestions.push({
+            id: 'frame-measurements',
+            title: 'Frame Measurements',
+            description: 'Get help with frame sizing and adjustments',
+            icon: 'package',
+            action: { type: 'explain', data: { topic: 'frame measurements and sizing' } }
+          })
+          break
+        case 'review-submit':
+          suggestions.push({
+            id: 'claim-validation',
+            title: 'Claim Validation',
+            description: 'Review claim completeness before submission',
+            icon: 'check-circle',
+            action: { type: 'explain', data: { topic: 'claim validation checklist' } }
+          })
+          break
+      }
+    } else if (currentForm === 'PatientEligibility') {
+      switch (currentField) {
+        case 'providerId':
+          suggestions.push({
+            id: 'npi-validation',
+            title: 'NPI Validation',
+            description: 'Validate your National Provider Identifier',
+            icon: 'user-check',
+            action: { type: 'search', data: { query: 'NPI validation format' } }
+          })
+          break
+        case 'subscriberId':
+          suggestions.push({
+            id: 'member-search',
+            title: 'Member Search',
+            description: 'Find patient by member ID',
+            icon: 'search',
+            action: { type: 'search', data: { query: 'member ID search' } }
+          })
+          break
+        case 'dependantSequence':
+          suggestions.push({
+            id: 'dependent-codes',
+            title: 'Dependent Codes',
+            description: 'Understand dependent sequence numbers',
+            icon: 'users',
+            action: { type: 'explain', data: { topic: 'dependent sequence codes' } }
+          })
+          break
+      }
+    } else if (currentForm === 'HEDIS') {
+      switch (currentField) {
+        case 'diagnosis':
+          suggestions.push({
+            id: 'diabetes-codes',
+            title: 'Diabetes Codes',
+            description: 'Common diabetes diagnosis codes',
+            icon: 'file-text',
+            action: { type: 'search', data: { query: 'diabetes diagnosis codes' } }
+          })
+          break
+        case 'retinal-imaging':
+          suggestions.push({
+            id: 'retinal-codes',
+            title: 'Retinal Imaging Codes',
+            description: 'CPT codes for retinal imaging',
+            icon: 'camera',
+            action: { type: 'search', data: { query: 'retinal imaging CPT codes' } }
+          })
+          break
+      }
+    }
+    
+    return suggestions
   }
 
   const handlePredictiveSuggestionClick = async (suggestion: any) => {

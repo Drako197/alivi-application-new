@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { ReactElement } from 'react'
 import { createPortal } from 'react-dom'
 import DatePicker from './DatePicker'
+import AIAssistantButton from './AIAssistantButton'
 
 // NOTE: Using React Portal to ensure modal overlay covers entire viewport
 // This fixes the issue where modals don't start from the top of the page
@@ -368,6 +369,13 @@ export default function NewScreeningForm({
           </div>
         </div>
       </div>
+
+      {/* M.I.L.A. Assistant Button */}
+      <AIAssistantButton
+        currentForm="NewScreeningForm"
+        currentField="diabetesMellitus"
+        currentStep={currentStep}
+      />
     </div>
   )
 

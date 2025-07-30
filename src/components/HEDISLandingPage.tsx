@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import DatePicker from './DatePicker'
+import AIAssistantButton from './AIAssistantButton'
 import ScreeningDataService from '../services/ScreeningDataService'
 import type { CompletedScreening, SavedScreening, DashboardStats } from '../services/ScreeningDataService'
 
@@ -4210,6 +4211,13 @@ export default function HEDISLandingPage({
           savedScreenings={savedScreenings}
         />
       )}
+
+      {/* M.I.L.A. Assistant Button */}
+      <AIAssistantButton
+        currentForm="NewScreeningForm"
+        currentField="diabetesMellitus"
+        currentStep={1}
+      />
     </div>
   )
 } 

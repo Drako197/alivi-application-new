@@ -528,7 +528,7 @@ export default function PatientEligibilityForm({
     ]
 
     return (
-      <div className="hedis-screening-step-indicators">
+      <div className="step-indicators-container">
         {/* Mobile-friendly step indicators */}
         <div className="flex items-center justify-between w-full">
           {steps.map((step, index) => (

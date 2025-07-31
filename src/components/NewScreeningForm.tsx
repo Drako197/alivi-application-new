@@ -246,30 +246,30 @@ export default function NewScreeningForm({
 
         {/* Progress Indicator */}
         <div className="flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 flex-shrink-0">
-          <div className="hedis-screening-step-indicators">
-            <div className={`hedis-screening-step ${
-              currentStep > 1 ? 'hedis-screening-step-completed' : 
-              currentStep === 1 ? 'hedis-screening-step-active' : 
-              'hedis-screening-step-inactive'
+          <div className="step-indicators-container">
+            <div className={`step-item ${
+              currentStep > 1 ? 'step-completed' : 
+              currentStep === 1 ? 'step-active' : 
+              'step-inactive'
             }`}>
-              <div className="hedis-screening-step-number">1</div>
-              <div className="hedis-screening-step-label">Screening Details</div>
+              <div className="step-number">1</div>
+              <div className="step-label">Screening Details</div>
             </div>
-            <div className={`hedis-screening-step ${
-              currentStep > 2 ? 'hedis-screening-step-completed' : 
-              currentStep === 2 ? 'hedis-screening-step-active' : 
-              'hedis-screening-step-inactive'
+            <div className={`step-item ${
+              currentStep > 2 ? 'step-completed' : 
+              currentStep === 2 ? 'step-active' : 
+              'step-inactive'
             }`}>
-              <div className="hedis-screening-step-number">2</div>
-              <div className="hedis-screening-step-label">Retinal Images</div>
+              <div className="step-number">2</div>
+              <div className="step-label">Retinal Images</div>
             </div>
-            <div className={`hedis-screening-step ${
-              currentStep > 3 ? 'hedis-screening-step-completed' : 
-              currentStep === 3 ? 'hedis-screening-step-active' : 
-              'hedis-screening-step-inactive'
+            <div className={`step-item ${
+              currentStep > 3 ? 'step-completed' : 
+              currentStep === 3 ? 'step-active' : 
+              'step-inactive'
             }`}>
-              <div className="hedis-screening-step-number">3</div>
-              <div className="hedis-screening-step-label">Review & Submit</div>
+              <div className="step-number">3</div>
+              <div className="step-label">Review & Submit</div>
             </div>
           </div>
         </div>

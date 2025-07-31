@@ -701,42 +701,33 @@ export default function ClaimsSubmissionForm({
 
   // Step Indicators Component
   const StepIndicators = ({ currentStep }: { currentStep: number }) => {
-    const steps = [
-      { number: 1, label: 'Patient Information' },
-      { number: 2, label: 'Claim Details' },
-      { number: 3, label: 'Prescription Details' },
-      { number: 4, label: 'Lens Choice' },
-      { number: 5, label: 'Frame Selection' },
-      { number: 6, label: 'Review & Submit' }
-    ]
-
     return (
-      <div className="hedis-screening-step-indicators">
-        {steps.map((step, index) => {
-          let stepClass = 'hedis-screening-step'
-          if (currentStep > step.number) {
-            stepClass += ' hedis-screening-step-completed'
-          } else if (currentStep === step.number) {
-            stepClass += ' hedis-screening-step-active'
-          } else {
-            stepClass += ' hedis-screening-step-inactive'
-          }
-
-          return (
-            <div key={step.number} className={stepClass}>
-              <div className="hedis-screening-step-number">
-                {currentStep > step.number ? (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                ) : (
-                  step.number
-                )}
-              </div>
-              <div className="hedis-screening-step-label">{step.label}</div>
-            </div>
-          )
-        })}
+      <div className="step-indicators-container">
+        {/* Mobile-friendly step indicators */}
+        <div className="step-item step-completed">
+          <div className="step-number">1</div>
+          <div className="step-label">Patient Info</div>
+        </div>
+        <div className={`step-item ${currentStep >= 2 ? 'step-completed' : 'step-inactive'}`}>
+          <div className="step-number">2</div>
+          <div className="step-label">Diagnosis</div>
+        </div>
+        <div className={`step-item ${currentStep >= 3 ? 'step-completed' : 'step-inactive'}`}>
+          <div className="step-number">3</div>
+          <div className="step-label">Procedure</div>
+        </div>
+        <div className={`step-item ${currentStep >= 4 ? 'step-completed' : 'step-inactive'}`}>
+          <div className="step-number">4</div>
+          <div className="step-label">Provider</div>
+        </div>
+        <div className={`step-item ${currentStep >= 5 ? 'step-completed' : 'step-inactive'}`}>
+          <div className="step-number">5</div>
+          <div className="step-label">Billing</div>
+        </div>
+        <div className={`step-item ${currentStep >= 6 ? 'step-completed' : 'step-inactive'}`}>
+          <div className="step-number">6</div>
+          <div className="step-label">Review</div>
+        </div>
       </div>
     )
   }

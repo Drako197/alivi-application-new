@@ -2280,7 +2280,7 @@ select {
 }
 
 .hedis-screening-progress {
-  @apply flex-1;
+  @apply flex-1 flex justify-center;
 }
 
 .hedis-screening-step-indicators {
@@ -2364,6 +2364,17 @@ select {
   
   .hedis-screening-step-label {
     @apply text-xs;
+  }
+}
+
+/* Desktop-specific centering for HEDIS screening progress */
+@media (min-width: 1025px) {
+  .hedis-screening-progress {
+    @apply flex justify-center;
+  }
+  
+  .hedis-screening-step-indicators {
+    @apply justify-center;
   }
 }
 
@@ -3231,6 +3242,178 @@ select {
 
 .animate-ping-slow {
   animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Claims Submission Form Step Indicators */
+.claims-submission-step-indicators {
+  @apply flex items-center justify-center space-x-4 w-full;
+}
+
+.claims-submission-step {
+  @apply flex flex-col items-center space-y-2;
+}
+
+.claims-submission-step-number {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors;
+}
+
+.claims-submission-step-active .claims-submission-step-number {
+  @apply bg-blue-600 border-blue-600 text-white;
+}
+
+.claims-submission-step-inactive .claims-submission-step-number {
+  @apply bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400;
+}
+
+.claims-submission-step-completed .claims-submission-step-number {
+  @apply bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white shadow-lg;
+  animation: completedPulse 2s ease-in-out infinite;
+}
+
+.claims-submission-step-label {
+  @apply text-xs font-medium text-gray-600 dark:text-gray-400 text-center;
+}
+
+.claims-submission-step-active .claims-submission-step-label {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+.claims-submission-step-completed .claims-submission-step-label {
+  @apply text-green-600 dark:text-green-400 font-semibold;
+}
+
+/* Patient Eligibility Form Step Indicators */
+.patient-eligibility-step-indicators {
+  @apply flex items-center justify-center space-x-4 w-full;
+}
+
+.patient-eligibility-step {
+  @apply flex flex-col items-center space-y-2;
+}
+
+.patient-eligibility-step-number {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors;
+}
+
+.patient-eligibility-step-active .patient-eligibility-step-number {
+  @apply bg-blue-600 border-blue-600 text-white;
+}
+
+.patient-eligibility-step-inactive .patient-eligibility-step-number {
+  @apply bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400;
+}
+
+.patient-eligibility-step-completed .patient-eligibility-step-number {
+  @apply bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white shadow-lg;
+  animation: completedPulse 2s ease-in-out infinite;
+}
+
+.patient-eligibility-step-label {
+  @apply text-xs font-medium text-gray-600 dark:text-gray-400 text-center;
+}
+
+.patient-eligibility-step-active .patient-eligibility-step-label {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+.patient-eligibility-step-completed .patient-eligibility-step-label {
+  @apply text-green-600 dark:text-green-400 font-semibold;
+}
+
+/* Unified Step Indicator Styling System */
+/* This system provides consistent styling for all step indicators across the application */
+
+/* Base Step Indicator Container */
+.step-indicators-container {
+  @apply flex items-center justify-center space-x-4 w-full;
+}
+
+/* Base Step Item */
+.step-item {
+  @apply flex flex-col items-center space-y-2;
+}
+
+/* Base Step Number */
+.step-number {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-all duration-200;
+}
+
+/* Step States - Active */
+.step-active .step-number {
+  @apply bg-blue-600 border-blue-600 text-white shadow-lg;
+}
+
+.step-active .step-label {
+  @apply text-blue-600 dark:text-blue-400 font-medium;
+}
+
+/* Step States - Completed */
+.step-completed .step-number {
+  @apply bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white shadow-lg;
+  animation: stepCompletedPulse 2s ease-in-out infinite;
+}
+
+.step-completed .step-label {
+  @apply text-green-600 dark:text-green-400 font-semibold;
+}
+
+/* Step States - Inactive/Upcoming */
+.step-inactive .step-number {
+  @apply bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400;
+}
+
+.step-inactive .step-label {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+/* Base Step Label */
+.step-label {
+  @apply text-xs font-medium text-center transition-colors duration-200;
+}
+
+/* Animation for completed steps */
+@keyframes stepCompletedPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px -3px rgba(34, 197, 94, 0.4);
+  }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .step-indicators-container {
+    @apply space-x-2 overflow-x-auto pb-2;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .step-indicators-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .step-item {
+    @apply flex-shrink-0 min-w-0;
+  }
+  
+  .step-number {
+    @apply w-6 h-6 text-xs;
+  }
+  
+  .step-label {
+    @apply text-xs leading-tight max-w-16;
+    word-wrap: break-word;
+  }
+}
+
+/* Desktop Centering */
+@media (min-width: 1025px) {
+  .step-indicators-container {
+    @apply justify-center;
+  }
 }
 
 

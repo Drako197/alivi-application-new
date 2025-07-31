@@ -177,7 +177,7 @@ export default function DatePicker({
 
       {/* Calendar Dropdown */}
       {isOpen && !disabled && (
-        <div className="md:absolute md:mt-2 fixed inset-0 z-50 bg-white md:bg-white md:rounded-lg md:shadow-lg md:border md:border-gray-200 md:p-4 md:w-80 p-6">
+        <div className="fixed inset-0 z-50 bg-white p-6 md:absolute md:mt-2 md:bg-white md:rounded-lg md:shadow-lg md:border md:border-gray-200 md:p-4 md:w-80 md:inset-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <button

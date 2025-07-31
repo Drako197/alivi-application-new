@@ -2830,22 +2830,22 @@ function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewPr
     <div className="hedis-screening-page">
       <div className="hedis-screening-header">
         <div className="hedis-screening-progress">
-          <div className="hedis-screening-step-indicators">
-            <div className="hedis-screening-step hedis-screening-step-completed">
-              <div className="hedis-screening-step-number">1</div>
-              <div className="hedis-screening-step-label">Patient Search</div>
+          <div className="step-indicators-container">
+            <div className="step-item step-completed">
+              <div className="step-number">1</div>
+              <div className="step-label">Patient Search</div>
             </div>
-            <div className="hedis-screening-step hedis-screening-step-completed">
-              <div className="hedis-screening-step-number">2</div>
-              <div className="hedis-screening-step-label">Screening Details</div>
+            <div className="step-item step-completed">
+              <div className="step-number">2</div>
+              <div className="step-label">Screening Details</div>
             </div>
-            <div className="hedis-screening-step hedis-screening-step-completed">
-              <div className="hedis-screening-step-number">3</div>
-              <div className="hedis-screening-step-label">Retinal Images</div>
+            <div className="step-item step-completed">
+              <div className="step-number">3</div>
+              <div className="step-label">Retinal Images</div>
             </div>
-            <div className="hedis-screening-step hedis-screening-step-completed">
-              <div className="hedis-screening-step-number">4</div>
-              <div className="hedis-screening-step-label">Review & Submit</div>
+            <div className="step-item step-completed">
+              <div className="step-number">4</div>
+              <div className="step-label">Review & Submit</div>
             </div>
           </div>
         </div>
@@ -3856,25 +3856,23 @@ export default function HEDISLandingPage({
       <div className="hedis-screening-page">
         <div className="hedis-screening-header">
           <div className="hedis-screening-progress">
-            <div className="hedis-screening-step-indicators">
-              {[1, 2, 3, 4].map((step) => (
-                <div 
-                  key={step}
-                  className={`hedis-screening-step ${
-                    currentScreeningStep > step ? 'hedis-screening-step-completed' : 
-                    currentScreeningStep === step ? 'hedis-screening-step-active' : 
-                    'hedis-screening-step-inactive'
-                  }`}
-                >
-                  <div className="hedis-screening-step-number">{step}</div>
-                  <div className="hedis-screening-step-label">
-                    {step === 1 && 'Patient Search'}
-                    {step === 2 && 'Screening Details'}
-                    {step === 3 && 'Retinal Images'}
-                    {step === 4 && 'Review & Submit'}
-                  </div>
-                </div>
-              ))}
+            <div className="step-indicators-container">
+              <div className="step-item step-completed">
+                <div className="step-number">1</div>
+                <div className="step-label">Patient Search</div>
+              </div>
+              <div className="step-item step-completed">
+                <div className="step-number">2</div>
+                <div className="step-label">Screening Details</div>
+              </div>
+              <div className="step-item step-completed">
+                <div className="step-number">3</div>
+                <div className="step-label">Retinal Images</div>
+              </div>
+              <div className="step-item step-completed">
+                <div className="step-number">4</div>
+                <div className="step-label">Review & Submit</div>
+              </div>
             </div>
           </div>
         </div>

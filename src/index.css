@@ -864,10 +864,7 @@ body {
   outline: none;
 }
 
-/* Transitions */
-* {
-  transition: all 0.2s ease-in-out;
-}
+/* Transitions - Removed global transition to fix scrolling issues */
 
 /* PIC Landing Page Styles */
 .pic-landing-page {

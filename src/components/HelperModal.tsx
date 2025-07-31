@@ -676,7 +676,6 @@ export default function HelperModal({
 
     const userInput = inputValue.trim()
     setInputValue('')
-    addMessage('user', userInput, 'slide-in')
 
     // Record the query for personalization
     PersonalizationService.recordQuery(userInput, 'general', true, 0)

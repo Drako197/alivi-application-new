@@ -755,10 +755,6 @@ export class AIAssistantService {
     return input.includes('what') || input.includes('how') || input.includes('why') || input.includes('when')
   }
 
-  private static async handleGeneralQuestion(input: string): Promise<string> {
-    return `I'd be happy to help you with your medical billing questions! I can assist with codes, terminology, provider information, eligibility checks, claims submission, and workflow guidance. What specific question do you have?`
-  }
-
   // Enhanced default response with predictive suggestions
   private static getEnhancedDefaultResponse(input: string, context: any): string {
     let response = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with all your medical billing questions! You can ask me about:\n\n• **Medical Terminology** (OD, OS, PCP, etc.)\n• **Diagnosis Codes** (ICD-10)\n• **Procedure Codes** (CPT, HCPCS)\n• **Drug & Lab Codes** (J-codes, 8-series)\n• **Provider Information** (NPI lookup)\n• **Insurance Eligibility** (coverage verification)\n• **Claims Submission** (billing assistance)\n• **Form Field Guidance** (contextual help)\n• **Workflow Assistance** (step-by-step guidance)\n• **Mobile Features** (touch, voice, offline)\n• **General Billing Questions**\n\nWhat would you like to know?`

@@ -476,6 +476,35 @@ export default function Dashboard() {
 
             {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
+              {/* M.I.L.A. AI Assistant Card - Moved to first position */}
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="stat-icon bg-gradient-to-r from-blue-500 to-purple-600">
+                      <Icon name="bot" size={20} className="text-white" />
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <p className="stat-label">M.I.L.A. AI Assistant</p>
+                    <p className="stat-value">Active</p>
+                    <div className="mt-2 space-y-1">
+                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                        Inline form integration for medical codes
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
+                        Contextual help across all forms
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                        One-click code insertion & validation
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="stat-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -576,6 +605,20 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
                     Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
                   </p>
+                  <div className="px-4 space-y-2">
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                      Inline form integration for medical codes
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
+                      Contextual help across all forms
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                      One-click code insertion & validation
+                    </div>
+                  </div>
                   <div className="px-4">
                     <HelperButton 
                       currentForm="Dashboard"
@@ -669,6 +712,19 @@ export default function Dashboard() {
 
               {/* Stats Cards */}
               <div className="grid grid-cols-2 gap-4 mb-6">
+                {/* M.I.L.A. AI Assistant Card - First position */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                      <Icon name="bot" size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">M.I.L.A. AI</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">Active</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
@@ -1150,6 +1206,35 @@ export default function Dashboard() {
 
             {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
+              {/* M.I.L.A. AI Assistant Card - Moved to first position */}
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="stat-icon bg-gradient-to-r from-blue-500 to-purple-600">
+                      <Icon name="bot" size={20} className="text-white" />
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <p className="stat-label">M.I.L.A. AI Assistant</p>
+                    <p className="stat-value">Active</p>
+                    <div className="mt-2 space-y-1">
+                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                        Inline form integration for medical codes
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
+                        Contextual help across all forms
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                        One-click code insertion & validation
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="stat-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -1250,6 +1335,20 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
                     Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
                   </p>
+                  <div className="px-4 space-y-2">
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                      Inline form integration for medical codes
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
+                      Contextual help across all forms
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                      One-click code insertion & validation
+                    </div>
+                  </div>
                   <div className="px-4">
                     <HelperButton 
                       currentForm="Dashboard"

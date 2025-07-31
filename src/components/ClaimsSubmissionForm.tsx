@@ -4079,19 +4079,6 @@ export default function ClaimsSubmissionForm({
                         osPrismType: '',
                         slabOff: '',
                         eligibilityNumber: '',
-                        procedureCodes: [
-                          {
-                            id: 1,
-                            code: '92012',
-                            description: 'Eye Exam Establish Patient, Copy will run...',
-                            pos: '',
-                            mod: '',
-                            diagnosisReference: '',
-                            units: '1',
-                            uAndCCharge: '$200,000.00',
-                            planAllowed: '$10,000.00'
-                          }
-                        ],
                         totalCharges: '',
                         totalAllowed: '',
                         

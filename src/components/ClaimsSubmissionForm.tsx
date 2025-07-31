@@ -941,13 +941,16 @@ export default function ClaimsSubmissionForm({
 
                         {formData.manualProviderId ? (
                           <div className="relative">
-                            <input
-                              type="text"
-                              id="providerId"
-                              name="providerId"
+                            <MilaInputField
                               value={formData.providerId}
-                              onChange={handleInputChange}
+                              onChange={(value) => {
+                                setFormData(prev => ({ ...prev, providerId: value }))
+                              }}
                               placeholder="Enter provider ID"
+                              fieldName="providerId"
+                              formName="ClaimsSubmission"
+                              onMilaTrigger={handleMilaTrigger}
+                              error={!!errors.providerId}
                               className="form-input"
                             />
                             {validations.providerId && !errors.providerId && (
@@ -1079,13 +1082,16 @@ export default function ClaimsSubmissionForm({
 
                             {formData.manualSubscriberId ? (
                               <div className="relative">
-                                <input
-                                  type="text"
-                                  id="subscriberId"
-                                  name="subscriberId"
+                                <MilaInputField
                                   value={formData.subscriberId}
-                                  onChange={handleInputChange}
+                                  onChange={(value) => {
+                                    setFormData(prev => ({ ...prev, subscriberId: value }))
+                                  }}
                                   placeholder="Enter subscriber ID"
+                                  fieldName="subscriberId"
+                                  formName="ClaimsSubmission"
+                                  onMilaTrigger={handleMilaTrigger}
+                                  error={!!errors.subscriberId}
                                   className="form-input"
                                 />
                                 {validations.subscriberId && !errors.subscriberId && (
@@ -3481,16 +3487,19 @@ export default function ClaimsSubmissionForm({
                         {formData.procedureCodes.map((procedure, index) => (
                           <tr key={procedure.id} className="border-b border-gray-200 dark:border-gray-700">
                             <td className="px-3 py-2">
-                              <input
-                                type="text"
+                              <MilaInputField
                                 value={procedure.code}
-                                onChange={(e) => {
+                                onChange={(value) => {
                                   const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].code = e.target.value
+                                  updatedCodes[index].code = value
                                   setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
                                 }}
-                                className="form-input w-full border rounded-md pl-2.5 text-sm"
                                 placeholder="Code"
+                                fieldName="procedureCodes"
+                                formName="ClaimsSubmission"
+                                onMilaTrigger={handleMilaTrigger}
+                                error={!!errors.procedureCodes}
+                                className="w-full border rounded-md pl-2.5 text-sm"
                               />
                             </td>
                             <td className="px-3 py-2">

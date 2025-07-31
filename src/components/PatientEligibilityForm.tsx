@@ -3,6 +3,7 @@ import Icon from './Icon'
 import DatePicker from './DatePicker'
 import ReservedBenefitsPageStandalone from './ReservedBenefitsPage'
 import HelperButton from './HelperButton'
+import MilaInputField from './MilaInputField'
 import { scrollToFirstError } from '../utils/validationUtils'
 
 interface PatientEligibilityFormProps {
@@ -275,6 +276,11 @@ export default function PatientEligibilityForm({
       ...prev,
       identificationMethod: method
     }))
+  }
+
+  const handleMilaTrigger = (fieldName: string, formName: string) => {
+    // This will be handled by the HelperModal component
+    console.log(`M.I.L.A. triggered for ${fieldName} in ${formName}`)
   }
 
   const validateForm = () => {
@@ -955,15 +961,17 @@ export default function PatientEligibilityForm({
 
                       {formData.manualProviderId ? (
                         <div className="relative">
-                          <input
-                            type="text"
-                            id="providerId"
-                            name="providerId"
+                          <MilaInputField
                             value={formData.providerId}
-                            onChange={handleInputChange}
+                            onChange={(value) => {
+                              setFormData(prev => ({ ...prev, providerId: value }))
+                            }}
                             placeholder="Enter provider ID"
+                            fieldName="providerId"
+                            formName="PatientEligibility"
+                            onMilaTrigger={handleMilaTrigger}
+                            error={!!errors.providerId}
                             className="form-input"
-                            onClick={() => handleIdentificationMethodChange('subscriber')}
                           />
                           {validations.providerId && !errors.providerId && (
                             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -1097,15 +1105,17 @@ export default function PatientEligibilityForm({
 
                         {formData.manualSubscriberId ? (
                           <div className="relative">
-                            <input
-                              type="text"
-                              id="subscriberId"
-                              name="subscriberId"
+                            <MilaInputField
                               value={formData.subscriberId}
-                              onChange={handleInputChange}
+                              onChange={(value) => {
+                                setFormData(prev => ({ ...prev, subscriberId: value }))
+                              }}
                               placeholder="Enter subscriber ID"
+                              fieldName="subscriberId"
+                              formName="PatientEligibility"
+                              onMilaTrigger={handleMilaTrigger}
+                              error={!!errors.subscriberId}
                               className="form-input"
-                              onClick={() => handleIdentificationMethodChange('subscriber')}
                             />
                             {validations.subscriberId && !errors.subscriberId && (
                               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">

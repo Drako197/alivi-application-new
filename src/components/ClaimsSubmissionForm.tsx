@@ -3791,6 +3791,46 @@ export default function ClaimsSubmissionForm({
                     </button>
                   </div>
                   
+                  {/* Calculated Totals */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Total Charges
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          type="text"
+                          value={formData.procedureCodes.reduce((total, procedure) => {
+                            const charge = parseFloat(procedure.uAndCCharge.replace(/[$,]/g, '')) || 0
+                            return total + charge
+                          }, 0).toFixed(2)}
+                          className="form-input w-full border rounded-md pl-8 bg-gray-50 dark:bg-gray-700"
+                          placeholder="0.00"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Total Allowed
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          type="text"
+                          value={formData.procedureCodes.reduce((total, procedure) => {
+                            const allowed = parseFloat(procedure.planAllowed.replace(/[$,]/g, '')) || 0
+                            return total + allowed
+                          }, 0).toFixed(2)}
+                          className="form-input w-full border rounded-md pl-8 bg-gray-50 dark:bg-gray-700"
+                          placeholder="0.00"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
                   {/* Diagnosis Modal */}
                   {formData.procedureCodes.map((procedure, index) => (
                     procedure.showDiagnosisModal && (

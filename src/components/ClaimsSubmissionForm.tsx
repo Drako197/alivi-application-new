@@ -704,27 +704,27 @@ export default function ClaimsSubmissionForm({
     return (
       <div className="step-indicators-container">
         {/* Mobile-friendly step indicators */}
-        <div className="step-item step-completed">
+        <div className={`step-item ${currentStep > 1 ? 'step-completed' : currentStep === 1 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">1</div>
           <div className="step-label">Patient Info</div>
         </div>
-        <div className={`step-item ${currentStep >= 2 ? 'step-completed' : 'step-inactive'}`}>
+        <div className={`step-item ${currentStep > 2 ? 'step-completed' : currentStep === 2 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">2</div>
           <div className="step-label">Diagnosis</div>
         </div>
-        <div className={`step-item ${currentStep >= 3 ? 'step-completed' : 'step-inactive'}`}>
+        <div className={`step-item ${currentStep > 3 ? 'step-completed' : currentStep === 3 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">3</div>
           <div className="step-label">Procedure</div>
         </div>
-        <div className={`step-item ${currentStep >= 4 ? 'step-completed' : 'step-inactive'}`}>
+        <div className={`step-item ${currentStep > 4 ? 'step-completed' : currentStep === 4 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">4</div>
           <div className="step-label">Provider</div>
         </div>
-        <div className={`step-item ${currentStep >= 5 ? 'step-completed' : 'step-inactive'}`}>
+        <div className={`step-item ${currentStep > 5 ? 'step-completed' : currentStep === 5 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">5</div>
           <div className="step-label">Billing</div>
         </div>
-        <div className={`step-item ${currentStep >= 6 ? 'step-completed' : 'step-inactive'}`}>
+        <div className={`step-item ${currentStep > 6 ? 'step-completed' : currentStep === 6 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">6</div>
           <div className="step-label">Review</div>
         </div>

@@ -413,7 +413,7 @@ export default function PrescriptionForm({
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Refractive Correction
+              Refractive Correction <span className="text-red-500">*</span>
             </h2>
           </div>
           
@@ -690,7 +690,7 @@ export default function PrescriptionForm({
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Prism Correction
+              Prism Correction <span className="text-red-500">*</span>
             </h2>
           </div>
           
@@ -893,7 +893,7 @@ export default function PrescriptionForm({
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Slab Off
+              Slab Off <span className="text-red-500">*</span>
             </h2>
           </div>
           

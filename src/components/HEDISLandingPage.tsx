@@ -651,7 +651,7 @@ function ScreeningDetailsForm({
           {/* Date of Screening */}
           <div data-error={!!errors.dateOfScreening}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-              Date of Screening *
+              Date of Screening <span className="text-red-500">*</span>
             </label>
             <DatePicker
               name="dateOfScreening"
@@ -668,7 +668,7 @@ function ScreeningDetailsForm({
           {/* Place of Service */}
           <div data-error={!!errors.placeOfService}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-              Place of Service *
+              Place of Service <span className="text-red-500">*</span>
             </label>
             <select
               name="placeOfService"
@@ -692,7 +692,7 @@ function ScreeningDetailsForm({
           {/* PCP Location */}
           <div data-error={!!errors.pcpLocation}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-              PCP Location *
+              PCP Location <span className="text-red-500">*</span>
             </label>
             <select
               name="pcpLocation"
@@ -851,7 +851,7 @@ function ScreeningDetailsForm({
           {/* DM (Diabetes Mellitus) */}
           <div data-error={!!errors.diabetesMellitus}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-              Diabetes Mellitus *
+              Diabetes Mellitus <span className="text-red-500">*</span>
             </label>
             <div className="flex space-x-4">
               <label className="flex items-center">
@@ -885,7 +885,7 @@ function ScreeningDetailsForm({
           {/* DM Type - To the right of Diabetes Mellitus */}
           <div data-error={!!errors.diabetesType}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
-              DM Type {screeningDetails.diabetesMellitus === 'yes' ? '*' : '(Disabled)'}
+              DM Type {screeningDetails.diabetesMellitus === 'yes' ? <span className="text-red-500">*</span> : '(Disabled)'}
             </label>
             <div className="flex space-x-4">
               <label className={`flex items-center ${
@@ -945,7 +945,7 @@ function ScreeningDetailsForm({
           {/* Ocular HX - Left column */}
           <div data-error={!!errors.ocularHistory || !!errors.ocularHistoryOther}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
-              Ocular HX *
+              Ocular HX <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
               {[
@@ -992,7 +992,7 @@ function ScreeningDetailsForm({
           {/* Ocular SX - Right column */}
           <div data-error={!!errors.ocularSurgery || !!errors.ocularSurgeryOther}>
             <label className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-3">
-              Ocular SX *
+              Ocular SX <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
               {[

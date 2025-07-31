@@ -439,7 +439,7 @@ function ScreeningDetailsForm({
           {/* Date of Screening */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Date of Screening
+              Date of Screening <span className="text-red-500">*</span>
             </label>
             <DatePicker
               name="dateOfScreening"
@@ -466,7 +466,7 @@ function ScreeningDetailsForm({
           {/* Place of Service */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Place of Service
+              Place of Service <span className="text-red-500">*</span>
             </label>
             <select
               name="placeOfService"
@@ -876,7 +876,7 @@ function RetinalImagesForm({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Right Eye */}
           <div className="space-y-4">
-            <h4 className="text-md font-medium text-gray-900 dark:text-white">Right Eye</h4>
+            <h4 className="text-md font-medium text-gray-900 dark:text-white">Right Eye <span className="text-red-500">*</span></h4>
             
             {/* Missing Eye Question */}
             <div>
@@ -973,7 +973,7 @@ function RetinalImagesForm({
 
           {/* Left Eye */}
           <div className="space-y-4">
-            <h4 className="text-md font-medium text-gray-900 dark:text-white">Left Eye</h4>
+            <h4 className="text-md font-medium text-gray-900 dark:text-white">Left Eye <span className="text-red-500">*</span></h4>
             
             {/* Missing Eye Question */}
             <div>

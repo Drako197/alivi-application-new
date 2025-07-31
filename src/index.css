@@ -3328,14 +3328,40 @@ select {
   @apply flex items-center justify-center space-x-4 w-full;
 }
 
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .step-indicators-container {
+    @apply space-x-2 px-2;
+  }
+  
+  /* Remove padding from HEDIS screening pages on mobile */
+  .hedis-screening-page {
+    @apply p-0;
+  }
+}
+
 /* Base Step Item */
 .step-item {
   @apply flex flex-col items-center space-y-2;
 }
 
+/* Mobile step item optimizations */
+@media (max-width: 768px) {
+  .step-item {
+    @apply space-y-1;
+  }
+}
+
 /* Base Step Number */
 .step-number {
   @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-all duration-200;
+}
+
+/* Mobile step number optimizations */
+@media (max-width: 768px) {
+  .step-number {
+    @apply w-10 h-10 text-base;
+  }
 }
 
 /* Step States - Active */
@@ -3349,15 +3375,14 @@ select {
 
 /* Step States - Completed */
 .step-completed .step-number {
-  @apply bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white shadow-lg;
-  animation: stepCompletedPulse 2s ease-in-out infinite;
+  @apply bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white shadow-md;
 }
 
 .step-completed .step-label {
-  @apply text-green-600 dark:text-green-400 font-semibold;
+  @apply text-green-600 dark:text-green-400 font-medium;
 }
 
-/* Step States - Inactive/Upcoming */
+/* Step States - Inactive */
 .step-inactive .step-number {
   @apply bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400;
 }
@@ -3366,20 +3391,45 @@ select {
   @apply text-gray-500 dark:text-gray-400;
 }
 
-/* Base Step Label */
-.step-label {
-  @apply text-xs font-medium text-center transition-colors duration-200;
+/* Mobile label optimizations */
+@media (max-width: 640px) {
+  .step-label {
+    @apply text-xs;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-label {
+    @apply text-xs max-w-16 text-center leading-tight;
+  }
+}
+
+/* Mobile progress bar alternative for very small screens */
+@media (max-width: 400px) {
+  .step-indicators-container {
+    @apply flex-col space-y-2;
+  }
+  
+  .step-item {
+    @apply flex-row space-x-3 space-y-0 items-center;
+  }
+  
+  .step-label {
+    @apply text-xs max-w-none;
+  }
 }
 
 /* Animation for completed steps */
+.step-completed .step-number {
+  animation: stepCompletedPulse 2s ease-in-out infinite;
+}
+
 @keyframes stepCompletedPulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 8px 15px -3px rgba(34, 197, 94, 0.4);
   }
 }
 
@@ -3415,5 +3465,6 @@ select {
     @apply justify-center;
   }
 }
+
 
 

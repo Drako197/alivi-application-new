@@ -331,6 +331,8 @@ export default function PrescriptionForm({
       setTimeout(() => {
         setIsSubmitting(false)
         onNext?.()
+        // Scroll to top on mobile when proceeding to next step
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }, 500)
     }
   }

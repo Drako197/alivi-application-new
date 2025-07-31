@@ -671,11 +671,15 @@ export default function ClaimsSubmissionForm({
     setTimeout(() => {
       setCurrentStep(prev => Math.min(prev + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6)
       setIsTransitioning(false)
+      // Scroll to top on mobile when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }, 500) // 500ms delay to show loading animation
   }
 
   const handleBack = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1) as 1 | 2 | 3 | 4 | 5 | 6)
+    // Scroll to top on mobile when moving to previous step
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleBackToLanding = () => {

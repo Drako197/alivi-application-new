@@ -402,6 +402,8 @@ export default function PatientEligibilityForm({
     setTimeout(() => {
       setIsSubmitting(false)
       setCurrentStep(3) // Move to results step
+      // Scroll to top on mobile when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }, 2000)
   }
 
@@ -412,6 +414,8 @@ export default function PatientEligibilityForm({
     setTimeout(() => {
       setIsSubmitting(false)
       setCurrentStep(4) // Move to success step
+      // Scroll to top on mobile when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }, 2000)
   }
 
@@ -443,6 +447,8 @@ export default function PatientEligibilityForm({
     
     // Go back to step 1
     setCurrentStep(1)
+    // Scroll to top on mobile when resetting to step 1
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleBackFromReservedBenefits = () => {

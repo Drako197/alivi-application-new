@@ -42,7 +42,7 @@ export default function HelperButton({
           </div>
           
           {/* Pulse animation */}
-          <div className="ai-helper-pulse absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-ping opacity-20"></div>
+          <div className="ai-helper-pulse absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-ping-slow opacity-20"></div>
         </button>
         
         {/* M.I.L.A. badge */}

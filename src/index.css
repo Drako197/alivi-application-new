@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom animations for M.I.L.A. */
+/* Custom animations for M.I.A. */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -16,13 +16,11 @@
   }
 }
 
+
+
 /* AI Helper Component Styles */
 .ai-helper-button {
   @apply w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200;
-}
-
-.ai-helper-pulse {
-  @apply absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-ping opacity-20;
 }
 
 .ai-helper-badge {
@@ -3221,6 +3219,18 @@ select {
 /* Custom calendar icon container padding */
 .calendar-icon-container {
   padding-left: 0.5rem !important;
+}
+
+/* Custom slower ping animation for M.I.L.A. icon - same visual effect as animate-ping but slower */
+@keyframes ping-slow {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 

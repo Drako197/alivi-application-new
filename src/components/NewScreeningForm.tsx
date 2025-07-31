@@ -160,12 +160,16 @@ export default function NewScreeningForm({
   const handleNext = () => {
     if (currentStep === 1 && validateScreeningDetails()) {
       setCurrentStep(2)
+      // Scroll to top on mobile when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
   const handlePrevious = () => {
     if (currentStep === 2) {
       setCurrentStep(1)
+      // Scroll to top on mobile when moving to previous step
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 

@@ -161,6 +161,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = () => {
     setUser(null)
     localStorage.removeItem('alivi_user')
+    // Clear M.I.L.A. welcome session so user gets welcome message on next login
+    sessionStorage.removeItem('mila_welcomed_user')
   }
 
   const resetPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {

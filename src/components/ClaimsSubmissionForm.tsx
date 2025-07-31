@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react'
 import Icon from './Icon'
 import DatePicker from './DatePicker'
 import HelperButton from './HelperButton'
+import MilaInputField from './MilaInputField'
+import HelperModal from './HelperModal'
 import ClaimAcceptedView from './ClaimAcceptedView'
 import ReservedBenefitsView from './ReservedBenefitsView'
 import { scrollToFirstError } from '../utils/validationUtils'
@@ -30,6 +32,12 @@ export default function ClaimsSubmissionForm({
 
   // Reserved Benefits state
   const [showReservedBenefits, setShowReservedBenefits] = useState(false)
+
+  // M.I.L.A. Code Selection state
+  const [showMilaModal, setShowMilaModal] = useState(false)
+  const [milaCodeSelectionMode, setMilaCodeSelectionMode] = useState(false)
+  const [triggeringField, setTriggeringField] = useState('')
+  const [triggeringForm, setTriggeringForm] = useState('')
 
   // Help tooltip state
   const [showHelp, setShowHelp] = useState<string | null>(null)
@@ -411,6 +419,32 @@ export default function ClaimsSubmissionForm({
 
   const handleIdentificationMethodChange = (method: 'subscriber' | 'name') => {
     setFormData(prev => ({ ...prev, identificationMethod: method }))
+  }
+
+  // M.I.L.A. Code Selection handlers
+  const handleMilaTrigger = (fieldName: string, formName: string) => {
+    setTriggeringField(fieldName)
+    setTriggeringForm(formName)
+    setMilaCodeSelectionMode(true)
+    setShowMilaModal(true)
+  }
+
+  const handleCodeSelect = (code: string, description: string) => {
+    // Find the current diagnosis code being edited and update it
+    if (triggeringField === 'diagnosisCodes') {
+      // For now, update the first diagnosis code
+      // In a real implementation, you'd track which specific diagnosis code is being edited
+      setFormData(prev => ({
+        ...prev,
+        diagnosisCodes: prev.diagnosisCodes.map((dc, index) => 
+          index === 0 ? { ...dc, code, description } : dc
+        )
+      }))
+    }
+    
+    // Close the modal
+    setShowMilaModal(false)
+    setMilaCodeSelectionMode(false)
   }
 
   // Validation
@@ -1647,12 +1681,14 @@ export default function ClaimsSubmissionForm({
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                   ICD-10 Code
                                 </label>
-                                <input
-                                  type="text"
+                                <MilaInputField
                                   value={diagnosisCode.code}
-                                  onChange={(e) => updateDiagnosisCode(diagnosisCode.id, 'code', e.target.value)}
+                                  onChange={(value) => updateDiagnosisCode(diagnosisCode.id, 'code', value)}
                                   placeholder="e.g., H25.1"
-                                  className={`form-input ${errors.diagnosisCodes ? 'border-red-500' : ''}`}
+                                  fieldName="diagnosisCodes"
+                                  formName="ClaimsSubmission"
+                                  onMilaTrigger={handleMilaTrigger}
+                                  error={!!errors.diagnosisCodes}
                                 />
                               </div>
                               <div>
@@ -4114,6 +4150,22 @@ export default function ClaimsSubmissionForm({
         currentForm="ClaimsSubmission"
         currentField={getCurrentField()}
         currentStep={currentStep}
+      />
+
+      {/* M.I.L.A. Code Selection Modal */}
+      <HelperModal
+        isOpen={showMilaModal}
+        onClose={() => {
+          setShowMilaModal(false)
+          setMilaCodeSelectionMode(false)
+        }}
+        currentForm="ClaimsSubmission"
+        currentField={getCurrentField()}
+        currentStep={currentStep}
+        isCodeSelectionMode={milaCodeSelectionMode}
+        triggeringFieldName={triggeringField}
+        triggeringFormName={triggeringForm}
+        onCodeSelect={handleCodeSelect}
       />
 
       {/* Loading Modal */}

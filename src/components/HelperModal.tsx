@@ -30,6 +30,11 @@ interface HelperModalProps {
   currentField?: string
   currentStep?: number
   onFieldSuggestion?: (fieldName: string, suggestion: string) => void
+  // New props for code selection mode
+  isCodeSelectionMode?: boolean
+  triggeringFieldName?: string
+  triggeringFormName?: string
+  onCodeSelect?: (code: string, description: string) => void
 }
 
 // Medical billing knowledge base
@@ -96,7 +101,12 @@ export default function HelperModal({
   currentForm, 
   currentField, 
   currentStep,
-  onFieldSuggestion 
+  onFieldSuggestion,
+  // New props for code selection mode
+  isCodeSelectionMode,
+  triggeringFieldName,
+  triggeringFormName,
+  onCodeSelect
 }: HelperModalProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -107,12 +117,83 @@ export default function HelperModal({
   const [predictiveSuggestions, setPredictiveSuggestions] = useState<any[]>([])
   const [showPredictiveSuggestions, setShowPredictiveSuggestions] = useState(false)
   const [hasShownSuggestions, setHasShownSuggestions] = useState(false)
+  const [hasWelcomedUser, setHasWelcomedUser] = useState(false)
   const [conversationContext, setConversationContext] = useState<{
     lastCode?: string
     lastTopic?: string
   }>({})
+  const [codeSelectionMode, setCodeSelectionMode] = useState(false)
+  const [availableCodes, setAvailableCodes] = useState<Array<{code: string, description: string}>>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Check if user has been welcomed in this session
+  useEffect(() => {
+    const sessionWelcomed = sessionStorage.getItem('mila_welcomed_user')
+    if (sessionWelcomed === 'true') {
+      setHasWelcomedUser(true)
+    }
+  }, [])
+
+  // Handle code selection mode
+  useEffect(() => {
+    if (isCodeSelectionMode && triggeringFieldName && triggeringFormName) {
+      setCodeSelectionMode(true)
+      loadAvailableCodes(triggeringFieldName, triggeringFormName)
+    } else {
+      setCodeSelectionMode(false)
+      setAvailableCodes([])
+    }
+  }, [isCodeSelectionMode, triggeringFieldName, triggeringFormName])
+
+  const loadAvailableCodes = (fieldName: string, formName: string) => {
+    let codes: Array<{code: string, description: string}> = []
+    
+    if (fieldName === 'diagnosisCodes') {
+      codes = [
+        { code: 'E11.9', description: 'Type 2 diabetes mellitus without complications' },
+        { code: 'E11.21', description: 'Type 2 diabetes mellitus with diabetic nephropathy' },
+        { code: 'E11.22', description: 'Type 2 diabetes mellitus with diabetic chronic kidney disease' },
+        { code: 'H35.00', description: 'Unspecified background retinopathy' },
+        { code: 'H35.01', description: 'Mild nonproliferative diabetic retinopathy' },
+        { code: 'H35.02', description: 'Moderate nonproliferative diabetic retinopathy' },
+        { code: 'H35.03', description: 'Severe nonproliferative diabetic retinopathy' },
+        { code: 'H35.04', description: 'Proliferative diabetic retinopathy' },
+        { code: 'Z79.4', description: 'Long term (current) use of insulin' },
+        { code: 'Z79.84', description: 'Long term (current) use of oral hypoglycemic drugs' }
+      ]
+    } else if (fieldName === 'procedureCodes') {
+      codes = [
+        { code: '92250', description: 'Fundus photography with interpretation and report' },
+        { code: '92227', description: 'Imaging of retina for detection or monitoring of disease' },
+        { code: '92228', description: 'Imaging of retina for detection or monitoring of disease; with remote analysis' },
+        { code: '92229', description: 'Imaging of retina for detection or monitoring of disease; with point-of-care automated analysis' },
+        { code: '92285', description: 'External ocular photography with interpretation and report' },
+        { code: '92287', description: 'Ophthalmic biometry by partial coherence interferometry' }
+      ]
+    }
+    
+    setAvailableCodes(codes)
+    
+    // Add contextual message
+    const demoName = getDemoUserFirstName()
+    const message = `Hi ${demoName}! Here are the available ${fieldName.replace('Codes', ' codes')} for your ${formName} form. Click on any code to automatically insert it into your field:`
+    addMessage('assistant', message, 'fade-in')
+  }
+
+  const handleCodeSelect = (code: string, description: string) => {
+    if (onCodeSelect) {
+      onCodeSelect(code, description)
+    }
+    
+    // Add confirmation message
+    addMessage('assistant', `✅ Code "${code}" has been inserted into your field!`, 'fade-in')
+    
+    // Close the modal after a short delay
+    setTimeout(() => {
+      onClose()
+    }, 1500)
+  }
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -126,9 +207,9 @@ export default function HelperModal({
     }
   }, [isOpen])
 
-  // Add initial welcome message and setup personalization
+  // Add initial welcome message and setup personalization (only once per session)
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    if (isOpen && messages.length === 0 && !hasWelcomedUser) {
       // Initialize personalization
       PersonalizationService.incrementSessionCount()
       
@@ -148,13 +229,17 @@ export default function HelperModal({
       
       addMessage('assistant', welcomeMessage, 'fade-in')
       
+      // Mark user as welcomed for this session
+      setHasWelcomedUser(true)
+      sessionStorage.setItem('mila_welcomed_user', 'true')
+      
       // Show proactive suggestions after a short delay
       // DISABLED: Proactive suggestions turned off as requested
       // setTimeout(() => {
       //   showProactiveSuggestions()
       // }, 2000)
     }
-  }, [isOpen, messages.length])
+  }, [isOpen, messages.length, hasWelcomedUser])
 
   // Reset suggestions when modal closes
   useEffect(() => {
@@ -184,22 +269,37 @@ export default function HelperModal({
         setPredictiveSuggestions(contextualSuggestions)
         setShowPredictiveSuggestions(true)
         
-        // Add a contextual welcome message
+        // Add contextual message based on whether user has been welcomed
         const demoName = getDemoUserFirstName()
-        const welcomeMessage = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. Here are some suggestions for the ${currentField} field:`
-        addMessage('assistant', welcomeMessage, 'fade-in')
+        if (!hasWelcomedUser) {
+          const welcomeMessage = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. Here are some suggestions for the ${currentField} field:`
+          addMessage('assistant', welcomeMessage, 'fade-in')
+        } else {
+          const contextualMessage = `I see you're working on the ${currentForm} form. Here are some helpful suggestions for the ${currentField} field:`
+          addMessage('assistant', contextualMessage, 'fade-in')
+        }
       } else {
-        // Add a general welcome message if no specific suggestions
+        // Add general message if no specific suggestions
         const demoName = getDemoUserFirstName()
-        const generalWelcome = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
-        addMessage('assistant', generalWelcome, 'fade-in')
+        if (!hasWelcomedUser) {
+          const generalWelcome = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
+          addMessage('assistant', generalWelcome, 'fade-in')
+        } else {
+          const contextualMessage = `I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
+          addMessage('assistant', contextualMessage, 'fade-in')
+        }
       }
     } catch (error) {
       console.error('Error loading predictive suggestions:', error)
-      // Add fallback welcome message
+      // Add fallback message
       const demoName = getDemoUserFirstName()
-      const fallbackMessage = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your medical billing questions!`
-      addMessage('assistant', fallbackMessage, 'fade-in')
+      if (!hasWelcomedUser) {
+        const fallbackMessage = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your medical billing questions!`
+        addMessage('assistant', fallbackMessage, 'fade-in')
+      } else {
+        const fallbackMessage = `I'm here to help with your medical billing questions!`
+        addMessage('assistant', fallbackMessage, 'fade-in')
+      }
     }
   }
 
@@ -290,59 +390,138 @@ export default function HelperModal({
             icon: 'check-circle',
             action: { type: 'explain', data: { topic: 'claim validation checklist' } }
           })
+          suggestions.push({
+            id: 'submission-guidance',
+            title: 'Submission Guidance',
+            description: 'Ensure proper claim submission format',
+            icon: 'send',
+            action: { type: 'explain', data: { topic: 'claim submission process' } }
+          })
           break
       }
     } else if (currentForm === 'PatientEligibility') {
       switch (currentField) {
-        case 'providerId':
+        case 'provider-information':
           suggestions.push({
             id: 'npi-validation',
             title: 'NPI Validation',
-            description: 'Validate your National Provider Identifier',
+            description: 'Verify your National Provider Identifier',
             icon: 'user-check',
-            action: { type: 'search', data: { query: 'NPI validation format' } }
+            action: { type: 'search', data: { query: 'validate NPI number' } }
           })
-          break
-        case 'subscriberId':
           suggestions.push({
-            id: 'member-search',
-            title: 'Member Search',
-            description: 'Find patient by member ID',
+            id: 'provider-search',
+            title: 'Provider Search',
+            description: 'Find provider information in database',
             icon: 'search',
-            action: { type: 'search', data: { query: 'member ID search' } }
+            action: { type: 'search', data: { query: 'search provider database' } }
           })
           break
-        case 'dependantSequence':
+        case 'patient-information':
           suggestions.push({
-            id: 'dependent-codes',
-            title: 'Dependent Codes',
-            description: 'Understand dependent sequence numbers',
+            id: 'member-id-help',
+            title: 'Member ID Help',
+            description: 'Understanding member ID format and location',
+            icon: 'credit-card',
+            action: { type: 'explain', data: { topic: 'member ID format insurance card' } }
+          })
+          suggestions.push({
+            id: 'dependent-sequence',
+            title: 'Dependent Sequence',
+            description: 'Understanding dependent sequence numbers',
             icon: 'users',
-            action: { type: 'explain', data: { topic: 'dependent sequence codes' } }
+            action: { type: 'explain', data: { topic: 'dependent sequence numbers' } }
+          })
+          break
+        case 'eligibility-check':
+          suggestions.push({
+            id: 'coverage-verification',
+            title: 'Coverage Verification',
+            description: 'Check patient coverage and benefits',
+            icon: 'shield-check',
+            action: { type: 'explain', data: { topic: 'coverage verification process' } }
+          })
+          suggestions.push({
+            id: 'benefit-inquiry',
+            title: 'Benefit Inquiry',
+            description: 'Understand covered services and limitations',
+            icon: 'info-circle',
+            action: { type: 'explain', data: { topic: 'benefit inquiry process' } }
           })
           break
       }
     } else if (currentForm === 'HEDIS') {
       switch (currentField) {
-        case 'diagnosis':
+        case 'screening-setup':
           suggestions.push({
-            id: 'diabetes-codes',
-            title: 'Diabetes Codes',
-            description: 'Common diabetes diagnosis codes',
-            icon: 'file-text',
-            action: { type: 'search', data: { query: 'diabetes diagnosis codes' } }
+            id: 'hedis-measures',
+            title: 'HEDIS Measures',
+            description: 'Understanding HEDIS quality measures',
+            icon: 'chart-bar',
+            action: { type: 'explain', data: { topic: 'HEDIS quality measures' } }
+          })
+          suggestions.push({
+            id: 'screening-protocols',
+            title: 'Screening Protocols',
+            description: 'Standard screening procedures and guidelines',
+            icon: 'clipboard-list',
+            action: { type: 'explain', data: { topic: 'screening protocols' } }
           })
           break
-        case 'retinal-imaging':
+        case 'patient-data':
           suggestions.push({
-            id: 'retinal-codes',
-            title: 'Retinal Imaging Codes',
-            description: 'CPT codes for retinal imaging',
-            icon: 'camera',
-            action: { type: 'search', data: { query: 'retinal imaging CPT codes' } }
+            id: 'data-collection',
+            title: 'Data Collection',
+            description: 'Required patient data for HEDIS measures',
+            icon: 'database',
+            action: { type: 'explain', data: { topic: 'HEDIS data collection requirements' } }
+          })
+          suggestions.push({
+            id: 'quality-measures',
+            title: 'Quality Measures',
+            description: 'Understanding quality measure calculations',
+            icon: 'target',
+            action: { type: 'explain', data: { topic: 'quality measure calculations' } }
           })
           break
       }
+    } else if (currentForm === 'Dashboard') {
+      suggestions.push({
+        id: 'quick-actions',
+        title: 'Quick Actions',
+        description: 'Common tasks and shortcuts',
+        icon: 'bolt',
+        action: { type: 'explain', data: { topic: 'dashboard quick actions' } }
+      })
+      suggestions.push({
+        id: 'recent-activity',
+        title: 'Recent Activity',
+        description: 'View your recent form submissions',
+        icon: 'clock',
+        action: { type: 'search', data: { query: 'recent form submissions' } }
+      })
+      suggestions.push({
+        id: 'statistics-help',
+        title: 'Statistics Help',
+        description: 'Understanding dashboard statistics',
+        icon: 'chart-pie',
+        action: { type: 'explain', data: { topic: 'dashboard statistics' } }
+      })
+    } else if (currentForm === 'PIC') {
+      suggestions.push({
+        id: 'pic-actions',
+        title: 'PIC Actions',
+        description: 'Provider Interface Center operations',
+        icon: 'cog',
+        action: { type: 'explain', data: { topic: 'PIC operations' } }
+      })
+      suggestions.push({
+        id: 'provider-support',
+        title: 'Provider Support',
+        description: 'Provider assistance and resources',
+        icon: 'headset',
+        action: { type: 'search', data: { query: 'provider support resources' } }
+      })
     }
     
     return suggestions
@@ -748,6 +927,47 @@ export default function HelperModal({
                     >
                       Dismiss
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Code Selection Interface */}
+              {codeSelectionMode && availableCodes.length > 0 && (
+                <div className="flex justify-start animate-fade-in">
+                  <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-4 shadow-md border border-green-200 dark:border-green-700 w-full">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Icon name="code" size={16} className="text-green-500" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Available Codes</span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
+                      {availableCodes.map((codeItem, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleCodeSelect(codeItem.code, codeItem.description)}
+                          className="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500 transition-all duration-200 hover:shadow-md hover:bg-green-50 dark:hover:bg-green-900/20"
+                        >
+                          <div className="flex items-start space-x-3">
+                            <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                              <Icon name="copy" size={14} className="text-green-600 dark:text-green-400" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-sm font-mono font-medium text-gray-900 dark:text-white mb-1">
+                                {codeItem.code}
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                                {codeItem.description}
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0">
+                              <Icon name="arrow-right" size={14} className="text-green-500" />
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                      Click any code to automatically insert it into your field
+                    </div>
                   </div>
                 </div>
               )}

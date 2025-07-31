@@ -43,7 +43,7 @@ export default function ClaimsSubmissionForm({
   const [showHelp, setShowHelp] = useState<string | null>(null)
 
   // Tooltip state
-  const [showTooltip, setShowTooltip] = useState<{ index: number; text: string } | null>(null)
+  const [showTooltip, setShowTooltip] = useState<{ index: number; text: string; position: { x: number; y: number } } | null>(null)
 
   // Close tooltip when clicking outside
   useEffect(() => {
@@ -3537,16 +3537,33 @@ export default function ClaimsSubmissionForm({
                                     updatedCodes[index].description = e.target.value
                                     setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
                                   }}
-                                  onClick={() => {
+                                  onClick={(e) => {
                                     if (procedure.description && procedure.description.length > 30) {
-                                      setShowTooltip({ index, text: procedure.description })
+                                      const inputElement = e.target as HTMLElement
+                                      const rect = inputElement.getBoundingClientRect()
+                                      setShowTooltip({ 
+                                        index, 
+                                        text: procedure.description, 
+                                        position: { 
+                                          x: rect.left, 
+                                          y: rect.bottom + 5 
+                                        } 
+                                      })
                                     }
                                   }}
                                   className="form-input w-full border rounded-md pl-2.5 text-sm cursor-pointer"
                                   placeholder="Description"
                                 />
                                 {showTooltip && showTooltip.index === index && (
-                                  <div className="absolute z-50 bg-gray-900 text-white text-sm rounded-lg py-2 px-3 shadow-lg max-w-xs break-words tooltip-container">
+                                  <div 
+                                    className="fixed z-[9999] bg-gray-900 text-white text-sm rounded-lg py-2 px-3 shadow-lg max-w-xs break-words tooltip-container"
+                                    style={{
+                                      top: `${showTooltip.position.y}px`,
+                                      left: `${showTooltip.position.x}px`,
+                                      maxHeight: '200px',
+                                      overflowY: 'auto'
+                                    }}
+                                  >
                                     {showTooltip.text}
                                     <button
                                       type="button"

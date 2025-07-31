@@ -485,6 +485,22 @@ export default function ClaimsSubmissionForm({
           index === editingRowIndex ? { ...pc, code, description } : pc
         )
       }))
+    } else if (triggeringField === 'posCodes') {
+      // Update the specific POS code row that was clicked
+      setFormData(prev => ({
+        ...prev,
+        procedureCodes: prev.procedureCodes.map((pc, index) => 
+          index === editingRowIndex ? { ...pc, pos: code } : pc
+        )
+      }))
+    } else if (triggeringField === 'modCodes') {
+      // Update the specific MOD code row that was clicked
+      setFormData(prev => ({
+        ...prev,
+        procedureCodes: prev.procedureCodes.map((pc, index) => 
+          index === editingRowIndex ? { ...pc, mod: code } : pc
+        )
+      }))
     }
     
     // Close the modal
@@ -3491,277 +3507,259 @@ export default function ClaimsSubmissionForm({
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     Procedure Codes
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                     Please enter the corresponding diagnosis codes and line charges, and any other procedure codes if needed:
                   </p>
                   
-                  {/* Procedure Codes Table */}
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full border border-gray-200 dark:border-gray-700">
-                      <thead>
-                        <tr className="bg-gray-50 dark:bg-gray-700">
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Codes</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Descriptions</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">POS</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">MOD</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Diagnosis Reference</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Units</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">U&C Charge</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Plan Allowed</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {formData.procedureCodes.map((procedure, index) => (
-                          <tr key={procedure.id} className="border-b border-gray-200 dark:border-gray-700">
-                            <td className="px-3 py-2">
-                              <MilaInputField
-                                value={procedure.code}
-                                onChange={(value) => {
-                                  const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].code = value
-                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                }}
-                                placeholder="Code"
-                                fieldName="procedureCodes"
-                                formName="ClaimsSubmission"
-                                onMilaTrigger={(fieldName, formName) => handleMilaTrigger(fieldName, formName, index)}
-                                error={!!errors.procedureCodes}
-                                className="w-full border rounded-md pl-2.5 text-sm"
-                              />
-                            </td>
-                            <td className="px-3 py-2">
-                              <div className="relative">
-                                <input
-                                  type="text"
-                                  value={procedure.description}
-                                  onChange={(e) => {
-                                    const updatedCodes = [...formData.procedureCodes]
-                                    updatedCodes[index].description = e.target.value
-                                    setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                  }}
-                                  onClick={(e) => {
-                                    if (procedure.description && procedure.description.length > 30) {
-                                      const inputElement = e.target as HTMLElement
-                                      const rect = inputElement.getBoundingClientRect()
-                                      setShowTooltip({ 
-                                        index, 
-                                        text: procedure.description, 
-                                        position: { 
-                                          x: rect.left, 
-                                          y: rect.bottom + 5 
-                                        } 
-                                      })
-                                    }
-                                  }}
-                                  className="form-input w-full border rounded-md pl-2.5 text-sm cursor-pointer"
-                                  placeholder="Description"
-                                />
-                                {showTooltip && showTooltip.index === index && (
-                                  <div 
-                                    className="fixed z-[9999] bg-gray-900 text-white text-sm rounded-lg py-2 px-3 shadow-lg max-w-xs break-words tooltip-container"
-                                    style={{
-                                      top: `${showTooltip.position.y}px`,
-                                      left: `${showTooltip.position.x}px`,
-                                      maxHeight: '200px',
-                                      overflowY: 'auto'
-                                    }}
-                                  >
-                                    {showTooltip.text}
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setShowTooltip(null)
-                                      }}
-                                      className="absolute top-1 right-1 text-gray-300 hover:text-white"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-3 py-2">
+                  {/* Procedure Codes Cards */}
+                  <div className="space-y-4">
+                    {formData.procedureCodes.map((procedure, index) => (
+                      <div key={procedure.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                          {/* Code Field */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Procedure Code *
+                            </label>
+                            <MilaInputField
+                              value={procedure.code}
+                              onChange={(value) => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].code = value
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              placeholder="Code"
+                              fieldName="procedureCodes"
+                              formName="ClaimsSubmission"
+                              onMilaTrigger={(fieldName, formName) => handleMilaTrigger(fieldName, formName, index)}
+                              error={!!errors.procedureCodes}
+                              className="w-full border rounded-md pl-2.5 text-sm"
+                            />
+                          </div>
+                          
+                          {/* Description Field */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Description
+                            </label>
+                            <div className="relative">
                               <input
                                 type="text"
-                                value={procedure.pos}
+                                value={procedure.description}
                                 onChange={(e) => {
                                   const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].pos = e.target.value
+                                  updatedCodes[index].description = e.target.value
                                   setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
                                 }}
-                                className="form-input w-full border rounded-md pl-2.5 text-sm"
-                                placeholder="POS"
-                              />
-                            </td>
-                            <td className="px-3 py-2">
-                              <input
-                                type="text"
-                                value={procedure.mod}
-                                onChange={(e) => {
-                                  const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].mod = e.target.value
-                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                onClick={(e) => {
+                                  if (procedure.description && procedure.description.length > 30) {
+                                    const inputElement = e.target as HTMLElement
+                                    const rect = inputElement.getBoundingClientRect()
+                                    setShowTooltip({ 
+                                      index, 
+                                      text: procedure.description, 
+                                      position: { 
+                                        x: rect.left, 
+                                        y: rect.bottom + 5 
+                                      } 
+                                    })
+                                  }
                                 }}
-                                className="form-input w-full border rounded-md pl-2.5 text-sm"
-                                placeholder="MOD"
+                                className="form-input w-full border rounded-md pl-2.5 text-sm cursor-pointer"
+                                placeholder="Description"
                               />
-                            </td>
-                            <td className="px-3 py-2">
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const updatedCodes = [...formData.procedureCodes]
-                                    updatedCodes[index].showDiagnosisModal = true
-                                    setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              {showTooltip && showTooltip.index === index && (
+                                <div 
+                                  className="fixed z-[9999] bg-gray-900 text-white text-sm rounded-lg py-2 px-3 shadow-lg max-w-xs break-words tooltip-container"
+                                  style={{
+                                    top: `${showTooltip.position.y}px`,
+                                    left: `${showTooltip.position.x}px`,
+                                    maxHeight: '200px',
+                                    overflowY: 'auto'
                                   }}
-                                  className="w-full text-left px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                                 >
-                                  {procedure.diagnosisReference ? (
-                                    <div className="flex flex-wrap gap-1">
-                                      {procedure.diagnosisReference.split(',').map((ref, idx) => (
-                                        <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                          {ref}
-                                          <button
-                                            type="button"
-                                            onClick={(e) => {
-                                              e.stopPropagation()
-                                              const currentRefs = procedure.diagnosisReference.split(',')
-                                              const newRefs = currentRefs.filter(r => r !== ref)
-                                              const updatedCodes = [...formData.procedureCodes]
-                                              updatedCodes[index].diagnosisReference = newRefs.join(',')
-                                              setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                            }}
-                                            className="ml-1 text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100"
-                                          >
-                                            ×
-                                          </button>
-                                        </span>
-                                      ))}
-                                    </div>
-                                  ) : (
-                                    <span className="text-gray-500 dark:text-gray-400">Select diagnosis references...</span>
-                                  )}
-                                </button>
-                                
-                                {/* Multi-select Modal */}
-                                {procedure.showDiagnosisModal && (
-                                  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
-                                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Diagnosis References</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Choose one or more diagnosis references for this procedure code.</p>
-                                      </div>
-                                      
-                                      <div className="p-4 max-h-64 overflow-y-auto">
-                                        <div className="space-y-2">
-                                          {[1, 2, 3, 4, 5, 6].map((refNum) => {
-                                            const isSelected = procedure.diagnosisReference && procedure.diagnosisReference.split(',').includes(refNum.toString())
-                                            return (
-                                              <label key={refNum} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
-                                                <input
-                                                  type="checkbox"
-                                                  checked={isSelected}
-                                                  onChange={(e) => {
-                                                    const currentRefs = procedure.diagnosisReference ? procedure.diagnosisReference.split(',') : []
-                                                    let newRefs
-                                                    if (e.target.checked) {
-                                                      newRefs = [...currentRefs, refNum.toString()]
-                                                    } else {
-                                                      newRefs = currentRefs.filter(r => r !== refNum.toString())
-                                                    }
-                                                    const updatedCodes = [...formData.procedureCodes]
-                                                    updatedCodes[index].diagnosisReference = newRefs.join(',')
-                                                    setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                                  }}
-                                                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                                />
-                                                <span className="text-sm font-medium text-gray-900 dark:text-white">Diagnosis Reference {refNum}</span>
-                                              </label>
-                                            )
-                                          })}
-                                        </div>
-                                      </div>
-                                      
-                                      <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const updatedCodes = [...formData.procedureCodes]
-                                            updatedCodes[index].diagnosisReference = ''
-                                            updatedCodes[index].showDiagnosisModal = false
-                                            setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                          }}
-                                          className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                                        >
-                                          Clear All
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const updatedCodes = [...formData.procedureCodes]
-                                            updatedCodes[index].showDiagnosisModal = false
-                                            setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                          }}
-                                          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
-                                        >
-                                          Done
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">{procedure.units}</td>
-                            <td className="px-3 py-2">
-                              <input
-                                type="text"
-                                value={procedure.uAndCCharge}
-                                onChange={(e) => {
-                                  const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].uAndCCharge = e.target.value
-                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                }}
-                                className="form-input w-full border rounded-md pl-2.5 text-sm"
-                                placeholder="$0.00"
-                              />
-                            </td>
-                            <td className="px-3 py-2">
-                              <input
-                                type="text"
-                                value={procedure.planAllowed}
-                                onChange={(e) => {
-                                  const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].planAllowed = e.target.value
-                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                }}
-                                className="form-input w-full border rounded-md pl-2.5 text-sm"
-                                placeholder="$0.00"
-                              />
-                            </td>
-                            <td className="px-3 py-2">
+                                  {showTooltip.text}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setShowTooltip(null)
+                                    }}
+                                    className="absolute top-1 right-1 text-gray-300 hover:text-white"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* POS Field */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              POS
+                            </label>
+                            <MilaInputField
+                              value={procedure.pos}
+                              onChange={(value) => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].pos = value
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              placeholder="POS"
+                              fieldName="posCodes"
+                              formName="ClaimsSubmission"
+                              onMilaTrigger={(fieldName, formName) => handleMilaTrigger(fieldName, formName, index)}
+                              error={!!errors.procedureCodes}
+                              className="w-full border rounded-md pl-2.5 text-sm"
+                            />
+                          </div>
+                          
+                          {/* MOD Field */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              MOD
+                            </label>
+                            <MilaInputField
+                              value={procedure.mod}
+                              onChange={(value) => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].mod = value
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              placeholder="MOD"
+                              fieldName="modCodes"
+                              formName="ClaimsSubmission"
+                              onMilaTrigger={(fieldName, formName) => handleMilaTrigger(fieldName, formName, index)}
+                              error={!!errors.procedureCodes}
+                              className="w-full border rounded-md pl-2.5 text-sm"
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Secondary Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                          {/* Diagnosis Reference */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Diagnosis Reference
+                            </label>
+                            <div className="relative">
                               <button
                                 type="button"
                                 onClick={() => {
-                                  const updatedCodes = formData.procedureCodes.filter((_, i) => i !== index)
+                                  const updatedCodes = [...formData.procedureCodes]
+                                  updatedCodes[index].showDiagnosisModal = true
                                   setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
                                 }}
-                                className="text-red-600 hover:text-red-800"
+                                className="w-full text-left px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                               >
-                                <Icon name="x" size={16} />
+                                {procedure.diagnosisReference ? (
+                                  <div className="flex flex-wrap gap-1">
+                                    {procedure.diagnosisReference.split(',').map((ref, idx) => (
+                                      <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                        {ref}
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            const currentRefs = procedure.diagnosisReference.split(',')
+                                            const newRefs = currentRefs.filter(r => r !== ref)
+                                            const updatedCodes = [...formData.procedureCodes]
+                                            updatedCodes[index].diagnosisReference = newRefs.join(',')
+                                            setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                          }}
+                                          className="ml-1 text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100"
+                                        >
+                                          ×
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-500 dark:text-gray-400">Select diagnosis references...</span>
+                                )}
                               </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                            </div>
+                          </div>
+                          
+                          {/* Units */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Units
+                            </label>
+                            <input
+                              type="text"
+                              value={procedure.units}
+                              onChange={(e) => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].units = e.target.value
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              className="form-input w-full border rounded-md pl-2.5 text-sm"
+                              placeholder="1"
+                            />
+                          </div>
+                          
+                          {/* Charge */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              U&C Charge
+                            </label>
+                            <input
+                              type="text"
+                              value={procedure.uAndCCharge}
+                              onChange={(e) => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].uAndCCharge = e.target.value
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              className="form-input w-full border rounded-md pl-2.5 text-sm"
+                              placeholder="$0.00"
+                            />
+                          </div>
+                          
+                          {/* Plan Allowed */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Plan Allowed
+                            </label>
+                            <input
+                              type="text"
+                              value={procedure.planAllowed}
+                              onChange={(e) => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].planAllowed = e.target.value
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              className="form-input w-full border rounded-md pl-2.5 text-sm"
+                              placeholder="$0.00"
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Remove Button */}
+                        <div className="flex justify-end mt-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (formData.procedureCodes.length > 1) {
+                                const updatedCodes = formData.procedureCodes.filter((_, i) => i !== index)
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }
+                            }}
+                            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
+                            disabled={formData.procedureCodes.length === 1}
+                          >
+                            Remove Line
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                   
                   {/* Action Buttons */}
-                  <div className="flex gap-3 mt-4">
+                  <div className="flex gap-3 mt-6">
                     <button
                       type="button"
                       onClick={() => {
@@ -3793,47 +3791,75 @@ export default function ClaimsSubmissionForm({
                     </button>
                   </div>
                   
-                  {/* Summary Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                    <div>
-                      <label htmlFor="totalCharges" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Total Charges <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                        <input
-                          type="text"
-                          id="totalCharges"
-                          value={formData.totalCharges}
-                          onChange={(e) => setFormData(prev => ({ ...prev, totalCharges: e.target.value }))}
-                          className="form-input w-full border rounded-md pl-8"
-                          placeholder="0.00"
-                        />
+                  {/* Diagnosis Modal */}
+                  {formData.procedureCodes.map((procedure, index) => (
+                    procedure.showDiagnosisModal && (
+                      <div key={`modal-${procedure.id}`} className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+                          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Diagnosis References</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Choose one or more diagnosis references for this procedure code.</p>
+                          </div>
+                          
+                          <div className="p-4 max-h-64 overflow-y-auto">
+                            <div className="space-y-2">
+                              {[1, 2, 3, 4, 5, 6].map((refNum) => {
+                                const isSelected = procedure.diagnosisReference && procedure.diagnosisReference.split(',').includes(refNum.toString())
+                                return (
+                                  <label key={refNum} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={(e) => {
+                                        const currentRefs = procedure.diagnosisReference ? procedure.diagnosisReference.split(',') : []
+                                        let newRefs
+                                        if (e.target.checked) {
+                                          newRefs = [...currentRefs, refNum.toString()]
+                                        } else {
+                                          newRefs = currentRefs.filter(r => r !== refNum.toString())
+                                        }
+                                        const updatedCodes = [...formData.procedureCodes]
+                                        updatedCodes[index].diagnosisReference = newRefs.join(',')
+                                        setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                      }}
+                                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">Diagnosis Reference {refNum}</span>
+                                  </label>
+                                )
+                              })}
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].diagnosisReference = ''
+                                updatedCodes[index].showDiagnosisModal = false
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                            >
+                              Clear All
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updatedCodes = [...formData.procedureCodes]
+                                updatedCodes[index].showDiagnosisModal = false
+                                setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                              }}
+                              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                            >
+                              Done
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      {errors.totalCharges && (
-                        <p className="mt-1 text-sm text-red-600">{errors.totalCharges}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="totalAllowed" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Total Allowed <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                        <input
-                          type="text"
-                          id="totalAllowed"
-                          value={formData.totalAllowed}
-                          onChange={(e) => setFormData(prev => ({ ...prev, totalAllowed: e.target.value }))}
-                          className="form-input w-full border rounded-md pl-8"
-                          placeholder="0.00"
-                        />
-                      </div>
-                      {errors.totalAllowed && (
-                        <p className="mt-1 text-sm text-red-600">{errors.totalAllowed}</p>
-                      )}
-                    </div>
-                  </div>
+                    )
+                  ))}
                 </div>
 
                 {/* Prescription Section */}
@@ -4042,7 +4068,52 @@ export default function ClaimsSubmissionForm({
                   </div>
                 </div>
 
-
+                {/* Summary Fields */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Summary
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="totalCharges" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Total Charges <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          type="text"
+                          id="totalCharges"
+                          value={formData.totalCharges}
+                          onChange={(e) => setFormData(prev => ({ ...prev, totalCharges: e.target.value }))}
+                          className="form-input w-full border rounded-md pl-8"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      {errors.totalCharges && (
+                        <p className="mt-1 text-sm text-red-600">{errors.totalCharges}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="totalAllowed" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Total Allowed <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          type="text"
+                          id="totalAllowed"
+                          value={formData.totalAllowed}
+                          onChange={(e) => setFormData(prev => ({ ...prev, totalAllowed: e.target.value }))}
+                          className="form-input w-full border rounded-md pl-8"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      {errors.totalAllowed && (
+                        <p className="mt-1 text-sm text-red-600">{errors.totalAllowed}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

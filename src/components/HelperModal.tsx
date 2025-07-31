@@ -171,6 +171,33 @@ export default function HelperModal({
         { code: '92285', description: 'External ocular photography with interpretation and report' },
         { code: '92287', description: 'Ophthalmic biometry by partial coherence interferometry' }
       ]
+    } else if (fieldName === 'posCodes') {
+      codes = [
+        { code: '11', description: 'Office (most common for routine eye exams)' },
+        { code: '22', description: 'Outpatient Hospital (for specialized procedures)' },
+        { code: '24', description: 'Ambulatory Surgical Center (for surgeries)' },
+        { code: '25', description: 'Birthing Center' },
+        { code: '31', description: 'Skilled Nursing Facility' },
+        { code: '50', description: 'Federally Qualified Health Center' },
+        { code: '71', description: 'State or Local Public Health Clinic' },
+        { code: '72', description: 'Rural Health Clinic' },
+        { code: '99', description: 'Other Place of Service' }
+      ]
+    } else if (fieldName === 'modCodes') {
+      codes = [
+        { code: '25', description: 'Significant, separately identifiable evaluation and management service' },
+        { code: '59', description: 'Distinct procedural service' },
+        { code: '76', description: 'Repeat procedure by same physician' },
+        { code: '77', description: 'Repeat procedure by another physician' },
+        { code: '78', description: 'Return to operating room for related procedure' },
+        { code: '79', description: 'Unrelated procedure by same physician' },
+        { code: '90', description: 'Reference (outside) laboratory' },
+        { code: '91', description: 'Repeat clinical diagnostic laboratory test' },
+        { code: '95', description: 'Synchronous telemedicine service' },
+        { code: '96', description: 'Habilitative services' },
+        { code: '97', description: 'Rehabilitative services' },
+        { code: '99', description: 'Multiple modifiers' }
+      ]
     }
     
     setAvailableCodes(codes)

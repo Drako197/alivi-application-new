@@ -46,6 +46,8 @@ export class AIAssistantService {
       'EDI': 'Electronic Data Interchange',
       'HIPAA': 'Health Insurance Portability and Accountability Act',
       'CMS': 'Centers for Medicare & Medicaid Services',
+      'POS': 'Place of Service',
+      'MOD': 'Modifier',
       // Enhanced with specialty-specific terminology
       ...MedicalSpecialtiesService.getAllTerminology()
     },
@@ -60,6 +62,52 @@ export class AIAssistantService {
       ...Object.fromEntries(
         MedicalSpecialtiesService.getAllCodes().map(code => [code, `Code: ${code}`])
       )
+    },
+    posCodes: {
+      // Place of Service codes for optometry
+      '11': 'Office (most common for routine eye exams)',
+      '12': 'Home',
+      '15': 'Mobile Unit',
+      '22': 'Outpatient Hospital (for specialized procedures)',
+      '24': 'Ambulatory Surgical Center (for surgeries)',
+      '25': 'Birthing Center',
+      '26': 'Military Treatment Facility',
+      '31': 'Skilled Nursing Facility',
+      '32': 'Nursing Facility',
+      '33': 'Custodial Care Facility',
+      '34': 'Hospice',
+      '41': 'Ambulance - Land',
+      '42': 'Ambulance - Air or Water',
+      '50': 'Federally Qualified Health Center',
+      '52': 'Psychiatric Facility - Partial Hospitalization',
+      '53': 'Community Mental Health Center',
+      '54': 'Intermediate Care Facility/Individuals with Intellectual Disabilities',
+      '55': 'Residential Substance Abuse Treatment Facility',
+      '56': 'Psychiatric Residential Treatment Facility',
+      '57': 'Non-residential Substance Abuse Treatment Facility',
+      '60': 'Mass Immunization Center',
+      '61': 'Comprehensive Inpatient Rehabilitation Facility',
+      '62': 'Comprehensive Outpatient Rehabilitation Facility',
+      '65': 'End-Stage Renal Disease Treatment Facility',
+      '71': 'State or Local Public Health Clinic',
+      '72': 'Rural Health Clinic',
+      '81': 'Independent Laboratory',
+      '99': 'Other Place of Service'
+    },
+    modCodes: {
+      // Modifier codes for optometry
+      '25': 'Significant, separately identifiable evaluation and management service',
+      '59': 'Distinct procedural service',
+      '76': 'Repeat procedure by same physician',
+      '77': 'Repeat procedure by another physician',
+      '78': 'Return to operating room for related procedure',
+      '79': 'Unrelated procedure by same physician',
+      '90': 'Reference (outside) laboratory',
+      '91': 'Repeat clinical diagnostic laboratory test',
+      '95': 'Synchronous telemedicine service',
+      '96': 'Habilitative services',
+      '97': 'Rehabilitative services',
+      '99': 'Multiple modifiers'
     }
   }
 
@@ -650,18 +698,24 @@ export class AIAssistantService {
       }
     }
 
-    // General code search
-    if (input.includes('diabetes') && input.includes('code')) {
-      const codes = await MedicalAPIService.searchICD10Codes('diabetes')
-      return `I'd be delighted to help you with diabetes codes! Here are some commonly used ICD-10 codes for diabetes:\n\n${codes.slice(0, 5).map(c => `• **${c.code}**: ${c.description}`).join('\n')}\n\nThese codes are essential for diabetes care documentation and billing. Would you like me to explain any of these codes in more detail?`
+    // Handle POS (Place of Service) codes
+    if (input.toLowerCase().includes('pos') || input.toLowerCase().includes('place of service')) {
+      const posCodes = this.LOCAL_KNOWLEDGE.posCodes
+      const commonCodes = Object.entries(posCodes).slice(0, 8).map(([code, desc]) => `• **${code}** - ${desc}`).join('\n')
+      
+      return `Here are the most common **Place of Service (POS)** codes for optometry:\n\n${commonCodes}\n\n**Most commonly used**:\n• **11** - Office (routine eye exams)\n• **22** - Outpatient Hospital (specialized procedures)\n• **24** - Ambulatory Surgical Center (surgeries)\n\nWould you like me to explain any specific POS code or help you choose the right one for your situation?`
     }
 
-    if (input.includes('retinopathy') && input.includes('code')) {
-      const codes = await MedicalAPIService.searchICD10Codes('retinopathy')
-      return `I'd be happy to help you with retinopathy codes! Here are some commonly used ICD-10 codes for diabetic retinopathy:\n\n${codes.slice(0, 5).map(c => `• **${c.code}**: ${c.description}`).join('\n')}\n\nThese codes are critical for diabetic eye care documentation. Would you like me to explain any of these codes in more detail?`
+    // Handle MOD (Modifier) codes
+    if (input.toLowerCase().includes('mod') || input.toLowerCase().includes('modifier')) {
+      const modCodes = this.LOCAL_KNOWLEDGE.modCodes
+      const commonCodes = Object.entries(modCodes).slice(0, 8).map(([code, desc]) => `• **${code}** - ${desc}`).join('\n')
+      
+      return `Here are the most common **Modifier (MOD)** codes for optometry:\n\n${commonCodes}\n\n**Most commonly used**:\n• **25** - Separate E&M service (when exam + procedure same day)\n• **59** - Distinct procedural service\n• **76** - Repeat procedure by same doctor\n• **95** - Telemedicine service\n\nWould you like me to explain any specific modifier or help you choose the right one for your situation?`
     }
 
-    return `I'd be happy to help you find the right medical codes! Try asking about specific conditions like "diabetes codes" or "retinopathy codes" and I'll search our comprehensive database for you. You can also search for specific codes like "E11.9" or "92250" and I'll provide detailed information.`
+    // Generic code lookup response
+    return `I'd be happy to help you with medical codes! I can assist with:\n\n• **ICD-10 codes** (diagnosis codes)\n• **CPT codes** (procedure codes)\n• **HCPCS codes** (Medicare/Medicaid codes)\n• **POS codes** (Place of Service)\n• **MOD codes** (Modifiers)\n• **Drug codes**\n• **Lab codes**\n\nJust ask me about any specific code or type of code you need help with!`
   }
 
   // Enhanced medical terminology handling

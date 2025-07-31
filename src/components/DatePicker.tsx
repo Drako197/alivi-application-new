@@ -164,14 +164,14 @@ export default function DatePicker({
           disabled={disabled}
           readOnly
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 ${
-            disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
-          } ${hasError ? 'border-red-500 focus:border-red-500' : 'border-gray-300'}`}
+          className={`calendar-input-text block w-full pl-16 pr-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white cursor-pointer'} ${hasError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300'} calendar-input-text-padding`}
+          style={{ paddingLeft: '35px' }}
         />
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="calendar-icon-container absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none p-2">
+          <svg className="calendar-icon h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
+          <div className="calendar-icon-spacer w-12"></div>
         </div>
       </div>
 

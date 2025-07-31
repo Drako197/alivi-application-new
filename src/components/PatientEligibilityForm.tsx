@@ -520,77 +520,23 @@ export default function PatientEligibilityForm({
 
   // Step Indicators Component
   const StepIndicators = ({ currentStep }: { currentStep: number }) => {
-    const steps = [
-      { number: 1, label: 'Patient Information' },
-      { number: 2, label: 'Eligibility Type' },
-      { number: 3, label: 'Current Eligibility' },
-      { number: 4, label: 'Reserved Benefits' }
-    ]
-
     return (
       <div className="step-indicators-container">
-        {/* Mobile-friendly step indicators */}
-        <div className="flex items-center justify-between w-full">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center flex-1">
-              {/* Step circle */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-all duration-200 ${
-                    step.number === currentStep
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
-                      : step.number < currentStep
-                      ? 'bg-green-500 border-green-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  {step.number < currentStep ? (
-                    <Icon name="check" size={14} className="text-white" />
-                  ) : (
-                    step.number
-                  )}
-                </div>
-                
-                {/* Step label - hidden on very small screens, shown on larger mobile */}
-                <div className="mt-1 text-center">
-                  <div
-                    className={`text-xs font-medium transition-colors ${
-                      step.number === currentStep
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : step.number < currentStep
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    {step.label}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Connector line - only show if not the last step */}
-              {index < steps.length - 1 && (
-                <div className="flex-1 h-0.5 mx-2 bg-gray-300 dark:bg-gray-600 relative">
-                  {step.number < currentStep && (
-                    <div className="absolute inset-0 bg-green-500 transition-all duration-300"></div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+        <div className={`step-item ${currentStep > 1 ? 'step-completed' : currentStep === 1 ? 'step-active' : 'step-inactive'}`}>
+          <div className="step-number">1</div>
+          <div className="step-label">Patient Info</div>
         </div>
-        
-        {/* Mobile progress bar alternative */}
-        <div className="mt-4 md:hidden">
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / steps.length) * 100}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-            <span>Step {currentStep} of {steps.length}</span>
-            <span className="ml-4">{Math.round((currentStep / steps.length) * 100)}% Complete</span>
-          </div>
+        <div className={`step-item ${currentStep > 2 ? 'step-completed' : currentStep === 2 ? 'step-active' : 'step-inactive'}`}>
+          <div className="step-number">2</div>
+          <div className="step-label">Eligibility Type</div>
+        </div>
+        <div className={`step-item ${currentStep > 3 ? 'step-completed' : currentStep === 3 ? 'step-active' : 'step-inactive'}`}>
+          <div className="step-number">3</div>
+          <div className="step-label">Current Eligibility</div>
+        </div>
+        <div className={`step-item ${currentStep > 4 ? 'step-completed' : currentStep === 4 ? 'step-active' : 'step-inactive'}`}>
+          <div className="step-number">4</div>
+          <div className="step-label">Reserved Benefits</div>
         </div>
       </div>
     )

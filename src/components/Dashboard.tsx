@@ -476,35 +476,6 @@ export default function Dashboard() {
 
             {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
-              {/* M.I.L.A. AI Assistant Card - Moved to first position */}
-              <div className="stat-card mila-ai-assistant-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-gradient-to-r from-blue-500 to-purple-600">
-                      <Icon name="bot" size={20} className="text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="stat-label">M.I.L.A. AI Assistant</p>
-                    <p className="stat-value">Active</p>
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
-                        Inline form integration for medical codes
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
-                        Contextual help across all forms
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                        One-click code insertion & validation
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <div className="stat-card completed-screenings-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -564,6 +535,40 @@ export default function Dashboard() {
 
             {/* Quick Actions - Updated with real form links */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* M.I.L.A. AI Assistant Card */}
+              <div className="stat-card mila-ai-assistant-detail-card">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg flex items-center">
+                  <Icon name="bot" size={20} className="mr-2" />
+                  M.I.L.A. AI Assistant
+                </h3>
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
+                    Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
+                  </p>
+                  <div className="px-4 space-y-2">
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                      Inline form integration for medical codes
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
+                      Contextual help across all forms
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                      One-click code insertion & validation
+                    </div>
+                  </div>
+                  <div className="px-4">
+                    <HelperButton 
+                      currentForm="Dashboard"
+                      currentField="general"
+                      currentStep={1}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="stat-card quick-actions-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
@@ -595,37 +600,6 @@ export default function Dashboard() {
                     <Icon name="upload" size={16} className="inline mr-2" />
                     Submit Claims
                   </button>
-                </div>
-              </div>
-
-              {/* M.I.L.A. AI Assistant Card */}
-              <div className="stat-card mila-ai-assistant-detail-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg">M.I.L.A. AI Assistant</h3>
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
-                    Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
-                  </p>
-                  <div className="px-4 space-y-2">
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
-                      Inline form integration for medical codes
-                    </div>
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
-                      Contextual help across all forms
-                    </div>
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                      One-click code insertion & validation
-                    </div>
-                  </div>
-                  <div className="px-4">
-                    <HelperButton 
-                      currentForm="Dashboard"
-                      currentField="general"
-                      currentStep={1}
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -1206,35 +1180,6 @@ export default function Dashboard() {
 
             {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
-              {/* M.I.L.A. AI Assistant Card - Moved to first position */}
-              <div className="stat-card mila-ai-assistant-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-gradient-to-r from-blue-500 to-purple-600">
-                      <Icon name="bot" size={20} className="text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="stat-label">M.I.L.A. AI Assistant</p>
-                    <p className="stat-value">Active</p>
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
-                        Inline form integration for medical codes
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
-                        Contextual help across all forms
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                        One-click code insertion & validation
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <div className="stat-card completed-screenings-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -1294,6 +1239,40 @@ export default function Dashboard() {
 
             {/* Quick Actions - Updated with real form links */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* M.I.L.A. AI Assistant Card */}
+              <div className="stat-card mila-ai-assistant-detail-card">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg flex items-center">
+                  <Icon name="bot" size={20} className="mr-2" />
+                  M.I.L.A. AI Assistant
+                </h3>
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
+                    Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
+                  </p>
+                  <div className="px-4 space-y-2">
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                      Inline form integration for medical codes
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
+                      Contextual help across all forms
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                      One-click code insertion & validation
+                    </div>
+                  </div>
+                  <div className="px-4">
+                    <HelperButton 
+                      currentForm="Dashboard"
+                      currentField="general"
+                      currentStep={1}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="stat-card quick-actions-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
@@ -1325,37 +1304,6 @@ export default function Dashboard() {
                     <Icon name="upload" size={16} className="inline mr-2" />
                     Submit Claims
                   </button>
-                </div>
-              </div>
-
-              {/* M.I.L.A. AI Assistant Card */}
-              <div className="stat-card mila-ai-assistant-detail-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg">M.I.L.A. AI Assistant</h3>
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
-                    Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
-                  </p>
-                  <div className="px-4 space-y-2">
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
-                      Inline form integration for medical codes
-                    </div>
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
-                      Contextual help across all forms
-                    </div>
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                      One-click code insertion & validation
-                    </div>
-                  </div>
-                  <div className="px-4">
-                    <HelperButton 
-                      currentForm="Dashboard"
-                      currentField="general"
-                      currentStep={1}
-                    />
-                  </div>
                 </div>
               </div>
 

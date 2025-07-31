@@ -2831,19 +2831,19 @@ function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewPr
       <div className="hedis-screening-header">
         <div className="hedis-screening-progress">
           <div className="step-indicators-container">
-            <div className={`step-item ${currentScreeningStep > 1 ? 'step-completed' : currentScreeningStep === 1 ? 'step-active' : 'step-inactive'}`}>
+            <div className={`step-item ${currentScreeningStepState > 1 ? 'step-completed' : currentScreeningStepState === 1 ? 'step-active' : 'step-inactive'}`}>
               <div className="step-number">1</div>
               <div className="step-label">Patient Search</div>
             </div>
-            <div className={`step-item ${currentScreeningStep > 2 ? 'step-completed' : currentScreeningStep === 2 ? 'step-active' : 'step-inactive'}`}>
+            <div className={`step-item ${currentScreeningStepState > 2 ? 'step-completed' : currentScreeningStepState === 2 ? 'step-active' : 'step-inactive'}`}>
               <div className="step-number">2</div>
               <div className="step-label">Screening Details</div>
             </div>
-            <div className={`step-item ${currentScreeningStep > 3 ? 'step-completed' : currentScreeningStep === 3 ? 'step-active' : 'step-inactive'}`}>
+            <div className={`step-item ${currentScreeningStepState > 3 ? 'step-completed' : currentScreeningStepState === 3 ? 'step-active' : 'step-inactive'}`}>
               <div className="step-number">3</div>
               <div className="step-label">Retinal Images</div>
             </div>
-            <div className={`step-item ${currentScreeningStep > 4 ? 'step-completed' : currentScreeningStep === 4 ? 'step-active' : 'step-inactive'}`}>
+            <div className={`step-item ${currentScreeningStepState > 4 ? 'step-completed' : currentScreeningStepState === 4 ? 'step-active' : 'step-inactive'}`}>
               <div className="step-number">4</div>
               <div className="step-label">Review & Submit</div>
             </div>
@@ -3559,6 +3559,8 @@ export default function HEDISLandingPage({
       }, 100) // Small delay to ensure DOM updates
     }
   }
+
+
 
   const getGreeting = () => {
     const hour = currentTime.getHours()

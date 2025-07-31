@@ -156,7 +156,25 @@ export default function ClaimsSubmissionForm({
       }
     ],
     totalCharges: '',
-    totalAllowed: ''
+    totalAllowed: '',
+    
+    // Additional missing properties
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    routineExams: '',
+    contactLensFittings: '',
+    postCataractExam: '',
+    remakeReason: '',
+    jobOrderNumber: '',
+    remakeDate: '',
+    claimNotes: '',
+    manualDependantSequence: '',
+    primaryInsurance: '',
+    memberId: '',
+    manualProviderId: '',
+    effectiveDate: '',
+    manualSubscriberId: ''
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -3987,7 +4005,20 @@ export default function ClaimsSubmissionForm({
                         diagnosisCodes: [
                           { id: 1, code: '', description: '', isPrimary: true }
                         ],
-                        procedureCodes: '',
+                        procedureCodes: [
+                          {
+                            id: 1,
+                            code: '92012',
+                            description: 'Eye Exam Establish Patient, Copy will run...',
+                            pos: '',
+                            mod: '',
+                            diagnosisReference: '',
+                            units: '1',
+                            uAndCCharge: '$200,000.00',
+                            planAllowed: '$10,000.00',
+                            showDiagnosisModal: false
+                          }
+                        ],
                         charges: '',
                         primaryInsurance: '',
                         secondaryInsurance: '',

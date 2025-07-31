@@ -38,6 +38,7 @@ export default function ClaimsSubmissionForm({
   const [milaCodeSelectionMode, setMilaCodeSelectionMode] = useState(false)
   const [triggeringField, setTriggeringField] = useState('')
   const [triggeringForm, setTriggeringForm] = useState('')
+  const [editingRowIndex, setEditingRowIndex] = useState<number>(-1)
 
   // Help tooltip state
   const [showHelp, setShowHelp] = useState<string | null>(null)
@@ -457,9 +458,10 @@ export default function ClaimsSubmissionForm({
   }
 
   // M.I.L.A. Code Selection handlers
-  const handleMilaTrigger = (fieldName: string, formName: string) => {
+  const handleMilaTrigger = (fieldName: string, formName: string, rowIndex?: number) => {
     setTriggeringField(fieldName)
     setTriggeringForm(formName)
+    setEditingRowIndex(rowIndex !== undefined ? rowIndex : -1)
     setMilaCodeSelectionMode(true)
     setShowMilaModal(true)
   }
@@ -476,11 +478,11 @@ export default function ClaimsSubmissionForm({
         )
       }))
     } else if (triggeringField === 'procedureCodes') {
-      // Update the first procedure code
+      // Update the specific procedure code row that was clicked
       setFormData(prev => ({
         ...prev,
         procedureCodes: prev.procedureCodes.map((pc, index) => 
-          index === 0 ? { ...pc, code, description } : pc
+          index === editingRowIndex ? { ...pc, code, description } : pc
         )
       }))
     }
@@ -488,6 +490,7 @@ export default function ClaimsSubmissionForm({
     // Close the modal
     setShowMilaModal(false)
     setMilaCodeSelectionMode(false)
+    setEditingRowIndex(-1) // Reset the editing row index
   }
 
   // Validation
@@ -3522,7 +3525,7 @@ export default function ClaimsSubmissionForm({
                                 placeholder="Code"
                                 fieldName="procedureCodes"
                                 formName="ClaimsSubmission"
-                                onMilaTrigger={handleMilaTrigger}
+                                onMilaTrigger={(fieldName, formName) => handleMilaTrigger(fieldName, formName, index)}
                                 error={!!errors.procedureCodes}
                                 className="w-full border rounded-md pl-2.5 text-sm"
                               />

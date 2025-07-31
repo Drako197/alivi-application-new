@@ -6,6 +6,7 @@ import { PredictiveSuggestionsService } from '../services/PredictiveSuggestionsS
 import PersonalizationSettings from './PersonalizationSettings'
 import AIAssistantService from '../services/AIAssistantService'
 import { createPortal } from 'react-dom'
+import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 interface Message {
   id: string
@@ -138,10 +139,11 @@ export default function HelperModal({
       let welcomeMessage = 'Hello! I\'m M.I.L.A., your Medical Intelligence & Learning Assistant. 👋\n\nI\'m here to make your medical billing experience smoother and more efficient. I can help you with:\n\n• **Medical Terminology** - Understanding complex terms\n• **Diagnosis Codes** - Finding the right ICD-10 codes\n• **Procedure Codes** - Locating CPT codes with RVU values\n• **Provider Information** - Verifying NPI numbers\n• **Form Guidance** - Contextual help for form fields\n\nWhat would you like to know? I\'m here to help! 💙'
       
       // Personalize message based on user experience
+      const demoName = getDemoUserFirstName()
       if (userStats.sessionCount === 1) {
-        welcomeMessage = 'Welcome to M.I.L.A.! I\'m your Medical Intelligence & Learning Assistant. 👋\n\nI\'m excited to help you with medical billing! I can assist with:\n\n• **Medical Terminology** - Understanding complex terms\n• **Diagnosis Codes** - Finding the right ICD-10 codes\n• **Procedure Codes** - Locating CPT codes with RVU values\n• **Provider Information** - Verifying NPI numbers\n• **Form Guidance** - Contextual help for form fields\n\nLet\'s get started! What would you like to know? 💙'
+        welcomeMessage = `Welcome to M.I.L.A., ${demoName}! I'm your Medical Intelligence & Learning Assistant. 👋\n\nI'm excited to help you with medical billing! I can assist with:\n\n• **Medical Terminology** - Understanding complex terms\n• **Diagnosis Codes** - Finding the right ICD-10 codes\n• **Procedure Codes** - Locating CPT codes with RVU values\n• **Provider Information** - Verifying NPI numbers\n• **Form Guidance** - Contextual help for form fields\n\nLet's get started! What would you like to know? 💙`
       } else if (userStats.sessionCount > 5) {
-        welcomeMessage = 'Welcome back! I\'m M.I.L.A., your Medical Intelligence & Learning Assistant. 👋\n\nGreat to see you again! I\'m here to help with:\n\n• **Medical Terminology** - Understanding complex terms\n• **Diagnosis Codes** - Finding the right ICD-10 codes\n• **Procedure Codes** - Locating CPT codes with RVU values\n• **Provider Information** - Verifying NPI numbers\n• **Form Guidance** - Contextual help for form fields\n\nHow can I assist you today? 💙'
+        welcomeMessage = `Welcome back, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. 👋\n\nGreat to see you again! I'm here to help with:\n\n• **Medical Terminology** - Understanding complex terms\n• **Diagnosis Codes** - Finding the right ICD-10 codes\n• **Procedure Codes** - Locating CPT codes with RVU values\n• **Provider Information** - Verifying NPI numbers\n• **Form Guidance** - Contextual help for form fields\n\nHow can I assist you today? 💙`
       }
       
       addMessage('assistant', welcomeMessage, 'fade-in')
@@ -183,17 +185,20 @@ export default function HelperModal({
         setShowPredictiveSuggestions(true)
         
         // Add a contextual welcome message
-        const welcomeMessage = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. Here are some suggestions for the ${currentField} field:`
+        const demoName = getDemoUserFirstName()
+        const welcomeMessage = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. Here are some suggestions for the ${currentField} field:`
         addMessage('assistant', welcomeMessage, 'fade-in')
       } else {
         // Add a general welcome message if no specific suggestions
-        const generalWelcome = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
+        const demoName = getDemoUserFirstName()
+        const generalWelcome = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
         addMessage('assistant', generalWelcome, 'fade-in')
       }
     } catch (error) {
       console.error('Error loading predictive suggestions:', error)
       // Add fallback welcome message
-      const fallbackMessage = `Hi there! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your medical billing questions!`
+      const demoName = getDemoUserFirstName()
+      const fallbackMessage = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your medical billing questions!`
       addMessage('assistant', fallbackMessage, 'fade-in')
     }
   }

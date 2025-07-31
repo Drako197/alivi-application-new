@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import LottieLoader from './LottieLoader'
 import LoadingOverlay from './LoadingOverlay'
 
 interface LoginViewProps {
@@ -9,54 +8,43 @@ interface LoginViewProps {
 
 export default function LoginView({ onViewChange }: LoginViewProps) {
   const { login } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    username: '',
+    password: ''
   })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const [showPassword, setShowPassword] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [validations, setValidations] = useState({
-    email: false
-  })
-
-  // Real-time validation
-  useEffect(() => {
-    const newValidations = {
-      email: /\S+@\S+\.\S+/.test(formData.email)
-    }
-    setValidations(newValidations)
-  }, [formData])
+  const [validations, setValidations] = useState<{ [key: string]: boolean }>({})
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
     
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
+    
+    // Update validation state
+    if (name === 'username' && value.length > 0) {
+      setValidations(prev => ({ ...prev, username: true }))
+    } else if (name === 'password' && value.length > 0) {
+      setValidations(prev => ({ ...prev, password: true }))
+    }
   }
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
-    
-    if (!formData.email) {
-      newErrors.email = 'Email is required'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email'
+
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required'
     }
-    
-    if (!formData.password) {
+
+    if (!formData.password.trim()) {
       newErrors.password = 'Password is required'
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -66,22 +54,21 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
     if (!validateForm()) return
 
     setIsSubmitting(true)
-    
-    // Simulate a longer loading time for better UX
-    setTimeout(async () => {
-      try {
-        const result = await login(formData.email, formData.password)
-        
-        if (!result.success) {
-          setErrors({ general: result.error || 'Login failed' })
-        }
-        // If successful, the AuthContext will handle the redirect
-      } catch (error) {
-        setErrors({ general: 'An unexpected error occurred' })
-      } finally {
-        setIsSubmitting(false)
+    try {
+      // Add a delay for better UX, especially for demo login
+      await new Promise(resolve => setTimeout(resolve, 8000))
+      
+      const result = await login(formData.username, formData.password)
+      
+      if (!result.success) {
+        setErrors({ general: result.error || 'Login failed' })
       }
-                    }, 8000) // 8 second delay
+      // If successful, the AuthContext will handle the redirect
+    } catch (error) {
+      setErrors({ general: 'An unexpected error occurred' })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const togglePasswordVisibility = () => {
@@ -116,6 +103,26 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
         </p>
       </div>
 
+      {/* Demo Credentials Notice */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <div className="flex items-start space-x-3">
+          <div className="flex-shrink-0">
+            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+              Demo Credentials
+            </h3>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+              <strong>Username:</strong> demo<br />
+              <strong>Password:</strong> demo
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="form-section">
         {errors.general && (
@@ -125,21 +132,21 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
         )}
 
         <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email address
+          <label htmlFor="username" className="form-label">
+            Username
           </label>
           <div className="relative">
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleInputChange}
-              className={getInputClassName('email')}
-              placeholder="Enter your email"
+              className={getInputClassName('username')}
+              placeholder="Enter your username"
               disabled={isSubmitting}
             />
-            {validations.email && !errors.email && (
+            {validations.username && !errors.username && (
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <div className="w-5 h-5 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
                   <svg className="w-3 h-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
@@ -149,8 +156,8 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
               </div>
             )}
           </div>
-          {errors.email && (
-            <p className="form-error">{errors.email}</p>
+          {errors.username && (
+            <p className="form-error">{errors.username}</p>
           )}
         </div>
 
@@ -197,24 +204,10 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              name="rememberMe"
-              type="checkbox"
-              checked={formData.rememberMe}
-              onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              disabled={isSubmitting}
-            />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-              Remember me
-            </label>
-          </div>
           <button
             type="button"
             onClick={() => onViewChange('forgot-password')}
-            className="form-link"
+            className="form-link text-sm"
             disabled={isSubmitting}
           >
             Forgot password?
@@ -228,43 +221,31 @@ export default function LoginView({ onViewChange }: LoginViewProps) {
         >
           {isSubmitting ? (
             <div className="flex items-center">
-              <LottieLoader size="small" className="mr-3" />
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
               Signing in...
             </div>
           ) : (
             'Sign in'
           )}
         </button>
-      </form>
 
-      {/* Sign up link */}
-      <div className="text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Don't have an account?{' '}
-          <button
-            type="button"
-            onClick={() => {
-              onViewChange('signup')
-              // Smooth scroll to form on mobile
-              if (window.innerWidth <= 1023) {
-                setTimeout(() => {
-                  const formElement = document.querySelector('.form-container form')
-                  if (formElement) {
-                    formElement.scrollIntoView({ 
-                      behavior: 'smooth', 
-                      block: 'start' 
-                    })
-                  }
-                }, 100) // Small delay to ensure form is rendered
-              }
-            }}
-            className="form-link"
-            disabled={isSubmitting}
-          >
-            Create one
-          </button>
-        </p>
-      </div>
+        <div className="text-center">
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            Don't have an account?{' '}
+            <button
+              type="button"
+              onClick={() => onViewChange('signup')}
+              className="form-link"
+              disabled={isSubmitting}
+            >
+              Sign up
+            </button>
+          </p>
+        </div>
+      </form>
     </div>
     </>
   )

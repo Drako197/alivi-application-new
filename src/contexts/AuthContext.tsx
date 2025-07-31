@@ -12,7 +12,7 @@ interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>
   signup: (fullName: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => void
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>
@@ -27,6 +27,34 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Initialize demo user account
+  useEffect(() => {
+    const initializeDemoUser = () => {
+      const storedUsers = localStorage.getItem('alivi_users')
+      const users = storedUsers ? JSON.parse(storedUsers) : []
+      
+      // Check if demo user already exists
+      const demoUserExists = users.find((u: any) => u.username === 'demo')
+      
+      if (!demoUserExists) {
+        // Create demo user account
+        const demoUser = {
+          id: 'demo-user-001',
+          username: 'demo',
+          fullName: 'Demo User',
+          email: 'demo@alivi.com',
+          password: 'demo',
+          createdAt: new Date().toISOString()
+        }
+        
+        users.push(demoUser)
+        localStorage.setItem('alivi_users', JSON.stringify(users))
+      }
+    }
+
+    initializeDemoUser()
+  }, [])
 
   // Check for existing session on app load
   useEffect(() => {
@@ -43,14 +71,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(false)
   }, [])
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       // Get stored users
       const storedUsers = localStorage.getItem('alivi_users')
       const users = storedUsers ? JSON.parse(storedUsers) : []
 
-      // Find user by email
-      const user = users.find((u: any) => u.email === email)
+      // Find user by username or email
+      const user = users.find((u: any) => u.username === username || u.email === username)
 
       if (!user) {
         return { success: false, error: 'User not found. Please create an account.' }

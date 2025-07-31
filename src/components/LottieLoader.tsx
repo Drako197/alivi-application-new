@@ -1,6 +1,6 @@
 import React from 'react'
 import Lottie from 'lottie-react'
-import loaderAnimation from '../assets/animations/Loader.json'
+import loaderAnimation from '../assets/animations/loader2.json'
 
 interface LottieLoaderProps {
   size?: 'small' | 'medium' | 'large'
@@ -14,7 +14,7 @@ const LottieLoader: React.FC<LottieLoaderProps> = ({
   const sizeClasses = {
     small: 'w-8 h-8',
     medium: 'w-16 h-16',
-    large: 'w-45 h-45' // Increased from w-36 h-36 (25% larger - 180px)
+    large: 'w-45 h-45'
   }
 
   return (
@@ -24,6 +24,10 @@ const LottieLoader: React.FC<LottieLoaderProps> = ({
         loop={true}
         autoplay={true}
         className={sizeClasses[size]}
+        style={{
+          // Simple hardware acceleration
+          transform: 'translateZ(0)'
+        }}
       />
     </div>
   )

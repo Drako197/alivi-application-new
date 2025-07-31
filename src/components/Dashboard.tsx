@@ -17,6 +17,7 @@ import PrescriptionForm from './PrescriptionForm'
 import HelperButton from './HelperButton'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
+import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
@@ -469,7 +470,7 @@ export default function Dashboard() {
           <div className="dashboard-content">
             {/* Welcome Section */}
             <div className="welcome-section">
-              <h1 className="welcome-title">Welcome back, {user?.fullName?.split(' ')[0] || 'User'}!</h1>
+              <h1 className="welcome-title">Welcome back, {getDemoUserFirstName()}!</h1>
               <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
             </div>
 
@@ -568,6 +569,23 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* M.I.L.A. AI Assistant Card */}
+              <div className="stat-card">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg">M.I.L.A. AI Assistant</h3>
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
+                    Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
+                  </p>
+                  <div className="px-4">
+                    <HelperButton 
+                      currentForm="Dashboard"
+                      currentField="general"
+                      currentStep={1}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="stat-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
@@ -635,6 +653,182 @@ export default function Dashboard() {
   // Mobile content based on active tab
   const renderMobileContent = () => {
     switch (activeMobileTab) {
+      case 'dashboard':
+        return (
+          <div className="mobile-main-content">
+            <div className="p-4">
+              {/* Welcome Section */}
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Welcome back, {getDemoUserFirstName()}!
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Here's what's happening with your healthcare services today.
+                </p>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
+                      <Icon name="check-circle" size={20} className="text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Completed</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{dashboardStats.completedScreenings}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
+                      <Icon name="save" size={20} className="text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Saved</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{dashboardStats.savedScreenings}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3">
+                      <Icon name="user-check" size={20} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Eligibility</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">24</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mr-3">
+                      <Icon name="clock" size={20} className="text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{dashboardStats.savedScreenings + 3}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => handleQuickAction('hedis')}
+                    className="w-full text-left p-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="plus" size={16} className="inline mr-2" />
+                    Start New HEDIS Screening
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('eligibility')}
+                    className="w-full text-left p-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="user-check" size={16} className="inline mr-2" />
+                    Request Patient Eligibility
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('completed-screenings')}
+                    className="w-full text-left p-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="file-text" size={16} className="inline mr-2" />
+                    View Completed Screenings
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left p-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="upload" size={16} className="inline mr-2" />
+                    Submit Claims
+                  </button>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+                <div className="space-y-3">
+                  {dashboardStats.recentCompletedScreenings.length > 0 ? (
+                    dashboardStats.recentCompletedScreenings.map((screening, index) => (
+                      <div key={screening.id} className="flex items-center text-sm">
+                        <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {screening.patientName} - Screening completed
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      No recent completed screenings
+                    </div>
+                  )}
+                  {dashboardStats.recentSavedScreenings.length > 0 && (
+                    <div className="flex items-center text-sm">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {dashboardStats.recentSavedScreenings.length} saved screening{dashboardStats.recentSavedScreenings.length !== 1 ? 's' : ''} pending
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center text-sm">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+                    <span className="text-gray-600 dark:text-gray-400">Patient eligibility request submitted</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Popular PIC Actions */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Popular PIC Actions</h3>
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left p-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="user-check" size={16} className="inline mr-2" />
+                    Request Patient Eligibility (95% usage)
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left p-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="upload" size={16} className="inline mr-2" />
+                    Claims Submission (92% usage)
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
+                    className="w-full text-left p-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                  >
+                    <Icon name="search" size={16} className="inline mr-2" />
+                    Claim Status (88% usage)
+                  </button>
+                </div>
+              </div>
+
+              {/* M.I.L.A. AI Assistant */}
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
+                <h3 className="text-lg font-semibold mb-2">M.I.L.A. AI Assistant</h3>
+                <p className="text-sm text-blue-100 mb-4">
+                  Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
+                </p>
+                <HelperButton 
+                  currentForm="Dashboard"
+                  currentField="mobile"
+                  currentStep={1}
+                />
+              </div>
+            </div>
+          </div>
+        )
       case 'profile':
         return <MobileProfile />
       case 'hedis':
@@ -950,7 +1144,7 @@ export default function Dashboard() {
           <div className="dashboard-content">
             {/* Welcome Section */}
             <div className="welcome-section">
-              <h1 className="welcome-title">Welcome back, {user?.fullName?.split(' ')[0] || 'User'}!</h1>
+              <h1 className="welcome-title">Welcome back, {getDemoUserFirstName()}!</h1>
               <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
             </div>
 
@@ -1046,6 +1240,23 @@ export default function Dashboard() {
                     <Icon name="upload" size={16} className="inline mr-2" />
                     Submit Claims
                   </button>
+                </div>
+              </div>
+
+              {/* M.I.L.A. AI Assistant Card */}
+              <div className="stat-card">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg">M.I.L.A. AI Assistant</h3>
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
+                    Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
+                  </p>
+                  <div className="px-4">
+                    <HelperButton 
+                      currentForm="Dashboard"
+                      currentField="general"
+                      currentStep={1}
+                    />
+                  </div>
                 </div>
               </div>
 

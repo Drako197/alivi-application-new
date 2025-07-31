@@ -458,6 +458,14 @@ export default function ClaimsSubmissionForm({
           index === 0 ? { ...dc, code, description } : dc
         )
       }))
+    } else if (triggeringField === 'procedureCodes') {
+      // Update the first procedure code
+      setFormData(prev => ({
+        ...prev,
+        procedureCodes: prev.procedureCodes.map((pc, index) => 
+          index === 0 ? { ...pc, code, description } : pc
+        )
+      }))
     }
     
     // Close the modal

@@ -477,7 +477,7 @@ export default function Dashboard() {
             {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
               {/* M.I.L.A. AI Assistant Card - Moved to first position */}
-              <div className="stat-card">
+              <div className="stat-card mila-ai-assistant-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-gradient-to-r from-blue-500 to-purple-600">
@@ -505,7 +505,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card completed-screenings-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-green-100 dark:bg-green-900">
@@ -519,7 +519,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card saved-screenings-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-blue-100 dark:bg-blue-900">
@@ -533,7 +533,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card eligibility-requests-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-purple-100 dark:bg-purple-900">
@@ -547,7 +547,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card pending-actions-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-yellow-100 dark:bg-yellow-900">
@@ -564,7 +564,7 @@ export default function Dashboard() {
 
             {/* Quick Actions - Updated with real form links */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="stat-card">
+              <div className="stat-card quick-actions-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
                   <button 
@@ -599,7 +599,7 @@ export default function Dashboard() {
               </div>
 
               {/* M.I.L.A. AI Assistant Card */}
-              <div className="stat-card">
+              <div className="stat-card mila-ai-assistant-detail-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg">M.I.L.A. AI Assistant</h3>
                 <div className="space-y-3">
                   <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
@@ -629,7 +629,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card recent-activity-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
                   {dashboardStats.recentCompletedScreenings.length > 0 ? (
@@ -661,7 +661,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card popular-pic-actions-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-r-lg">Popular PIC Actions</h3>
                 <div className="space-y-3">
                   <button 
@@ -713,7 +713,7 @@ export default function Dashboard() {
               {/* Stats Cards */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {/* M.I.L.A. AI Assistant Card - First position */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mila-ai-assistant-card-mobile">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="bot" size={20} className="text-white" />
@@ -725,7 +725,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 completed-screenings-card-mobile">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="check-circle" size={20} className="text-green-600 dark:text-green-400" />
@@ -737,7 +737,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 saved-screenings-card-mobile">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="save" size={20} className="text-blue-600 dark:text-blue-400" />
@@ -749,7 +749,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 eligibility-requests-card-mobile">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="user-check" size={20} className="text-purple-600 dark:text-purple-400" />
@@ -761,7 +761,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 pending-actions-card-mobile">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="clock" size={20} className="text-yellow-600 dark:text-yellow-400" />
@@ -1207,7 +1207,7 @@ export default function Dashboard() {
             {/* Stats Grid - Updated with real data */}
             <div className="stats-grid">
               {/* M.I.L.A. AI Assistant Card - Moved to first position */}
-              <div className="stat-card">
+              <div className="stat-card mila-ai-assistant-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-gradient-to-r from-blue-500 to-purple-600">
@@ -1235,7 +1235,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card completed-screenings-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-green-100 dark:bg-green-900">
@@ -1249,7 +1249,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card saved-screenings-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-blue-100 dark:bg-blue-900">
@@ -1263,7 +1263,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card eligibility-requests-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-purple-100 dark:bg-purple-900">
@@ -1277,7 +1277,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card pending-actions-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="stat-icon bg-yellow-100 dark:bg-yellow-900">
@@ -1294,7 +1294,7 @@ export default function Dashboard() {
 
             {/* Quick Actions - Updated with real form links */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="stat-card">
+              <div className="stat-card quick-actions-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
                 <div className="space-y-3">
                   <button 
@@ -1329,7 +1329,7 @@ export default function Dashboard() {
               </div>
 
               {/* M.I.L.A. AI Assistant Card */}
-              <div className="stat-card">
+              <div className="stat-card mila-ai-assistant-detail-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg">M.I.L.A. AI Assistant</h3>
                 <div className="space-y-3">
                   <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
@@ -1359,7 +1359,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card recent-activity-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
                   {dashboardStats.recentCompletedScreenings.length > 0 ? (
@@ -1391,7 +1391,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card popular-pic-actions-card">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-r-lg">Popular PIC Actions</h3>
                 <div className="space-y-3">
                   <button 

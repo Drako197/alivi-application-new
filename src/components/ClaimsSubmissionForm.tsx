@@ -42,6 +42,23 @@ export default function ClaimsSubmissionForm({
   // Help tooltip state
   const [showHelp, setShowHelp] = useState<string | null>(null)
 
+  // Tooltip state
+  const [showTooltip, setShowTooltip] = useState<{ index: number; text: string } | null>(null)
+
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showTooltip && !(event.target as Element).closest('.tooltip-container')) {
+        setShowTooltip(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showTooltip])
+
   const loadingMessages = [
     "We are processing your claim... 🏥",
     "Logging medical codes like a pro! 📊",
@@ -3511,17 +3528,39 @@ export default function ClaimsSubmissionForm({
                               />
                             </td>
                             <td className="px-3 py-2">
-                              <input
-                                type="text"
-                                value={procedure.description}
-                                onChange={(e) => {
-                                  const updatedCodes = [...formData.procedureCodes]
-                                  updatedCodes[index].description = e.target.value
-                                  setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
-                                }}
-                                className="form-input w-full border rounded-md pl-2.5 text-sm"
-                                placeholder="Description"
-                              />
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={procedure.description}
+                                  onChange={(e) => {
+                                    const updatedCodes = [...formData.procedureCodes]
+                                    updatedCodes[index].description = e.target.value
+                                    setFormData(prev => ({ ...prev, procedureCodes: updatedCodes }))
+                                  }}
+                                  onClick={() => {
+                                    if (procedure.description && procedure.description.length > 30) {
+                                      setShowTooltip({ index, text: procedure.description })
+                                    }
+                                  }}
+                                  className="form-input w-full border rounded-md pl-2.5 text-sm cursor-pointer"
+                                  placeholder="Description"
+                                />
+                                {showTooltip && showTooltip.index === index && (
+                                  <div className="absolute z-50 bg-gray-900 text-white text-sm rounded-lg py-2 px-3 shadow-lg max-w-xs break-words tooltip-container">
+                                    {showTooltip.text}
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        setShowTooltip(null)
+                                      }}
+                                      className="absolute top-1 right-1 text-gray-300 hover:text-white"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </td>
                             <td className="px-3 py-2">
                               <input

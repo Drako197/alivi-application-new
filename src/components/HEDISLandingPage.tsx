@@ -2829,17 +2829,6 @@ function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewPr
   return (
     <div className="hedis-screening-page">
       <div className="hedis-screening-header">
-        <div className="hedis-screening-breadcrumb">
-          <button 
-            onClick={onClose}
-            className="hedis-screening-back-button"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Completed Screenings
-          </button>
-        </div>
         <div className="hedis-screening-progress">
           <div className="hedis-screening-step-indicators">
             <div className="hedis-screening-step hedis-screening-step-completed">
@@ -3849,17 +3838,6 @@ export default function HEDISLandingPage({
     return (
       <div className="hedis-screening-page">
         <div className="hedis-screening-header">
-          <div className="hedis-screening-breadcrumb">
-            <button 
-              onClick={handleBackToDashboard}
-              className="hedis-screening-back-button"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to HEDIS Dashboard
-            </button>
-          </div>
         </div>
         <div className="hedis-screening-content">
           <ScreeningSuccess
@@ -3877,17 +3855,6 @@ export default function HEDISLandingPage({
     return (
       <div className="hedis-screening-page">
         <div className="hedis-screening-header">
-          <div className="hedis-screening-breadcrumb">
-            <button 
-              onClick={() => updateScreeningStep(0)}
-              className="hedis-screening-back-button"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to HEDIS Dashboard
-            </button>
-          </div>
           <div className="hedis-screening-progress">
             <div className="hedis-screening-step-indicators">
               {[1, 2, 3, 4].map((step) => (

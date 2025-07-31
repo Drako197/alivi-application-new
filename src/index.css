@@ -3196,3 +3196,8 @@ select {
 .hedis-compact-badge {
   @apply flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium flex-shrink-0;
 }
+
+/* Mobile Calendar Icon Specific Styling */
+.mobile-calendar-icon {
+  padding-right: 15px !important;
+}

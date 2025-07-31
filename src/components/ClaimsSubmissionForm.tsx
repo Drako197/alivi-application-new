@@ -4,6 +4,7 @@ import DatePicker from './DatePicker'
 import HelperButton from './HelperButton'
 import ClaimAcceptedView from './ClaimAcceptedView'
 import ReservedBenefitsView from './ReservedBenefitsView'
+import { scrollToFirstError } from '../utils/validationUtils'
 
 interface ClaimsSubmissionFormProps {
   onBack?: () => void
@@ -626,6 +627,8 @@ export default function ClaimsSubmissionForm({
     // If there are errors, set them and don't proceed
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      // Scroll to first error on mobile
+      scrollToFirstError(newErrors)
       return
     }
     
@@ -1669,14 +1672,14 @@ export default function ClaimsSubmissionForm({
                         ))}
                       </div>
                       
-                                             <div className="flex items-center gap-4 mt-3">
+                                             <div className="flex flex-col sm:flex-row items-center gap-3 mt-3">
                          {formData.diagnosisCodes.length < 6 && (
                            <button
                              type="button"
                              onClick={addDiagnosisCode}
-                             className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-2"
+                             className="text-blue-600 hover:text-blue-800 text-base font-medium flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors w-full sm:w-auto min-h-[44px]"
                            >
-                             <Icon name="plus" size={16} />
+                             <Icon name="plus" size={18} />
                              Add Diagnosis Code ({formData.diagnosisCodes.length}/6)
                            </button>
                          )}
@@ -1684,9 +1687,9 @@ export default function ClaimsSubmissionForm({
                          <button
                            type="button"
                            onClick={() => setShowDiagnosisCheatSheet(!showDiagnosisCheatSheet)}
-                           className="text-gray-600 hover:text-gray-800 text-sm flex items-center gap-2"
+                           className="text-gray-600 hover:text-gray-800 text-base font-medium flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors w-full sm:w-auto min-h-[44px]"
                          >
-                           <Icon name="info" size={16} />
+                           <Icon name="info" size={18} />
                            Common Diagnosis Codes
                          </button>
                        </div>
@@ -3919,16 +3922,16 @@ export default function ClaimsSubmissionForm({
             )}
 
             {/* Form Actions */}
-            <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700 gap-4">
               {/* Left side: Destructive/utility actions */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 {currentStep > 1 && (
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="btn-secondary flex items-center gap-2"
+                    className="btn-secondary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
                   >
-                    <Icon name="arrow-left" size={16} />
+                    <Icon name="arrow-left" size={18} />
                     Back
                   </button>
                 )}
@@ -4038,31 +4041,31 @@ export default function ClaimsSubmissionForm({
                       })
                     }
                   }}
-                  className="px-3 py-1.5 text-sm border border-red-500 text-red-600 bg-white hover:bg-red-50 rounded-md transition-colors flex items-center gap-2"
+                  className="px-6 py-3 text-base font-medium border border-red-500 text-red-600 bg-white hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]"
                 >
-                  <Icon name="x" size={16} />
+                  <Icon name="x" size={18} />
                   Clear Form
                 </button>
               </div>
               
               {/* Right side: Primary actions */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 {currentStep < 6 ? (
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="btn-primary flex items-center gap-2"
+                    className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
                     disabled={isTransitioning}
                   >
                     {isTransitioning ? (
                       <>
-                        <Icon name="loader-2" size={16} className="animate-spin" />
+                        <Icon name="loader-2" size={18} className="animate-spin" />
                         Processing...
                       </>
                     ) : (
                       <>
                         {currentStep === 1 ? 'Start Claim' : currentStep === 2 ? 'Continue' : currentStep === 3 ? 'Continue to Lens Choice' : currentStep === 4 ? 'Continue to Frame Selection' : currentStep === 5 ? 'Continue to Review' : 'Next'}
-                        <Icon name="arrow-right" size={16} />
+                        <Icon name="arrow-right" size={18} />
                       </>
                     )}
                   </button>
@@ -4070,16 +4073,16 @@ export default function ClaimsSubmissionForm({
                   <button
                     type="submit"
                     disabled={isSubmitting || !isFormValid}
-                    className="btn-primary flex items-center gap-2"
+                    className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
                   >
                     {isSubmitting ? (
                       <>
-                        <Icon name="loader-2" size={16} className="animate-spin" />
+                        <Icon name="loader-2" size={18} className="animate-spin" />
                         Submitting...
                       </>
                     ) : (
                       <>
-                        <Icon name="upload" size={16} />
+                        <Icon name="upload" size={18} />
                         Submit Claim
                       </>
                     )}
@@ -4098,16 +4101,6 @@ export default function ClaimsSubmissionForm({
     <div className="hedis-screening-page">
       {/* Header with breadcrumb and step indicators */}
       <div className="hedis-screening-header">
-        <div className="hedis-screening-breadcrumb">
-          <button
-            onClick={handleBackToLanding}
-            className="hedis-screening-back-button flex items-center gap-2 whitespace-nowrap"
-          >
-            <Icon name="arrow-left" size={16} />
-            {getOriginatingPageDisplayName()}
-          </button>
-        </div>
-        
         {currentStep <= 6 && (
           <StepIndicators currentStep={currentStep} />
         )}

@@ -69,28 +69,27 @@ export default function ReservedBenefitsPage({
   return (
     <div className="hedis-screening-content">
       {/* Page Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
           Reserved Benefits
         </h1>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <button 
             onClick={handlePrint}
-            className="btn-tertiary flex items-center gap-2"
+            className="btn-tertiary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto"
           >
-            <Icon name="printer" size={16} />
+            <Icon name="printer" size={18} />
             Print
           </button>
           {onBack && (
             <button 
               onClick={onBack}
-              className="btn-secondary flex items-center gap-2"
+              className="btn-secondary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto"
             >
-              <Icon name="arrow-left" size={16} />
+              <Icon name="arrow-left" size={18} />
               Back
             </button>
           )}
-          {/* New Search button hidden as search type is unclear */}
         </div>
       </div>
 

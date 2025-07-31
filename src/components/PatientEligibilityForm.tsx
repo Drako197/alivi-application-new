@@ -3,6 +3,7 @@ import Icon from './Icon'
 import DatePicker from './DatePicker'
 import ReservedBenefitsPageStandalone from './ReservedBenefitsPage'
 import HelperButton from './HelperButton'
+import { scrollToFirstError } from '../utils/validationUtils'
 
 interface PatientEligibilityFormProps {
   onBack?: () => void
@@ -313,6 +314,12 @@ export default function PatientEligibilityForm({
     }
     
     setErrors(newErrors)
+    
+    // Scroll to first error on mobile if there are errors
+    if (Object.keys(newErrors).length > 0) {
+      scrollToFirstError(newErrors)
+    }
+    
     return Object.keys(newErrors).length === 0
   }
 
@@ -516,21 +523,69 @@ export default function PatientEligibilityForm({
 
     return (
       <div className="hedis-screening-step-indicators">
-        {steps.map((step) => (
-          <div
-            key={step.number}
-            className={`hedis-screening-step ${
-              step.number === currentStep
-                ? 'hedis-screening-step-active'
-                : step.number < currentStep
-                ? 'hedis-screening-step-completed'
-                : 'hedis-screening-step-inactive'
-            }`}
-          >
-            <div className="hedis-screening-step-number">{step.number}</div>
-            <div className="hedis-screening-step-label">{step.label}</div>
+        {/* Mobile-friendly step indicators */}
+        <div className="flex items-center justify-between w-full">
+          {steps.map((step, index) => (
+            <div key={step.number} className="flex items-center flex-1">
+              {/* Step circle */}
+              <div className="flex flex-col items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-all duration-200 ${
+                    step.number === currentStep
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
+                      : step.number < currentStep
+                      ? 'bg-green-500 border-green-500 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  {step.number < currentStep ? (
+                    <Icon name="check" size={14} className="text-white" />
+                  ) : (
+                    step.number
+                  )}
+                </div>
+                
+                {/* Step label - hidden on very small screens, shown on larger mobile */}
+                <div className="mt-1 text-center">
+                  <div
+                    className={`text-xs font-medium transition-colors ${
+                      step.number === currentStep
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : step.number < currentStep
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}
+                  >
+                    {step.label}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Connector line - only show if not the last step */}
+              {index < steps.length - 1 && (
+                <div className="flex-1 h-0.5 mx-2 bg-gray-300 dark:bg-gray-600 relative">
+                  {step.number < currentStep && (
+                    <div className="absolute inset-0 bg-green-500 transition-all duration-300"></div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {/* Mobile progress bar alternative */}
+        <div className="mt-4 md:hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div 
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${(currentStep / steps.length) * 100}%` }}
+            ></div>
           </div>
-        ))}
+          <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <span>Step {currentStep} of {steps.length}</span>
+            <span className="ml-4">{Math.round((currentStep / steps.length) * 100)}% Complete</span>
+          </div>
+        </div>
       </div>
     )
   }
@@ -653,25 +708,25 @@ export default function PatientEligibilityForm({
               <p>Eligibility Type: <span className="font-medium text-gray-900 dark:text-white">{selectedEligibilityType}</span></p>
               <p>Requested on: {new Date().toLocaleDateString()}</p>
             </div>
-                              <div className="flex gap-3">
-                    <button
-                      onClick={handleReserveBenefits}
-                      disabled={isSubmitting}
-                      className="btn-primary"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Icon name="loader-2" size={16} className="animate-spin" />
-                          Reserving Benefits...
-                        </>
-                      ) : (
-                        <>
-                          <Icon name="shield-check" size={16} />
-                          Reserve Benefits
-                        </>
-                      )}
-                    </button>
-                  </div>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <button
+                onClick={handleReserveBenefits}
+                disabled={isSubmitting}
+                className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Icon name="loader-2" size={18} className="animate-spin" />
+                    <span>Reserving Benefits...</span>
+                  </>
+                ) : (
+                  <>
+                    <Icon name="shield-check" size={18} />
+                    <span>Reserve Benefits</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -682,22 +737,22 @@ export default function PatientEligibilityForm({
     return (
       <div className="hedis-screening-content">
         {/* Page Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Reserved Benefits
           </h1>
-          <div className="flex gap-3">
-            <button className="btn-tertiary flex items-center gap-2">
-              <Icon name="printer" size={16} />
-              Print
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <button className="btn-tertiary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]">
+              <Icon name="printer" size={18} />
+              <span>Print</span>
             </button>
             {/* Back button hidden for step 4 */}
             <button 
               onClick={handleNewSearch}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
             >
-              <Icon name="search" size={16} />
-              New Search
+              <Icon name="search" size={18} />
+              <span>New Search</span>
             </button>
           </div>
         </div>
@@ -727,7 +782,7 @@ export default function PatientEligibilityForm({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Member Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-left">
               Member:
             </h3>
             <div className="space-y-2 text-sm">
@@ -740,7 +795,7 @@ export default function PatientEligibilityForm({
 
           {/* Primary Care Physician Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-left">
               Primary Care Physician:
             </h3>
             <div className="space-y-2 text-sm">
@@ -1357,10 +1412,6 @@ export default function PatientEligibilityForm({
   return (
     <div className="hedis-screening-page">
       <div className="hedis-screening-header">
-        <button onClick={handleBack} className="hedis-screening-back-button">
-          <Icon name="arrow-left" size={20} />
-          <span>{getOriginatingPageDisplayName()}</span>
-        </button>
         <div className="hedis-screening-progress">
           <StepIndicators currentStep={currentStep} />
         </div>

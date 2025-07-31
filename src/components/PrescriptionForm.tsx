@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Icon from './Icon'
+import { scrollToFirstError } from '../utils/validationUtils'
 
 interface PrescriptionFormProps {
   onBack?: () => void
@@ -315,6 +316,12 @@ export default function PrescriptionForm({
     }
     
     setErrors(newErrors)
+    
+    // Scroll to first error on mobile if there are errors
+    if (Object.keys(newErrors).length > 0) {
+      scrollToFirstError(newErrors)
+    }
+    
     return Object.keys(newErrors).length === 0
   }
 

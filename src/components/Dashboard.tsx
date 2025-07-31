@@ -95,12 +95,35 @@ export default function Dashboard() {
     switch (actionId) {
       case 'request-patient-eligibility':
         setMobilePICView('patient-eligibility')
+        // Scroll to top when navigating to form views
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       case 'claims-submission':
         setMobilePICView('claims-submission')
+        // Scroll to top when navigating to form views
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       case 'prescription':
         setMobilePICView('prescription')
+        // Scroll to top when navigating to form views
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        break
+      case 'claim-status':
+      case 'claim-summary':
+      case 'job-status-online':
+      case 'job-status-paper':
+      case 'health-plan-details':
+      case 'explanation-of-payments':
+      case 'payment-summary-report':
+      case 'frame-collections':
+      case 'lens-price-list':
+      case 'um-prior-authorization':
+      case 'um-authorization-status':
+      case 'manual-eligibility-request':
+      case 'provider-resources':
+        // For now, these actions will show a placeholder or could be implemented later
+        console.log('Action clicked:', actionId)
+        alert(`The ${actionId.replace(/-/g, ' ')} feature is coming soon!`)
         break
       default:
         console.log('Mobile action clicked:', actionId)
@@ -276,6 +299,8 @@ export default function Dashboard() {
   const handleMobileTabChange = (tab: string) => {
     setActiveMobileTab(tab)
     setMobileTabChangeCount(prev => prev + 1)
+    // Scroll to top when changing tabs on mobile
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleDesktopTabChange = (tab: string) => {
@@ -630,10 +655,16 @@ export default function Dashboard() {
                 </div>
                 <PatientSearchModal 
                   isOpen={true} 
-                  onClose={() => setMobileHEDISView('landing')}
+                  onClose={() => {
+                    setMobileHEDISView('landing')
+                    // Scroll to top when navigating back
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
                   onPatientSelect={(patient) => {
                     console.log('Patient selected:', patient)
                     setMobileHEDISView('screening-form')
+                    // Scroll to top when navigating to form
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
                 />
               </div>
@@ -641,7 +672,11 @@ export default function Dashboard() {
               <div className="p-4">
                 <div className="flex items-center mb-4">
                   <button
-                    onClick={() => setMobileHEDISView('landing')}
+                    onClick={() => {
+                      setMobileHEDISView('landing')
+                      // Scroll to top when navigating back
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
                     className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                   >
                     <Icon name="arrow-left" size={20} />
@@ -661,11 +696,17 @@ export default function Dashboard() {
                     status: 'active'
                   }}
                   isOpen={true}
-                  onClose={() => setMobileHEDISView('landing')}
+                  onClose={() => {
+                    setMobileHEDISView('landing')
+                    // Scroll to top when navigating back
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
                   onSave={(data) => console.log('Screening saved:', data)}
                   onComplete={(data) => {
                     console.log('Screening completed:', data)
                     setMobileHEDISView('landing')
+                    // Scroll to top when completing form
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
                 />
               </div>
@@ -736,7 +777,11 @@ export default function Dashboard() {
                         .filter(action => action.frequency >= 80)
                         .slice(0, 3)
                         .map((action) => (
-                          <div key={action.id} className="pic-actions-mobile-frequent-card bg-blue-50 dark:bg-blue-900/10 border border-blue-300 dark:border-blue-600 rounded-lg shadow-sm p-4">
+                          <div 
+                            key={action.id} 
+                            className="pic-actions-mobile-frequent-card bg-blue-50 dark:bg-blue-900/10 border border-blue-300 dark:border-blue-600 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-colors"
+                            onClick={() => handleMobileAction(action.id)}
+                          >
                             <div className="flex items-center">
                               <div className="pic-actions-mobile-frequent-icon flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
                                 {getMobileFrequentIcon(action.icon)}
@@ -787,7 +832,7 @@ export default function Dashboard() {
                           ) : action.frequency >= 60 ? (
                             <span className="pic-actions-mobile-card-badge-active inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
                               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 11-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                               </svg>
                               Active
                             </span>
@@ -816,7 +861,11 @@ export default function Dashboard() {
               <div className="p-4">
                 <div className="flex items-center mb-4">
                   <button
-                    onClick={() => setMobilePICView('landing')}
+                    onClick={() => {
+                      setMobilePICView('landing')
+                      // Scroll to top when navigating back
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
                     className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                   >
                     <Icon name="arrow-left" size={20} />
@@ -824,38 +873,46 @@ export default function Dashboard() {
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Eligibility</h2>
                 </div>
                 <PatientEligibilityForm />
-                                              <HelperButton currentForm="PatientEligibility" currentField="mobile" currentStep={1} />
-                            </div>
-                          ) : mobilePICView === 'claims-submission' ? (
-                            <div className="p-4">
-                              <div className="flex items-center mb-4">
-                                <button
-                                  onClick={() => setMobilePICView('landing')}
-                                  className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                                >
-                                  <Icon name="arrow-left" size={20} />
-                                </button>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Claims Submission</h2>
-                              </div>
-                              <ClaimsSubmissionForm />
-                              <HelperButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} />
-                            </div>
-                          ) : mobilePICView === 'prescription' ? (
-                            <div className="p-4">
-                              <div className="flex items-center mb-4">
-                                <button
-                                  onClick={() => setMobilePICView('landing')}
-                                  className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                                >
-                                  <Icon name="arrow-left" size={20} />
-                                </button>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Entry</h2>
-                              </div>
-                              <PrescriptionForm />
-                              <HelperButton currentForm="Prescription" currentField="mobile" currentStep={1} />
-                            </div>
-                          ) : null}
-                          <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} />
+                <HelperButton currentForm="PatientEligibility" currentField="mobile" currentStep={1} />
+              </div>
+            ) : mobilePICView === 'claims-submission' ? (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => {
+                      setMobilePICView('landing')
+                      // Scroll to top when navigating back
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Claims Submission</h2>
+                </div>
+                <ClaimsSubmissionForm />
+                <HelperButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} />
+              </div>
+            ) : mobilePICView === 'prescription' ? (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => {
+                      setMobilePICView('landing')
+                      // Scroll to top when navigating back
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Entry</h2>
+                </div>
+                <PrescriptionForm />
+                <HelperButton currentForm="Prescription" currentField="mobile" currentStep={1} />
+              </div>
+            ) : null}
+            <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} />
           </div>
         )
       case 'reports':

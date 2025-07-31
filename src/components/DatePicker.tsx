@@ -24,7 +24,19 @@ export default function DatePicker({
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(value ? new Date(value) : null)
   const [showYearDropdown, setShowYearDropdown] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -100,27 +112,28 @@ export default function DatePicker({
     return days
   }
 
+  const days = getDaysInMonth(currentMonth)
+
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }) // Keep as MM/DD/YYYY format
+    return date.toISOString().split('T')[0]
   }
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date)
     onChange(formatDate(date))
-    setIsOpen(false)
+    // Close calendar on mobile after selection
+    if (isMobile) {
+      setIsOpen(false)
+    }
   }
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentMonth(prev => {
       const newMonth = new Date(prev)
       if (direction === 'prev') {
-        newMonth.setMonth(prev.getMonth() - 1)
+        newMonth.setMonth(newMonth.getMonth() - 1)
       } else {
-        newMonth.setMonth(prev.getMonth() + 1)
+        newMonth.setMonth(newMonth.getMonth() + 1)
       }
       return newMonth
     })
@@ -130,9 +143,9 @@ export default function DatePicker({
     setCurrentMonth(prev => {
       const newMonth = new Date(prev)
       if (direction === 'prev') {
-        newMonth.setFullYear(prev.getFullYear() - 1)
+        newMonth.setFullYear(newMonth.getFullYear() - 1)
       } else {
-        newMonth.setFullYear(prev.getFullYear() + 1)
+        newMonth.setFullYear(newMonth.getFullYear() + 1)
       }
       return newMonth
     })
@@ -146,8 +159,7 @@ export default function DatePicker({
   const generateYearOptions = () => {
     const currentYear = new Date().getFullYear()
     const years = []
-    // Generate years from 1930 to 5 years in the future (allowing for very old patients)
-    for (let i = 1930; i <= currentYear + 5; i++) {
+    for (let i = currentYear - 10; i <= currentYear + 10; i++) {
       years.push(i)
     }
     return years
@@ -159,63 +171,76 @@ export default function DatePicker({
   }
 
   const isSelected = (date: Date) => {
-    if (!selectedDate) return false
-    return date.getFullYear() === selectedDate.getFullYear() &&
-           date.getMonth() === selectedDate.getMonth() &&
-           date.getDate() === selectedDate.getDate()
+    return selectedDate && date.toDateString() === selectedDate.toDateString()
   }
 
   const getIcon = (iconName: string): ReactElement => {
-    const icons: { [key: string]: ReactElement } = {
-      calendar: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-      chevronLeft: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      ),
-      chevronRight: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      ),
-      chevronUp: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-        </svg>
-      ),
-      chevronDown: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      )
+    switch (iconName) {
+      case 'calendar':
+        return (
+          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        )
+      case 'chevronLeft':
+        return (
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        )
+      case 'chevronRight':
+        return (
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        )
+      case 'chevronUp':
+        return (
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        )
+      case 'chevronDown':
+        return (
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        )
+      case 'x':
+        return (
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        )
+      default:
+        return <></>
     }
-    return icons[iconName] || icons.calendar
   }
 
-  const days = getDaysInMonth(currentMonth)
   const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
   const yearOptions = generateYearOptions()
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      {/* Mobile: Native date input with enhanced calendar dropdown */}
+      {/* Mobile: Enhanced touch-friendly input */}
       <div className="md:hidden">
-        <input
-          type="text"
-          name={name}
-          value={value || ''}
-          placeholder={placeholder}
-          disabled={disabled}
-          readOnly
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`block w-full px-3 py-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 text-base ${
-            disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
-          } ${hasError ? 'border-red-500 focus:border-red-500' : ''}`}
-        />
+        <div className="relative">
+          <input
+            type="text"
+            name={name}
+            value={value || ''}
+            placeholder={placeholder}
+            disabled={disabled}
+            readOnly
+            onClick={() => !disabled && setIsOpen(!isOpen)}
+            className={`block w-full px-4 py-4 pr-16 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600 text-base ${
+              disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'cursor-pointer active:bg-gray-50'
+            } ${hasError ? 'border-red-500 focus:border-red-500' : 'border-gray-300'}`}
+          />
+          <div className="absolute inset-y-0 right-0 pr-15 flex items-center pointer-events-none mobile-calendar-icon">
+            {getIcon('calendar')}
+          </div>
+        </div>
       </div>
 
       {/* Desktop: Custom calendar input */}
@@ -237,11 +262,167 @@ export default function DatePicker({
         />
       </div>
 
-      {/* Calendar Dropdown - Mobile and Desktop */}
-      {isOpen && !disabled && (
-        <div className="absolute z-50 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 p-4 md:w-80 w-full max-w-sm mx-auto">
+      {/* Full-Screen Mobile Calendar */}
+      {isOpen && !disabled && isMobile && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden">
+            {/* Mobile Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Select Date</h2>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+                >
+                  {getIcon('x')}
+                </button>
+              </div>
+              
+              {/* Selected Date Display */}
+              {selectedDate && (
+                <div className="mt-3 text-center">
+                  <p className="text-blue-100 text-sm">Selected</p>
+                  <p className="text-2xl font-bold">
+                    {selectedDate.toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Calendar Content */}
+            <div className="p-6">
+              {/* Month/Year Navigation */}
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  type="button"
+                  onClick={() => navigateMonth('prev')}
+                  className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  {getIcon('chevronLeft')}
+                </button>
+                
+                <div className="flex flex-col items-center">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {currentMonth.toLocaleDateString('en-US', { 
+                      month: 'long'
+                    })}
+                  </h3>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowYearDropdown(!showYearDropdown)}
+                      className="flex items-center space-x-2 px-4 py-3 text-base font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-300 transition-colors"
+                    >
+                      <span>{currentMonth.getFullYear()}</span>
+                      {showYearDropdown ? getIcon('chevronUp') : getIcon('chevronDown')}
+                    </button>
+                    
+                    {/* Year Dropdown */}
+                    {showYearDropdown && (
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-48 max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                        {yearOptions.map((year) => (
+                          <button
+                            key={year}
+                            type="button"
+                            onClick={() => handleYearSelect(year)}
+                            className={`w-full px-4 py-3 text-left hover:bg-gray-100 transition-colors text-base ${
+                              year === currentMonth.getFullYear() ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700'
+                            }`}
+                          >
+                            {year}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={() => navigateMonth('next')}
+                  className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  {getIcon('chevronRight')}
+                </button>
+              </div>
+
+              {/* Days of Week */}
+              <div className="grid grid-cols-7 gap-1 mb-4">
+                {weekDays.map((day, index) => (
+                  <div key={index} className="text-center text-lg font-medium text-gray-500 py-3">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-2">
+                {days.map((day, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleDateSelect(day.date)}
+                    className={`
+                      w-12 h-12 text-lg rounded-full flex items-center justify-center transition-all duration-200 font-medium
+                      ${day.isCurrentMonth 
+                        ? 'text-gray-900 hover:bg-gray-100 active:bg-gray-200' 
+                        : 'text-gray-400'
+                      }
+                      ${isToday(day.date) 
+                        ? 'bg-blue-100 text-blue-600 font-semibold ring-2 ring-blue-200' 
+                        : ''
+                      }
+                      ${isSelected(day.date) 
+                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg transform scale-105' 
+                        : ''
+                      }
+                      ${!day.isCurrentMonth && isSelected(day.date)
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : ''
+                      }
+                    `}
+                  >
+                    {day.date.getDate()}
+                  </button>
+                ))}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const today = new Date()
+                    handleDateSelect(today)
+                  }}
+                  className="px-6 py-3 text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                  Today
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="px-6 py-3 text-base font-medium text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Calendar Dropdown */}
+      {isOpen && !disabled && !isMobile && (
+        <div className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 md:w-80 p-4">
           {/* Header */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             {/* Left Arrow */}
             <button
               type="button"
@@ -254,7 +435,7 @@ export default function DatePicker({
             
             {/* Centered Month and Year */}
             <div className="flex flex-col items-center">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
                 {currentMonth.toLocaleDateString('en-US', { 
                   month: 'long'
                 })}
@@ -263,7 +444,7 @@ export default function DatePicker({
                 <button
                   type="button"
                   onClick={() => setShowYearDropdown(!showYearDropdown)}
-                  className="flex items-center space-x-1 px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                  className="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 transition-colors"
                 >
                   <span>{currentMonth.getFullYear()}</span>
                   {showYearDropdown ? getIcon('chevronUp') : getIcon('chevronDown')}
@@ -271,13 +452,13 @@ export default function DatePicker({
                 
                 {/* Year Dropdown */}
                 {showYearDropdown && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-32 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-32 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                     {yearOptions.map((year) => (
                       <button
                         key={year}
                         type="button"
                         onClick={() => handleYearSelect(year)}
-                        className={`w-full px-3 py-2 text-sm text-left hover:bg-gray-100 transition-colors ${
+                        className={`w-full px-4 py-3 text-left hover:bg-gray-100 transition-colors text-sm ${
                           year === currentMonth.getFullYear() ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700'
                         }`}
                       >
@@ -301,37 +482,37 @@ export default function DatePicker({
           </div>
 
           {/* Days of Week */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
+          <div className="grid grid-cols-7 gap-1 mb-4">
             {weekDays.map((day, index) => (
-              <div key={index} className="text-center text-sm md:text-sm text-base font-medium text-gray-500 py-2 md:py-1">
+              <div key={index} className="text-center text-sm font-medium text-gray-500 py-2">
                 {day}
               </div>
             ))}
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-2">
             {days.map((day, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => handleDateSelect(day.date)}
                 className={`
-                  w-12 h-12 md:w-10 md:h-10 text-base md:text-sm rounded-full flex items-center justify-center transition-colors
+                  w-10 h-10 text-sm rounded-full flex items-center justify-center transition-all duration-200 font-medium
                   ${day.isCurrentMonth 
-                    ? 'text-gray-900 hover:bg-gray-100' 
+                    ? 'text-gray-900 hover:bg-gray-100 active:bg-gray-200' 
                     : 'text-gray-400'
                   }
                   ${isToday(day.date) 
-                    ? 'bg-blue-100 text-blue-600 font-semibold' 
+                    ? 'bg-blue-100 text-blue-600 font-semibold ring-2 ring-blue-200' 
                     : ''
                   }
                   ${isSelected(day.date) 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg transform scale-105' 
                     : ''
                   }
                   ${!day.isCurrentMonth && isSelected(day.date)
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-blue-600 text-white shadow-lg'
                     : ''
                   }
                 `}

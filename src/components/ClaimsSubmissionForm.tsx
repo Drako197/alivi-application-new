@@ -4373,6 +4373,14 @@ export default function ClaimsSubmissionForm({
         triggeringFieldName={triggeringField}
         triggeringFormName={triggeringForm}
         onCodeSelect={handleCodeSelect}
+        formData={formData}
+        userBehavior={{
+          fieldFocusTime: {}, // Track field focus time
+          commonErrors: {}, // Track common errors
+          successfulPatterns: {}, // Track successful patterns
+          formCompletionRate: 0.8, // Example completion rate
+          averageSessionTime: 300000 // 5 minutes in milliseconds
+        }}
       />
 
       {/* Loading Modal */}

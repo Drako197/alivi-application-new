@@ -4,13 +4,13 @@ import PersonalizationService from '../services/PersonalizationService'
 import ProactiveSuggestionsService, { type ProactiveSuggestion } from '../services/ProactiveSuggestionsService'
 import { PredictiveSuggestionsService } from '../services/PredictiveSuggestionsService'
 import PersonalizationSettings from './PersonalizationSettings'
-import AIAssistantService from '../services/AIAssistantService'
+import AIAssistantService, { type SmartSuggestion, type ProactiveAlert, type AIContext } from '../services/AIAssistantService'
 import { createPortal } from 'react-dom'
 import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 interface Message {
   id: string
-  type: 'user' | 'assistant'
+  type: 'user' | 'assistant' | 'suggestion' | 'alert'
   content: string
   timestamp: Date
   context?: {
@@ -21,6 +21,8 @@ interface Message {
     lastTopic?: string
   }
   animation?: 'typing' | 'fade-in' | 'slide-in'
+  suggestions?: SmartSuggestion[]
+  alerts?: ProactiveAlert[]
 }
 
 interface HelperModalProps {
@@ -35,6 +37,15 @@ interface HelperModalProps {
   triggeringFieldName?: string
   triggeringFormName?: string
   onCodeSelect?: (code: string, description: string) => void
+  // New props for smart suggestions and proactive assistance
+  formData?: Record<string, any>
+  userBehavior?: {
+    fieldFocusTime: Record<string, number>
+    commonErrors: Record<string, number>
+    successfulPatterns: Record<string, number>
+    formCompletionRate: number
+    averageSessionTime: number
+  }
 }
 
 // Medical billing knowledge base
@@ -98,7 +109,6 @@ const MEDICAL_BILLING_KNOWLEDGE = {
 export default function HelperModal({ 
   isOpen, 
   onClose, 
-  currentForm, 
   currentField, 
   currentStep,
   onFieldSuggestion,
@@ -106,16 +116,25 @@ export default function HelperModal({
   isCodeSelectionMode,
   triggeringFieldName,
   triggeringFormName,
-  onCodeSelect
+  onCodeSelect,
+  // New props for smart suggestions and proactive assistance
+  formData,
+  userBehavior
 }: HelperModalProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [availableCodes, setAvailableCodes] = useState<Array<{ code: string; description: string }>>([])
+  const [showCodeSelection, setShowCodeSelection] = useState(false)
+  const [predictiveSuggestions, setPredictiveSuggestions] = useState<any[]>([])
+  const [showPredictiveSuggestions, setShowPredictiveSuggestions] = useState(false)
+  const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestion[]>([])
+  const [proactiveAlerts, setProactiveAlerts] = useState<ProactiveAlert[]>([])
+  const [showSmartSuggestions, setShowSmartSuggestions] = useState(false)
+  const [showProactiveAlerts, setShowProactiveAlerts] = useState(false)
   const [proactiveSuggestions, setProactiveSuggestions] = useState<ProactiveSuggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const [predictiveSuggestions, setPredictiveSuggestions] = useState<any[]>([])
-  const [showPredictiveSuggestions, setShowPredictiveSuggestions] = useState(false)
   const [hasShownSuggestions, setHasShownSuggestions] = useState(false)
   const [hasWelcomedUser, setHasWelcomedUser] = useState(false)
   const [conversationContext, setConversationContext] = useState<{
@@ -123,9 +142,62 @@ export default function HelperModal({
     lastTopic?: string
   }>({})
   const [codeSelectionMode, setCodeSelectionMode] = useState(false)
-  const [availableCodes, setAvailableCodes] = useState<Array<{code: string, description: string}>>([])
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Create AI context for enhanced responses
+  const createAIContext = (): AIContext => {
+    return {
+      formType: currentForm,
+      currentField,
+      currentStep,
+      formData,
+      userBehavior,
+      deviceType: window.innerWidth < 768 ? 'mobile' : 'desktop',
+      timeOfDay: getTimeOfDay(),
+      sessionDuration: Date.now() - (sessionStartTime || Date.now())
+    }
+  }
+
+  const [sessionStartTime] = useState(Date.now())
+  const [currentForm] = useState(() => {
+    if (triggeringFormName) return triggeringFormName as 'claims_submission' | 'patient_eligibility' | 'hedis_screening' | 'prescription' | 'pic_actions'
+    if (currentField?.includes('provider')) return 'patient_eligibility' as const
+    if (currentField?.includes('diagnosis') || currentField?.includes('procedure')) return 'claims_submission' as const
+    return 'general' as any
+  })
+
+  const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
+    const hour = new Date().getHours()
+    if (hour >= 6 && hour < 12) return 'morning'
+    if (hour >= 12 && hour < 17) return 'afternoon'
+    if (hour >= 17 && hour < 22) return 'evening'
+    return 'night'
+  }
+
+  // Load smart suggestions and proactive alerts
+  useEffect(() => {
+    if (isOpen) {
+      const context = createAIContext()
+      const suggestions = AIAssistantService.getSmartSuggestions(context)
+      const alerts = AIAssistantService.getProactiveAlerts(context)
+      
+      setSmartSuggestions(suggestions)
+      setProactiveAlerts(alerts)
+      
+      // Show proactive alerts if any exist
+      if (alerts.length > 0) {
+        setShowProactiveAlerts(true)
+        addMessage('alert', 'Proactive alerts available', 'fade-in', undefined, undefined, alerts)
+      }
+      
+      // Show smart suggestions if any exist
+      if (suggestions.length > 0) {
+        setShowSmartSuggestions(true)
+        addMessage('suggestion', 'Smart suggestions available', 'fade-in', undefined, suggestions)
+      }
+    }
+  }, [isOpen, currentField, currentStep, formData])
 
   // Check if user has been welcomed in this session
   useEffect(() => {
@@ -224,7 +296,7 @@ export default function HelperModal({
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    messagesContainerRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   // Focus input when assistant opens
@@ -598,14 +670,16 @@ export default function HelperModal({
     }
   }, [currentField, currentForm, isOpen])
 
-  const addMessage = (type: 'user' | 'assistant', content: string, animation: 'typing' | 'fade-in' | 'slide-in' = 'fade-in', context?: any) => {
+  const addMessage = (type: 'user' | 'assistant' | 'suggestion' | 'alert', content: string, animation: 'typing' | 'fade-in' | 'slide-in' = 'fade-in', context?: any, suggestions?: SmartSuggestion[], alerts?: ProactiveAlert[]) => {
     const newMessage: Message = {
       id: Date.now().toString(),
       type,
       content,
       timestamp: new Date(),
       context,
-      animation
+      animation,
+      suggestions,
+      alerts
     }
     setMessages(prev => [...prev, newMessage])
     
@@ -849,10 +923,76 @@ export default function HelperModal({
                     className={`max-w-[80%] rounded-lg px-4 py-2 transition-all duration-300 ${
                       message.type === 'user'
                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+                        : message.type === 'suggestion'
+                        ? 'bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 text-gray-900 dark:text-white shadow-md border border-green-200 dark:border-green-700'
+                        : message.type === 'alert'
+                        ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 text-gray-900 dark:text-white shadow-md border border-yellow-200 dark:border-yellow-700'
                         : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white shadow-md'
                     }`}
                   >
                     <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                    
+                    {/* Smart Suggestions */}
+                    {message.suggestions && message.suggestions.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Icon name="lightbulb" size={14} className="text-green-500" />
+                          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Smart Suggestions</span>
+                        </div>
+                        {message.suggestions.map((suggestion, idx) => (
+                          <div key={suggestion.id} className="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+                            <div className="flex items-start space-x-2">
+                              <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                                suggestion.priority === 'high' ? 'bg-red-500' : 
+                                suggestion.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                              }`}></div>
+                              <div className="flex-1">
+                                <div className="text-xs font-medium text-gray-900 dark:text-white">
+                                  {suggestion.title}
+                                </div>
+                                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                  {suggestion.description}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Proactive Alerts */}
+                    {message.alerts && message.alerts.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Icon name="alert-triangle" size={14} className="text-yellow-500" />
+                          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Proactive Alerts</span>
+                        </div>
+                        {message.alerts.map((alert, idx) => (
+                          <div key={alert.id} className="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+                            <div className="flex items-start space-x-2">
+                              <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                                alert.severity === 'critical' ? 'bg-red-500' : 
+                                alert.severity === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                              }`}></div>
+                              <div className="flex-1">
+                                <div className="text-xs font-medium text-gray-900 dark:text-white">
+                                  {alert.title}
+                                </div>
+                                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                  {alert.message}
+                                </div>
+                                {alert.actionable && (
+                                  <button className="text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-1">
+                                    Take Action
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <div className={`text-xs mt-1 ${
                       message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
                     }`}>
@@ -998,7 +1138,7 @@ export default function HelperModal({
                 </div>
               )}
               
-              <div ref={messagesEndRef} />
+              <div ref={messagesContainerRef} />
             </div>
 
             {/* Input */}

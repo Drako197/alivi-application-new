@@ -22,10 +22,59 @@ export interface ProviderLookupResult {
 }
 
 export interface AIAssistantResponse {
-  type: 'terminology' | 'code_lookup' | 'provider_lookup' | 'form_guidance' | 'general'
+  type: 'terminology' | 'code_lookup' | 'provider_lookup' | 'form_guidance' | 'general' | 'suggestion' | 'proactive'
   content: string
   data?: any
   suggestions?: string[]
+  proactiveAlerts?: string[]
+}
+
+// Enhanced context interface for better awareness
+export interface AIContext {
+  formType?: 'claims_submission' | 'patient_eligibility' | 'hedis_screening' | 'prescription' | 'pic_actions'
+  currentField?: string
+  currentStep?: number
+  totalSteps?: number
+  formData?: Record<string, any>
+  previousFields?: string[]
+  nextFields?: string[]
+  userRole?: 'biller' | 'provider' | 'admin'
+  deviceType?: 'desktop' | 'mobile'
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night'
+  sessionDuration?: number
+  errorFields?: string[]
+  validationErrors?: Record<string, string>
+  userBehavior?: {
+    fieldFocusTime: Record<string, number>
+    commonErrors: Record<string, number>
+    successfulPatterns: Record<string, number>
+    formCompletionRate: number
+    averageSessionTime: number
+  }
+}
+
+// Smart Suggestions Engine Interface
+export interface SmartSuggestion {
+  id: string
+  type: 'code' | 'field' | 'workflow' | 'validation' | 'optimization'
+  title: string
+  description: string
+  confidence: number
+  priority: 'high' | 'medium' | 'low'
+  action?: string
+  data?: any
+}
+
+// Proactive Assistance Interface
+export interface ProactiveAlert {
+  id: string
+  type: 'error_prevention' | 'optimization' | 'compliance' | 'workflow' | 'validation'
+  title: string
+  message: string
+  severity: 'critical' | 'warning' | 'info'
+  actionable: boolean
+  action?: string
+  data?: any
 }
 
 export class AIAssistantService {
@@ -95,47 +144,667 @@ export class AIAssistantService {
       '99': 'Other Place of Service'
     },
     modCodes: {
-      // Modifier codes for optometry
-      '25': 'Significant, separately identifiable evaluation and management service',
+      // Modifier codes
+      '25': 'Significant, separately identifiable evaluation and management service by the same physician or other qualified health care professional on the same day of the procedure or other service',
       '59': 'Distinct procedural service',
-      '76': 'Repeat procedure by same physician',
-      '77': 'Repeat procedure by another physician',
-      '78': 'Return to operating room for related procedure',
-      '79': 'Unrelated procedure by same physician',
-      '90': 'Reference (outside) laboratory',
+      '24': 'Unrelated evaluation and management service by the same physician or other qualified health care professional during a postoperative period',
+      '57': 'Decision for surgery',
+      '58': 'Staged or related procedure or service by the same physician or other qualified health care professional during the postoperative period',
+      '78': 'Unplanned return to the operating/procedure room by the same physician or other qualified health care professional following initial procedure for a related procedure during the postoperative period',
+      '79': 'Unrelated procedure or service by the same physician or other qualified health care professional during the postoperative period',
+      '80': 'Assistant surgeon',
+      '81': 'Minimum assistant surgeon',
+      '82': 'Assistant surgeon (when qualified resident surgeon not available)',
+      'AS': 'Physician assistant, nurse practitioner, or clinical nurse specialist services for assistant at surgery',
+      'TC': 'Technical component',
+      '26': 'Professional component',
+      '50': 'Bilateral procedure',
+      '51': 'Multiple procedures',
+      '52': 'Reduced services',
+      '53': 'Discontinued procedure',
+      '54': 'Surgical care only',
+      '55': 'Postoperative management only',
+      '56': 'Preoperative management only',
+      '58': 'Staged or related procedure or service by the same physician or other qualified health care professional during the postoperative period',
+      '73': 'Discontinued outpatient hospital/ambulatory surgery center procedure prior to the administration of anesthesia',
+      '74': 'Discontinued outpatient hospital/ambulatory surgery center procedure after administration of anesthesia',
+      '76': 'Repeat procedure or service by same physician or other qualified health care professional',
+      '77': 'Repeat procedure by another physician or other qualified health care professional',
       '91': 'Repeat clinical diagnostic laboratory test',
-      '95': 'Synchronous telemedicine service',
+      '92': 'Alternative laboratory platform testing',
+      '95': 'Synchronous telemedicine service rendered via a real-time interactive audio and video telecommunications system',
       '96': 'Habilitative services',
       '97': 'Rehabilitative services',
       '99': 'Multiple modifiers'
     }
   }
 
-  // Enhanced processUserInput with new capabilities
-  static async processUserInput(
-    input: string,
-    context: {
-      formType?: string
-      currentField?: string
-      currentStep?: number
-      formData?: Record<string, any>
-    } = {}
-  ): Promise<string> {
-    const lowerInput = input.toLowerCase().trim()
+  // Smart Suggestions Engine - Item 7
+  private static SMART_SUGGESTIONS_ENGINE = {
+    // Suggestion patterns based on form context and user behavior
+    patterns: {
+      claims_submission: {
+        step1: {
+          suggestions: [
+            { type: 'field', title: 'Provider ID Format', description: 'NPI must be 10 digits', confidence: 0.9 },
+            { type: 'code', title: 'Common POS Codes', description: '11 for office, 22 for outpatient hospital', confidence: 0.8 },
+            { type: 'validation', title: 'Date Validation', description: 'Service date cannot be in the future', confidence: 0.95 }
+          ]
+        },
+        step2: {
+          suggestions: [
+            { type: 'code', title: 'Primary Diagnosis', description: 'List most significant diagnosis first', confidence: 0.9 },
+            { type: 'workflow', title: 'Multiple Diagnoses', description: 'Use additional diagnosis codes for comorbidities', confidence: 0.8 }
+          ]
+        },
+        step3: {
+          suggestions: [
+            { type: 'code', title: 'Procedure Codes', description: 'Use most specific code available', confidence: 0.9 },
+            { type: 'validation', title: 'Modifier Usage', description: 'Add modifiers for additional information', confidence: 0.8 },
+            { type: 'optimization', title: 'Bundling Check', description: 'Verify codes aren\'t bundled', confidence: 0.7 }
+          ]
+        }
+      },
+      patient_eligibility: {
+        suggestions: [
+          { type: 'field', title: 'Member ID Format', description: 'Check insurance card for correct format', confidence: 0.9 },
+          { type: 'workflow', title: 'Real-time Check', description: 'Verify eligibility before proceeding', confidence: 0.95 }
+        ]
+      },
+      hedis_screening: {
+        suggestions: [
+          { type: 'code', title: 'HEDIS Measures', description: 'Focus on quality measures for reporting', confidence: 0.9 },
+          { type: 'compliance', title: 'Documentation', description: 'Ensure complete documentation for audit', confidence: 0.95 }
+        ]
+      }
+    },
 
-    // Track user behavior for predictive suggestions
-    if (context.formType && context.currentField) {
-      PredictiveSuggestionsService.trackUserBehavior({
-        formType: context.formType,
-        fieldName: context.currentField,
-        action: 'input',
-        timestamp: new Date(),
-        value: input
+    // Intelligent suggestion algorithms
+    algorithms: {
+      // Context-aware suggestions based on current field and form data
+      getContextualSuggestions: (context: AIContext): SmartSuggestion[] => {
+        const suggestions: SmartSuggestion[] = []
+        
+        if (!context.formType || !context.currentField) return suggestions
+
+        // Get base suggestions for form type and step
+        const baseSuggestions = AIAssistantService.SMART_SUGGESTIONS_ENGINE.patterns[context.formType]?.[`step${context.currentStep}`]?.suggestions || []
+        
+        // Add contextual suggestions based on current field
+        const fieldSuggestions = AIAssistantService.getFieldSpecificSuggestions(context.currentField, context)
+        suggestions.push(...fieldSuggestions)
+
+        // Add workflow suggestions based on form progress
+        const workflowSuggestions = AIAssistantService.getWorkflowSuggestions(context)
+        suggestions.push(...workflowSuggestions)
+
+        // Add optimization suggestions based on user behavior
+        const optimizationSuggestions = AIAssistantService.getOptimizationSuggestions(context)
+        suggestions.push(...optimizationSuggestions)
+
+        return suggestions.sort((a, b) => b.confidence - a.confidence)
+      },
+
+      // Predictive suggestions based on user behavior patterns
+      getPredictiveSuggestions: (context: AIContext): SmartSuggestion[] => {
+        const suggestions: SmartSuggestion[] = []
+        
+        if (!context.userBehavior) return suggestions
+
+        // Analyze user behavior patterns
+        const { fieldFocusTime, commonErrors, successfulPatterns } = context.userBehavior
+
+        // Suggest based on common errors
+        Object.entries(commonErrors).forEach(([field, errorCount]) => {
+          if (errorCount > 2) {
+            suggestions.push({
+              id: `error_prevention_${field}`,
+              type: 'validation',
+              title: `Common Error Prevention`,
+              description: `You've had ${errorCount} errors in ${field}. Consider double-checking this field.`,
+              confidence: 0.8,
+              priority: 'high'
+            })
+          }
+        })
+
+        // Suggest based on successful patterns
+        Object.entries(successfulPatterns).forEach(([pattern, successCount]) => {
+          if (successCount > 3) {
+            suggestions.push({
+              id: `optimization_${pattern}`,
+              type: 'optimization',
+              title: `Proven Pattern`,
+              description: `This approach has worked ${successCount} times. Consider using it again.`,
+              confidence: 0.9,
+              priority: 'medium'
+            })
+          }
+        })
+
+        return suggestions
+      },
+
+      // Real-time validation suggestions
+      getValidationSuggestions: (context: AIContext): SmartSuggestion[] => {
+        const suggestions: SmartSuggestion[] = []
+        
+        if (!context.formData) return suggestions
+
+        // Check for common validation issues
+        const validationChecks = [
+          { field: 'providerId', check: (value: string) => value && value.length !== 10, message: 'Provider ID must be 10 digits' },
+          { field: 'serviceDate', check: (value: string) => value && new Date(value) > new Date(), message: 'Service date cannot be in the future' },
+          { field: 'diagnosisCodes', check: (value: any[]) => value && value.length === 0, message: 'At least one diagnosis code is required' },
+          { field: 'procedureCodes', check: (value: any[]) => value && value.length === 0, message: 'At least one procedure code is required' }
+        ]
+
+        validationChecks.forEach(({ field, check, message }) => {
+          if (context.formData[field] && check(context.formData[field])) {
+            suggestions.push({
+              id: `validation_${field}`,
+              type: 'validation',
+              title: 'Validation Alert',
+              description: message,
+              confidence: 0.95,
+              priority: 'high'
+            })
+          }
+        })
+
+        return suggestions
+      }
+    }
+  }
+
+  // Proactive Assistance Engine - Item 5
+  private static PROACTIVE_ASSISTANCE_ENGINE = {
+    // Proactive monitoring and alerting
+    monitoring: {
+      // Monitor form completion patterns
+      trackFormProgress: (context: AIContext): ProactiveAlert[] => {
+        const alerts: ProactiveAlert[] = []
+        
+        if (!context.formType || !context.currentStep || !context.totalSteps) return alerts
+
+        const progress = (context.currentStep / context.totalSteps) * 100
+        
+        // Alert for slow progress
+        if (context.sessionDuration && context.sessionDuration > 300000 && progress < 50) { // 5 minutes
+          alerts.push({
+            id: 'slow_progress',
+            type: 'workflow',
+            title: 'Slow Progress Detected',
+            message: 'You\'ve been on this form for a while. Would you like help with the current step?',
+            severity: 'info',
+            actionable: true,
+            action: 'get_step_help'
+          })
+        }
+
+        // Alert for incomplete required fields
+        if (context.errorFields && context.errorFields.length > 0) {
+          alerts.push({
+            id: 'required_fields_missing',
+            type: 'error_prevention',
+            title: 'Required Fields Missing',
+            message: `${context.errorFields.length} required field(s) need to be completed.`,
+            severity: 'warning',
+            actionable: true,
+            action: 'show_field_help'
+          })
+        }
+
+        return alerts
+      },
+
+      // Monitor for potential errors
+      detectPotentialErrors: (context: AIContext): ProactiveAlert[] => {
+        const alerts: ProactiveAlert[] = []
+        
+        if (!context.formData) return alerts
+
+        // Check for common billing errors
+        const errorChecks = [
+          {
+            condition: (data: any) => data.providerId && data.providerId.length !== 10,
+            alert: {
+              id: 'invalid_provider_id',
+              type: 'error_prevention',
+              title: 'Invalid Provider ID',
+              message: 'Provider ID should be exactly 10 digits. Please verify the NPI number.',
+              severity: 'warning',
+              actionable: true,
+              action: 'validate_provider_id'
+            }
+          },
+          {
+            condition: (data: any) => data.serviceDate && new Date(data.serviceDate) > new Date(),
+            alert: {
+              id: 'future_service_date',
+              type: 'error_prevention',
+              title: 'Future Service Date',
+              message: 'Service date cannot be in the future. Please check the date.',
+              severity: 'warning',
+              actionable: true,
+              action: 'validate_service_date'
+            }
+          },
+          {
+            condition: (data: any) => data.diagnosisCodes && data.diagnosisCodes.length === 0,
+            alert: {
+              id: 'missing_diagnosis',
+              type: 'error_prevention',
+              title: 'Missing Diagnosis Codes',
+              message: 'At least one diagnosis code is required for claims submission.',
+              severity: 'critical',
+              actionable: true,
+              action: 'add_diagnosis_codes'
+            }
+          }
+        ]
+
+        errorChecks.forEach(({ condition, alert }) => {
+          if (condition(context.formData)) {
+            alerts.push(alert)
+          }
+        })
+
+        return alerts
+      },
+
+      // Monitor for optimization opportunities
+      detectOptimizationOpportunities: (context: AIContext): ProactiveAlert[] => {
+        const alerts: ProactiveAlert[] = []
+        
+        if (!context.formData) return alerts
+
+        // Check for potential optimizations
+        const optimizationChecks = [
+          {
+            condition: (data: any) => data.procedureCodes && data.procedureCodes.length > 5,
+            alert: {
+              id: 'multiple_procedures',
+              type: 'optimization',
+              title: 'Multiple Procedures',
+              message: 'You have multiple procedures. Consider checking for bundling opportunities.',
+              severity: 'info',
+              actionable: true,
+              action: 'check_bundling'
+            }
+          },
+          {
+            condition: (data: any) => data.diagnosisCodes && data.diagnosisCodes.length > 3,
+            alert: {
+              id: 'multiple_diagnoses',
+              type: 'optimization',
+              title: 'Multiple Diagnoses',
+              message: 'You have multiple diagnoses. Ensure they\'re in order of significance.',
+              severity: 'info',
+              actionable: true,
+              action: 'order_diagnoses'
+            }
+          }
+        ]
+
+        optimizationChecks.forEach(({ condition, alert }) => {
+          if (condition(context.formData)) {
+            alerts.push(alert)
+          }
+        })
+
+        return alerts
+      }
+    },
+
+    // Proactive assistance triggers
+    triggers: {
+      // Trigger based on user behavior
+      onFieldFocus: (fieldName: string, context: AIContext): ProactiveAlert[] => {
+        const alerts: ProactiveAlert[] = []
+        
+        // Check if user has struggled with this field before
+        if (context.userBehavior?.commonErrors?.[fieldName] > 1) {
+          alerts.push({
+            id: `field_help_${fieldName}`,
+            type: 'error_prevention',
+            title: 'Field Assistance Available',
+            message: `You've had issues with ${fieldName} before. Would you like help?`,
+            severity: 'info',
+            actionable: true,
+            action: 'get_field_help'
+          })
+        }
+
+        return alerts
+      },
+
+      // Trigger based on form step
+      onStepChange: (step: number, context: AIContext): ProactiveAlert[] => {
+        const alerts: ProactiveAlert[] = []
+        
+        // Provide step-specific guidance
+        const stepGuidance = {
+          1: 'Provider and patient information is required for all claims.',
+          2: 'Diagnosis codes describe the patient\'s condition or reason for visit.',
+          3: 'Procedure codes describe the services provided.',
+          4: 'Review all information before submission.'
+        }
+
+        if (stepGuidance[step]) {
+          alerts.push({
+            id: `step_guidance_${step}`,
+            type: 'workflow',
+            title: `Step ${step} Guidance`,
+            message: stepGuidance[step],
+            severity: 'info',
+            actionable: false
+          })
+        }
+
+        return alerts
+      },
+
+      // Trigger based on time of day
+      onTimeBased: (context: AIContext): ProactiveAlert[] => {
+        const alerts: ProactiveAlert[] = []
+        
+        const hour = new Date().getHours()
+        
+        // Morning productivity tips
+        if (hour >= 8 && hour <= 10) {
+          alerts.push({
+            id: 'morning_tips',
+            type: 'optimization',
+            title: 'Morning Productivity',
+            message: 'Good morning! Consider batch processing similar claims for efficiency.',
+            severity: 'info',
+            actionable: false
+          })
+        }
+
+        // Afternoon reminders
+        if (hour >= 14 && hour <= 16) {
+          alerts.push({
+            id: 'afternoon_reminder',
+            type: 'workflow',
+            title: 'Afternoon Check-in',
+            message: 'Remember to submit claims before end of day for faster processing.',
+            severity: 'info',
+            actionable: false
+          })
+        }
+
+        return alerts
+      }
+    }
+  }
+
+  // Helper methods for Smart Suggestions Engine
+  private static getFieldSpecificSuggestions(fieldName: string, context: AIContext): SmartSuggestion[] {
+    const suggestions: SmartSuggestion[] = []
+    
+    const fieldSuggestions = {
+      'providerId': [
+        {
+          id: 'npi_format',
+          type: 'field',
+          title: 'NPI Format',
+          description: 'NPI must be exactly 10 digits, no spaces or dashes',
+          confidence: 0.95,
+          priority: 'high'
+        }
+      ],
+      'diagnosisCodes': [
+        {
+          id: 'primary_diagnosis',
+          type: 'code',
+          title: 'Primary Diagnosis',
+          description: 'List the most significant diagnosis first',
+          confidence: 0.9,
+          priority: 'high'
+        }
+      ],
+      'procedureCodes': [
+        {
+          id: 'specific_codes',
+          type: 'code',
+          title: 'Most Specific Code',
+          description: 'Use the most specific procedure code available',
+          confidence: 0.9,
+          priority: 'high'
+        }
+      ],
+      'serviceDate': [
+        {
+          id: 'date_validation',
+          type: 'validation',
+          title: 'Date Validation',
+          description: 'Service date cannot be in the future',
+          confidence: 0.95,
+          priority: 'high'
+        }
+      ]
+    }
+
+    return fieldSuggestions[fieldName] || []
+  }
+
+  private static getWorkflowSuggestions(context: AIContext): SmartSuggestion[] {
+    const suggestions: SmartSuggestion[] = []
+    
+    if (!context.formType || !context.currentStep) return suggestions
+
+    // Workflow suggestions based on form progress
+    const workflowSuggestions = {
+      claims_submission: {
+        1: [
+          {
+            id: 'verify_provider',
+            type: 'workflow',
+            title: 'Verify Provider',
+            description: 'Ensure provider is in-network before proceeding',
+            confidence: 0.8,
+            priority: 'medium'
+          }
+        ],
+        2: [
+          {
+            id: 'check_eligibility',
+            type: 'workflow',
+            title: 'Check Eligibility',
+            description: 'Verify patient eligibility for services',
+            confidence: 0.9,
+            priority: 'high'
+          }
+        ],
+        3: [
+          {
+            id: 'review_codes',
+            type: 'workflow',
+            title: 'Review Codes',
+            description: 'Double-check all codes for accuracy',
+            confidence: 0.8,
+            priority: 'medium'
+          }
+        ]
+      }
+    }
+
+    return workflowSuggestions[context.formType]?.[context.currentStep] || []
+  }
+
+  private static getOptimizationSuggestions(context: AIContext): SmartSuggestion[] {
+    const suggestions: SmartSuggestion[] = []
+    
+    if (!context.userBehavior) return suggestions
+
+    // Optimization suggestions based on user behavior
+    const { formCompletionRate, averageSessionTime } = context.userBehavior
+
+    if (formCompletionRate < 0.7) {
+      suggestions.push({
+        id: 'completion_rate',
+        type: 'optimization',
+        title: 'Form Completion',
+        description: 'Consider completing forms in one session for better efficiency',
+        confidence: 0.8,
+        priority: 'medium'
       })
     }
 
-    // Use the new agile response system with confidence scoring
-    return await this.getAgileResponseWithLearning(lowerInput, context)
+    if (averageSessionTime > 600000) { // 10 minutes
+      suggestions.push({
+        id: 'session_time',
+        type: 'optimization',
+        title: 'Session Duration',
+        description: 'Long sessions may indicate complexity. Consider breaking into smaller tasks',
+        confidence: 0.7,
+        priority: 'low'
+      })
+    }
+
+    return suggestions
+  }
+
+  // Main method to get smart suggestions
+  static getSmartSuggestions(context: AIContext): SmartSuggestion[] {
+    const contextualSuggestions = AIAssistantService.SMART_SUGGESTIONS_ENGINE.algorithms.getContextualSuggestions(context)
+    const predictiveSuggestions = AIAssistantService.SMART_SUGGESTIONS_ENGINE.algorithms.getPredictiveSuggestions(context)
+    const validationSuggestions = AIAssistantService.SMART_SUGGESTIONS_ENGINE.algorithms.getValidationSuggestions(context)
+
+    return [...contextualSuggestions, ...predictiveSuggestions, ...validationSuggestions]
+      .sort((a, b) => b.confidence - a.confidence)
+      .slice(0, 5) // Return top 5 suggestions
+  }
+
+  // Main method to get proactive alerts
+  static getProactiveAlerts(context: AIContext): ProactiveAlert[] {
+    const progressAlerts = AIAssistantService.PROACTIVE_ASSISTANCE_ENGINE.monitoring.trackFormProgress(context)
+    const errorAlerts = AIAssistantService.PROACTIVE_ASSISTANCE_ENGINE.monitoring.detectPotentialErrors(context)
+    const optimizationAlerts = AIAssistantService.PROACTIVE_ASSISTANCE_ENGINE.monitoring.detectOptimizationOpportunities(context)
+    const timeAlerts = AIAssistantService.PROACTIVE_ASSISTANCE_ENGINE.triggers.onTimeBased(context)
+
+    return [...progressAlerts, ...errorAlerts, ...optimizationAlerts, ...timeAlerts]
+      .sort((a, b) => {
+        const severityOrder = { critical: 3, warning: 2, info: 1 }
+        return severityOrder[b.severity] - severityOrder[a.severity]
+      })
+  }
+
+  // Enhanced processUserInput to include smart suggestions and proactive assistance
+  static async processUserInput(
+    input: string,
+    context: AIContext = {}
+  ): Promise<string> {
+    // Get smart suggestions and proactive alerts
+    const suggestions = AIAssistantService.getSmartSuggestions(context)
+    const alerts = AIAssistantService.getProactiveAlerts(context)
+
+    // Process the main input
+    let response = await AIAssistantService.processMainInput(input, context)
+
+    // Add smart suggestions to response if available
+    if (suggestions.length > 0) {
+      response += '\n\n**💡 Smart Suggestions:**\n'
+      suggestions.forEach((suggestion, index) => {
+        response += `${index + 1}. **${suggestion.title}** (${suggestion.priority} priority)\n   ${suggestion.description}\n\n`
+      })
+    }
+
+    // Add proactive alerts to response if available
+    if (alerts.length > 0) {
+      response += '\n\n**⚠️ Proactive Alerts:**\n'
+      alerts.forEach((alert, index) => {
+        const icon = alert.severity === 'critical' ? '🚨' : alert.severity === 'warning' ? '⚠️' : 'ℹ️'
+        response += `${index + 1}. ${icon} **${alert.title}**\n   ${alert.message}\n\n`
+      })
+    }
+
+    return response
+  }
+
+  // Helper method to process main input (existing logic)
+  private static async processMainInput(input: string, context: AIContext): Promise<string> {
+    try {
+      // Enhanced context-aware processing with new capabilities
+      
+      // 1. Real-time code validation
+      if (input.match(/\b([A-Z]\d{4}|\d{5}|E\d{2}\.\d{1,2}|Z\d{2}\.\d{1,2})\b/g)) {
+        const realTimeValidation = await this.handleCodeLookupWithRealTimeValidation(input, context)
+        if (realTimeValidation) {
+          this.learnFromInteraction(input, realTimeValidation, context, true)
+          return realTimeValidation
+        }
+      }
+
+      // 2. Insurance policy lookup
+      if (input.match(/\b(insurance|policy|coverage|benefits)\b/i)) {
+        const insuranceResponse = await this.handleInsurancePolicyLookup(input, context)
+        if (insuranceResponse) {
+          this.learnFromInteraction(input, insuranceResponse, context, true)
+          return insuranceResponse
+        }
+      }
+
+      // 3. Compliance guidance
+      if (input.match(/\b(hipaa|compliance|regulations|privacy|security)\b/i)) {
+        const complianceResponse = await this.handleComplianceGuidance(input, context)
+        if (complianceResponse) {
+          this.learnFromInteraction(input, complianceResponse, context, true)
+          return complianceResponse
+        }
+      }
+
+      // 4. Specialty-specific queries
+      if (input.match(/\b(optometry|ophthalmology|primary care|diabetes|hypertension|preventive)\b/i)) {
+        const specialtyResponse = await this.handleSpecialtySpecificQuery(input, context)
+        if (specialtyResponse) {
+          this.learnFromInteraction(input, specialtyResponse, context, true)
+          return specialtyResponse
+        }
+      }
+
+      // 5. Treatment protocol queries
+      if (input.match(/\b(treatment|protocol|management|care plan)\b/i)) {
+        const protocolResponse = await this.handleTreatmentProtocolQuery(input, context)
+        if (protocolResponse) {
+          this.learnFromInteraction(input, protocolResponse, context, true)
+          return protocolResponse
+        }
+      }
+
+      // 6. Documentation template queries
+      if (input.match(/\b(template|documentation|note|chart)\b/i)) {
+        const templateResponse = await this.handleDocumentationTemplateQuery(input, context)
+        if (templateResponse) {
+          this.learnFromInteraction(input, templateResponse, context, true)
+          return templateResponse
+        }
+      }
+
+      // 7. Audit trail queries
+      if (input.match(/\b(audit|compliance|trail|tracking)\b/i)) {
+        const auditResponse = await this.handleAuditTrailQuery(input, context)
+        if (auditResponse) {
+          this.learnFromInteraction(input, auditResponse, context, true)
+          return auditResponse
+        }
+      }
+
+      // Enhanced context-aware response generation
+      const contextualResponse = this.generateContextualResponse(input, context, { intent: 'general', confidence: 0.5 })
+      if (contextualResponse) {
+        this.learnFromInteraction(input, contextualResponse, context, true)
+        return contextualResponse
+      }
+
+      // Fallback to existing enhanced processing
+      return await this.getAgileResponseWithLearning(input, context)
+    } catch (error) {
+      console.error('Error in enhanced processUserInput:', error)
+      return `I apologize, but I encountered an error processing your request. Please try rephrasing your question or contact support if the issue persists.`
+    }
   }
 
   private static isTerminologyQuestion(input: string): boolean {

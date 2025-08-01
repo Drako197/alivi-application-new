@@ -286,6 +286,33 @@ body {
     @apply bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300;
   }
   
+  /* Sidebar Gradient Options (avoiding M.I.L.A.'s blue-to-purple) */
+  
+  /* Option 1: Green Gradient (Healthcare Professional) */
+  .nav-item-active-green {
+    @apply bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-700 dark:text-green-300;
+  }
+  
+  /* Option 2: Amber to Orange Gradient (Warm & Trustworthy) */
+  .nav-item-active-amber {
+    @apply bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 text-amber-700 dark:text-amber-300;
+  }
+  
+  /* Option 3: Teal to Cyan Gradient (Modern Healthcare) */
+  .nav-item-active-teal {
+    @apply bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 text-teal-700 dark:text-teal-300;
+  }
+  
+  /* Option 4: Indigo to Violet Gradient (Professional Tech) */
+  .nav-item-active-indigo {
+    @apply bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/20 text-indigo-700 dark:text-indigo-300;
+  }
+  
+  /* Option 5: Slate to Gray Gradient (Neutral Professional) */
+  .nav-item-active-slate {
+    @apply bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 text-slate-700 dark:text-slate-300;
+  }
+  
   .nav-item-inactive {
     @apply text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700;
   }
@@ -1245,7 +1272,7 @@ body {
 }
 
 .hedis-primary-action-card {
-  @apply bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-8 text-white;
+  @apply bg-gradient-to-r from-teal-500 to-cyan-700 rounded-xl shadow-lg p-8 text-white;
 }
 
 .hedis-primary-action-header {

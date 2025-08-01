@@ -3250,9 +3250,11 @@ function CompletedScreeningView({ screening, onClose }: CompletedScreeningViewPr
 }
 
 export default function HEDISLandingPage({ 
-  onUpdateBreadcrumb 
+  onUpdateBreadcrumb,
+  resetToLanding = 0
 }: { 
-  onUpdateBreadcrumb?: (path: string[]) => void 
+  onUpdateBreadcrumb?: (path: string[]) => void
+  resetToLanding?: number
 }) {
   const { user } = useAuth()
   
@@ -3291,6 +3293,23 @@ export default function HEDISLandingPage({
   const [currentScreeningStep, setCurrentScreeningStep] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
   const [showSuccessAlert, setShowSuccessAlert] = useState(false)
+  
+  // Reset to dashboard when resetToLanding prop changes
+  useEffect(() => {
+    if (resetToLanding > 0) {
+      setCurrentView('dashboard')
+      setCurrentScreeningStep(0)
+      setShowSuccess(false)
+      setShowSuccessAlert(false)
+      setSelectedPatient(null)
+      setCurrentFormId(undefined)
+      setFormMode('new')
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'H.E.D.I.S.'])
+      }
+    }
+  }, [resetToLanding, onUpdateBreadcrumb])
+
   const [screeningFormData, setScreeningFormData] = useState<{
     details: ScreeningDetails
     images: RetinalImages

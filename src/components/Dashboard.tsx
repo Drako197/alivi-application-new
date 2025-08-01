@@ -40,6 +40,7 @@ export default function Dashboard() {
   
   const [breadcrumbPath, setBreadcrumbPath] = useState(['Dashboard'])
   const [picResetCounter, setPICResetCounter] = useState(0)
+  const [hedisResetCounter, setHEDISResetCounter] = useState(0)
   const [mobileSearchTerm, setMobileSearchTerm] = useState('')
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
   
@@ -313,6 +314,12 @@ export default function Dashboard() {
       // Force a re-render of PICLandingPage to reset its internal state
       setPICResetCounter(prev => prev + 1)
     }
+    
+    // If navigating to HEDIS, we need to reset any active forms
+    if (tab === 'hedis') {
+      // Force a re-render of HEDISLandingPage to reset its internal state
+      setHEDISResetCounter(prev => prev + 1)
+    }
   }
 
   const updateBreadcrumbPath = (tab: string) => {
@@ -381,6 +388,7 @@ export default function Dashboard() {
           <div className="dashboard-content">
             <HEDISLandingPage 
               onUpdateBreadcrumb={setBreadcrumbPath}
+              resetToLanding={hedisResetCounter}
             />
           </div>
         )

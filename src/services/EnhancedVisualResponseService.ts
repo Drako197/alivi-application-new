@@ -306,6 +306,12 @@ export class EnhancedVisualResponseService {
       content += `**Related Codes:**\n${additionalInfo.relatedCodes.map(rc => `• ${rc}`).join('\n')}`
     }
 
+    // Enhance actions with code data
+    const enhancedActions = actions ? actions.map(action => ({
+      ...action,
+      data: action.action === 'copy_code' ? { code } : action.data
+    })) : undefined
+
     return this.buildEnhancedResponse(content, {
       visualIndicators: [{
         type: 'status',
@@ -313,7 +319,7 @@ export class EnhancedVisualResponseService {
         color: 'green',
         icon: 'check-circle'
       }],
-      interactiveElements: actions ? this.createInteractiveElements(actions) : undefined,
+      interactiveElements: enhancedActions ? this.createInteractiveElements(enhancedActions) : undefined,
       animations: [{
         type: 'slide-in',
         duration: 300,

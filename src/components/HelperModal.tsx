@@ -799,15 +799,54 @@ export default function HelperModal({
         // Create enhanced response based on the type of response
         let enhancedResponse: EnhancedResponse | undefined
         
-        if (response.includes('**Code:**') || response.includes('**Provider:**')) {
-          // Code lookup response
-          const codeMatch = response.match(/\*\*Code:\s*([^*]+)\*\*/)
-          const descriptionMatch = response.match(/\*\*([^*]+)\*\*\n([^*\n]+)/)
+        // Check for invalid code responses FIRST (before valid code responses)
+        if (response.includes('❌ INVALID') || 
+            (input.toLowerCase().includes('what is') && input.match(/[A-Z]{3}\d{3}/)) ||
+            (input.toLowerCase().includes('help with') && input.match(/[A-Z]{3}\d{3}/))) {
+          // Handle invalid code responses or "What is XYZ123?" / "Help with ABC999" type queries
+          let invalidCode = ''
+          let errorMessage = 'Invalid medical code'
           
-          if (codeMatch && descriptionMatch) {
+          // Try to extract code from response first
+          const responseCodeMatch = response.match(/Code:\s*([A-Z0-9\.]+)/)
+          if (responseCodeMatch) {
+            invalidCode = responseCodeMatch[1]
+            errorMessage = `Invalid medical code: ${invalidCode}`
+          } else {
+            // Fall back to extracting from input
+            const inputCodeMatch = input.match(/([A-Z]{3}\d{3})/)
+            if (inputCodeMatch) {
+              invalidCode = inputCodeMatch[1]
+              errorMessage = `Invalid medical code: ${invalidCode}`
+            }
+          }
+          
+          if (invalidCode || response.includes('❌ INVALID')) {
+            enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
+              errorMessage,
+              ['Check the code spelling', 'Verify it\'s a valid medical code', 'Try searching for similar codes'],
+              [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+            )
+            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+          }
+        } else if (response.includes('**Code:**') || response.includes('**Code Validation Result:**')) {
+          // Extract code from various formats
+          const codeMatch = response.match(/\*\*Code:\s*([^*\n]+)\*\*/) || 
+                           response.match(/Code:\s*([A-Z0-9\.]+)/) ||
+                           response.match(/([A-Z]\d{4}|\d{5}|E\d{2}\.\d{1,2}|Z\d{2}\.\d{1,2})/)
+          
+          // Extract description from various formats
+          const descriptionMatch = response.match(/\*\*Description:\s*([^*\n]+)/) ||
+                                 response.match(/Description:\s*([^\n]+)/) ||
+                                 response.match(/\*\*([^*]+)\*\*\n([^*\n]+)/)
+          
+          if (codeMatch) {
+            const code = codeMatch[1] || codeMatch[0]
+            const description = descriptionMatch ? (descriptionMatch[2] || descriptionMatch[1]) : 'Medical code'
+            
             enhancedResponse = EnhancedVisualResponseService.createCodeLookupResponse(
-              codeMatch[1].trim(),
-              descriptionMatch[2].trim(),
+              code.trim(),
+              description.trim(),
               {
                 category: 'Medical Code',
                 usage: 'Billing and claims',
@@ -819,19 +858,22 @@ export default function HelperModal({
                 { label: 'Show Help', action: 'show_help', style: 'info' }
               ]
             )
+            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
           }
-        } else if (response.includes('**Error:**') || response.includes('**Warning:**')) {
+        } else if (response.includes('**Error:**') || response.includes('**Warning:**') || response.includes('❌ INVALID')) {
           // Error response
           const errorMatch = response.match(/\*\*Error:\s*([^*]+)\*\*/)
           const warningMatch = response.match(/\*\*Warning:\s*([^*]+)\*\*/)
+          const invalidMatch = response.match(/❌ INVALID/)
           
-          if (errorMatch || warningMatch) {
-            const errorText = errorMatch?.[1] || warningMatch?.[1] || 'Unknown error'
+          if (errorMatch || warningMatch || invalidMatch) {
+            const errorText = errorMatch?.[1] || warningMatch?.[1] || 'Invalid code or query'
             enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
               errorText,
               ['Check your input', 'Verify the information', 'Try a different approach'],
               [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
             )
+            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
           }
         } else if (response.includes('**Help:**') || response.includes('I can help')) {
           // Help response
@@ -844,19 +886,28 @@ export default function HelperModal({
               { label: 'Provider Search', action: 'search_provider', style: 'info' }
             ]
           )
+          addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
         } else {
-          // Regular response with status
-          enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
-            response,
-            'info',
-            [
-              { label: 'Search Codes', action: 'search_code', style: 'primary' },
-              { label: 'Get Help', action: 'show_help', style: 'info' }
-            ]
-          )
+          // Check if this looks like a general/contextual response that shouldn't be enhanced
+          if (response.includes('You\'re on **Step') || 
+              response.includes('This step collects') ||
+              response.includes('All fields marked') ||
+              response.includes('Enhanced Response')) {
+            // This is a contextual response, don't enhance it
+            addMessage('assistant', response, 'fade-in')
+          } else {
+            // Regular response with status
+            enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+              response,
+              'info',
+              [
+                { label: 'Search Codes', action: 'search_code', style: 'primary' },
+                { label: 'Get Help', action: 'show_help', style: 'info' }
+              ]
+            )
+            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+          }
         }
-        
-        addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
       }
     } catch (error) {
       console.error('Error processing message:', error)
@@ -994,6 +1045,7 @@ export default function HelperModal({
 
   // Render interactive elements
   const renderInteractiveElement = (element: InteractiveElement, index: number) => {
+    
     const styleClasses = {
       primary: 'bg-blue-500 hover:bg-blue-600 text-white',
       secondary: 'bg-gray-500 hover:bg-gray-600 text-white',
@@ -1003,7 +1055,7 @@ export default function HelperModal({
       info: 'bg-blue-500 hover:bg-blue-600 text-white'
     }
 
-    return (
+    const buttonElement = (
       <button
         key={index}
         onClick={() => handleInteractiveElementClick(element)}
@@ -1015,33 +1067,69 @@ export default function HelperModal({
         {element.label}
       </button>
     )
+    
+    return buttonElement
   }
 
   // Handle interactive element clicks
-  const handleInteractiveElementClick = (element: InteractiveElement) => {
-    console.log('Interactive element clicked:', element)
+  const handleInteractiveElementClick = async (element: InteractiveElement) => {
+    
     // Handle different action types
     switch (element.action) {
       case 'search_code':
         // Trigger code search
+        addMessage('user', 'Search for medical codes', 'fade-in')
+        await processUserMessage('search medical codes')
         break
+        
       case 'show_help':
         // Show help for the topic
+        addMessage('user', 'Show help', 'fade-in')
+        await processUserMessage('help with medical billing')
         break
+        
       case 'copy_code':
         // Copy code to clipboard
         if (element.data?.code) {
-          navigator.clipboard.writeText(element.data.code)
+          try {
+            await navigator.clipboard.writeText(element.data.code)
+            addMessage('assistant', `✅ Code "${element.data.code}" copied to clipboard!`, 'fade-in')
+          } catch (error) {
+            addMessage('assistant', `❌ Failed to copy code. Please copy manually: ${element.data.code}`, 'fade-in')
+          }
+        } else {
+          addMessage('assistant', '❌ No code available to copy', 'fade-in')
         }
         break
+        
+      case 'try_again':
+        // Retry the last action
+        addMessage('user', 'Try again', 'fade-in')
+        await processUserMessage('try again')
+        break
+        
+      case 'retry':
+        // Retry the last action
+        addMessage('user', 'Retry', 'fade-in')
+        await processUserMessage('retry')
+        break
+        
+      case 'search_provider':
+        // Search for providers
+        addMessage('user', 'Search for providers', 'fade-in')
+        await processUserMessage('search providers')
+        break
+        
       default:
         // Handle other actions
+        addMessage('assistant', `Action "${element.action}" is not yet implemented.`, 'fade-in')
         break
     }
   }
 
   // Render enhanced response
   const renderEnhancedResponse = (enhancedResponse: EnhancedResponse) => {
+    
     return (
       <div className="space-y-3">
         {/* Rich text content */}
@@ -1055,7 +1143,9 @@ export default function HelperModal({
         {enhancedResponse.visualIndicators && enhancedResponse.visualIndicators.length > 0 && (
           <div className="flex items-center space-x-3">
             {enhancedResponse.visualIndicators.map((indicator, index) => 
-              renderVisualIndicator(indicator)
+              <div key={`indicator-${index}`}>
+                {renderVisualIndicator(indicator)}
+              </div>
             )}
           </div>
         )}

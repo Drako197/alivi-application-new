@@ -213,11 +213,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
             <div
               key={action.id}
               onClick={() => handleActionClick(action)}
-              className={`pic-action-card cursor-pointer ${
-                index === 0 ? 'pic-frequent-action-v1' : 
-                index === 1 ? 'pic-frequent-action-v2' : 
-                'pic-frequent-action-v3'
-              }`}
+              className="pic-action-card pic-frequent-action-v1 cursor-pointer"
             >
               <div className="pic-action-icon">
                 {getFrequentIcon(action.icon)}

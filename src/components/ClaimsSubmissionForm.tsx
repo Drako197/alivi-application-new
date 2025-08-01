@@ -3782,17 +3782,22 @@ export default function ClaimsSubmissionForm({
                       <Icon name="plus" size={16} />
                       Add New Line
                     </button>
-                    <button
-                      type="button"
-                      className="btn-secondary flex items-center gap-2"
-                    >
-                      <Icon name="refresh-cw" size={16} />
-                      Retrieve and Recalculate
-                    </button>
                   </div>
                   
-                  {/* Calculated Totals */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                  {/* Retrieve and Recalculate with Calculated Totals */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+                    {/* Retrieve and Recalculate Button - spans 2 columns */}
+                    <div className="md:col-span-2">
+                      <button
+                        type="button"
+                        className="btn-secondary flex items-center gap-2 w-full h-full min-h-[42px]"
+                      >
+                        <Icon name="refresh-cw" size={16} />
+                        Retrieve and Recalculate
+                      </button>
+                    </div>
+                    
+                    {/* Total Charges - 1 column */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Total Charges
@@ -3811,6 +3816,8 @@ export default function ClaimsSubmissionForm({
                         />
                       </div>
                     </div>
+                    
+                    {/* Total Allowed - 1 column */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Total Allowed

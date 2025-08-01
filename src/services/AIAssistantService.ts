@@ -134,53 +134,8 @@ export class AIAssistantService {
       })
     }
 
-    // 1. Handle specific code lookups (ICD-10, CPT, HCPCS, Drug Codes, Lab Codes)
-    if (this.isSpecificCodeLookup(lowerInput)) {
-      return await this.handleSpecificCodeLookup(lowerInput)
-    }
-
-    // 2. Handle medical terminology
-    if (this.isMedicalTerminology(lowerInput)) {
-      return await this.handleMedicalTerminology(lowerInput)
-    }
-
-    // 3. Handle provider searches
-    if (this.isProviderSearch(lowerInput)) {
-      return await this.handleProviderSearch(lowerInput)
-    }
-
-    // 4. Handle eligibility checks
-    if (this.isEligibilityCheck(lowerInput)) {
-      return await this.handleEligibilityCheck(lowerInput)
-    }
-
-    // 5. Handle claims submission
-    if (this.isClaimsSubmission(lowerInput)) {
-      return await this.handleClaimsSubmission(lowerInput)
-    }
-
-    // 6. Handle workflow assistance
-    if (this.isWorkflowAssistance(lowerInput)) {
-      return await this.handleWorkflowAssistance(lowerInput, context)
-    }
-
-    // 7. Handle mobile-specific requests
-    if (this.isMobileRequest(lowerInput)) {
-      return await this.handleMobileRequest(lowerInput)
-    }
-
-    // 8. Handle general medical billing questions
-    if (this.isGeneralQuestion(lowerInput)) {
-      return await this.handleGeneralQuestion(lowerInput)
-    }
-
-    // 9. Handle specialty-specific questions
-    if (this.isSpecialtyQuestion(lowerInput)) {
-      return await this.handleSpecialtyQuestion(lowerInput)
-    }
-
-    // 10. Default response with enhanced capabilities
-    return this.getEnhancedDefaultResponse(lowerInput, context)
+    // Use the new agile response system with confidence scoring
+    return await this.getAgileResponseWithLearning(lowerInput, context)
   }
 
   private static isTerminologyQuestion(input: string): boolean {
@@ -819,6 +774,768 @@ export class AIAssistantService {
     }
 
     return response
+  }
+
+  // Enhanced intent recognition with confidence scoring
+  private static analyzeIntent(input: string): { intent: string; confidence: number; keywords: string[] } {
+    const lowerInput = input.toLowerCase()
+    const intents = [
+      { name: 'code_lookup', keywords: ['code', 'icd', 'cpt', 'hcpcs', 'diagnosis', 'procedure'], confidence: 0 },
+      { name: 'terminology', keywords: ['what is', 'define', 'meaning', 'term', 'abbreviation'], confidence: 0 },
+      { name: 'provider_search', keywords: ['provider', 'doctor', 'physician', 'npi', 'find'], confidence: 0 },
+      { name: 'eligibility', keywords: ['eligibility', 'insurance', 'coverage', 'benefits'], confidence: 0 },
+      { name: 'claims', keywords: ['claim', 'submit', 'billing', 'reimbursement'], confidence: 0 },
+      { name: 'workflow', keywords: ['workflow', 'step', 'form', 'process', 'guidance'], confidence: 0 },
+      { name: 'mobile', keywords: ['mobile', 'touch', 'voice', 'offline'], confidence: 0 },
+      { name: 'general', keywords: ['what', 'how', 'why', 'when', 'help'], confidence: 0 }
+    ]
+
+    // Calculate confidence scores
+    intents.forEach(intent => {
+      intent.confidence = intent.keywords.reduce((score, keyword) => {
+        if (lowerInput.includes(keyword)) {
+          // Exact matches get higher scores
+          if (lowerInput.includes(` ${keyword} `) || lowerInput.startsWith(keyword) || lowerInput.endsWith(keyword)) {
+            return score + 2
+          }
+          return score + 1
+        }
+        return score
+      }, 0)
+    })
+
+    // Find the highest confidence intent
+    const bestIntent = intents.reduce((best, current) => 
+      current.confidence > best.confidence ? current : best
+    )
+
+    // Extract relevant keywords
+    const keywords = bestIntent.keywords.filter(keyword => lowerInput.includes(keyword))
+
+    return {
+      intent: bestIntent.name,
+      confidence: bestIntent.confidence,
+      keywords
+    }
+  }
+
+  // Advanced semantic analysis for better intent recognition
+  private static analyzeSemanticContext(input: string, context: any): { semanticIntent: string; confidence: number; entities: string[] } {
+    const lowerInput = input.toLowerCase()
+    const entities: string[] = []
+    
+    // Extract medical entities
+    const medicalTerms = ['diabetes', 'hypertension', 'cataract', 'glaucoma', 'macular degeneration', 'retinal detachment']
+    const codes = ['e11.9', 'i10', 'h25.9', 'h40.9', 'h35.3', 'h33.2']
+    const procedures = ['eye exam', 'dilation', 'fundus photography', 'tonometry', 'visual field']
+    
+    // Check for medical entities
+    medicalTerms.forEach(term => {
+      if (lowerInput.includes(term)) entities.push(term)
+    })
+    
+    codes.forEach(code => {
+      if (lowerInput.includes(code)) entities.push(code)
+    })
+    
+    procedures.forEach(proc => {
+      if (lowerInput.includes(proc)) entities.push(proc)
+    })
+    
+    // Determine semantic intent based on entities and context
+    let semanticIntent = 'general'
+    let confidence = 0
+    
+    if (entities.length > 0) {
+      if (entities.some(e => codes.includes(e))) {
+        semanticIntent = 'code_specific'
+        confidence = 3
+      } else if (entities.some(e => medicalTerms.includes(e))) {
+        semanticIntent = 'condition_specific'
+        confidence = 2
+      } else if (entities.some(e => procedures.includes(e))) {
+        semanticIntent = 'procedure_specific'
+        confidence = 2
+      }
+    }
+    
+    return { semanticIntent, confidence, entities }
+  }
+
+  // Dynamic response generation based on user behavior patterns
+  private static generateDynamicResponse(input: string, context: any, semanticAnalysis: any): string {
+    const { semanticIntent, entities } = semanticAnalysis
+    
+    // User behavior pattern analysis
+    const userPatterns = this.analyzeUserPatterns(context)
+    
+    // Generate response based on semantic intent and user patterns
+    switch (semanticIntent) {
+      case 'code_specific':
+        return this.generateCodeSpecificResponse(entities, userPatterns, context)
+      case 'condition_specific':
+        return this.generateConditionSpecificResponse(entities, userPatterns, context)
+      case 'procedure_specific':
+        return this.generateProcedureSpecificResponse(entities, userPatterns, context)
+      default:
+        return this.generatePatternBasedResponse(input, userPatterns, context)
+    }
+  }
+
+  private static analyzeUserPatterns(context: any): any {
+    const patterns = {
+      formUsage: this.getFormUsagePattern(context),
+      fieldFocus: this.getFieldFocusPattern(context),
+      timeOfDay: this.getTimeOfDayPattern(),
+      interactionFrequency: this.getInteractionFrequency(context)
+    }
+    
+    return patterns
+  }
+
+  private static getFormUsagePattern(context: any): string {
+    if (!context.formType) return 'unknown'
+    
+    const formPrefs = this.userPreferences.get(context.formType)
+    if (formPrefs && formPrefs.interactionCount > 5) {
+      return 'frequent_user'
+    } else if (formPrefs && formPrefs.interactionCount > 2) {
+      return 'moderate_user'
+    } else {
+      return 'new_user'
+    }
+  }
+
+  private static getFieldFocusPattern(context: any): string {
+    if (!context.currentField) return 'unknown'
+    
+    const fieldInteractions = this.conversationMemory
+      .filter(memory => memory.context.currentField === context.currentField)
+      .length
+    
+    if (fieldInteractions > 3) return 'field_expert'
+    if (fieldInteractions > 1) return 'field_familiar'
+    return 'field_new'
+  }
+
+  private static getTimeOfDayPattern(): string {
+    const hour = new Date().getHours()
+    if (hour >= 9 && hour <= 11) return 'morning_peak'
+    if (hour >= 13 && hour <= 15) return 'afternoon_peak'
+    if (hour >= 16 && hour <= 18) return 'evening_peak'
+    return 'off_peak'
+  }
+
+  private static getInteractionFrequency(context: any): string {
+    const recentInteractions = this.conversationMemory
+      .filter(memory => 
+        memory.timestamp > new Date(Date.now() - 30 * 60 * 1000) // Last 30 minutes
+      ).length
+    
+    if (recentInteractions > 5) return 'high_frequency'
+    if (recentInteractions > 2) return 'moderate_frequency'
+    return 'low_frequency'
+  }
+
+  private static generateCodeSpecificResponse(entities: string[], patterns: any, context: any): string {
+    const codes = entities.filter(e => /^[a-z]\d+\.\d+$/i.test(e))
+    
+    if (codes.length > 0) {
+      const code = codes[0].toUpperCase()
+      return `I found the **${code}** code you're asking about. This is a commonly used diagnosis code in medical billing. Here's what you need to know:\n\n**Code Details:**\n• **${code}** - ${this.getCodeDescription(code)}\n• **Category:** ${this.getCodeCategory(code)}\n• **Usage:** ${this.getCodeUsage(code)}\n\n**Billing Context:** This code is frequently used in ${context.formType || 'medical billing'} and is essential for proper claim processing.`
+    }
+    
+    return this.generateFallbackCodeResponse(entities, patterns, context)
+  }
+
+  private static generateConditionSpecificResponse(entities: string[], patterns: any, context: any): string {
+    const conditions = entities.filter(e => ['diabetes', 'hypertension', 'cataract', 'glaucoma'].includes(e))
+    
+    if (conditions.length > 0) {
+      const condition = conditions[0]
+      return `I understand you're asking about **${condition}**. This is a common condition in medical billing with specific coding requirements:\n\n**Condition:** ${condition}\n**Primary Codes:** ${this.getConditionCodes(condition)}\n**HEDIS Impact:** ${this.getHEDISImpact(condition)}\n**Billing Considerations:** ${this.getBillingConsiderations(condition)}\n\nWould you like specific codes for ${condition} or help with related billing procedures?`
+    }
+    
+    return this.generateFallbackConditionResponse(entities, patterns, context)
+  }
+
+  private static generateProcedureSpecificResponse(entities: string[], patterns: any, context: any): string {
+    const procedures = entities.filter(e => ['eye exam', 'dilation', 'fundus photography'].includes(e))
+    
+    if (procedures.length > 0) {
+      const procedure = procedures[0]
+      return `I can help you with **${procedure}** billing. This procedure has specific coding and documentation requirements:\n\n**Procedure:** ${procedure}\n**Common CPT Codes:** ${this.getProcedureCodes(procedure)}\n**Documentation Requirements:** ${this.getDocumentationRequirements(procedure)}\n**Billing Tips:** ${this.getBillingTips(procedure)}\n\nWhat specific aspect of ${procedure} billing do you need help with?`
+    }
+    
+    return this.generateFallbackProcedureResponse(entities, patterns, context)
+  }
+
+  private static generatePatternBasedResponse(input: string, patterns: any, context: any): string {
+    // Generate response based on user patterns
+    if (patterns.formUsage === 'frequent_user') {
+      return `I notice you're a frequent user of ${context.formType || 'our forms'}. Let me provide you with advanced tips and shortcuts:\n\n**Pro Tips for Frequent Users:**\n• Use keyboard shortcuts for faster navigation\n• Save common codes as favorites\n• Enable auto-complete for frequently used fields\n\nWhat specific area would you like to optimize?`
+    }
+    
+    if (patterns.fieldFocus === 'field_expert') {
+      return `You seem very familiar with the ${context.currentField} field. Here are some advanced features you might not know about:\n\n**Advanced ${context.currentField} Features:**\n• Bulk import capabilities\n• Validation rules customization\n• Integration with external databases\n\nWould you like to explore these advanced features?`
+    }
+    
+    if (patterns.interactionFrequency === 'high_frequency') {
+      return `I see you're working intensively on forms right now. Here are some efficiency tips:\n\n**Efficiency Tips:**\n• Use tab navigation for faster field switching\n• Enable auto-save to prevent data loss\n• Use the bulk operations feature for multiple entries\n\nHow can I help you work more efficiently?`
+    }
+    
+    return this.getEnhancedDefaultResponse(input, context)
+  }
+
+  // Helper methods for code and condition information
+  private static getCodeDescription(code: string): string {
+    const descriptions: { [key: string]: string } = {
+      'E11.9': 'Type 2 diabetes mellitus without complications',
+      'I10': 'Essential (primary) hypertension',
+      'H25.9': 'Age-related cataract, unspecified',
+      'H40.9': 'Glaucoma, unspecified',
+      'H35.3': 'Macular degeneration',
+      'H33.2': 'Retinal detachment'
+    }
+    return descriptions[code] || 'Medical diagnosis code'
+  }
+
+  private static getCodeCategory(code: string): string {
+    if (code.startsWith('E')) return 'Endocrine, nutritional and metabolic diseases'
+    if (code.startsWith('I')) return 'Diseases of the circulatory system'
+    if (code.startsWith('H')) return 'Diseases of the eye and adnexa'
+    return 'Medical diagnosis'
+  }
+
+  private static getCodeUsage(code: string): string {
+    if (code.startsWith('E11')) return 'Diabetes care and HEDIS measures'
+    if (code.startsWith('I10')) return 'Cardiovascular care and quality measures'
+    if (code.startsWith('H25')) return 'Ophthalmology and cataract care'
+    return 'General medical billing'
+  }
+
+  private static getConditionCodes(condition: string): string {
+    const codes: { [key: string]: string } = {
+      'diabetes': 'E11.9, E11.21, E11.22, Z79.4, Z79.84',
+      'hypertension': 'I10, I11.9, I12.9, Z79.4',
+      'cataract': 'H25.9, 66984, 66985, 66986',
+      'glaucoma': 'H40.9, 92285, 92286, 92287'
+    }
+    return codes[condition] || 'Varies by specific condition'
+  }
+
+  private static getHEDISImpact(condition: string): string {
+    const impacts: { [key: string]: string } = {
+      'diabetes': 'Diabetes care measures (HbA1c, eye exam, foot exam)',
+      'hypertension': 'Cardiovascular care measures (BP control)',
+      'cataract': 'Preventive care and quality measures',
+      'glaucoma': 'Specialty care and monitoring measures'
+    }
+    return impacts[condition] || 'Quality measure impact varies'
+  }
+
+  private static getBillingConsiderations(condition: string): string {
+    const considerations: { [key: string]: string } = {
+      'diabetes': 'Requires regular monitoring codes, preventive care codes, and medication management',
+      'hypertension': 'Includes monitoring codes, medication management, and cardiovascular risk assessment',
+      'cataract': 'Surgical codes, pre-op evaluation, and post-op care codes',
+      'glaucoma': 'Specialty evaluation codes, monitoring codes, and treatment codes'
+    }
+    return considerations[condition] || 'Standard medical billing procedures apply'
+  }
+
+  private static getProcedureCodes(procedure: string): string {
+    const codes: { [key: string]: string } = {
+      'eye exam': '92310, 92285, 92250, 92227',
+      'dilation': '92285, 92286, 92287',
+      'fundus photography': '92250, 92227, 92228'
+    }
+    return codes[procedure] || 'Varies by specific procedure'
+  }
+
+  private static getDocumentationRequirements(procedure: string): string {
+    const requirements: { [key: string]: string } = {
+      'eye exam': 'Comprehensive exam documentation, medical necessity, and diagnosis codes',
+      'dilation': 'Medical necessity documentation, patient consent, and follow-up plan',
+      'fundus photography': 'Medical necessity, image documentation, and interpretation report'
+    }
+    return requirements[procedure] || 'Standard medical documentation requirements'
+  }
+
+  private static getBillingTips(procedure: string): string {
+    const tips: { [key: string]: string } = {
+      'eye exam': 'Use appropriate evaluation codes, document medical necessity, and include diagnosis codes',
+      'dilation': 'Document medical necessity, use correct modifiers, and ensure proper coding',
+      'fundus photography': 'Use imaging codes with interpretation, document medical necessity, and include diagnosis'
+    }
+    return tips[procedure] || 'Follow standard medical billing best practices'
+  }
+
+  // Fallback response generators
+  private static generateFallbackCodeResponse(entities: string[], patterns: any, context: any): string {
+    return `I can help you find specific medical codes. Based on your context, here are some relevant code categories:\n\n**Common Code Types:**\n• **ICD-10 Diagnosis Codes** - For patient conditions\n• **CPT Procedure Codes** - For medical services\n• **HCPCS Codes** - For supplies and equipment\n\nWhat specific type of code are you looking for?`
+  }
+
+  private static generateFallbackConditionResponse(entities: string[], patterns: any, context: any): string {
+    return `I can help you with condition-specific billing and coding. Common conditions include:\n\n**Frequent Conditions:**\n• **Diabetes** - E11.9, E11.21, E11.22\n• **Hypertension** - I10, I11.9, I12.9\n• **Cataracts** - H25.9, 66984, 66985\n• **Glaucoma** - H40.9, 92285, 92286\n\nWhat specific condition are you working with?`
+  }
+
+  private static generateFallbackProcedureResponse(entities: string[], patterns: any, context: any): string {
+    return `I can help you with procedure-specific billing. Common procedures include:\n\n**Frequent Procedures:**\n• **Eye Exams** - 92310, 92285, 92250\n• **Dilation** - 92285, 92286, 92287\n• **Fundus Photography** - 92250, 92227, 92228\n\nWhat specific procedure are you billing for?`
+  }
+
+  // Enhanced learning and conversation memory
+  private static conversationMemory: Array<{
+    userInput: string
+    response: string
+    context: any
+    timestamp: Date
+    success: boolean
+  }> = []
+
+  private static userPreferences: Map<string, any> = new Map()
+
+  // Learn from user interactions
+  private static learnFromInteraction(userInput: string, response: string, context: any, success: boolean) {
+    this.conversationMemory.push({
+      userInput,
+      response,
+      context,
+      timestamp: new Date(),
+      success
+    })
+
+    // Keep only last 50 interactions to prevent memory bloat
+    if (this.conversationMemory.length > 50) {
+      this.conversationMemory = this.conversationMemory.slice(-50)
+    }
+
+    // Learn user preferences
+    if (context.formType) {
+      const formPrefs = this.userPreferences.get(context.formType) || {}
+      formPrefs.lastUsed = new Date()
+      formPrefs.interactionCount = (formPrefs.interactionCount || 0) + 1
+      this.userPreferences.set(context.formType, formPrefs)
+    }
+  }
+
+  // Get personalized suggestions based on user history
+  private static getPersonalizedSuggestions(context: any): string[] {
+    const suggestions: string[] = []
+
+    // Based on form type preferences
+    if (context.formType) {
+      const formPrefs = this.userPreferences.get(context.formType)
+      if (formPrefs && formPrefs.interactionCount > 3) {
+        suggestions.push(`I notice you use ${context.formType} forms frequently. I can help with common issues in this form type.`)
+      }
+    }
+
+    // Based on recent successful interactions
+    const recentSuccessful = this.conversationMemory
+      .filter(memory => memory.success && memory.context.formType === context.formType)
+      .slice(-3)
+
+    if (recentSuccessful.length > 0) {
+      const commonPatterns = this.analyzeCommonPatterns(recentSuccessful)
+      suggestions.push(...commonPatterns)
+    }
+
+    return suggestions
+  }
+
+  private static analyzeCommonPatterns(memories: any[]): string[] {
+    const patterns: string[] = []
+    const keywords = new Map<string, number>()
+
+    memories.forEach(memory => {
+      const words = memory.userInput.toLowerCase().split(' ')
+      words.forEach(word => {
+        if (word.length > 3) {
+          keywords.set(word, (keywords.get(word) || 0) + 1)
+        }
+      })
+    })
+
+    const topKeywords = Array.from(keywords.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([word]) => word)
+
+    if (topKeywords.length > 0) {
+      patterns.push(`You often ask about: ${topKeywords.join(', ')}`)
+    }
+
+    return patterns
+  }
+
+  // Enhanced response with learning
+  private static async getAgileResponseWithLearning(input: string, context: any): Promise<string> {
+    const intent = this.analyzeIntent(input)
+    let response: string
+
+    // Get response using agile system
+    response = await this.getAgileResponse(input, context)
+
+    // Learn from this interaction
+    const success = !this.isGenericResponse(response)
+    this.learnFromInteraction(input, response, context, success)
+
+    // Add personalized suggestions if available
+    const personalizedSuggestions = this.getPersonalizedSuggestions(context)
+    if (personalizedSuggestions.length > 0 && success) {
+      response += '\n\n💡 **Personalized Tip**: ' + personalizedSuggestions[0]
+    }
+
+    return response
+  }
+
+  // Enhanced response with multiple fallback strategies
+  private static async getAgileResponse(input: string, context: any): Promise<string> {
+    const intent = this.analyzeIntent(input)
+    
+    // Try semantic analysis first (most specific)
+    const semanticAnalysis = this.analyzeSemanticContext(input, context)
+    if (semanticAnalysis.confidence > 0) {
+      const dynamicResponse = this.generateDynamicResponse(input, context, semanticAnalysis)
+      if (dynamicResponse && !this.isGenericResponse(dynamicResponse)) {
+        return dynamicResponse
+      }
+    }
+    
+    // Try contextual response second
+    const contextualResponse = this.generateContextualResponse(input, context, intent)
+    if (contextualResponse && !this.isGenericResponse(contextualResponse)) {
+      return contextualResponse
+    }
+    
+    // High confidence responses
+    if (intent.confidence >= 2) {
+      switch (intent.intent) {
+        case 'code_lookup':
+          return await this.handleSpecificCodeLookup(input)
+        case 'terminology':
+          return await this.handleMedicalTerminology(input)
+        case 'provider_search':
+          return await this.handleProviderSearch(input)
+        case 'eligibility':
+          return await this.handleEligibilityCheck(input)
+        case 'claims':
+          return await this.handleClaimsSubmission(input)
+        case 'workflow':
+          return await this.handleWorkflowAssistance(input, context)
+        case 'mobile':
+          return await this.handleMobileRequest(input)
+        default:
+          return await this.handleGeneralQuestion(input)
+      }
+    }
+
+    // Medium confidence - try primary intent first, then fallbacks
+    if (intent.confidence >= 1) {
+      try {
+        const primaryResponse = await this.tryPrimaryIntent(intent.intent, input, context)
+        if (primaryResponse && !this.isGenericResponse(primaryResponse)) {
+          return primaryResponse
+        }
+      } catch (error) {
+        // Continue to fallback strategies
+      }
+    }
+
+    // Low confidence - use multiple fallback strategies
+    return await this.tryMultipleStrategies(input, context, intent.keywords)
+  }
+
+  private static async tryPrimaryIntent(intent: string, input: string, context: any): Promise<string | null> {
+    try {
+      switch (intent) {
+        case 'code_lookup':
+          return await this.handleSpecificCodeLookup(input)
+        case 'terminology':
+          return await this.handleMedicalTerminology(input)
+        case 'provider_search':
+          return await this.handleProviderSearch(input)
+        case 'eligibility':
+          return await this.handleEligibilityCheck(input)
+        case 'claims':
+          return await this.handleClaimsSubmission(input)
+        case 'workflow':
+          return await this.handleWorkflowAssistance(input, context)
+        case 'mobile':
+          return await this.handleMobileRequest(input)
+        default:
+          return await this.handleGeneralQuestion(input)
+      }
+    } catch (error) {
+      return null
+    }
+  }
+
+  private static async tryMultipleStrategies(input: string, context: any, keywords: string[]): Promise<string> {
+    const strategies = [
+      () => this.handleSpecificCodeLookup(input),
+      () => this.handleMedicalTerminology(input),
+      () => this.handleProviderSearch(input),
+      () => this.handleEligibilityCheck(input),
+      () => this.handleClaimsSubmission(input),
+      () => this.handleWorkflowAssistance(input, context),
+      () => this.handleMobileRequest(input),
+      () => this.handleGeneralQuestion(input)
+    ]
+
+    // Try each strategy until we get a non-generic response
+    for (const strategy of strategies) {
+      try {
+        const response = await strategy()
+        if (response && !this.isGenericResponse(response)) {
+          return response
+        }
+      } catch (error) {
+        continue
+      }
+    }
+
+    // If all strategies fail, provide contextual help
+    return this.getContextualHelp(input, context, keywords)
+  }
+
+  private static isGenericResponse(response: string): boolean {
+    const genericPhrases = [
+      "I'd be happy to help",
+      "I'd be delighted to help",
+      "I can assist with",
+      "What would you like to know",
+      "How can I help"
+    ]
+    return genericPhrases.some(phrase => response.toLowerCase().includes(phrase.toLowerCase()))
+  }
+
+  private static getContextualHelp(input: string, context: any, keywords: string[]): string {
+    let help = "I understand you're asking about medical billing. Let me help you more specifically:\n\n"
+
+    // Add context-specific suggestions
+    if (context.formType) {
+      help += `**Current Form**: ${context.formType}\n`
+      if (context.currentField) {
+        help += `**Current Field**: ${context.currentField}\n`
+      }
+      help += "\n"
+    }
+
+    // Add keyword-based suggestions
+    if (keywords.length > 0) {
+      help += `**Based on your keywords**: ${keywords.join(', ')}\n\n`
+    }
+
+    help += "**I can help with**:\n"
+    help += "• **Codes**: Ask about specific ICD-10, CPT, or HCPCS codes\n"
+    help += "• **Terminology**: Ask 'What is [term]?' for definitions\n"
+    help += "• **Providers**: Search for doctors by name or specialty\n"
+    help += "• **Eligibility**: Check insurance coverage\n"
+    help += "• **Claims**: Help with billing and submission\n"
+    help += "• **Workflow**: Step-by-step form guidance\n"
+    help += "• **Mobile**: Touch, voice, and offline features\n\n"
+
+    help += "**Try asking**:\n"
+    help += "• 'What is the code for diabetes?'\n"
+    help += "• 'Define PCP'\n"
+    help += "• 'Find a cardiologist'\n"
+    help += "• 'Help with step 3'\n"
+
+    return help
+  }
+
+  // Enhanced context-aware response generation
+  private static generateContextualResponse(input: string, context: any, intent: any): string {
+    const lowerInput = input.toLowerCase()
+    
+    // Form-specific contextual responses
+    if (context.formType) {
+      const formResponses = this.getFormSpecificResponses(context.formType, context.currentField, lowerInput)
+      if (formResponses) return formResponses
+    }
+
+    // Field-specific contextual responses
+    if (context.currentField) {
+      const fieldResponses = this.getFieldSpecificResponses(context.currentField, lowerInput, context)
+      if (fieldResponses) return fieldResponses
+    }
+
+    // Step-specific contextual responses
+    if (context.currentStep) {
+      const stepResponses = this.getStepSpecificResponses(context.currentStep, lowerInput, context)
+      if (stepResponses) return stepResponses
+    }
+
+    // Intent-specific enhanced responses
+    return this.getIntentSpecificResponse(intent, lowerInput, context)
+  }
+
+  private static getFormSpecificResponses(formType: string, currentField: string, input: string): string | null {
+    const formResponses = {
+      'claims_submission': {
+        'providerId': `For the **Provider ID** field, you'll need the National Provider Identifier (NPI) of the healthcare provider. This is a unique 10-digit identification number. You can find this on the provider's business card, billing statements, or by searching our provider directory.`,
+        'subscriberId': `The **Subscriber ID** is the member's insurance identification number. This is typically found on the patient's insurance card. It's usually a combination of letters and numbers, and may be called "Member ID" or "Policy Number" on some cards.`,
+        'serviceDateFrom': `The **Service Date From** should be the date when the medical service was first provided. For ongoing treatments, use the date of the first service in the series.`,
+        'diagnosisCodes': `**Diagnosis Codes** (ICD-10) describe the patient's condition or reason for the visit. The primary diagnosis should be listed first. Common codes include E11.9 for diabetes, Z00.00 for routine checkup, and Z51.11 for chemotherapy.`
+      },
+      'patient_eligibility': {
+        'memberId': `The **Member ID** is the unique identifier assigned by the insurance company. This can be found on the patient's insurance card, often labeled as "Member ID," "Subscriber ID," or "Policy Number."`,
+        'dateOfBirth': `Enter the patient's **Date of Birth** in MM/DD/YYYY format. This is used to verify eligibility and ensure proper claim processing.`,
+        'effectiveDate': `The **Effective Date** is when the insurance coverage began. This is important for determining if services are covered under the current policy.`
+      },
+      'hedis_screening': {
+        'screeningType': `**Screening Type** determines which HEDIS measures to track. Common types include diabetes care, cardiovascular disease, and preventive care measures.`,
+        'measurementYear': `The **Measurement Year** is the calendar year for which HEDIS data is being collected. This affects which version of HEDIS specifications to use.`
+      }
+    }
+
+    const formData = formResponses[formType as keyof typeof formResponses]
+    if (formData && currentField && formData[currentField as keyof typeof formData]) {
+      return formData[currentField as keyof typeof formData] as string
+    }
+
+    return null
+  }
+
+  private static getFieldSpecificResponses(fieldName: string, input: string, context: any): string | null {
+    const fieldResponses = {
+      'diagnosisCodes': this.getDiagnosisCodeResponse(input, context),
+      'procedureCodes': this.getProcedureCodeResponse(input, context),
+      'providerId': this.getProviderIdResponse(input, context),
+      'subscriberId': this.getSubscriberIdResponse(input, context),
+      'dateOfBirth': this.getDateOfBirthResponse(input, context),
+      'serviceDateFrom': this.getServiceDateResponse(input, context),
+      'serviceDateTo': this.getServiceDateResponse(input, context)
+    }
+
+    return fieldResponses[fieldName as keyof typeof fieldResponses] || null
+  }
+
+  private static getDiagnosisCodeResponse(input: string, context: any): string {
+    if (input.includes('diabetes')) {
+      return `For **diabetes-related diagnosis codes**, here are the most common ICD-10 codes:\n\n**Primary Codes:**\n• **E11.9** - Type 2 diabetes without complications (most common)\n• **E11.21** - Type 2 diabetes with diabetic nephropathy\n• **E11.22** - Type 2 diabetes with diabetic chronic kidney disease\n\n**Secondary Codes:**\n• **Z79.4** - Long-term use of insulin\n• **Z79.84** - Long-term use of oral hypoglycemic drugs\n• **Z00.00** - Encounter for general adult medical examination\n\n**HEDIS Impact:** These codes are essential for diabetes care measures and quality reporting.`
+    }
+    
+    if (input.includes('hypertension') || input.includes('high blood pressure')) {
+      return `For **hypertension diagnosis codes**, use these common ICD-10 codes:\n\n**Primary Codes:**\n• **I10** - Essential (primary) hypertension\n• **I11.9** - Hypertensive heart disease without heart failure\n• **I12.9** - Hypertensive chronic kidney disease\n\n**Secondary Codes:**\n• **Z79.4** - Long-term drug therapy for hypertension\n• **Z00.00** - Preventive care encounter\n\n**Quality Impact:** These codes support cardiovascular HEDIS measures and quality reporting.`
+    }
+
+    return null
+  }
+
+  private static getProcedureCodeResponse(input: string, context: any): string {
+    if (input.includes('eye') || input.includes('vision') || input.includes('ophthalmology')) {
+      return `For **ophthalmology procedure codes**, here are common CPT codes:\n\n• **92310** - Prescription of optical and physical characteristics of contact lens\n• **92285** - External ocular photography with interpretation\n• **92250** - Fundus photography with interpretation\n• **92227** - Remote imaging for detection of retinal disease\n• **92228** - Remote imaging for monitoring of retinal disease\n\nThese codes are frequently used for routine eye exams and specialized procedures.`
+    }
+
+    return null
+  }
+
+  private static getProviderIdResponse(input: string, context: any): string {
+    return `The **Provider ID** field requires a valid National Provider Identifier (NPI). This is a unique 10-digit number assigned to healthcare providers by CMS. You can:\n\n• Find it on the provider's business card or billing statements\n• Search our provider directory by name or specialty\n• Look it up on the NPPES website\n\nNPIs are required for all healthcare claims and cannot be left blank.`
+  }
+
+  private static getSubscriberIdResponse(input: string, context: any): string {
+    return `The **Subscriber ID** is the member's insurance identification number. This information is found on the patient's insurance card and may be labeled as:\n\n• Member ID\n• Policy Number\n• Subscriber Number\n• Member Number\n\nThis field is required for claim processing and eligibility verification.`
+  }
+
+  private static getDateOfBirthResponse(input: string, context: any): string {
+    return `Enter the patient's **Date of Birth** in MM/DD/YYYY format (e.g., 01/15/1985). This information is used for:\n\n• Patient identification and verification\n• Age-specific benefit determinations\n• HEDIS measure calculations\n• Eligibility verification\n\nEnsure the date is accurate as it affects claim processing and coverage determinations.`
+  }
+
+  private static getServiceDateResponse(input: string, context: any): string {
+    return `The **Service Date** should be the actual date when the medical service was provided. This is critical for:\n\n• Claim processing and reimbursement\n• Eligibility verification at time of service\n• HEDIS measure calculations\n• Audit compliance\n\nUse the date when the patient received the service, not when the claim is being submitted.`
+  }
+
+  private static getStepSpecificResponses(step: number, input: string, context: any): string | null {
+    const stepResponses = {
+      1: `You're on **Step 1** - Provider & Patient Information. This step collects essential identification data including provider NPI, subscriber information, and patient demographics. All fields marked with * are required for claim processing.`,
+      2: `You're on **Step 2** - Claim Details. This step captures service dates, diagnosis codes, and claim-specific information. The diagnosis codes determine medical necessity and affect reimbursement rates.`,
+      3: `You're on **Step 3** - Prescription Details. This step records optical prescription information including sphere, cylinder, axis, and prism values. This data is essential for optical claims.`,
+      4: `You're on **Step 4** - Lens Choice. This step documents the specific lens materials, coatings, and features selected. These choices affect claim amounts and patient responsibility.`,
+      5: `You're on **Step 5** - Insurance Information. This step verifies coverage details, copays, and benefit information. This data determines patient responsibility and claim approval.`,
+      6: `You're on **Step 6** - Review & Submit. This final step allows you to review all information before submission. Ensure all required fields are complete and accurate.`
+    }
+
+    return stepResponses[step as keyof typeof stepResponses] || null
+  }
+
+  private static getIntentSpecificResponse(intent: any, input: string, context: any): string {
+    switch (intent.intent) {
+      case 'code_lookup':
+        return this.getEnhancedCodeLookupResponse(input, context)
+      case 'terminology':
+        return this.getEnhancedTerminologyResponse(input, context)
+      case 'provider_search':
+        return this.getEnhancedProviderResponse(input, context)
+      case 'eligibility':
+        return this.getEnhancedEligibilityResponse(input, context)
+      case 'claims':
+        return this.getEnhancedClaimsResponse(input, context)
+      case 'workflow':
+        return this.getEnhancedWorkflowResponse(input, context)
+      default:
+        return this.getEnhancedGeneralResponse(input, context)
+    }
+  }
+
+  private static getEnhancedCodeLookupResponse(input: string, context: any): string {
+    if (input.includes('diabetes')) {
+      return `Here are the most relevant **diabetes diagnosis codes** for medical billing:\n\n**Primary Codes:**\n• **E11.9** - Type 2 diabetes without complications (most common)\n• **E11.21** - Type 2 diabetes with diabetic nephropathy\n• **E11.22** - Type 2 diabetes with diabetic chronic kidney disease\n\n**Secondary Codes:**\n• **Z79.4** - Long-term use of insulin\n• **Z79.84** - Long-term use of oral hypoglycemic drugs\n• **Z00.00** - Encounter for general adult medical examination\n\n**HEDIS Impact:** These codes are essential for diabetes care measures and quality reporting.`
+    }
+
+    if (input.includes('hypertension')) {
+      return `Here are the key **hypertension diagnosis codes** for cardiovascular measures:\n\n**Primary Codes:**\n• **I10** - Essential (primary) hypertension\n• **I11.9** - Hypertensive heart disease without heart failure\n• **I12.9** - Hypertensive chronic kidney disease\n\n**Secondary Codes:**\n• **Z79.4** - Long-term drug therapy for hypertension\n• **Z00.00** - Preventive care encounter\n\n**Quality Impact:** These codes support cardiovascular HEDIS measures and quality reporting.`
+    }
+
+    return `I can help you find specific medical codes. Try asking about:\n\n• "Diabetes diagnosis codes"\n• "Hypertension codes"\n• "Eye exam procedure codes"\n• "Preventive care codes"\n\nI'll provide the most relevant codes with their descriptions and usage context.`
+  }
+
+  private static getEnhancedTerminologyResponse(input: string, context: any): string {
+    const terminologyMap = {
+      'od': '**OD** stands for "Oculus Dexter" - the right eye. This is used in optical prescriptions and medical documentation.',
+      'os': '**OS** stands for "Oculus Sinister" - the left eye. This is used in optical prescriptions and medical documentation.',
+      'ou': '**OU** stands for "Oculus Uterque" - both eyes. This is used when the same prescription applies to both eyes.',
+      'pcp': '**PCP** stands for "Primary Care Physician" - the main doctor responsible for coordinating a patient\'s healthcare.',
+      'npi': '**NPI** stands for "National Provider Identifier" - a unique 10-digit number assigned to healthcare providers by CMS.',
+      'hedis': '**HEDIS** stands for "Healthcare Effectiveness Data and Information Set" - quality measures used by health plans to assess performance.',
+      'cpt': '**CPT** stands for "Current Procedural Terminology" - standardized codes for medical procedures and services.',
+      'icd': '**ICD** stands for "International Classification of Diseases" - standardized codes for diagnoses and conditions.'
+    }
+
+    for (const [term, definition] of Object.entries(terminologyMap)) {
+      if (input.includes(term)) {
+        return definition
+      }
+    }
+
+    return `I can explain medical terminology and abbreviations. Try asking about:\n\n• "What is OD/OS?"\n• "Define PCP"\n• "What does NPI mean?"\n• "Explain HEDIS"\n\nI'll provide clear definitions with context for medical billing.`
+  }
+
+  private static getEnhancedProviderResponse(input: string, context: any): string {
+    return `I can help you find provider information. You can search by:\n\n• **Name** - Enter the provider's full name\n• **Specialty** - Search by medical specialty (e.g., cardiology, ophthalmology)\n• **Location** - Search by city or zip code\n• **NPI** - Search by National Provider Identifier\n\nI'll provide contact information, specialties, and practice details. What type of provider are you looking for?`
+  }
+
+  private static getEnhancedEligibilityResponse(input: string, context: any): string {
+    return `I can help you check insurance eligibility. To verify coverage, I'll need:\n\n• **Member ID** - From the patient's insurance card\n• **Date of Birth** - Patient's birth date\n• **Service Date** - When the service will be provided\n• **Service Type** - Type of medical service\n\nI'll check coverage, copays, deductibles, and benefit information. Would you like to start an eligibility check?`
+  }
+
+  private static getEnhancedClaimsResponse(input: string, context: any): string {
+    return `I can help you with claims submission. The process includes:\n\n• **Provider Information** - NPI and practice details\n• **Patient Information** - Demographics and insurance\n• **Service Details** - Dates, procedures, and diagnoses\n• **Billing Information** - Charges and payment details\n\nI'll guide you through each step and help ensure all required information is complete. What specific aspect of claims submission do you need help with?`
+  }
+
+  private static getEnhancedWorkflowResponse(input: string, context: any): string {
+    if (context.formType) {
+      return `I can help you with the ${context.formType} workflow. Each form has specific steps and requirements:\n\n• **Step-by-step guidance** for each form section\n• **Field validation** to ensure completeness\n• **Required vs optional** field identification\n• **Error resolution** for common issues\n\nWhat specific step or field are you working on?`
+    }
+
+    return `I can help you with form workflows and processes. I provide:\n\n• **Step-by-step guidance** for form completion\n• **Field-specific help** and validation\n• **Error resolution** for common issues\n• **Best practices** for efficient form completion\n\nWhat form or process are you working with?`
+  }
+
+  private static getEnhancedGeneralResponse(input: string, context: any): string {
+    return `I'm here to help with medical billing and form completion. I can assist with:\n\n• **Code Lookups** - ICD-10, CPT, HCPCS codes\n• **Terminology** - Medical abbreviations and definitions\n• **Provider Information** - NPI lookups and contact details\n• **Eligibility Checks** - Insurance coverage verification\n• **Claims Submission** - Billing and reimbursement help\n• **Form Guidance** - Step-by-step form completion\n\nWhat specific area do you need help with?`
   }
 }
 

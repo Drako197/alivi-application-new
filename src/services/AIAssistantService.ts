@@ -51,6 +51,86 @@ export interface AIContext {
     formCompletionRate: number
     averageSessionTime: number
   }
+  // Advanced Context Awareness - Item 6
+  advancedContext?: {
+    // Enhanced form field tracking with detailed metadata
+    fieldMetadata?: Record<string, {
+      type: 'text' | 'select' | 'date' | 'number' | 'checkbox' | 'textarea'
+      required: boolean
+      validation: string[]
+      dependencies: string[]
+      relatedFields: string[]
+      lastModified: Date
+      modificationCount: number
+      averageTimeSpent: number
+      commonValues: string[]
+      errorHistory: string[]
+    }>
+    // Multi-step workflow context with step dependencies
+    workflowContext?: {
+      currentWorkflow: string
+      workflowSteps: Array<{
+        step: number
+        name: string
+        status: 'completed' | 'current' | 'pending' | 'skipped'
+        dependencies: number[]
+        estimatedTime: number
+        actualTime?: number
+        errors: string[]
+        warnings: string[]
+      }>
+      workflowProgress: number
+      workflowEfficiency: number
+      bottlenecks: string[]
+      optimizationOpportunities: string[]
+    }
+    // User session analysis with behavior patterns
+    sessionAnalysis?: {
+      sessionStartTime: Date
+      sessionDuration: number
+      activeTime: number
+      idleTime: number
+      formSwitches: number
+      fieldFocusPatterns: Record<string, number>
+      errorPatterns: Record<string, number>
+      successPatterns: Record<string, number>
+      userEfficiency: number
+      learningCurve: 'beginner' | 'intermediate' | 'advanced'
+      preferredWorkflow: string
+      commonWorkflows: string[]
+    }
+    // Cross-form context for related workflows
+    crossFormContext?: {
+      relatedForms: Array<{
+        formType: string
+        lastAccessed: Date
+        completionStatus: 'completed' | 'in_progress' | 'abandoned'
+        sharedData: Record<string, any>
+        dataConsistency: boolean
+      }>
+      dataFlow: Array<{
+        fromForm: string
+        toForm: string
+        dataType: string
+        lastSync: Date
+        syncStatus: 'synced' | 'pending' | 'failed'
+      }>
+      workflowContinuity: boolean
+      dataIntegrity: boolean
+    }
+    // Real-time context updates
+    realTimeContext?: {
+      lastActivity: Date
+      currentAction: string
+      pendingActions: string[]
+      systemStatus: 'normal' | 'busy' | 'error'
+      performanceMetrics: {
+        responseTime: number
+        accuracy: number
+        userSatisfaction: number
+      }
+    }
+  }
 }
 
 // Smart Suggestions Engine Interface
@@ -216,6 +296,18 @@ export class AIAssistantService {
           { type: 'code', title: 'HEDIS Measures', description: 'Focus on quality measures for reporting', confidence: 0.9 },
           { type: 'compliance', title: 'Documentation', description: 'Ensure complete documentation for audit', confidence: 0.95 }
         ]
+      },
+      prescription: {
+        suggestions: [
+          { type: 'field', title: 'Prescription Details', description: 'Enter complete prescription information', confidence: 0.9 },
+          { type: 'validation', title: 'Prescription Validation', description: 'Verify prescription accuracy', confidence: 0.95 }
+        ]
+      },
+      pic_actions: {
+        suggestions: [
+          { type: 'workflow', title: 'PIC Actions', description: 'Complete required PIC actions', confidence: 0.9 },
+          { type: 'compliance', title: 'Compliance Check', description: 'Ensure compliance with PIC requirements', confidence: 0.95 }
+        ]
       }
     },
 
@@ -370,10 +462,10 @@ export class AIAssistantService {
             condition: (data: any) => data.providerId && data.providerId.length !== 10,
             alert: {
               id: 'invalid_provider_id',
-              type: 'error_prevention',
+              type: 'error_prevention' as const,
               title: 'Invalid Provider ID',
               message: 'Provider ID should be exactly 10 digits. Please verify the NPI number.',
-              severity: 'warning',
+              severity: 'warning' as const,
               actionable: true,
               action: 'validate_provider_id'
             }
@@ -382,10 +474,10 @@ export class AIAssistantService {
             condition: (data: any) => data.serviceDate && new Date(data.serviceDate) > new Date(),
             alert: {
               id: 'future_service_date',
-              type: 'error_prevention',
+              type: 'error_prevention' as const,
               title: 'Future Service Date',
               message: 'Service date cannot be in the future. Please check the date.',
-              severity: 'warning',
+              severity: 'warning' as const,
               actionable: true,
               action: 'validate_service_date'
             }
@@ -394,10 +486,10 @@ export class AIAssistantService {
             condition: (data: any) => data.diagnosisCodes && data.diagnosisCodes.length === 0,
             alert: {
               id: 'missing_diagnosis',
-              type: 'error_prevention',
+              type: 'error_prevention' as const,
               title: 'Missing Diagnosis Codes',
               message: 'At least one diagnosis code is required for claims submission.',
-              severity: 'critical',
+              severity: 'critical' as const,
               actionable: true,
               action: 'add_diagnosis_codes'
             }
@@ -425,10 +517,10 @@ export class AIAssistantService {
             condition: (data: any) => data.procedureCodes && data.procedureCodes.length > 5,
             alert: {
               id: 'multiple_procedures',
-              type: 'optimization',
+              type: 'optimization' as const,
               title: 'Multiple Procedures',
               message: 'You have multiple procedures. Consider checking for bundling opportunities.',
-              severity: 'info',
+              severity: 'info' as const,
               actionable: true,
               action: 'check_bundling'
             }
@@ -437,10 +529,10 @@ export class AIAssistantService {
             condition: (data: any) => data.diagnosisCodes && data.diagnosisCodes.length > 3,
             alert: {
               id: 'multiple_diagnoses',
-              type: 'optimization',
+              type: 'optimization' as const,
               title: 'Multiple Diagnoses',
               message: 'You have multiple diagnoses. Ensure they\'re in order of significance.',
-              severity: 'info',
+              severity: 'info' as const,
               actionable: true,
               action: 'order_diagnoses'
             }
@@ -2205,6 +2297,228 @@ export class AIAssistantService {
 
   private static getEnhancedGeneralResponse(input: string, context: any): string {
     return `I'm here to help with medical billing and form completion. I can assist with:\n\n• **Code Lookups** - ICD-10, CPT, HCPCS codes\n• **Terminology** - Medical abbreviations and definitions\n• **Provider Information** - NPI lookups and contact details\n• **Eligibility Checks** - Insurance coverage verification\n• **Claims Submission** - Billing and reimbursement help\n• **Form Guidance** - Step-by-step form completion\n\nWhat specific area do you need help with?`
+  }
+
+  // Advanced Search & Discovery Engine - Item 8
+  private static ADVANCED_SEARCH_ENGINE = {
+    // Semantic search capabilities for medical terminology
+    semanticSearch: {
+      // Medical terminology synonyms and related terms
+      terminologyMap: {
+        'diabetes': ['diabetes mellitus', 'DM', 'type 1 diabetes', 'type 2 diabetes', 'diabetic'],
+        'hypertension': ['HTN', 'high blood pressure', 'essential hypertension'],
+        'glaucoma': ['open angle glaucoma', 'closed angle glaucoma', 'ocular hypertension'],
+        'cataract': ['cataracts', 'lens opacity', 'senile cataract'],
+        'retinopathy': ['diabetic retinopathy', 'hypertensive retinopathy', 'retinal disease'],
+        'macular degeneration': ['AMD', 'age-related macular degeneration', 'macular disease'],
+        'refraction': ['refractive error', 'vision correction', 'optical correction'],
+        'ophthalmology': ['eye care', 'ocular', 'ophthalmic', 'vision care'],
+        'optometry': ['vision care', 'eye exam', 'refraction', 'contact lens fitting']
+      },
+
+      // Fuzzy matching for code lookups
+      fuzzyMatch: {
+        // Common misspellings and variations
+        variations: {
+          'diabetes': ['diabetis', 'diabete', 'diabet'],
+          'hypertension': ['hypertention', 'hypertens', 'htn'],
+          'glaucoma': ['glacoma', 'glacoma', 'glac'],
+          'cataract': ['cataracts', 'catarac', 'cat'],
+          'retinopathy': ['retinopaty', 'retinop', 'ret'],
+          'refraction': ['refract', 'refractn', 'ref'],
+          'ophthalmology': ['ophthalm', 'ophthal', 'oph'],
+          'optometry': ['optometr', 'optom', 'opt']
+        },
+
+        // Code variations and common errors
+        codeVariations: {
+          'E11.9': ['E119', 'E11.9', 'E11-9', 'E11 9'],
+          'H35.00': ['H3500', 'H35.00', 'H35-00', 'H35 00'],
+          '92250': ['92250', '9225', '922.50'],
+          '92310': ['92310', '9231', '923.10']
+        }
+      },
+
+      // Search history with personalized results
+      searchHistory: {
+        userSearches: new Map<string, Array<{
+          query: string
+          timestamp: Date
+          results: any[]
+          clicked: string[]
+          success: boolean
+        }>>(),
+
+        // Get personalized search suggestions
+        getPersonalizedSuggestions: (userId: string, query: string): string[] => {
+          const userHistory = AIAssistantService.ADVANCED_SEARCH_ENGINE.searchHistory.userSearches.get(userId) || []
+          const recentSearches = userHistory
+            .filter(search => search.query.toLowerCase().includes(query.toLowerCase()))
+            .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+            .slice(0, 5)
+          
+          return recentSearches.map(search => search.query)
+        },
+
+        // Record search activity
+        recordSearch: (userId: string, query: string, results: any[], clicked: string[], success: boolean) => {
+          const userHistory = AIAssistantService.ADVANCED_SEARCH_ENGINE.searchHistory.userSearches.get(userId) || []
+          userHistory.push({
+            query,
+            timestamp: new Date(),
+            results,
+            clicked,
+            success
+          })
+          
+          // Keep only last 50 searches
+          if (userHistory.length > 50) {
+            userHistory.splice(0, userHistory.length - 50)
+          }
+          
+          AIAssistantService.ADVANCED_SEARCH_ENGINE.searchHistory.userSearches.set(userId, userHistory)
+        }
+      },
+
+      // Advanced filtering by specialty, code type, etc.
+      advancedFiltering: {
+        // Filter by medical specialty
+        bySpecialty: (results: any[], specialty: string): any[] => {
+          const specialtyKeywords = {
+            'optometry': ['vision', 'refraction', 'contact lens', 'eye exam'],
+            'ophthalmology': ['surgery', 'retinal', 'glaucoma', 'cataract'],
+            'primary care': ['general', 'preventive', 'screening'],
+            'cardiology': ['heart', 'cardiac', 'cardiovascular'],
+            'endocrinology': ['diabetes', 'endocrine', 'hormone']
+          }
+          
+          const keywords = specialtyKeywords[specialty.toLowerCase()] || []
+          return results.filter(result => 
+            keywords.some(keyword => 
+              result.description?.toLowerCase().includes(keyword) ||
+              result.code?.toLowerCase().includes(keyword)
+            )
+          )
+        },
+
+        // Filter by code type
+        byCodeType: (results: any[], codeType: 'ICD10' | 'CPT' | 'HCPCS' | 'POS' | 'MOD'): any[] => {
+          return results.filter(result => {
+            if (codeType === 'ICD10') return /^[A-Z]\d{2}\.\d{1,2}$/.test(result.code)
+            if (codeType === 'CPT') return /^\d{5}$/.test(result.code)
+            if (codeType === 'HCPCS') return /^[A-Z]\d{4}$/.test(result.code)
+            if (codeType === 'POS') return /^\d{2}$/.test(result.code)
+            if (codeType === 'MOD') return /^\d{2}$|^[A-Z]{2}$/.test(result.code)
+            return true
+          })
+        },
+
+        // Filter by usage frequency
+        byUsageFrequency: (results: any[], frequency: 'high' | 'medium' | 'low'): any[] => {
+          const frequencyMap = {
+            high: ['E11.9', '92250', '92310', '11', '25'],
+            medium: ['H35.00', '92227', '92228', '22', '59'],
+            low: ['Z79.4', '92229', '92285', '24', 'AS']
+          }
+          
+          const targetCodes = frequencyMap[frequency] || []
+          return results.filter(result => targetCodes.includes(result.code))
+        }
+      }
+    },
+
+    // Enhanced search algorithms
+    algorithms: {
+      // Semantic search with context awareness
+      semanticSearch: (query: string, context: AIContext): any[] => {
+        const results: any[] = []
+        const queryLower = query.toLowerCase()
+        
+        // Search in terminology map
+        Object.entries(AIAssistantService.ADVANCED_SEARCH_ENGINE.semanticSearch.terminologyMap).forEach(([term, synonyms]) => {
+          if (term.toLowerCase().includes(queryLower) || synonyms.some(s => s.toLowerCase().includes(queryLower))) {
+            results.push({
+              type: 'terminology',
+              term,
+              synonyms,
+              relevance: term.toLowerCase().includes(queryLower) ? 1.0 : 0.8
+            })
+          }
+        })
+        
+        // Search in common codes
+        Object.entries(AIAssistantService.LOCAL_KNOWLEDGE.commonCodes).forEach(([code, description]) => {
+          if (description.toLowerCase().includes(queryLower) || code.toLowerCase().includes(queryLower)) {
+            results.push({
+              type: 'code',
+              code,
+              description,
+              relevance: description.toLowerCase().includes(queryLower) ? 1.0 : 0.7
+            })
+          }
+        })
+        
+        return results.sort((a, b) => b.relevance - a.relevance)
+      },
+
+      // Fuzzy matching for approximate searches
+      fuzzyMatch: (query: string): any[] => {
+        const results: any[] = []
+        const queryLower = query.toLowerCase()
+        
+        // Check for variations
+        Object.entries(AIAssistantService.ADVANCED_SEARCH_ENGINE.semanticSearch.fuzzyMatch.variations).forEach(([correct, variations]) => {
+          if (variations.some(v => v.toLowerCase().includes(queryLower))) {
+            results.push({
+              type: 'correction',
+              original: query,
+              suggested: correct,
+              confidence: 0.9
+            })
+          }
+        })
+        
+        // Check for code variations
+        Object.entries(AIAssistantService.ADVANCED_SEARCH_ENGINE.semanticSearch.fuzzyMatch.codeVariations).forEach(([correct, variations]) => {
+          if (variations.some(v => v.toLowerCase().includes(queryLower))) {
+            results.push({
+              type: 'code_correction',
+              original: query,
+              suggested: correct,
+              confidence: 0.95
+            })
+          }
+        })
+        
+        return results
+      },
+
+      // Advanced search with multiple criteria
+      advancedSearch: (query: string, filters: {
+        specialty?: string
+        codeType?: 'ICD10' | 'CPT' | 'HCPCS' | 'POS' | 'MOD'
+        frequency?: 'high' | 'medium' | 'low'
+        context?: AIContext
+      }): any[] => {
+        // Start with semantic search
+        let results = AIAssistantService.ADVANCED_SEARCH_ENGINE.algorithms.semanticSearch(query, filters.context || {})
+        
+        // Apply filters
+        if (filters.specialty) {
+          results = AIAssistantService.ADVANCED_SEARCH_ENGINE.semanticSearch.advancedFiltering.bySpecialty(results, filters.specialty)
+        }
+        
+        if (filters.codeType) {
+          results = AIAssistantService.ADVANCED_SEARCH_ENGINE.semanticSearch.advancedFiltering.byCodeType(results, filters.codeType)
+        }
+        
+        if (filters.frequency) {
+          results = AIAssistantService.ADVANCED_SEARCH_ENGINE.semanticSearch.advancedFiltering.byUsageFrequency(results, filters.frequency)
+        }
+        
+        return results
+      }
+    }
   }
 }
 

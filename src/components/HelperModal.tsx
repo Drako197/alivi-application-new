@@ -5,12 +5,13 @@ import ProactiveSuggestionsService, { type ProactiveSuggestion } from '../servic
 import { PredictiveSuggestionsService } from '../services/PredictiveSuggestionsService'
 import PersonalizationSettings from './PersonalizationSettings'
 import AIAssistantService, { type SmartSuggestion, type ProactiveAlert, type AIContext } from '../services/AIAssistantService'
+import { EnhancedVisualResponseService, type EnhancedResponse, type RichTextElement, type InteractiveElement, type VisualIndicator } from '../services/EnhancedVisualResponseService'
 import { createPortal } from 'react-dom'
 import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 interface Message {
   id: string
-  type: 'user' | 'assistant' | 'suggestion' | 'alert'
+  type: 'user' | 'assistant' | 'suggestion' | 'alert' | 'enhanced'
   content: string
   timestamp: Date
   context?: {
@@ -23,6 +24,7 @@ interface Message {
   animation?: 'typing' | 'fade-in' | 'slide-in'
   suggestions?: SmartSuggestion[]
   alerts?: ProactiveAlert[]
+  enhancedResponse?: EnhancedResponse
 }
 
 interface HelperModalProps {
@@ -670,7 +672,7 @@ export default function HelperModal({
     }
   }, [currentField, currentForm, isOpen])
 
-  const addMessage = (type: 'user' | 'assistant' | 'suggestion' | 'alert', content: string, animation: 'typing' | 'fade-in' | 'slide-in' = 'fade-in', context?: any, suggestions?: SmartSuggestion[], alerts?: ProactiveAlert[]) => {
+  const addMessage = (type: 'user' | 'assistant' | 'suggestion' | 'alert' | 'enhanced', content: string, animation: 'typing' | 'fade-in' | 'slide-in' = 'fade-in', context?: any, suggestions?: SmartSuggestion[], alerts?: ProactiveAlert[], enhancedResponse?: EnhancedResponse) => {
     const newMessage: Message = {
       id: Date.now().toString(),
       type,
@@ -679,7 +681,8 @@ export default function HelperModal({
       context,
       animation,
       suggestions,
-      alerts
+      alerts,
+      enhancedResponse
     }
     setMessages(prev => [...prev, newMessage])
     
@@ -749,25 +752,123 @@ export default function HelperModal({
   }
 
   const processUserMessage = async (input: string) => {
-    if (!input.trim()) return
-
-    // Add user message
-    addMessage('user', input, 'slide-in')
-
-    // Process with enhanced AI service
+    setIsTyping(true)
+    
     try {
-      const response = await AIAssistantService.processUserInput(input, {
-        formType: currentForm,
-        currentField: currentField,
-        currentStep: currentStep,
-        formData: {} // Add form data if available
-      })
-
-      // Add assistant response
-      addMessage('assistant', response, 'fade-in')
+      const context = createAIContext()
+      
+      // Use advanced search if the input looks like a search query
+      if (input.toLowerCase().includes('search') || input.toLowerCase().includes('find') || input.toLowerCase().includes('lookup')) {
+        const searchQuery = input.replace(/search|find|lookup/gi, '').trim()
+        // Use a simple search approach
+        const searchResults = [
+          { code: 'E11.9', description: 'Type 2 diabetes mellitus without complications', relevance: 0.9, type: 'code' },
+          { code: '92250', description: 'Fundus photography with interpretation and report', relevance: 0.8, type: 'code' },
+          { code: '92310', description: 'Prescription of optical and physical characteristics', relevance: 0.8, type: 'code' },
+          { code: 'H35.00', description: 'Unspecified background retinopathy', relevance: 0.7, type: 'code' },
+          { code: 'Z79.4', description: 'Long term (current) use of insulin', relevance: 0.7, type: 'code' }
+        ].filter(result => 
+          result.code.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          result.description.toLowerCase().includes(searchQuery.toLowerCase())
+        ).slice(0, 5)
+        
+        if (searchResults.length > 0) {
+          const enhancedResponse = EnhancedVisualResponseService.createSearchResultsResponse(
+            searchQuery,
+            searchResults,
+            [
+              { label: 'Copy Code', action: 'copy_code', style: 'primary' },
+              { label: 'Show Help', action: 'show_help', style: 'info' }
+            ]
+          )
+          
+          addMessage('enhanced', 'Search results found', 'fade-in', undefined, undefined, undefined, enhancedResponse)
+        } else {
+          const enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
+            'No results found',
+            ['Try a different search term', 'Check spelling', 'Use more specific terms'],
+            [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+          )
+          
+          addMessage('enhanced', 'No search results', 'fade-in', undefined, undefined, undefined, enhancedResponse)
+        }
+      } else {
+        // Process regular input with AI assistant
+        const response = await AIAssistantService.processUserInput(input, context)
+        
+        // Create enhanced response based on the type of response
+        let enhancedResponse: EnhancedResponse | undefined
+        
+        if (response.includes('**Code:**') || response.includes('**Provider:**')) {
+          // Code lookup response
+          const codeMatch = response.match(/\*\*Code:\s*([^*]+)\*\*/)
+          const descriptionMatch = response.match(/\*\*([^*]+)\*\*\n([^*\n]+)/)
+          
+          if (codeMatch && descriptionMatch) {
+            enhancedResponse = EnhancedVisualResponseService.createCodeLookupResponse(
+              codeMatch[1].trim(),
+              descriptionMatch[2].trim(),
+              {
+                category: 'Medical Code',
+                usage: 'Billing and claims',
+                examples: ['Common usage example'],
+                relatedCodes: ['Related code 1', 'Related code 2']
+              },
+              [
+                { label: 'Copy Code', action: 'copy_code', style: 'primary' },
+                { label: 'Show Help', action: 'show_help', style: 'info' }
+              ]
+            )
+          }
+        } else if (response.includes('**Error:**') || response.includes('**Warning:**')) {
+          // Error response
+          const errorMatch = response.match(/\*\*Error:\s*([^*]+)\*\*/)
+          const warningMatch = response.match(/\*\*Warning:\s*([^*]+)\*\*/)
+          
+          if (errorMatch || warningMatch) {
+            const errorText = errorMatch?.[1] || warningMatch?.[1] || 'Unknown error'
+            enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
+              errorText,
+              ['Check your input', 'Verify the information', 'Try a different approach'],
+              [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+            )
+          }
+        } else if (response.includes('**Help:**') || response.includes('I can help')) {
+          // Help response
+          enhancedResponse = EnhancedVisualResponseService.createHelpResponse(
+            'General Help',
+            response,
+            ['Code Lookup', 'Provider Search', 'Form Guidance'],
+            [
+              { label: 'Code Lookup', action: 'search_code', style: 'primary' },
+              { label: 'Provider Search', action: 'search_provider', style: 'info' }
+            ]
+          )
+        } else {
+          // Regular response with status
+          enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+            response,
+            'info',
+            [
+              { label: 'Search Codes', action: 'search_code', style: 'primary' },
+              { label: 'Get Help', action: 'show_help', style: 'info' }
+            ]
+          )
+        }
+        
+        addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+      }
     } catch (error) {
       console.error('Error processing message:', error)
-      addMessage('assistant', 'I apologize, but I encountered an error processing your request. Please try again.', 'fade-in')
+      const enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
+        'Sorry, I encountered an error processing your request.',
+        ['Try rephrasing your question', 'Check your internet connection', 'Contact support if the problem persists'],
+        [{ label: 'Try Again', action: 'retry', style: 'primary' }]
+      )
+      
+      addMessage('enhanced', 'An error occurred while processing your request.', 'fade-in', undefined, undefined, undefined, enhancedResponse)
+    } finally {
+      setIsTyping(false)
     }
   }
 
@@ -853,6 +954,131 @@ export default function HelperModal({
       }
     }
   ]
+
+  // Render rich text elements
+  const renderRichTextElement = (element: RichTextElement, index: number) => {
+    switch (element.type) {
+      case 'bold':
+        return <strong key={index} className="font-bold">{element.content}</strong>
+      case 'italic':
+        return <em key={index} className="italic">{element.content}</em>
+      case 'code':
+        return <code key={index} className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm font-mono">{element.content}</code>
+      case 'list':
+        return <li key={index} className="ml-4">{element.content}</li>
+      case 'text':
+      default:
+        return <span key={index}>{element.content}</span>
+    }
+  }
+
+  // Render visual indicators
+  const renderVisualIndicator = (indicator: VisualIndicator) => {
+    const colorClasses = {
+      red: 'text-red-500',
+      yellow: 'text-yellow-500',
+      green: 'text-green-500',
+      blue: 'text-blue-500',
+      gray: 'text-gray-500'
+    }
+
+    return (
+      <div className={`flex items-center space-x-2 ${colorClasses[indicator.color]}`}>
+        {indicator.icon && <Icon name={indicator.icon} size={14} />}
+        <span className={`text-xs font-medium ${indicator.animated ? 'animate-pulse' : ''}`}>
+          {indicator.value}
+        </span>
+      </div>
+    )
+  }
+
+  // Render interactive elements
+  const renderInteractiveElement = (element: InteractiveElement, index: number) => {
+    const styleClasses = {
+      primary: 'bg-blue-500 hover:bg-blue-600 text-white',
+      secondary: 'bg-gray-500 hover:bg-gray-600 text-white',
+      success: 'bg-green-500 hover:bg-green-600 text-white',
+      warning: 'bg-yellow-500 hover:bg-yellow-600 text-white',
+      danger: 'bg-red-500 hover:bg-red-600 text-white',
+      info: 'bg-blue-500 hover:bg-blue-600 text-white'
+    }
+
+    return (
+      <button
+        key={index}
+        onClick={() => handleInteractiveElementClick(element)}
+        disabled={element.disabled}
+        className={`px-3 py-1 rounded text-xs font-medium transition-colors duration-200 ${
+          styleClasses[element.style || 'primary']
+        } ${element.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        {element.label}
+      </button>
+    )
+  }
+
+  // Handle interactive element clicks
+  const handleInteractiveElementClick = (element: InteractiveElement) => {
+    console.log('Interactive element clicked:', element)
+    // Handle different action types
+    switch (element.action) {
+      case 'search_code':
+        // Trigger code search
+        break
+      case 'show_help':
+        // Show help for the topic
+        break
+      case 'copy_code':
+        // Copy code to clipboard
+        if (element.data?.code) {
+          navigator.clipboard.writeText(element.data.code)
+        }
+        break
+      default:
+        // Handle other actions
+        break
+    }
+  }
+
+  // Render enhanced response
+  const renderEnhancedResponse = (enhancedResponse: EnhancedResponse) => {
+    return (
+      <div className="space-y-3">
+        {/* Rich text content */}
+        <div className="space-y-2">
+          {enhancedResponse.content.map((element, index) => 
+            renderRichTextElement(element, index)
+          )}
+        </div>
+
+        {/* Visual indicators */}
+        {enhancedResponse.visualIndicators && enhancedResponse.visualIndicators.length > 0 && (
+          <div className="flex items-center space-x-3">
+            {enhancedResponse.visualIndicators.map((indicator, index) => 
+              renderVisualIndicator(indicator)
+            )}
+          </div>
+        )}
+
+        {/* Interactive elements */}
+        {enhancedResponse.interactiveElements && enhancedResponse.interactiveElements.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {enhancedResponse.interactiveElements.map((element, index) => 
+              renderInteractiveElement(element, index)
+            )}
+          </div>
+        )}
+
+        {/* Metadata */}
+        {enhancedResponse.metadata && (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Response time: {enhancedResponse.metadata.responseTime}ms | 
+            Confidence: {Math.round(enhancedResponse.metadata.confidence * 100)}%
+          </div>
+        )}
+      </div>
+    )
+  }
 
   if (!isOpen) return null
 
@@ -990,6 +1216,17 @@ export default function HelperModal({
                             </div>
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {/* Enhanced Response */}
+                    {message.enhancedResponse && (
+                      <div className="mt-3">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Icon name="info" size={14} className="text-blue-500" />
+                          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Enhanced Response</span>
+                        </div>
+                        {renderEnhancedResponse(message.enhancedResponse)}
                       </div>
                     )}
 

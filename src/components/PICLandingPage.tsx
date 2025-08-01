@@ -209,11 +209,15 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       <div className="pic-section">
         <h2 className="pic-section-title">Frequently Used Actions</h2>
         <div className={`pic-actions-grid ${viewMode === 'list' ? 'pic-actions-list' : ''}`}>
-          {frequentActions.map((action) => (
+          {frequentActions.map((action, index) => (
             <div
               key={action.id}
               onClick={() => handleActionClick(action)}
-              className={`pic-action-card pic-frequent-action cursor-pointer`}
+              className={`pic-action-card cursor-pointer ${
+                index === 0 ? 'pic-frequent-action-v1' : 
+                index === 1 ? 'pic-frequent-action-v2' : 
+                'pic-frequent-action-v3'
+              }`}
             >
               <div className="pic-action-icon">
                 {getFrequentIcon(action.icon)}

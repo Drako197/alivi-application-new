@@ -1415,10 +1415,13 @@ export default function HelperModal({
       )}
 
       {/* Personalization Settings Modal */}
-      <PersonalizationSettings
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-      />
+      {showSettings && createPortal(
+        <PersonalizationSettings
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+        />,
+        document.body
+      )}
     </>
   )
 } 

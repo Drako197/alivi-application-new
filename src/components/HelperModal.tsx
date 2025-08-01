@@ -948,64 +948,6 @@ export default function HelperModal({
     }, 1000)
   }
 
-  const handleQuickAction = (action: string) => {
-    let message = ''
-    switch (action) {
-      case 'terminology':
-        message = 'I\'d love to help you with medical terminology! Here are some common terms:\n\n• **OD**: Right eye (Oculus Dexter)\n• **OS**: Left eye (Oculus Sinister)\n• **OU**: Both eyes (Oculus Uterque)\n• **PCP**: Primary Care Physician\n• **NPI**: National Provider Identifier\n• **HEDIS**: Healthcare Effectiveness Data and Information Set\n\nFeel free to ask about any other terms you encounter!'
-        break
-      case 'codes':
-        message = 'I\'m here to help you find the right codes! Here are some common ones:\n\n• **E11.9**: Type 2 diabetes without complications\n• **H35.01**: Mild nonproliferative diabetic retinopathy\n• **H35.04**: Proliferative diabetic retinopathy\n• **Z79.4**: Long-term insulin use\n\nJust ask me about specific conditions and I\'ll search our comprehensive database for you!'
-        break
-      case 'form-help':
-        message = 'I\'m here to make your forms easier! What specific field are you working on? I can explain what information is needed and how to enter it correctly. Just let me know which field you\'re stuck on!'
-        break
-    }
-    if (message) {
-      addMessage('assistant', message, 'fade-in')
-    }
-  }
-
-  // Quick actions for common form field tasks
-  const quickActions = [
-    {
-      id: 'field-help',
-      label: 'Field Help',
-      icon: 'help-circle',
-      action: () => {
-        if (currentField) {
-          processUserMessage(`Help me with the ${currentField} field`)
-        }
-      }
-    },
-    {
-      id: 'search-codes',
-      label: 'Search Codes',
-      icon: 'search',
-      action: () => {
-        processUserMessage('Search for medical codes')
-      }
-    },
-    {
-      id: 'validate-field',
-      label: 'Validate',
-      icon: 'check-circle',
-      action: () => {
-        if (currentField) {
-          processUserMessage(`Validate the ${currentField} field`)
-        }
-      }
-    },
-    {
-      id: 'next-step',
-      label: 'Next Step',
-      icon: 'arrow-right',
-      action: () => {
-        processUserMessage('What is the next step?')
-      }
-    }
-  ]
-
   // Render rich text elements
   const renderRichTextElement = (element: RichTextElement, index: number) => {
     switch (element.type) {
@@ -1205,27 +1147,6 @@ export default function HelperModal({
                 </button>
               </div>
             </div>
-
-            {/* Quick Actions */}
-            {currentForm && currentField && (
-              <div className="ai-helper-quick-actions p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                <div className="ai-helper-quick-actions-title text-xs text-gray-600 dark:text-gray-400 mb-2">
-                  Quick Actions for {currentField}
-                </div>
-                <div className="ai-helper-quick-actions-grid grid grid-cols-2 gap-2">
-                  {quickActions.map((action) => (
-                    <button
-                      key={action.id}
-                      onClick={action.action}
-                      className="ai-helper-quick-action-btn flex items-center space-x-2 p-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 text-xs"
-                    >
-                      <Icon name={action.icon} size={14} className="text-blue-500" />
-                      <span className="text-gray-700 dark:text-gray-300">{action.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Messages */}
             <div className="ai-helper-messages flex-1 overflow-y-auto p-4 space-y-4">

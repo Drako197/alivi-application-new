@@ -469,12 +469,11 @@ export default function ClaimsSubmissionForm({
   const handleCodeSelect = (code: string, description: string) => {
     // Find the current diagnosis code being edited and update it
     if (triggeringField === 'diagnosisCodes') {
-      // For now, update the first diagnosis code
-      // In a real implementation, you'd track which specific diagnosis code is being edited
+      // Update the specific diagnosis code row that was clicked
       setFormData(prev => ({
         ...prev,
         diagnosisCodes: prev.diagnosisCodes.map((dc, index) => 
-          index === 0 ? { ...dc, code, description } : dc
+          index === editingRowIndex ? { ...dc, code, description } : dc
         )
       }))
     } else if (triggeringField === 'procedureCodes') {
@@ -503,10 +502,12 @@ export default function ClaimsSubmissionForm({
       }))
     }
     
-    // Close the modal
+    // Close the modal and reset states
     setShowMilaModal(false)
     setMilaCodeSelectionMode(false)
-    setEditingRowIndex(-1) // Reset the editing row index
+    setTriggeringField('')
+    setTriggeringForm('')
+    setEditingRowIndex(-1)
   }
 
   // Validation
@@ -1750,7 +1751,7 @@ export default function ClaimsSubmissionForm({
                                   placeholder="e.g., H25.1"
                                   fieldName="diagnosisCodes"
                                   formName="ClaimsSubmission"
-                                  onMilaTrigger={handleMilaTrigger}
+                                  onMilaTrigger={(fieldName, formName) => handleMilaTrigger(fieldName, formName, index)}
                                   error={!!errors.diagnosisCodes}
                                 />
                               </div>

@@ -775,16 +775,16 @@ export default function HealthPlanDetailsPage({ onBack }: HealthPlanDetailsPageP
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Health Plans Container */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="bg-gray-100 dark:bg-gray-700 px-6 py-3 rounded-t-lg">
+          <div className="bg-gray-100 dark:bg-gray-700 px-4 sm:px-6 py-3 rounded-t-lg">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Health Plans
             </h2>
           </div>
           
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {healthPlanProviders.map((provider) => (
               <div key={provider.id} className="mb-4 last:mb-0">
                 {/* Provider Header */}
@@ -810,29 +810,36 @@ export default function HealthPlanDetailsPage({ onBack }: HealthPlanDetailsPageP
                     {provider.documents.map((document, index) => (
                       <div
                         key={document.id}
-                        className={`flex justify-between items-center p-4 ${
+                        className={`bg-white dark:bg-gray-700 p-4 ${
                           index !== provider.documents.length - 1
                             ? 'border-b border-gray-200 dark:border-gray-600'
                             : ''
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm text-gray-500 dark:text-gray-400 w-6">
-                            {index + 1}.
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <Icon
-                              name={getDocumentTypeIcon(document.type)}
-                              size={16}
-                              className={getDocumentTypeColor(document.type)}
-                            />
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {document.title} {document.year}
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-start gap-3 flex-1">
+                            <span className="text-sm text-gray-500 dark:text-gray-400 w-6 flex-shrink-0">
+                              {index + 1}.
                             </span>
+                            <div className="flex items-start gap-2 flex-1">
+                              <Icon
+                                name={getDocumentTypeIcon(document.type)}
+                                size={16}
+                                className={`${getDocumentTypeColor(document.type)} mt-1 flex-shrink-0`}
+                              />
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-sm font-medium text-gray-900 dark:text-white break-words">
+                                  {document.title} {document.year}
+                                </h3>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          {getDocumentStatusBadge(document)}
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {getDocumentStatusBadge(document)}
+                          </div>
                           <button
                             onClick={() => handleViewDocument(document)}
                             className={`btn-primary flex items-center gap-2 px-4 py-2 text-sm ${
@@ -854,10 +861,10 @@ export default function HealthPlanDetailsPage({ onBack }: HealthPlanDetailsPageP
         </div>
 
         {/* Information Footer */}
-        <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-          <div className="flex items-start gap-4">
-            <Icon name="info" size={20} className="text-blue-600 dark:text-blue-400 mt-1" />
-            <div>
+        <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+            <Icon name="info" size={20} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <div className="flex-1">
               <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
                 About Health Plan Documents
               </h3>

@@ -403,7 +403,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="insuranceProvider"
                   value={formData.insuranceProvider}
                   onChange={handleInputChange}
-                  className="form-select"
+                  className="form-select transition-all duration-200"
                 >
                   <option value="">Select an Insurance Provider</option>
                   {insuranceProviders.map(provider => (
@@ -458,35 +458,37 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
               Contact Method
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              How can we get in touch with you? Choose one option below:
+              Choose how you would like to receive the eligibility response
             </p>
 
-            {/* Method Selection Tabs */}
-            <div className="flex space-x-1 mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
-              <button
-                type="button"
-                onClick={() => handleContactMethodChange('email')}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  formData.contactMethod === 'email'
-                    ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
-              >
-                <Icon name="mail" size={16} className="inline mr-2" />
-                Email Reply Address
-              </button>
-              <button
-                type="button"
-                onClick={() => handleContactMethodChange('fax')}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  formData.contactMethod === 'fax'
-                    ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
-              >
-                <Icon name="printer" size={16} className="inline mr-2" />
-                Provider Fax-back Number
-              </button>
+            {/* Contact Method Toggle */}
+            <div className="mb-6">
+              <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex">
+                <button
+                  type="button"
+                  onClick={() => handleContactMethodChange('email')}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    formData.contactMethod === 'email'
+                      ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <Icon name="mail" size={16} className="inline mr-2" />
+                  Email Reply Address
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleContactMethodChange('fax')}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    formData.contactMethod === 'fax'
+                      ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <Icon name="printer" size={16} className="inline mr-2" />
+                  Provider Fax-back Number
+                </button>
+              </div>
             </div>
 
             {/* Email Method */}
@@ -651,7 +653,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  className="form-select"
+                  className="form-select transition-all duration-200"
                 >
                   <option value="">Select a State</option>
                   {usStates.map(state => (

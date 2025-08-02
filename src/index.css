@@ -982,6 +982,26 @@ body {
   grid-template-columns: 1fr;
 }
 
+.pic-actions-list .pic-action-card {
+  @apply flex items-start space-x-4;
+}
+
+.pic-actions-list .pic-action-icon {
+  @apply flex-shrink-0 mb-0;
+}
+
+.pic-actions-list .pic-action-content {
+  @apply flex-1 min-w-0;
+}
+
+.pic-actions-list .pic-action-title {
+  @apply mb-2;
+}
+
+.pic-actions-list .pic-action-description {
+  @apply mb-3;
+}
+
 .pic-action-card {
   @apply relative p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 text-left;
 }

@@ -155,19 +155,8 @@ export default function FramesAndLensesPage({ onBack }: FramesAndLensesPageProps
   const handleViewDocument = (document: DocumentItem) => {
     console.log('Viewing document:', document.title)
     
-    if (document.url && document.available) {
-      // Show external link warning
-      const confirmed = window.confirm(
-        `You are about to download: ${document.title}\n\nThis will open in a new tab. Do you want to continue?`
-      )
-      
-      if (confirmed) {
-        window.open(document.url, '_blank', 'noopener,noreferrer')
-      }
-    } else {
-      // Show fallback message
-      alert('This document is currently unavailable. Please contact support for access.')
-    }
+    // Simple message without external linking
+    alert(`Document "${document.title}" is available for viewing.\n\nPlease contact your administrator for access to this document.`)
   }
 
   const getDocumentIcon = (type: string) => {

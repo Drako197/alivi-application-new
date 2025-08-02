@@ -403,7 +403,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="insuranceProvider"
                   value={formData.insuranceProvider}
                   onChange={handleInputChange}
-                  className={getSelectClassName('insuranceProvider')}
+                  className="form-select"
                 >
                   <option value="">Select an Insurance Provider</option>
                   {insuranceProviders.map(provider => (
@@ -651,7 +651,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  className={getSelectClassName('state')}
+                  className="form-select"
                 >
                   <option value="">Select a State</option>
                   {usStates.map(state => (

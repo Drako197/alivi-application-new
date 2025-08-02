@@ -4,6 +4,7 @@ import Icon from './Icon'
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
+import HealthPlanDetailsPage from './HealthPlanDetailsPage'
 import HelperButton from './HelperButton'
 
 interface ActionItem {
@@ -24,7 +25,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription'>('landing')
+  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'health-plan-details'>('landing')
 
   // Reset to landing page when resetToLanding prop changes
   useEffect(() => {
@@ -101,6 +102,12 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       if (onUpdateBreadcrumb) {
         onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Prescription Entry'])
       }
+    } else if (action.id === 'health-plan-details') {
+      setCurrentView('health-plan-details')
+      // Update breadcrumb to show P.I.C. > Health Plan Details
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Health Plan Details'])
+      }
     } else {
       // Here you would typically navigate to the specific action or open a modal
       console.log('Navigating to:', action.name)
@@ -140,6 +147,11 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   // Show Prescription Form if currentView is 'prescription'
   if (currentView === 'prescription') {
     return <PrescriptionForm onBack={handleBackToLanding} />
+  }
+
+  // Show Health Plan Details Page if currentView is 'health-plan-details'
+  if (currentView === 'health-plan-details') {
+    return <HealthPlanDetailsPage onBack={handleBackToLanding} />
   }
 
   return (

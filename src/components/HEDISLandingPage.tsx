@@ -1059,15 +1059,13 @@ function ScreeningDetailsForm({
         {/* Mobile: Stack buttons vertically */}
         <div className="flex flex-col space-y-3 md:hidden">
           {/* Primary Action - Next */}
-          <button
-            onClick={handleNextClick}
-            className="flex items-center justify-center w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base"
-          >
-            <span>Continue to Next Step</span>
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+                      <button
+              onClick={handleNextClick}
+              className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
+            >
+              <span>Continue to Review & Submit</span>
+              <Icon name="arrow-right" size={18} />
+            </button>
           
           {/* Secondary Actions */}
           <div className="flex space-x-2">
@@ -1198,12 +1196,10 @@ function ScreeningDetailsForm({
             </button>
             <button
               onClick={handleNextClick}
-              className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
             >
-              <span>Next</span>
-              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <span>Continue to Next Step</span>
+              <Icon name="arrow-right" size={18} />
             </button>
           </div>
         </div>
@@ -1772,12 +1768,10 @@ function RetinalImagesForm({
           {/* Primary Action - Next */}
           <button
             onClick={handleNextClick}
-            className="flex items-center justify-center w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base"
+            className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
           >
-            <span>Continue to Review & Submit</span>
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <span>Continue to Next Step</span>
+            <Icon name="arrow-right" size={18} />
           </button>
 
           {/* Secondary Actions */}
@@ -1909,12 +1903,10 @@ function RetinalImagesForm({
             </button>
             <button
               onClick={handleNextClick}
-              className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
             >
-              <span>Next</span>
-              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <span>Continue to Next Step</span>
+              <Icon name="arrow-right" size={18} />
             </button>
           </div>
         </div>
@@ -4067,7 +4059,7 @@ export default function HEDISLandingPage({
             <div className="hedis-integrated-alert-content">
               <div className="hedis-integrated-alert-icon">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
               </div>
               <div className="hedis-integrated-alert-message">

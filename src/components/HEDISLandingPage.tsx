@@ -1277,6 +1277,19 @@ function RetinalImagesForm({
       delete newErrors.rightEyeImages
       setErrors(newErrors)
     }
+    
+    // Clear general error if the user's action resolves the overall validation issue
+    const updatedRetinalImages = { ...retinalImages, [field]: value }
+    const hasImages = updatedRetinalImages.rightEyeImages.length > 0 || updatedRetinalImages.leftEyeImages.length > 0
+    const hasMissingEyes = updatedRetinalImages.rightEyeMissing || updatedRetinalImages.leftEyeMissing
+    
+    if (hasImages || hasMissingEyes) {
+      const newErrors = { ...errors }
+      delete newErrors.general
+      if (Object.keys(newErrors).length !== Object.keys(errors).length) {
+        setErrors(newErrors)
+      }
+    }
   }
 
   const handleImageUpload = (eye: 'right' | 'left', files: FileList | null) => {
@@ -1289,11 +1302,41 @@ function RetinalImagesForm({
           ...retinalImages,
           rightEyeImages: [...retinalImages.rightEyeImages, ...imageFiles].slice(0, 3)
         })
+        
+        // Clear validation errors for right eye when images are added
+        const newErrors = { ...errors }
+        delete newErrors.rightEyeImages
+        if (Object.keys(newErrors).length !== Object.keys(errors).length) {
+          setErrors(newErrors)
+        }
       } else {
         setRetinalImages({
           ...retinalImages,
           leftEyeImages: [...retinalImages.leftEyeImages, ...imageFiles].slice(0, 3)
         })
+        
+        // Clear validation errors for left eye when images are added
+        const newErrors = { ...errors }
+        delete newErrors.leftEyeImages
+        if (Object.keys(newErrors).length !== Object.keys(errors).length) {
+          setErrors(newErrors)
+        }
+      }
+      
+      // Clear general error if at least one eye now has images
+      const updatedImages = eye === 'right' 
+        ? { ...retinalImages, rightEyeImages: [...retinalImages.rightEyeImages, ...imageFiles].slice(0, 3) }
+        : { ...retinalImages, leftEyeImages: [...retinalImages.leftEyeImages, ...imageFiles].slice(0, 3) }
+      
+      const hasImages = updatedImages.rightEyeImages.length > 0 || updatedImages.leftEyeImages.length > 0
+      const hasMissingEyes = updatedImages.rightEyeMissing || updatedImages.leftEyeMissing
+      
+      if (hasImages || hasMissingEyes) {
+        const newErrors = { ...errors }
+        delete newErrors.general
+        if (Object.keys(newErrors).length !== Object.keys(errors).length) {
+          setErrors(newErrors)
+        }
       }
     }
   }

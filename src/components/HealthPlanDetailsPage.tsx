@@ -27,12 +27,12 @@ export default function HealthPlanDetailsPage({ onBack }: HealthPlanDetailsPageP
       id: 'avmed',
       name: 'AvMed, Inc.',
       documents: [
-        { id: 'avmed-1', title: 'AvMed Essencial Health Benefits', year: '2016', type: 'benefits' },
-        { id: 'avmed-2', title: 'AvMed Essencial Health Benefits', year: '2015', type: 'benefits' },
-        { id: 'avmed-3', title: 'AvMed Essencial Medicaid Choices', year: '2016', type: 'medicaid' },
-        { id: 'avmed-4', title: 'AvMed Essencial Medicaid Choices', year: '2015', type: 'medicaid' },
-        { id: 'avmed-5', title: 'AvMed Billing Structure', year: '2016', type: 'billing' },
-        { id: 'avmed-6', title: 'AvMed Billing Structure', year: '2015', type: 'billing' }
+        { id: 'avmed-1', title: 'AvMed Essencial Health Benefits', year: '2025', type: 'benefits' },
+        { id: 'avmed-2', title: 'AvMed Essencial Health Benefits', year: '2024', type: 'benefits' },
+        { id: 'avmed-3', title: 'AvMed Essencial Medicaid Choices', year: '2025', type: 'medicaid' },
+        { id: 'avmed-4', title: 'AvMed Essencial Medicaid Choices', year: '2024', type: 'medicaid' },
+        { id: 'avmed-5', title: 'AvMed Billing Structure', year: '2025', type: 'billing' },
+        { id: 'avmed-6', title: 'AvMed Billing Structure', year: '2024', type: 'billing' }
       ]
     },
     {

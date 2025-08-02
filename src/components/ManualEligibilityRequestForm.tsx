@@ -47,6 +47,60 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
     { value: 'wellcare', label: 'WellCare' }
   ]
 
+  // US States options
+  const usStates = [
+    { value: 'AL', label: 'Alabama' },
+    { value: 'AK', label: 'Alaska' },
+    { value: 'AZ', label: 'Arizona' },
+    { value: 'AR', label: 'Arkansas' },
+    { value: 'CA', label: 'California' },
+    { value: 'CO', label: 'Colorado' },
+    { value: 'CT', label: 'Connecticut' },
+    { value: 'DE', label: 'Delaware' },
+    { value: 'FL', label: 'Florida' },
+    { value: 'GA', label: 'Georgia' },
+    { value: 'HI', label: 'Hawaii' },
+    { value: 'ID', label: 'Idaho' },
+    { value: 'IL', label: 'Illinois' },
+    { value: 'IN', label: 'Indiana' },
+    { value: 'IA', label: 'Iowa' },
+    { value: 'KS', label: 'Kansas' },
+    { value: 'KY', label: 'Kentucky' },
+    { value: 'LA', label: 'Louisiana' },
+    { value: 'ME', label: 'Maine' },
+    { value: 'MD', label: 'Maryland' },
+    { value: 'MA', label: 'Massachusetts' },
+    { value: 'MI', label: 'Michigan' },
+    { value: 'MN', label: 'Minnesota' },
+    { value: 'MS', label: 'Mississippi' },
+    { value: 'MO', label: 'Missouri' },
+    { value: 'MT', label: 'Montana' },
+    { value: 'NE', label: 'Nebraska' },
+    { value: 'NV', label: 'Nevada' },
+    { value: 'NH', label: 'New Hampshire' },
+    { value: 'NJ', label: 'New Jersey' },
+    { value: 'NM', label: 'New Mexico' },
+    { value: 'NY', label: 'New York' },
+    { value: 'NC', label: 'North Carolina' },
+    { value: 'ND', label: 'North Dakota' },
+    { value: 'OH', label: 'Ohio' },
+    { value: 'OK', label: 'Oklahoma' },
+    { value: 'OR', label: 'Oregon' },
+    { value: 'PA', label: 'Pennsylvania' },
+    { value: 'RI', label: 'Rhode Island' },
+    { value: 'SC', label: 'South Carolina' },
+    { value: 'SD', label: 'South Dakota' },
+    { value: 'TN', label: 'Tennessee' },
+    { value: 'TX', label: 'Texas' },
+    { value: 'UT', label: 'Utah' },
+    { value: 'VT', label: 'Vermont' },
+    { value: 'VA', label: 'Virginia' },
+    { value: 'WA', label: 'Washington' },
+    { value: 'WV', label: 'West Virginia' },
+    { value: 'WI', label: 'Wisconsin' },
+    { value: 'WY', label: 'Wyoming' }
+  ]
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -62,6 +116,11 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
   const handleContactMethodChange = (method: 'email' | 'fax') => {
     setFormData(prev => ({ ...prev, contactMethod: method }))
+  }
+
+  const handleMilaTrigger = (fieldName: string, formName: string) => {
+    console.log('M.I.L.A. triggered for:', fieldName, 'in form:', formName)
+    // This will be handled by the HelperButton component
   }
 
   const validateField = (fieldName: string, value: string) => {
@@ -318,14 +377,17 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 <label htmlFor="locationNumber" className="form-label">
                   Location Number *
                 </label>
-                <input
-                  type="text"
-                  id="locationNumber"
-                  name="locationNumber"
+                <MilaInputField
                   value={formData.locationNumber}
-                  onChange={handleInputChange}
-                  className={getInputClassName('locationNumber')}
+                  onChange={(value) => {
+                    setFormData(prev => ({ ...prev, locationNumber: value }))
+                  }}
                   placeholder="Provider ID"
+                  fieldName="locationNumber"
+                  formName="ManualEligibility"
+                  onMilaTrigger={handleMilaTrigger}
+                  error={!!errors.locationNumber}
+                  className="form-input"
                 />
                 {errors.locationNumber && (
                   <p className="form-error">{errors.locationNumber}</p>
@@ -374,18 +436,15 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 <label htmlFor="dateOfService" className="form-label">
                   Date of Service *
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="dateOfService"
-                    name="dateOfService"
-                    value={formData.dateOfService}
-                    onChange={handleInputChange}
-                    className={getInputClassName('dateOfService')}
-                    placeholder="Date of Service"
-                  />
-                  <Icon name="calendar" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                </div>
+                <DatePicker
+                  name="dateOfService"
+                  value={formData.dateOfService}
+                  onChange={(date) => {
+                    setFormData(prev => ({ ...prev, dateOfService: date }))
+                  }}
+                  placeholder="Select date of service"
+                  hasError={!!errors.dateOfService}
+                />
                 {errors.dateOfService && (
                   <p className="form-error">{errors.dateOfService}</p>
                 )}
@@ -494,14 +553,17 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 <label htmlFor="memberId" className="form-label">
                   Member ID *
                 </label>
-                <input
-                  type="text"
-                  id="memberId"
-                  name="memberId"
+                <MilaInputField
                   value={formData.memberId}
-                  onChange={handleInputChange}
-                  className={getInputClassName('memberId')}
+                  onChange={(value) => {
+                    setFormData(prev => ({ ...prev, memberId: value }))
+                  }}
                   placeholder="Member ID"
+                  fieldName="memberId"
+                  formName="ManualEligibility"
+                  onMilaTrigger={handleMilaTrigger}
+                  error={!!errors.memberId}
+                  className="form-input"
                 />
                 {errors.memberId && (
                   <p className="form-error">{errors.memberId}</p>
@@ -584,15 +646,20 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 <label htmlFor="state" className="form-label">
                   State *
                 </label>
-                <input
-                  type="text"
+                <select
                   id="state"
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  className={getInputClassName('state')}
-                  placeholder="State"
-                />
+                  className={getSelectClassName('state')}
+                >
+                  <option value="">Select a State</option>
+                  {usStates.map(state => (
+                    <option key={state.value} value={state.value}>
+                      {state.label}
+                    </option>
+                  ))}
+                </select>
                 {errors.state && (
                   <p className="form-error">{errors.state}</p>
                 )}
@@ -620,18 +687,15 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 <label htmlFor="dateOfBirth" className="form-label">
                   Date of Birth *
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="dateOfBirth"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    className={getInputClassName('dateOfBirth')}
-                    placeholder="Date of Birth"
-                  />
-                  <Icon name="calendar" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                </div>
+                <DatePicker
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={(date) => {
+                    setFormData(prev => ({ ...prev, dateOfBirth: date }))
+                  }}
+                  placeholder="Select date of birth"
+                  hasError={!!errors.dateOfBirth}
+                />
                 {errors.dateOfBirth && (
                   <p className="form-error">{errors.dateOfBirth}</p>
                 )}

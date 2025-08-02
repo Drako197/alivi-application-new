@@ -15,6 +15,8 @@ import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
 import ManualEligibilityRequestForm from './ManualEligibilityRequestForm'
+import HealthPlanDetailsPage from './HealthPlanDetailsPage'
+import FramesAndLensesPage from './FramesAndLensesPage'
 import HelperButton from './HelperButton'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
@@ -46,7 +48,7 @@ export default function Dashboard() {
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
   
   // Mobile form state management
-  const [mobilePICView, setMobilePICView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'manual-eligibility-request'>('landing')
+  const [mobilePICView, setMobilePICView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'manual-eligibility-request' | 'health-plan-details' | 'frames-and-lenses'>('landing')
   const [mobileHEDISView, setMobileHEDISView] = useState<'landing' | 'patient-search' | 'screening-form'>('landing')
 
   // Real data state
@@ -116,11 +118,20 @@ export default function Dashboard() {
         // Scroll to top when navigating to form views
         window.scrollTo({ top: 0, behavior: 'smooth' })
         break
+      case 'health-plan-details':
+        setMobilePICView('health-plan-details')
+        // Scroll to top when navigating to form views
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        break
+      case 'frames-and-lenses':
+        setMobilePICView('frames-and-lenses')
+        // Scroll to top when navigating to form views
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        break
       case 'claim-status':
       case 'claim-summary':
       case 'job-status-online':
       case 'job-status-paper':
-      case 'health-plan-details':
       case 'explanation-of-payments':
       case 'payment-summary-report':
       case 'frame-collections':
@@ -1165,6 +1176,42 @@ export default function Dashboard() {
                 </div>
                 <ManualEligibilityRequestForm />
                 <HelperButton currentForm="ManualEligibilityRequest" currentField="mobile" currentStep={1} />
+              </div>
+            ) : mobilePICView === 'health-plan-details' ? (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => {
+                      setMobilePICView('landing')
+                      // Scroll to top when navigating back
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Health Plan Details</h2>
+                </div>
+                <HealthPlanDetailsPage />
+                <HelperButton currentForm="HealthPlanDetails" currentField="mobile" currentStep={1} />
+              </div>
+            ) : mobilePICView === 'frames-and-lenses' ? (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => {
+                      setMobilePICView('landing')
+                      // Scroll to top when navigating back
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Frames and Lenses</h2>
+                </div>
+                <FramesAndLensesPage />
+                <HelperButton currentForm="FramesAndLenses" currentField="mobile" currentStep={1} />
               </div>
             ) : null}
             <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} />

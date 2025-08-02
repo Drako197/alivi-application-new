@@ -769,27 +769,27 @@ export default function ClaimsSubmissionForm({
         {/* Mobile-friendly step indicators */}
         <div className={`step-item ${currentStep > 1 ? 'step-completed' : currentStep === 1 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">1</div>
-          <div className="step-label">Patient Info</div>
+          <div className="step-label">Provider & Setup</div>
         </div>
         <div className={`step-item ${currentStep > 2 ? 'step-completed' : currentStep === 2 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">2</div>
-          <div className="step-label">Diagnosis</div>
+          <div className="step-label">Claim Details</div>
         </div>
         <div className={`step-item ${currentStep > 3 ? 'step-completed' : currentStep === 3 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">3</div>
-          <div className="step-label">Procedure</div>
+          <div className="step-label">Prescription</div>
         </div>
         <div className={`step-item ${currentStep > 4 ? 'step-completed' : currentStep === 4 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">4</div>
-          <div className="step-label">Provider</div>
+          <div className="step-label">Lens Choice</div>
         </div>
         <div className={`step-item ${currentStep > 5 ? 'step-completed' : currentStep === 5 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">5</div>
-          <div className="step-label">Billing</div>
+          <div className="step-label">Frame Selection</div>
         </div>
         <div className={`step-item ${currentStep > 6 ? 'step-completed' : currentStep === 6 ? 'step-active' : 'step-inactive'}`}>
           <div className="step-number">6</div>
-          <div className="step-label">Review</div>
+          <div className="step-label">Review & Submit</div>
         </div>
       </div>
     )

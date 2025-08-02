@@ -210,11 +210,11 @@ export default function FramesAndLensesPage({ onBack }: FramesAndLensesPageProps
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Tabbed Navigation */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6">
           <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+            <nav className="flex space-x-8 px-4 sm:px-6" aria-label="Tabs">
               <button
                 onClick={() => setActiveTab('frames')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
@@ -225,7 +225,8 @@ export default function FramesAndLensesPage({ onBack }: FramesAndLensesPageProps
               >
                 <div className="flex items-center gap-2">
                   <Icon name="eye" size={16} />
-                  Frames Collection
+                  <span className="hidden sm:inline">Frames Collection</span>
+                  <span className="sm:hidden">Frames</span>
                 </div>
               </button>
               <button
@@ -238,51 +239,51 @@ export default function FramesAndLensesPage({ onBack }: FramesAndLensesPageProps
               >
                 <div className="flex items-center gap-2">
                   <Icon name="tag" size={16} />
-                  Lens Price List
+                  <span className="hidden sm:inline">Lens Price List</span>
+                  <span className="sm:hidden">Lenses</span>
                 </div>
               </button>
             </nav>
           </div>
 
           {/* Content Area */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="space-y-4">
               {currentDocuments.map((document, index) => (
                 <div
                   key={document.id}
-                  className={`flex justify-between items-center p-4 rounded-lg border ${
-                    index !== currentDocuments.length - 1
-                      ? 'border-gray-200 dark:border-gray-600'
-                      : ''
+                  className={`bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4 shadow-sm hover:shadow-md transition-shadow ${
+                    index !== currentDocuments.length - 1 ? 'mb-4' : ''
                   }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-gray-500 dark:text-gray-400 w-6">
-                      {index + 1}.
-                    </span>
-                    <div className="flex items-center gap-3">
-                      <Icon
-                        name={getDocumentIcon(document.type)}
-                        size={16}
-                        className={getDocumentColor(document.type)}
-                      />
-                      <div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {document.title}
-                        </span>
-                        <div className="flex items-center gap-4 mt-1">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {document.fileSize}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            Updated: {document.lastUpdated}
-                          </span>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start gap-3 flex-1">
+                      <span className="text-sm text-gray-500 dark:text-gray-400 w-6 flex-shrink-0">
+                        {index + 1}.
+                      </span>
+                      <div className="flex items-start gap-3 flex-1">
+                        <Icon
+                          name={getDocumentIcon(document.type)}
+                          size={16}
+                          className={`${getDocumentColor(document.type)} mt-1 flex-shrink-0`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1 break-words">
+                            {document.title}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                            <span>{document.fileSize}</span>
+                            <span>Updated: {document.lastUpdated}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {getDocumentStatusBadge(document)}
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {getDocumentStatusBadge(document)}
+                    </div>
                     <button
                       onClick={() => handleViewDocument(document)}
                       className={`btn-primary flex items-center gap-2 px-4 py-2 text-sm ${
@@ -301,10 +302,10 @@ export default function FramesAndLensesPage({ onBack }: FramesAndLensesPageProps
         </div>
 
         {/* Information Footer */}
-        <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-          <div className="flex items-start gap-4">
-            <Icon name="info" size={20} className="text-blue-600 dark:text-blue-400 mt-1" />
-            <div>
+        <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+            <Icon name="info" size={20} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <div className="flex-1">
               <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
                 About Frames and Lenses Documents
               </h3>

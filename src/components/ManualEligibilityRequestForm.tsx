@@ -492,7 +492,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             {/* Email Method */}
             {formData.contactMethod === 'email' && (
               <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-                <div data-error={!!errors.emailAddress}>
+                <div className="form-group" data-error={!!errors.emailAddress}>
                   <label htmlFor="emailAddress" className="form-label">
                     Email Reply Address <span className="text-red-500">*</span>
                   </label>
@@ -502,7 +502,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                     name="emailAddress"
                     value={formData.emailAddress}
                     onChange={handleInputChange}
-                    className={getInputClassName('emailAddress')}
+                    className="form-input"
                     placeholder="email@domain.com"
                   />
                   {errors.emailAddress && (
@@ -518,7 +518,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             {/* Fax Method */}
             {formData.contactMethod === 'fax' && (
               <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-                <div data-error={!!errors.faxNumber}>
+                <div className="form-group" data-error={!!errors.faxNumber}>
                   <label htmlFor="faxNumber" className="form-label">
                     Provider Fax-back Number <span className="text-red-500">*</span>
                   </label>
@@ -528,7 +528,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                     name="faxNumber"
                     value={formData.faxNumber}
                     onChange={handleInputChange}
-                    className={getInputClassName('faxNumber')}
+                    className="form-input"
                     placeholder="000-000-0000"
                   />
                   {errors.faxNumber && (
@@ -580,7 +580,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={getInputClassName('firstName')}
+                  className="form-input"
                   placeholder="First Name"
                 />
                 {errors.firstName && (
@@ -598,7 +598,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={getInputClassName('lastName')}
+                  className="form-input"
                   placeholder="Last Name"
                 />
                 {errors.lastName && (
@@ -616,7 +616,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="streetAddress"
                   value={formData.streetAddress}
                   onChange={handleInputChange}
-                  className={getInputClassName('streetAddress')}
+                  className="form-input"
                   placeholder="Street Address"
                 />
                 {errors.streetAddress && (
@@ -634,7 +634,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="city"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className={getInputClassName('city')}
+                  className="form-input"
                   placeholder="City"
                 />
                 {errors.city && (
@@ -675,7 +675,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="zip"
                   value={formData.zip}
                   onChange={handleInputChange}
-                  className={getInputClassName('zip')}
+                  className="form-input"
                   placeholder="ZIP"
                 />
                 {errors.zip && (

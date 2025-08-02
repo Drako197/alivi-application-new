@@ -3985,6 +3985,231 @@ export default function ClaimsSubmissionForm({
                   ))}
                 </div>
 
+                {/* Prescription Card - Read Only */}
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription</h3>
+                      <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 text-xs font-medium rounded-full">
+                        Active
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 dark:border-gray-700">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-700">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b"></th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Sphere</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Cylinder</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Axis</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Add</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">BC</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Segment Hgt</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OD</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">+4.25</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">-0.50</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">2.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.50</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">8MM</td>
+                        </tr>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OS</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">+4.00</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">-0.75</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">2.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.0</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.50</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">8MM</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Prescription Detail Card - Read Only */}
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Detail</h3>
+                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
+                        Complete
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 dark:border-gray-700">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-700">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b"></th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Horizontal</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Direction</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Vertical</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Direction</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b">Prism Type</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OD</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.5</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">In</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.5</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Up</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Decentered</td>
+                        </tr>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">OS</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.75</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">In</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">0.75</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Up</td>
+                          <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">Ground In</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Far:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">40MM</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Near:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">37MM</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lens Instruction Card - Read Only */}
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Lens Instruction</h3>
+                      <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-xs font-medium rounded-full">
+                        Bi-Focal
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Vision Type:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Bi-Focal</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Lens Type:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Blended 25</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Material:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">CR-39</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Tint Type:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Grey Gradient 1/2</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Lens Source:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Italy</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Edge:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Standard</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Thickness:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Standard</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Coating:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Standard ARC</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Other:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">SlabOff - OD</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Extra:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">UV, Scratch Resistant and UV Package</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Frame Selection Card - Read Only */}
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Frame Selection</h3>
+                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                        Selected
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Frame Source:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Insurance Supplied - Grand Lux Collection</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Frame Type:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">1</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Rimless Type:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">XYL</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Name:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">U 20</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Color:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">Tortoise</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Eye Size:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">46</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Bridge:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">20</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Vertical:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">20</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">ED:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">46</span>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Footer with summary and action buttons */}
                 <div className="border-t pt-6 mt-8">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

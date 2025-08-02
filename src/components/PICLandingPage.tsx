@@ -5,6 +5,7 @@ import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
 import HealthPlanDetailsPage from './HealthPlanDetailsPage'
+import FramesAndLensesPage from './FramesAndLensesPage'
 import HelperButton from './HelperButton'
 
 interface ActionItem {
@@ -25,7 +26,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'health-plan-details'>('landing')
+  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'health-plan-details' | 'frames-and-lenses'>('landing')
 
   // Reset to landing page when resetToLanding prop changes
   useEffect(() => {
@@ -52,8 +53,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
     { id: 'health-plan-details', name: 'Health Plan Details', description: 'View health plan information and coverage', category: 'plans', frequency: 85, icon: 'info' },
     { id: 'explanation-of-payments', name: 'Explanation of Payments', description: 'View detailed payment explanations', category: 'plans', frequency: 78, icon: 'dollar-sign' },
     { id: 'payment-summary-report', name: 'Payment Summary Report', description: 'Generate payment summary reports', category: 'plans', frequency: 72, icon: 'bar-chart-3' },
-    { id: 'frame-collections', name: 'Frame Collections', description: 'Access frame collection information', category: 'plans', frequency: 65, icon: 'package' },
-    { id: 'lens-price-list', name: 'Lens Price List', description: 'View current lens pricing information', category: 'plans', frequency: 58, icon: 'tag' },
+    { id: 'frames-and-lenses', name: 'Frames and Lenses', description: 'Access frame collections and lens pricing information', category: 'plans', frequency: 75, icon: 'eye' },
     
     // Authorization & Management
     { id: 'um-prior-authorization', name: 'UM Prior Authorization', description: 'Submit utilization management authorizations', category: 'authorization', frequency: 82, icon: 'shield-check' },
@@ -108,6 +108,12 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       if (onUpdateBreadcrumb) {
         onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Health Plan Details'])
       }
+    } else if (action.id === 'frames-and-lenses') {
+      setCurrentView('frames-and-lenses')
+      // Update breadcrumb to show P.I.C. > Frames and Lenses
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Frames and Lenses'])
+      }
     } else {
       // Here you would typically navigate to the specific action or open a modal
       console.log('Navigating to:', action.name)
@@ -152,6 +158,11 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   // Show Health Plan Details Page if currentView is 'health-plan-details'
   if (currentView === 'health-plan-details') {
     return <HealthPlanDetailsPage onBack={handleBackToLanding} />
+  }
+
+  // Show Frames and Lenses Page if currentView is 'frames-and-lenses'
+  if (currentView === 'frames-and-lenses') {
+    return <FramesAndLensesPage onBack={handleBackToLanding} />
   }
 
   return (

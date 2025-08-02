@@ -14,6 +14,7 @@ import ScreeningDataService, { type CompletedScreening, type SavedScreening } fr
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
+import ManualEligibilityRequestForm from './ManualEligibilityRequestForm'
 import HelperButton from './HelperButton'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
@@ -45,7 +46,7 @@ export default function Dashboard() {
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
   
   // Mobile form state management
-  const [mobilePICView, setMobilePICView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription'>('landing')
+  const [mobilePICView, setMobilePICView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'manual-eligibility-request'>('landing')
   const [mobileHEDISView, setMobileHEDISView] = useState<'landing' | 'patient-search' | 'screening-form'>('landing')
 
   // Real data state
@@ -110,6 +111,11 @@ export default function Dashboard() {
         // Scroll to top when navigating to form views
         window.scrollTo({ top: 0, behavior: 'smooth' })
         break
+      case 'manual-eligibility-request':
+        setMobilePICView('manual-eligibility-request')
+        // Scroll to top when navigating to form views
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        break
       case 'claim-status':
       case 'claim-summary':
       case 'job-status-online':
@@ -121,7 +127,6 @@ export default function Dashboard() {
       case 'lens-price-list':
       case 'um-prior-authorization':
       case 'um-authorization-status':
-      case 'manual-eligibility-request':
       case 'provider-resources':
         // For now, these actions will show a placeholder or could be implemented later
         console.log('Action clicked:', actionId)
@@ -1142,6 +1147,24 @@ export default function Dashboard() {
                 </div>
                 <PrescriptionForm />
                 <HelperButton currentForm="Prescription" currentField="mobile" currentStep={1} />
+              </div>
+            ) : mobilePICView === 'manual-eligibility-request' ? (
+              <div className="p-4">
+                <div className="flex items-center mb-4">
+                  <button
+                    onClick={() => {
+                      setMobilePICView('landing')
+                      // Scroll to top when navigating back
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
+                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="arrow-left" size={20} />
+                  </button>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Manual Eligibility Request</h2>
+                </div>
+                <ManualEligibilityRequestForm />
+                <HelperButton currentForm="ManualEligibilityRequest" currentField="mobile" currentStep={1} />
               </div>
             ) : null}
             <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} />

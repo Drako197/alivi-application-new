@@ -162,7 +162,9 @@ export class AIAssistantService {
   // Local knowledge base for immediate responses
   private static LOCAL_KNOWLEDGE = {
     terminology: {
-      // General medical billing terms
+      'OD': 'Oculus Dexter - Right Eye',
+      'OS': 'Oculus Sinister - Left Eye',
+      'OU': 'Oculus Uterque - Both Eyes',
       'PCP': 'Primary Care Physician',
       'HEDIS': 'Healthcare Effectiveness Data and Information Set',
       'PIC': 'Provider Interface Center',
@@ -174,86 +176,154 @@ export class AIAssistantService {
       'ERA': 'Electronic Remittance Advice',
       'EDI': 'Electronic Data Interchange',
       'HIPAA': 'Health Insurance Portability and Accountability Act',
-      'CMS': 'Centers for Medicare & Medicaid Services',
-      'POS': 'Place of Service',
-      'MOD': 'Modifier',
-      // Enhanced with specialty-specific terminology
-      ...MedicalSpecialtiesService.getAllTerminology()
+      'CMS': 'Centers for Medicare & Medicaid Services'
     },
     commonCodes: {
-      // General codes
       'E11.9': 'Type 2 diabetes mellitus without complications',
       'E11.21': 'Type 2 diabetes mellitus with diabetic nephropathy',
       'E11.22': 'Type 2 diabetes mellitus with diabetic chronic kidney disease',
+      'H35.00': 'Unspecified background retinopathy',
+      'H35.01': 'Mild nonproliferative diabetic retinopathy',
+      'H35.02': 'Moderate nonproliferative diabetic retinopathy',
+      'H35.03': 'Severe nonproliferative diabetic retinopathy',
+      'H35.04': 'Proliferative diabetic retinopathy',
       'Z79.4': 'Long term (current) use of insulin',
       'Z79.84': 'Long term (current) use of oral hypoglycemic drugs',
-      // Enhanced with specialty-specific codes
-      ...Object.fromEntries(
-        MedicalSpecialtiesService.getAllCodes().map(code => [code, `Code: ${code}`])
-      )
+      '92250': 'Fundus photography with interpretation and report',
+      '92227': 'Imaging of retina for detection or monitoring of disease',
+      '92228': 'Imaging of retina for detection or monitoring of disease; with remote analysis',
+      '92229': 'Imaging of retina for detection or monitoring of disease; with point-of-care automated analysis'
     },
-    posCodes: {
-      // Place of Service codes for optometry
-      '11': 'Office (most common for routine eye exams)',
-      '12': 'Home',
-      '15': 'Mobile Unit',
-      '22': 'Outpatient Hospital (for specialized procedures)',
-      '24': 'Ambulatory Surgical Center (for surgeries)',
-      '25': 'Birthing Center',
-      '26': 'Military Treatment Facility',
-      '31': 'Skilled Nursing Facility',
-      '32': 'Nursing Facility',
-      '33': 'Custodial Care Facility',
-      '34': 'Hospice',
-      '41': 'Ambulance - Land',
-      '42': 'Ambulance - Air or Water',
-      '50': 'Federally Qualified Health Center',
-      '52': 'Psychiatric Facility - Partial Hospitalization',
-      '53': 'Community Mental Health Center',
-      '54': 'Intermediate Care Facility/Individuals with Intellectual Disabilities',
-      '55': 'Residential Substance Abuse Treatment Facility',
-      '56': 'Psychiatric Residential Treatment Facility',
-      '57': 'Non-residential Substance Abuse Treatment Facility',
-      '60': 'Mass Immunization Center',
-      '61': 'Comprehensive Inpatient Rehabilitation Facility',
-      '62': 'Comprehensive Outpatient Rehabilitation Facility',
-      '65': 'End-Stage Renal Disease Treatment Facility',
-      '71': 'State or Local Public Health Clinic',
-      '72': 'Rural Health Clinic',
-      '81': 'Independent Laboratory',
-      '99': 'Other Place of Service'
+    formGuidance: {
+      'PatientEligibilityForm': {
+        'providerId': 'Enter your 10-digit National Provider Identifier (NPI) number. This is required for all claims submissions.',
+        'subscriberId': 'Enter the patient\'s member ID as it appears on their insurance card. This is typically found on the front of the card.',
+        'dependantSequence': 'Enter the dependent sequence number. 00 = primary subscriber, 01 = spouse, 02+ = children in order of birth.',
+        'lastName': 'Enter the patient\'s legal last name exactly as it appears on their insurance card.',
+        'firstName': 'Enter the patient\'s legal first name exactly as it appears on their insurance card.',
+        'dateOfBirth': 'Enter the patient\'s date of birth in MM/DD/YYYY format.'
+      },
+      'ClaimsSubmissionForm': {
+        'serviceDateFrom': 'Enter the date when services began. This should be the first date of the service period.',
+        'serviceDateTo': 'Enter the date when services ended. For single-day services, this will be the same as the from date.',
+        'diagnosisCodes': 'Enter the primary diagnosis code first, followed by any secondary codes. Use the most specific code available.',
+        'procedureCodes': 'Enter the procedure codes for services rendered. Include modifiers if applicable.',
+        'units': 'Enter the number of units for this procedure. For most procedures, this is 1.',
+        'uAndCCharge': 'Enter your usual and customary charge for this service.',
+        'planAllowed': 'Enter the amount allowed by the insurance plan for this service.'
+      }
     },
-    modCodes: {
-      // Modifier codes
-      '25': 'Significant, separately identifiable evaluation and management service by the same physician or other qualified health care professional on the same day of the procedure or other service',
-      '59': 'Distinct procedural service',
-      '24': 'Unrelated evaluation and management service by the same physician or other qualified health care professional during a postoperative period',
-      '57': 'Decision for surgery',
-      '78': 'Unplanned return to the operating/procedure room by the same physician or other qualified health care professional following initial procedure for a related procedure during the postoperative period',
-      '79': 'Unrelated procedure or service by the same physician or other qualified health care professional during the postoperative period',
-      '80': 'Assistant surgeon',
-      '81': 'Minimum assistant surgeon',
-      '82': 'Assistant surgeon (when qualified resident surgeon not available)',
-      'AS': 'Physician assistant, nurse practitioner, or clinical nurse specialist services for assistant at surgery',
-      'TC': 'Technical component',
-      '26': 'Professional component',
-      '50': 'Bilateral procedure',
-      '51': 'Multiple procedures',
-      '52': 'Reduced services',
-      '53': 'Discontinued procedure',
-      '54': 'Surgical care only',
-      '55': 'Postoperative management only',
-      '56': 'Preoperative management only',
-      '73': 'Discontinued outpatient hospital/ambulatory surgery center procedure prior to the administration of anesthesia',
-      '74': 'Discontinued outpatient hospital/ambulatory surgery center procedure after administration of anesthesia',
-      '76': 'Repeat procedure or service by same physician or other qualified health care professional',
-      '77': 'Repeat procedure by another physician or other qualified health care professional',
-      '91': 'Repeat clinical diagnostic laboratory test',
-      '92': 'Alternative laboratory platform testing',
-      '95': 'Synchronous telemedicine service rendered via a real-time interactive audio and video telecommunications system',
-      '96': 'Habilitative services',
-      '97': 'Rehabilitative services',
-      '99': 'Multiple modifiers'
+    applicationKnowledge: {
+      pages: {
+        'Frames and Lenses': {
+          description: 'Comprehensive collection of frame and lens pricing information',
+          location: 'PIC Actions → Frames and Lenses',
+          documents: {
+            'Standard Lens Price List 2024': 'Complete pricing for standard lenses including single vision, bifocal, and trifocal lenses',
+            'Premium Lens Price List 2024': 'Premium lens options including high-index, polycarbonate, and specialty materials',
+            'Progressive Lens Price List 2024': 'Progressive lens pricing for all brands and designs',
+            'Contact Lens Price List 2024': 'Contact lens pricing including daily, weekly, and monthly options',
+            'Specialty Lens Price List 2024': 'Specialty lenses for conditions like keratoconus, post-surgery, and custom designs',
+            'Coating and Treatment Price List 2024': 'Anti-reflective, scratch-resistant, and other lens treatments',
+            'Premium Collection Frame Kit': 'Premium frame collections with detailed specifications',
+            'Grand Lux Frame Kit': 'Luxury frame collections and special orders',
+            'Designer Collection Frame Kit': 'Designer brand frames and exclusive collections',
+            'Kids Collection Frame Kit': 'Children\'s frames and safety options'
+          },
+          navigation: 'Access via PIC Actions page, then click "Frames and Lenses" action'
+        },
+        'Health Plan Details': {
+          description: 'Comprehensive health plan provider information and documents',
+          location: 'PIC Actions → Health Plan Details',
+          providers: {
+            'AvMed': 'Complete 2024-2025 benefits, Medicaid choices, and billing structure',
+            'Care Plus': 'Essential health benefits and provider network information',
+            'Florida Blue': 'Blue Cross Blue Shield of Florida plans and coverage',
+            'Humana': 'Medicare Advantage and commercial plan details',
+            'Kaiser': 'Integrated health system plans and benefits',
+            'Aetna': 'Commercial and Medicare plans with detailed coverage',
+            'Cigna': 'Global health service company plans and networks',
+            'UnitedHealthcare': 'Comprehensive health benefits and provider networks',
+            'Anthem': 'Blue Cross Blue Shield plans and coverage options',
+            'Molina': 'Medicaid and Marketplace plan information',
+            'WellCare': 'Medicare and Medicaid plan details'
+          },
+          documentTypes: {
+            'benefits': 'Essential health benefits and coverage details',
+            'medicaid': 'Medicaid plan options and eligibility',
+            'billing': 'Billing structure and payment information',
+            'coverage': 'Coverage details and limitations',
+            'network': 'Provider network information',
+            'formulary': 'Prescription drug coverage and formularies'
+          },
+          navigation: 'Access via PIC Actions page, then click "Health Plan Details" action'
+        },
+        'Reserved Benefits': {
+          description: 'Patient benefit information and coverage details',
+          location: 'Patient Eligibility Form → Step 3 Results',
+          features: {
+            'Financial Summary': 'Cost breakdown and patient responsibility',
+            'Member Information': 'Patient demographics and eligibility',
+            'Provider Information': 'Provider details and network status',
+            'Benefits Details': 'Coverage information and limitations',
+            'Available Benefits': 'List of covered services and procedures'
+          },
+          navigation: 'Complete Patient Eligibility Form to view reserved benefits'
+        }
+      },
+      features: {
+        'M.I.L.A. AI Assistant': {
+          description: 'Intelligent assistant for medical billing and form guidance',
+          capabilities: [
+            'Medical code lookup and validation',
+            'Form field guidance and explanations',
+            'Terminology definitions',
+            'Provider search assistance',
+            'Workflow optimization suggestions',
+            'Real-time error prevention',
+            'Context-aware help and guidance'
+          ],
+          activation: 'Click the M.I.L.A. button (lightbulb icon) in any form'
+        },
+        'PIC Actions': {
+          description: 'Provider Interface Center with quick access to common actions',
+          availableActions: [
+            'Health Plan Details - Access provider information and documents',
+            'Frames and Lenses - View pricing and collections',
+            'Request Patient Eligibility - Check patient coverage',
+            'Submit Claims - Process insurance claims',
+            'HEDIS Screening - Quality measure documentation'
+          ],
+          navigation: 'Main dashboard → PIC tab'
+        }
+      },
+      helpTopics: {
+        'lens pricing': {
+          keywords: ['lens', 'pricing', 'price', 'cost', 'lenses', 'frame', 'frames'],
+          response: 'I can help you find lens pricing information! The Frames and Lenses page contains comprehensive pricing for all lens types including Standard, Premium, Progressive, Contact, and Specialty lenses. You can access this information through the PIC Actions page by clicking "Frames and Lenses". The page includes separate price lists for different lens categories and frame collections.',
+          action: 'Navigate to PIC Actions → Frames and Lenses'
+        },
+        'health plan information': {
+          keywords: ['health plan', 'insurance', 'provider', 'benefits', 'coverage'],
+          response: 'Health plan information is available in the Health Plan Details page. This includes comprehensive information for major providers like AvMed, Care Plus, Florida Blue, Humana, Kaiser, Aetna, Cigna, UnitedHealthcare, Anthem, Molina, and WellCare. Each provider has detailed documents for benefits, Medicaid, billing, coverage, network, and formulary information.',
+          action: 'Navigate to PIC Actions → Health Plan Details'
+        },
+        'patient eligibility': {
+          keywords: ['eligibility', 'patient', 'coverage', 'benefits', 'reserved'],
+          response: 'Patient eligibility information can be accessed through the Request Patient Eligibility form. This will show you the patient\'s coverage details, reserved benefits, and financial information. Complete the form to view comprehensive benefit information including cost breakdowns and covered services.',
+          action: 'Navigate to PIC Actions → Request Patient Eligibility'
+        },
+        'claims submission': {
+          keywords: ['claims', 'submission', 'billing', 'submit', 'claim'],
+          response: 'Claims submission is available through the Submit Claims form. This comprehensive form guides you through the entire claims process including patient information, diagnosis codes, procedure codes, and billing details. The form includes M.I.L.A. assistance for code lookup and validation.',
+          action: 'Navigate to PIC Actions → Submit Claims'
+        },
+        'HEDIS screening': {
+          keywords: ['hedis', 'screening', 'quality', 'measures', 'retinal'],
+          response: 'HEDIS screening forms are available for quality measure documentation. These forms help document retinal imaging, patient demographics, and other quality measures required for HEDIS reporting. The forms include step-by-step guidance and validation.',
+          action: 'Navigate to HEDIS tab → New Screening'
+        }
+      }
     }
   }
 
@@ -816,104 +886,147 @@ export class AIAssistantService {
 
   // Helper method to process main input (existing logic)
   private static async processMainInput(input: string, context: AIContext): Promise<string> {
-    try {
-      // Enhanced context-aware processing with new capabilities
-      
-      // 1. Real-time code validation
-      if (input.match(/\b([A-Z]\d{4}|\d{5}|E\d{2}\.\d{1,2}|Z\d{2}\.\d{1,2})\b/g)) {
-        const realTimeValidation = await this.handleCodeLookupWithRealTimeValidation(input, context)
-        if (realTimeValidation) {
-          this.learnFromInteraction(input, realTimeValidation, context, true)
-          return realTimeValidation
-        }
-      }
-
-      // 1.5. Handle invalid code queries
-      if ((input.toLowerCase().includes('what is') || input.toLowerCase().includes('help with')) && input.match(/[A-Z]{3}\d{3}/)) {
-        const invalidCodeMatch = input.match(/([A-Z]{3}\d{3})/)
-        if (invalidCodeMatch) {
-          const invalidCode = invalidCodeMatch[1]
-          return `**Code Validation Result:**
-
-**Code:** ${invalidCode}
-**Status:** ❌ INVALID
-**Error:** Code not found in medical database
-
-**Suggestions:**
-- Check the code spelling and format
-- Verify it's a valid medical code (ICD-10, CPT, HCPCS)
-- Try searching for similar codes
-- Common formats: E11.9 (ICD-10), 92250 (CPT), G0008 (HCPCS)`
-        }
-      }
-
-      // 2. Insurance policy lookup
-      if (input.match(/\b(insurance|policy|coverage|benefits)\b/i)) {
-        const insuranceResponse = await this.handleInsurancePolicyLookup(input, context)
-        if (insuranceResponse) {
-          this.learnFromInteraction(input, insuranceResponse, context, true)
-          return insuranceResponse
-        }
-      }
-
-      // 3. Compliance guidance
-      if (input.match(/\b(hipaa|compliance|regulations|privacy|security)\b/i)) {
-        const complianceResponse = await this.handleComplianceGuidance(input, context)
-        if (complianceResponse) {
-          this.learnFromInteraction(input, complianceResponse, context, true)
-          return complianceResponse
-        }
-      }
-
-      // 4. Specialty-specific queries
-      if (input.match(/\b(optometry|ophthalmology|primary care|diabetes|hypertension|preventive)\b/i)) {
-        const specialtyResponse = await this.handleSpecialtySpecificQuery(input, context)
-        if (specialtyResponse) {
-          this.learnFromInteraction(input, specialtyResponse, context, true)
-          return specialtyResponse
-        }
-      }
-
-      // 5. Treatment protocol queries
-      if (input.match(/\b(treatment|protocol|management|care plan)\b/i)) {
-        const protocolResponse = await this.handleTreatmentProtocolQuery(input, context)
-        if (protocolResponse) {
-          this.learnFromInteraction(input, protocolResponse, context, true)
-          return protocolResponse
-        }
-      }
-
-      // 6. Documentation template queries
-      if (input.match(/\b(template|documentation|note|chart)\b/i)) {
-        const templateResponse = await this.handleDocumentationTemplateQuery(input, context)
-        if (templateResponse) {
-          this.learnFromInteraction(input, templateResponse, context, true)
-          return templateResponse
-        }
-      }
-
-      // 7. Audit trail queries
-      if (input.match(/\b(audit|compliance|trail|tracking)\b/i)) {
-        const auditResponse = await this.handleAuditTrailQuery(input, context)
-        if (auditResponse) {
-          this.learnFromInteraction(input, auditResponse, context, true)
-          return auditResponse
-        }
-      }
-
-      // Enhanced context-aware response generation
-      const contextualResponse = this.generateContextualResponse(input, context, { intent: 'general', confidence: 0.5 })
-      if (contextualResponse) {
-        this.learnFromInteraction(input, contextualResponse, context, true)
-        return contextualResponse
-      }
-
-      // Fallback to existing enhanced processing
-      return await this.getAgileResponseWithLearning(input, context)
-    } catch (error) {
-      console.error('Error in enhanced processUserInput:', error)
-      return `I apologize, but I encountered an error processing your request. Please try rephrasing your question or contact support if the issue persists.`
+    const lowerInput = input.toLowerCase()
+    
+    // Check for application knowledge queries first
+    const appKnowledgeResponse = this.handleApplicationKnowledgeQuery(input, context)
+    if (appKnowledgeResponse) {
+      return appKnowledgeResponse
     }
+    
+    // Check for terminology questions
+    if (this.isTerminologyQuestion(lowerInput)) {
+      const response = await this.handleTerminologyQuestion(input)
+      return response.content
+    }
+    
+    // Check for specific code lookups
+    if (this.isSpecificCodeLookup(input)) {
+      return await this.handleSpecificCodeLookup(input)
+    }
+    
+    // Check for ICD-10 lookups
+    if (this.isICD10Lookup(lowerInput)) {
+      const response = await this.handleICD10Lookup(input)
+      return response.content
+    }
+    
+    // Check for CPT lookups
+    if (this.isCPTLookup(lowerInput)) {
+      const response = await this.handleCPTLookup(input)
+      return response.content
+    }
+    
+    // Check for specialty questions
+    if (this.isSpecialtyQuestion(lowerInput)) {
+      const response = this.handleSpecialtyQuestion(input)
+      return response.content
+    }
+    
+    // Check for provider lookups
+    if (this.isProviderLookup(lowerInput)) {
+      const response = await this.handleProviderLookup(input)
+      return response.content
+    }
+    
+    // Check for form help
+    if (this.isFormHelp(lowerInput)) {
+      const response = this.handleFormHelp(input, context)
+      return response.content
+    }
+    
+    // Check for medical terminology
+    if (this.isMedicalTerminology(lowerInput)) {
+      return await this.handleMedicalTerminology(input)
+    }
+    
+    // Check for provider search
+    if (this.isProviderSearch(lowerInput)) {
+      return await this.handleProviderSearch(input)
+    }
+    
+    // Check for eligibility check
+    if (this.isEligibilityCheck(lowerInput)) {
+      return await this.handleEligibilityCheck(input)
+    }
+    
+    // Check for claims submission
+    if (this.isClaimsSubmission(lowerInput)) {
+      return await this.handleClaimsSubmission(input)
+    }
+    
+    // Check for workflow assistance
+    if (this.isWorkflowAssistance(lowerInput)) {
+      return await this.handleWorkflowAssistance(input, context)
+    }
+    
+    // Check for mobile requests
+    if (this.isMobileRequest(lowerInput)) {
+      return await this.handleMobileRequest(input)
+    }
+    
+    // Check for general questions
+    if (this.isGeneralQuestion(lowerInput)) {
+      const response = this.handleGeneralQuestion(input)
+      return response.content
+    }
+    
+    // Enhanced default response with context
+    return this.getEnhancedDefaultResponse(input, context)
+  }
+
+  private static handleApplicationKnowledgeQuery(input: string, context: AIContext): string | null {
+    const lowerInput = input.toLowerCase()
+    const knowledge = this.LOCAL_KNOWLEDGE.applicationKnowledge
+    
+    // Check for lens pricing queries
+    if (lowerInput.includes('lens') && (lowerInput.includes('pricing') || lowerInput.includes('price') || lowerInput.includes('cost'))) {
+      const pageInfo = knowledge.pages['Frames and Lenses']
+      return `I can help you find lens pricing information! The Frames and Lenses page contains comprehensive pricing for all lens types including Standard, Premium, Progressive, Contact, and Specialty lenses. You can access this information through the PIC Actions page by clicking "Frames and Lenses". The page includes separate price lists for different lens categories and frame collections.\n\n**Available Documents:**\n${Object.entries(pageInfo.documents).map(([title, desc]) => `• ${title}: ${desc}`).join('\n')}\n\n**Navigation:** ${pageInfo.navigation}`
+    }
+    
+    // Check for health plan queries
+    if (lowerInput.includes('health plan') || lowerInput.includes('insurance') || lowerInput.includes('provider')) {
+      const pageInfo = knowledge.pages['Health Plan Details']
+      return `Health plan information is available in the Health Plan Details page. This includes comprehensive information for major providers like AvMed, Care Plus, Florida Blue, Humana, Kaiser, Aetna, Cigna, UnitedHealthcare, Anthem, Molina, and WellCare. Each provider has detailed documents for benefits, Medicaid, billing, coverage, network, and formulary information.\n\n**Available Providers:**\n${Object.entries(pageInfo.providers).map(([name, desc]) => `• ${name}: ${desc}`).join('\n')}\n\n**Navigation:** ${pageInfo.navigation}`
+    }
+    
+    // Check for patient eligibility queries
+    if (lowerInput.includes('eligibility') || lowerInput.includes('patient') && lowerInput.includes('coverage')) {
+      const pageInfo = knowledge.pages['Reserved Benefits']
+      return `Patient eligibility information can be accessed through the Request Patient Eligibility form. This will show you the patient's coverage details, reserved benefits, and financial information. Complete the form to view comprehensive benefit information including cost breakdowns and covered services.\n\n**Available Features:**\n${Object.entries(pageInfo.features).map(([name, desc]) => `• ${name}: ${desc}`).join('\n')}\n\n**Navigation:** ${pageInfo.navigation}`
+    }
+    
+    // Check for claims submission queries
+    if (lowerInput.includes('claims') || lowerInput.includes('submission') || lowerInput.includes('billing')) {
+      return `Claims submission is available through the Submit Claims form. This comprehensive form guides you through the entire claims process including patient information, diagnosis codes, procedure codes, and billing details. The form includes M.I.L.A. assistance for code lookup and validation.\n\n**Navigation:** Navigate to PIC Actions → Submit Claims`
+    }
+    
+    // Check for HEDIS screening queries
+    if (lowerInput.includes('hedis') || lowerInput.includes('screening') || lowerInput.includes('quality')) {
+      return `HEDIS screening forms are available for quality measure documentation. These forms help document retinal imaging, patient demographics, and other quality measures required for HEDIS reporting. The forms include step-by-step guidance and validation.\n\n**Navigation:** Navigate to HEDIS tab → New Screening`
+    }
+    
+    // Check for general help topics
+    for (const [topic, info] of Object.entries(knowledge.helpTopics)) {
+      if (info.keywords.some(keyword => lowerInput.includes(keyword))) {
+        return `${info.response}\n\n**Action:** ${info.action}`
+      }
+    }
+    
+    // Check for general application features
+    if (lowerInput.includes('mila') || lowerInput.includes('assistant') || lowerInput.includes('help')) {
+      const milaInfo = knowledge.features['M.I.L.A. AI Assistant']
+      return `M.I.L.A. is your intelligent assistant for medical billing and form guidance. Here's what I can help you with:\n\n**Capabilities:**\n${milaInfo.capabilities.map(cap => `• ${cap}`).join('\n')}\n\n**Activation:** ${milaInfo.activation}`
+    }
+    
+    // Check for PIC actions queries
+    if (lowerInput.includes('pic') || lowerInput.includes('actions') || lowerInput.includes('quick access')) {
+      const picInfo = knowledge.features['PIC Actions']
+      return `The PIC Actions page provides quick access to common actions. Here's what's available:\n\n**Available Actions:**\n${picInfo.availableActions.map(action => `• ${action}`).join('\n')}\n\n**Navigation:** ${picInfo.navigation}`
+    }
+    
+    return null
   }
 
   private static isTerminologyQuestion(input: string): boolean {
@@ -1217,12 +1330,10 @@ export class AIAssistantService {
         'serviceDateFrom': 'Enter the date when services began. This should be the first date of the service period.',
         'serviceDateTo': 'Enter the date when services ended. For single-day services, this will be the same as the from date.',
         'diagnosisCodes': 'Enter the primary diagnosis code first, followed by any secondary codes. Use the most specific code available.',
-        'odSphere': 'Enter the sphere power for the right eye. Use negative values for myopia, positive for hyperopia.',
-        'osSphere': 'Enter the sphere power for the left eye. Use negative values for myopia, positive for hyperopia.',
-        'odCylinder': 'Enter the cylinder power for the right eye. This corrects astigmatism.',
-        'osCylinder': 'Enter the cylinder power for the left eye. This corrects astigmatism.',
-        'odAxis': 'Enter the axis for the right eye (0-180 degrees). This indicates the orientation of the cylinder.',
-        'osAxis': 'Enter the axis for the left eye (0-180 degrees). This indicates the orientation of the cylinder.'
+        'procedureCodes': 'Enter the procedure codes for services rendered. Include modifiers if applicable.',
+        'units': 'Enter the number of units for this procedure. For most procedures, this is 1.',
+        'uAndCCharge': 'Enter your usual and customary charge for this service.',
+        'planAllowed': 'Enter the amount allowed by the insurance plan for this service.'
       }
     }
 
@@ -1348,12 +1459,10 @@ export class AIAssistantService {
         'serviceDateFrom': 'Enter the date when services began. This should be the first date of the service period.',
         'serviceDateTo': 'Enter the date when services ended. For single-day services, this will be the same as the from date.',
         'diagnosisCodes': 'Enter the primary diagnosis code first, followed by any secondary codes. Use the most specific code available.',
-        'odSphere': 'Enter the sphere power for the right eye. Use negative values for myopia, positive for hyperopia.',
-        'osSphere': 'Enter the sphere power for the left eye. Use negative values for myopia, positive for hyperopia.',
-        'odCylinder': 'Enter the cylinder power for the right eye. This corrects astigmatism.',
-        'osCylinder': 'Enter the cylinder power for the left eye. This corrects astigmatism.',
-        'odAxis': 'Enter the axis for the right eye (0-180 degrees). This indicates the orientation of the cylinder.',
-        'osAxis': 'Enter the axis for the left eye (0-180 degrees). This indicates the orientation of the cylinder.'
+        'procedureCodes': 'Enter the procedure codes for services rendered. Include modifiers if applicable.',
+        'units': 'Enter the number of units for this procedure. For most procedures, this is 1.',
+        'uAndCCharge': 'Enter your usual and customary charge for this service.',
+        'planAllowed': 'Enter the amount allowed by the insurance plan for this service.'
       }
     }
 

@@ -551,112 +551,196 @@ export default function PatientEligibilityForm({
   // Current Eligibility Results Component
   const CurrentEligibilityResults = () => {
     return (
-      <div className="hedis-screening-content">
-        <h2 className="hedis-screening-step-title">
-          Current Eligibility based on the information provided
-        </h2>
-
-        {/* Provider Information */}
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
-          Provider Information
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Provider Name</p>
-            <p className="font-medium">{eligibilityResults.provider.name}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Provider ID</p>
-            <p className="font-medium">{eligibilityResults.provider.id}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Specialty</p>
-            <p className="font-medium">{eligibilityResults.provider.specialty}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-            <p className="font-medium">{eligibilityResults.provider.phone}</p>
-          </div>
-          <div className="md:col-span-2">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Address</p>
-            <p className="font-medium">{eligibilityResults.provider.address}</p>
+      <div className="screening-form-content relative">
+        {/* Enhanced Header with Status Indicators */}
+        <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Eligibility Results</h2>
+                <p className="text-gray-600 dark:text-gray-400">Patient eligibility information retrieved successfully</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-sm font-medium rounded-full">
+                Active Coverage
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Patient Information */}
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
-          Patient Information
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Patient Name</p>
-            <p className="font-medium">{eligibilityResults.patient.name}</p>
+        {/* Provider Information Card */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Provider Information</h3>
+              <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                Verified
+              </span>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Patient ID</p>
-            <p className="font-medium">{eligibilityResults.patient.id}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Date of Birth</p>
-            <p className="font-medium">{eligibilityResults.patient.dob}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Relationship</p>
-            <p className="font-medium">{eligibilityResults.patient.relationship}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
-            <p className="font-medium text-green-600">{eligibilityResults.patient.status}</p>
-          </div>
-        </div>
-
-        {/* Primary Care Physician */}
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
-          Primary Care Physician
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">PCP Name</p>
-            <p className="font-medium">{eligibilityResults.primaryCarePhysician.name}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Specialty</p>
-            <p className="font-medium">{eligibilityResults.primaryCarePhysician.specialty}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-            <p className="font-medium">{eligibilityResults.primaryCarePhysician.phone}</p>
+          
+          {/* Provider Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Name:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.provider.name}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">ID:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.provider.id}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Specialty:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.provider.specialty}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Phone:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.provider.phone}</span>
+            </div>
+            <div className="md:col-span-2 flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Address:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.provider.address}</span>
+            </div>
           </div>
         </div>
 
-        {/* Available Benefits */}
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
-          Available Benefits
-        </h3>
-        <div className="mb-6">
-          <ul className="space-y-2">
+        {/* Patient Information Card */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Information</h3>
+              <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                Active
+              </span>
+            </div>
+          </div>
+          
+          {/* Patient Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Name:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.patient.name}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">ID:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.patient.id}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">DOB:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.patient.dob}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Relationship:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.patient.relationship}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Status:</span>
+              <span className="text-sm font-medium text-green-600">{eligibilityResults.patient.status}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Primary Care Physician Card */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Primary Care Physician</h3>
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
+                Assigned
+              </span>
+            </div>
+          </div>
+          
+          {/* PCP Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Name:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.primaryCarePhysician.name}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Specialty:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.primaryCarePhysician.specialty}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[80px]">Phone:</span>
+              <span className="text-sm text-gray-900 dark:text-white">{eligibilityResults.primaryCarePhysician.phone}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Available Benefits Card */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Available Benefits</h3>
+              <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-xs font-medium rounded-full">
+                {eligibilityResults.availableBenefits.length} Benefits
+              </span>
+            </div>
+          </div>
+          
+          {/* Benefits List */}
+          <div className="space-y-2">
             {eligibilityResults.availableBenefits.map((benefit, index) => (
-              <li key={index} className="flex items-start">
-                <Icon name="check" size={16} className="text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
-              </li>
+              <div key={index} className="flex items-start p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <Icon name="check" size={16} className="text-green-500 mt-0.5 mr-3 flex-shrink-0" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">{benefit}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
-        {/* Notes */}
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">
-          Notes
-        </h3>
-        <div className="mb-6">
-          <ul className="space-y-2">
+        {/* Notes Card */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Notes</h3>
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
+                {eligibilityResults.notes.length} Notes
+              </span>
+            </div>
+          </div>
+          
+          {/* Notes List */}
+          <div className="space-y-2">
             {eligibilityResults.notes.map((note, index) => (
-              <li key={index} className="flex items-start">
-                <Icon name="info" size={16} className="text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
-                <span className="text-gray-700 dark:text-gray-300">{note}</span>
-              </li>
+              <div key={index} className="flex items-start p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <Icon name="info" size={16} className="text-blue-500 mt-0.5 mr-3 flex-shrink-0" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">{note}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
         {/* Footer */}

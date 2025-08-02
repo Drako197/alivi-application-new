@@ -4290,23 +4290,6 @@ export default function ClaimsSubmissionForm({
                   </div>
                 </div>
 
-                {/* Footer with summary and action buttons */}
-                <div className="border-t pt-6 mt-8">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      <p>Claim Type: <span className="font-medium text-gray-900 dark:text-white">{formData.claimType || 'N/A'}</span></p>
-                      <p>Prepared on: {new Date().toLocaleDateString()}</p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                      <button
-                        type="submit"
-                        className="btn-primary flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors w-full sm:w-auto min-h-[44px]"
-                      >
-                        <span>Submit Claim</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
 

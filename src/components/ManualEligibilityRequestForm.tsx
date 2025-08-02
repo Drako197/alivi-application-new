@@ -402,79 +402,85 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
               How can we get in touch with you? Choose one option below:
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className={`relative p-4 rounded-lg border-2 transition-colors ${
-                formData.contactMethod === 'email' 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700'
-              }`}>
-                <div className="flex items-center space-x-3 mb-4">
-                  <input
-                    type="radio"
-                    id="contactEmail"
-                    name="contactMethod"
-                    value="email"
-                    checked={formData.contactMethod === 'email'}
-                    onChange={() => handleContactMethodChange('email')}
-                    className="text-blue-600 focus:ring-blue-500"
-                  />
-                  <label htmlFor="contactEmail" className="form-label mb-0">
-                    Email Reply Address *
-                  </label>
-                </div>
-                <input
-                  type="email"
-                  name="emailAddress"
-                  value={formData.emailAddress}
-                  onChange={handleInputChange}
-                  className={getInputClassName('emailAddress')}
-                  placeholder="email@domain.com"
-                  disabled={formData.contactMethod !== 'email'}
-                />
-                {errors.emailAddress && (
-                  <p className="form-error">{errors.emailAddress}</p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-center">
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-full px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  OR
-                </div>
-              </div>
-
-              <div className={`relative p-4 rounded-lg border-2 transition-colors ${
-                formData.contactMethod === 'fax' 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700'
-              }`}>
-                <div className="flex items-center space-x-3 mb-4">
-                  <input
-                    type="radio"
-                    id="contactFax"
-                    name="contactMethod"
-                    value="fax"
-                    checked={formData.contactMethod === 'fax'}
-                    onChange={() => handleContactMethodChange('fax')}
-                    className="text-blue-600 focus:ring-blue-500"
-                  />
-                  <label htmlFor="contactFax" className="form-label mb-0">
-                    Provider Fax-back Number *
-                  </label>
-                </div>
-                <input
-                  type="text"
-                  name="faxNumber"
-                  value={formData.faxNumber}
-                  onChange={handleInputChange}
-                  className={getInputClassName('faxNumber')}
-                  placeholder="000-000-0000"
-                  disabled={formData.contactMethod !== 'fax'}
-                />
-                {errors.faxNumber && (
-                  <p className="form-error">{errors.faxNumber}</p>
-                )}
-              </div>
+            {/* Method Selection Tabs */}
+            <div className="flex space-x-1 mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => handleContactMethodChange('email')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  formData.contactMethod === 'email'
+                    ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+              >
+                <Icon name="mail" size={16} className="inline mr-2" />
+                Email Reply Address
+              </button>
+              <button
+                type="button"
+                onClick={() => handleContactMethodChange('fax')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  formData.contactMethod === 'fax'
+                    ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+              >
+                <Icon name="printer" size={16} className="inline mr-2" />
+                Provider Fax-back Number
+              </button>
             </div>
+
+            {/* Email Method */}
+            {formData.contactMethod === 'email' && (
+              <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+                <div data-error={!!errors.emailAddress}>
+                  <label htmlFor="emailAddress" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                    Email Reply Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="emailAddress"
+                    name="emailAddress"
+                    value={formData.emailAddress}
+                    onChange={handleInputChange}
+                    className={getInputClassName('emailAddress')}
+                    placeholder="email@domain.com"
+                  />
+                  {errors.emailAddress && (
+                    <p className="mt-1 text-sm text-red-600">{errors.emailAddress}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    We'll send the eligibility response to this email address
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Fax Method */}
+            {formData.contactMethod === 'fax' && (
+              <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+                <div data-error={!!errors.faxNumber}>
+                  <label htmlFor="faxNumber" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                    Provider Fax-back Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="faxNumber"
+                    name="faxNumber"
+                    value={formData.faxNumber}
+                    onChange={handleInputChange}
+                    className={getInputClassName('faxNumber')}
+                    placeholder="000-000-0000"
+                  />
+                  {errors.faxNumber && (
+                    <p className="mt-1 text-sm text-red-600">{errors.faxNumber}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    We'll fax the eligibility response to this number
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Patient Information Section */}

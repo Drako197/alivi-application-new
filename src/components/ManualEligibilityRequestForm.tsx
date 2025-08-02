@@ -493,7 +493,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             {formData.contactMethod === 'email' && (
               <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
                 <div data-error={!!errors.emailAddress}>
-                  <label htmlFor="emailAddress" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="emailAddress" className="form-label">
                     Email Reply Address <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -506,7 +506,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                     placeholder="email@domain.com"
                   />
                   {errors.emailAddress && (
-                    <p className="mt-1 text-sm text-red-600">{errors.emailAddress}</p>
+                    <p className="form-error">{errors.emailAddress}</p>
                   )}
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     We'll send the eligibility response to this email address
@@ -519,7 +519,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             {formData.contactMethod === 'fax' && (
               <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
                 <div data-error={!!errors.faxNumber}>
-                  <label htmlFor="faxNumber" className="block text-sm font-extrabold text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="faxNumber" className="form-label">
                     Provider Fax-back Number <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -532,7 +532,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                     placeholder="000-000-0000"
                   />
                   {errors.faxNumber && (
-                    <p className="mt-1 text-sm text-red-600">{errors.faxNumber}</p>
+                    <p className="form-error">{errors.faxNumber}</p>
                   )}
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     We'll fax the eligibility response to this number

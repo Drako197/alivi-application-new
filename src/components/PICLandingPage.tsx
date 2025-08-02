@@ -6,6 +6,7 @@ import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
 import HealthPlanDetailsPage from './HealthPlanDetailsPage'
 import FramesAndLensesPage from './FramesAndLensesPage'
+import ManualEligibilityRequestForm from './ManualEligibilityRequestForm'
 import HelperButton from './HelperButton'
 
 interface ActionItem {
@@ -26,7 +27,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'health-plan-details' | 'frames-and-lenses'>('landing')
+  const [currentView, setCurrentView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'health-plan-details' | 'frames-and-lenses' | 'manual-eligibility-request'>('landing')
 
   // Reset to landing page when resetToLanding prop changes
   useEffect(() => {
@@ -114,6 +115,12 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       if (onUpdateBreadcrumb) {
         onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Frames and Lenses'])
       }
+    } else if (action.id === 'manual-eligibility-request') {
+      setCurrentView('manual-eligibility-request')
+      // Update breadcrumb to show P.I.C. > Manual Eligibility Request
+      if (onUpdateBreadcrumb) {
+        onUpdateBreadcrumb(['Dashboard', 'P.I.C.', 'Manual Eligibility Request'])
+      }
     } else {
       // Here you would typically navigate to the specific action or open a modal
       console.log('Navigating to:', action.name)
@@ -163,6 +170,11 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
   // Show Frames and Lenses Page if currentView is 'frames-and-lenses'
   if (currentView === 'frames-and-lenses') {
     return <FramesAndLensesPage onBack={handleBackToLanding} />
+  }
+
+  // Show Manual Eligibility Request Form if currentView is 'manual-eligibility-request'
+  if (currentView === 'manual-eligibility-request') {
+    return <ManualEligibilityRequestForm onBack={handleBackToLanding} />
   }
 
   return (

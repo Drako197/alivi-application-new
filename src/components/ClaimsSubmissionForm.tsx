@@ -4210,6 +4210,86 @@ export default function ClaimsSubmissionForm({
                   </div>
                 </div>
 
+                {/* Remake Card - Mixed Editable/Read-Only */}
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Remake</h3>
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs font-medium rounded-full">
+                        Active
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Reason
+                      </label>
+                      <select
+                        value={formData.remakeReason}
+                        onChange={(e) => setFormData(prev => ({ ...prev, remakeReason: e.target.value }))}
+                        className="form-select w-full border rounded-md pl-2.5"
+                      >
+                        <option value="">Select Reason</option>
+                        <option value="Incorrect Order">Incorrect Order</option>
+                        <option value="Damaged">Damaged</option>
+                        <option value="Wrong Size">Wrong Size</option>
+                        <option value="Patient Request">Patient Request</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Job Order Number
+                      </label>
+                      <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span className="text-sm text-gray-900 dark:text-white">000122544552</span>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Date
+                      </label>
+                      <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span className="text-sm text-gray-900 dark:text-white">07/16/2016</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Claim Notes Card - Editable */}
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Claim Notes</h3>
+                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
+                        Editable
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Notes
+                    </label>
+                    <textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                      rows={4}
+                      className="form-textarea w-full border rounded-md pl-2.5 resize-vertical"
+                      placeholder="Enter any additional notes for this claim..."
+                    />
+                  </div>
+                </div>
+
                 {/* Footer with summary and action buttons */}
                 <div className="border-t pt-6 mt-8">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

@@ -91,17 +91,17 @@ function AppContent() {
                 <div className="flex flex-col items-center space-y-4 pre-login-alivi-content">
                   <div className="text-center pre-login-tagline">
                     <p className="text-white/90 text-sm lg:text-lg font-medium pre-login-tagline-main">Healthcare Data Intelligence</p>
-                    <p className="text-white/70 text-xs lg:text-base mt-1 pre-login-tagline-subtitle">Streamlining HEDIS & Quality Measures</p>
+                    <p className="text-white/70 text-xs lg:text-base mt-1 pre-login-tagline-subtitle">Smart Claims, Smarter Results</p>
                   </div>
                 </div>
               </div>
               
               <h1 className="text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent pre-login-main-heading">
-                Billing, adjudication, and payment workflows—modernized.
+                Billing, adjudication, and claims submission—intelligently enhanced.
               </h1>
               
               <p className="text-xl text-blue-100 leading-relaxed font-light pre-login-subheading">
-                Compliance-first medical claims management built for today.
+                AI-powered claims management that streamlines every step of your billing workflow.
               </p>
               
               {/* Feature highlights */}
@@ -110,19 +110,19 @@ function AppContent() {
                   <svg className="w-4 h-4 text-green-300 pre-login-feature-icon" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="pre-login-feature-text">HIPAA Compliant</span>
-                </div>
-                <div className="flex items-center justify-center space-x-2 pre-login-feature-item">
-                  <svg className="w-4 h-4 text-green-300 pre-login-feature-icon" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="pre-login-feature-text">Real-time Processing</span>
+                  <span className="pre-login-feature-text">Intelligent Claims Processing</span>
                 </div>
                 <div className="flex items-center justify-center space-x-2 pre-login-feature-item">
                   <svg className="w-4 h-4 text-green-300 pre-login-feature-icon" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                   <span className="pre-login-feature-text">Automated Adjudication</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 pre-login-feature-item">
+                  <svg className="w-4 h-4 text-green-300 pre-login-feature-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="pre-login-feature-text">HIPAA Compliant</span>
                 </div>
               </div>
             </div>
@@ -141,7 +141,7 @@ function AppContent() {
               />
               <div className="text-center pre-login-tagline">
                 <p className="text-white/90 text-base font-medium pre-login-tagline-main">Healthcare Data Intelligence</p>
-                <p className="text-white/70 text-sm mt-1 pre-login-tagline-subtitle">Streamlining HEDIS & Quality Measures</p>
+                <p className="text-white/70 text-sm mt-1 pre-login-tagline-subtitle">Smart Claims, Smarter Results</p>
               </div>
             </div>
             

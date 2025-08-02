@@ -796,116 +796,182 @@ export default function HelperModal({
         // Process regular input with AI assistant
         const response = await AIAssistantService.processUserInput(input, context)
         
-        // Create enhanced response based on the type of response
-        let enhancedResponse: EnhancedResponse | undefined
-        
-        // Check for invalid code responses FIRST (before valid code responses)
-        if (response.includes('❌ INVALID') || 
-            (input.toLowerCase().includes('what is') && input.match(/[A-Z]{3}\d{3}/)) ||
-            (input.toLowerCase().includes('help with') && input.match(/[A-Z]{3}\d{3}/))) {
-          // Handle invalid code responses or "What is XYZ123?" / "Help with ABC999" type queries
-          let invalidCode = ''
-          let errorMessage = 'Invalid medical code'
+        // Check if this is an application knowledge response (contains navigation guidance)
+        if (response.includes('🔗 Navigation:') || response.includes('📋 Available Information:')) {
+          // This is an application knowledge response - create custom enhanced response
+          let enhancedResponse: EnhancedResponse | undefined
           
-          // Try to extract code from response first
-          const responseCodeMatch = response.match(/Code:\s*([A-Z0-9\.]+)/)
-          if (responseCodeMatch) {
-            invalidCode = responseCodeMatch[1]
-            errorMessage = `Invalid medical code: ${invalidCode}`
-          } else {
-            // Fall back to extracting from input
-            const inputCodeMatch = input.match(/([A-Z]{3}\d{3})/)
-            if (inputCodeMatch) {
-              invalidCode = inputCodeMatch[1]
-              errorMessage = `Invalid medical code: ${invalidCode}`
-            }
-          }
-          
-          if (invalidCode || response.includes('❌ INVALID')) {
-            enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
-              errorMessage,
-              ['Check the code spelling', 'Verify it\'s a valid medical code', 'Try searching for similar codes'],
-              [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
-            )
-            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
-          }
-        } else if (response.includes('**Code:**') || response.includes('**Code Validation Result:**')) {
-          // Extract code from various formats
-          const codeMatch = response.match(/\*\*Code:\s*([^*\n]+)\*\*/) || 
-                           response.match(/Code:\s*([A-Z0-9\.]+)/) ||
-                           response.match(/([A-Z]\d{4}|\d{5}|E\d{2}\.\d{1,2}|Z\d{2}\.\d{1,2})/)
-          
-          // Extract description from various formats
-          const descriptionMatch = response.match(/\*\*Description:\s*([^*\n]+)/) ||
-                                 response.match(/Description:\s*([^\n]+)/) ||
-                                 response.match(/\*\*([^*]+)\*\*\n([^*\n]+)/)
-          
-          if (codeMatch) {
-            const code = codeMatch[1] || codeMatch[0]
-            const description = descriptionMatch ? (descriptionMatch[2] || descriptionMatch[1]) : 'Medical code'
-            
-            enhancedResponse = EnhancedVisualResponseService.createCodeLookupResponse(
-              code.trim(),
-              description.trim(),
-              {
-                category: 'Medical Code',
-                usage: 'Billing and claims',
-                examples: ['Common usage example'],
-                relatedCodes: ['Related code 1', 'Related code 2']
-              },
+          // Determine the type of application query and create appropriate buttons
+          if (response.includes('Frames and Lenses') || response.includes('lens pricing')) {
+            enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+              'Lens Pricing Information',
+              'success',
               [
-                { label: 'Copy Code', action: 'copy_code', style: 'primary' },
-                { label: 'Show Help', action: 'show_help', style: 'info' }
+                { label: 'Go to Frames & Lenses', action: 'navigate_frames_lenses', style: 'primary' },
+                { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'info' }
               ]
             )
-            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
-          }
-        } else if (response.includes('**Error:**') || response.includes('**Warning:**') || response.includes('❌ INVALID')) {
-          // Error response
-          const errorMatch = response.match(/\*\*Error:\s*([^*]+)\*\*/)
-          const warningMatch = response.match(/\*\*Warning:\s*([^*]+)\*\*/)
-          const invalidMatch = response.match(/❌ INVALID/)
-          
-          if (errorMatch || warningMatch || invalidMatch) {
-            const errorText = errorMatch?.[1] || warningMatch?.[1] || 'Invalid code or query'
-            enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
-              errorText,
-              ['Check your input', 'Verify the information', 'Try a different approach'],
-              [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
-            )
-            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
-          }
-        } else if (response.includes('**Help:**') || response.includes('I can help')) {
-          // Help response
-          enhancedResponse = EnhancedVisualResponseService.createHelpResponse(
-            'General Help',
-            response,
-            ['Code Lookup', 'Provider Search', 'Form Guidance'],
-            [
-              { label: 'Code Lookup', action: 'search_code', style: 'primary' },
-              { label: 'Provider Search', action: 'search_provider', style: 'info' }
-            ]
-          )
-          addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
-        } else {
-          // Check if this looks like a general/contextual response that shouldn't be enhanced
-          if (response.includes('You\'re on **Step') || 
-              response.includes('This step collects') ||
-              response.includes('All fields marked') ||
-              response.includes('Enhanced Response')) {
-            // This is a contextual response, don't enhance it
-            addMessage('assistant', response, 'fade-in')
-          } else {
-            // Regular response with status
+          } else if (response.includes('Health Plan Details') || response.includes('health plan')) {
             enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
-              response,
+              'Health Plan Information',
+              'success',
+              [
+                { label: 'Go to Health Plan Details', action: 'navigate_health_plans', style: 'primary' },
+                { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'info' }
+              ]
+            )
+          } else if (response.includes('Patient Eligibility') || response.includes('eligibility')) {
+            enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+              'Patient Eligibility',
+              'success',
+              [
+                { label: 'Request Patient Eligibility', action: 'navigate_patient_eligibility', style: 'primary' },
+                { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'info' }
+              ]
+            )
+          } else if (response.includes('Submit Claims') || response.includes('claims submission')) {
+            enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+              'Claims Submission',
+              'success',
+              [
+                { label: 'Submit Claims', action: 'navigate_claims_submission', style: 'primary' },
+                { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'info' }
+              ]
+            )
+          } else if (response.includes('HEDIS') || response.includes('screening')) {
+            enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+              'HEDIS Screening',
+              'success',
+              [
+                { label: 'New HEDIS Screening', action: 'navigate_hedis_screening', style: 'primary' },
+                { label: 'HEDIS Dashboard', action: 'navigate_hedis_dashboard', style: 'info' }
+              ]
+            )
+          } else {
+            // Generic application response
+            enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+              'Application Information',
               'info',
               [
-                { label: 'Search Codes', action: 'search_code', style: 'primary' },
+                { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'primary' },
                 { label: 'Get Help', action: 'show_help', style: 'info' }
               ]
             )
+          }
+          
+          addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+        } else {
+          // Create enhanced response based on the type of response
+          let enhancedResponse: EnhancedResponse | undefined
+          
+          // Check for invalid code responses FIRST (before valid code responses)
+          if (response.includes('❌ INVALID') || 
+              (input.toLowerCase().includes('what is') && input.match(/[A-Z]{3}\d{3}/)) ||
+              (input.toLowerCase().includes('help with') && input.match(/[A-Z]{3}\d{3}/))) {
+            // Handle invalid code responses or "What is XYZ123?" / "Help with ABC999" type queries
+            let invalidCode = ''
+            let errorMessage = 'Invalid medical code'
+            
+            // Try to extract code from response first
+            const responseCodeMatch = response.match(/Code:\s*([A-Z0-9\.]+)/)
+            if (responseCodeMatch) {
+              invalidCode = responseCodeMatch[1]
+              errorMessage = `Invalid medical code: ${invalidCode}`
+            } else {
+              // Fall back to extracting from input
+              const inputCodeMatch = input.match(/([A-Z]{3}\d{3})/)
+              if (inputCodeMatch) {
+                invalidCode = inputCodeMatch[1]
+                errorMessage = `Invalid medical code: ${invalidCode}`
+              }
+            }
+            
+            if (invalidCode || response.includes('❌ INVALID')) {
+              enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
+                errorMessage,
+                ['Check the code spelling', 'Verify it\'s a valid medical code', 'Try searching for similar codes'],
+                [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+              )
+              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+            }
+          } else if (response.includes('**Code:**') || response.includes('**Code Validation Result:**')) {
+            // Extract code from various formats
+            const codeMatch = response.match(/\*\*Code:\s*([^*\n]+)\*\*/) || 
+                             response.match(/Code:\s*([A-Z0-9\.]+)/) ||
+                             response.match(/([A-Z]\d{4}|\d{5}|E\d{2}\.\d{1,2}|Z\d{2}\.\d{1,2})/)
+            
+            // Extract description from various formats
+            const descriptionMatch = response.match(/\*\*Description:\s*([^*\n]+)/) ||
+                                   response.match(/Description:\s*([^\n]+)/) ||
+                                   response.match(/\*\*([^*]+)\*\*\n([^*\n]+)/)
+            
+            if (codeMatch) {
+              const code = codeMatch[1] || codeMatch[0]
+              const description = descriptionMatch ? (descriptionMatch[2] || descriptionMatch[1]) : 'Medical code'
+              
+              enhancedResponse = EnhancedVisualResponseService.createCodeLookupResponse(
+                code.trim(),
+                description.trim(),
+                {
+                  category: 'Medical Code',
+                  usage: 'Billing and claims',
+                  examples: ['Common usage example'],
+                  relatedCodes: ['Related code 1', 'Related code 2']
+                },
+                [
+                  { label: 'Copy Code', action: 'copy_code', style: 'primary' },
+                  { label: 'Show Help', action: 'show_help', style: 'info' }
+                ]
+              )
+              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+            }
+          } else if (response.includes('**Error:**') || response.includes('**Warning:**') || response.includes('❌ INVALID')) {
+            // Error response
+            const errorMatch = response.match(/\*\*Error:\s*([^*]+)\*\*/)
+            const warningMatch = response.match(/\*\*Warning:\s*([^*]+)\*\*/)
+            const invalidMatch = response.match(/❌ INVALID/)
+            
+            if (errorMatch || warningMatch || invalidMatch) {
+              const errorText = errorMatch?.[1] || warningMatch?.[1] || 'Invalid code or query'
+              enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
+                errorText,
+                ['Check your input', 'Verify the information', 'Try a different approach'],
+                [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+              )
+              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+            }
+          } else if (response.includes('**Help:**') || response.includes('I can help')) {
+            // Help response
+            enhancedResponse = EnhancedVisualResponseService.createHelpResponse(
+              'General Help',
+              response,
+              ['Code Lookup', 'Provider Search', 'Form Guidance'],
+              [
+                { label: 'Code Lookup', action: 'search_code', style: 'primary' },
+                { label: 'Provider Search', action: 'search_provider', style: 'info' }
+              ]
+            )
             addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+          } else {
+            // Check if this looks like a general/contextual response that shouldn't be enhanced
+            if (response.includes('You\'re on **Step') || 
+                response.includes('This step collects') ||
+                response.includes('All fields marked') ||
+                response.includes('Enhanced Response')) {
+              // This is a contextual response, don't enhance it
+              addMessage('assistant', response, 'fade-in')
+            } else {
+              // Regular response with status
+              enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+                response,
+                'info',
+                [
+                  { label: 'Search Codes', action: 'search_code', style: 'primary' },
+                  { label: 'Get Help', action: 'show_help', style: 'info' }
+                ]
+              )
+              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+            }
           }
         }
       }
@@ -1060,6 +1126,41 @@ export default function HelperModal({
         // Search for providers
         addMessage('user', 'Search for providers', 'fade-in')
         await processUserMessage('search providers')
+        break
+        
+      case 'navigate_frames_lenses':
+        // Navigate to Frames and Lenses page
+        addMessage('assistant', 'I\'ll help you navigate to the Frames and Lenses page. Go to PIC Actions and click "Frames and Lenses" to access all pricing documents.', 'fade-in')
+        break
+        
+      case 'navigate_health_plans':
+        // Navigate to Health Plan Details page
+        addMessage('assistant', 'I\'ll help you navigate to the Health Plan Details page. Go to PIC Actions and click "Health Plan Details" to access provider information and documents.', 'fade-in')
+        break
+        
+      case 'navigate_patient_eligibility':
+        // Navigate to Patient Eligibility form
+        addMessage('assistant', 'I\'ll help you navigate to the Patient Eligibility form. Go to PIC Actions and click "Request Patient Eligibility" to check patient coverage.', 'fade-in')
+        break
+        
+      case 'navigate_claims_submission':
+        // Navigate to Claims Submission form
+        addMessage('assistant', 'I\'ll help you navigate to the Claims Submission form. Go to PIC Actions and click "Submit Claims" to start the claims submission process.', 'fade-in')
+        break
+        
+      case 'navigate_hedis_screening':
+        // Navigate to HEDIS Screening
+        addMessage('assistant', 'I\'ll help you navigate to the HEDIS Screening. Go to the HEDIS tab and click "New Screening" to start HEDIS documentation.', 'fade-in')
+        break
+        
+      case 'navigate_hedis_dashboard':
+        // Navigate to HEDIS Dashboard
+        addMessage('assistant', 'I\'ll help you navigate to the HEDIS Dashboard. Go to the HEDIS tab to access the dashboard and view existing screenings.', 'fade-in')
+        break
+        
+      case 'navigate_pic_actions':
+        // Navigate to PIC Actions
+        addMessage('assistant', 'I\'ll help you navigate to the PIC Actions page. This is your central hub for accessing all the main features and forms.', 'fade-in')
         break
         
       default:

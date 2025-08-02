@@ -981,49 +981,46 @@ export class AIAssistantService {
     
     // Check for lens pricing queries
     if (lowerInput.includes('lens') && (lowerInput.includes('pricing') || lowerInput.includes('price') || lowerInput.includes('cost'))) {
-      const pageInfo = knowledge.pages['Frames and Lenses']
-      return `I can help you find lens pricing information! The Frames and Lenses page contains comprehensive pricing for all lens types including Standard, Premium, Progressive, Contact, and Specialty lenses. You can access this information through the PIC Actions page by clicking "Frames and Lenses". The page includes separate price lists for different lens categories and frame collections.\n\n**Available Documents:**\n${Object.entries(pageInfo.documents).map(([title, desc]) => `• ${title}: ${desc}`).join('\n')}\n\n**Navigation:** ${pageInfo.navigation}`
+      return `I can help you find lens pricing information! The Frames and Lenses page contains comprehensive pricing for all lens types including Standard, Premium, Progressive, Contact, and Specialty lenses.\n\n**📋 Available Information:**\n• Standard, Premium, and Progressive lens pricing\n• Contact lens options and pricing\n• Specialty lenses for specific conditions\n• Frame collections and pricing\n• Coating and treatment options\n\n**🔗 Navigation:** Go to PIC Actions → Click "Frames and Lenses" to access all pricing documents.`
     }
     
     // Check for health plan queries
     if (lowerInput.includes('health plan') || lowerInput.includes('insurance') || lowerInput.includes('provider')) {
-      const pageInfo = knowledge.pages['Health Plan Details']
-      return `Health plan information is available in the Health Plan Details page. This includes comprehensive information for major providers like AvMed, Care Plus, Florida Blue, Humana, Kaiser, Aetna, Cigna, UnitedHealthcare, Anthem, Molina, and WellCare. Each provider has detailed documents for benefits, Medicaid, billing, coverage, network, and formulary information.\n\n**Available Providers:**\n${Object.entries(pageInfo.providers).map(([name, desc]) => `• ${name}: ${desc}`).join('\n')}\n\n**Navigation:** ${pageInfo.navigation}`
+      return `Health plan information is available in the Health Plan Details page. This includes comprehensive information for major providers like AvMed, Care Plus, Florida Blue, Humana, Kaiser, Aetna, Cigna, UnitedHealthcare, Anthem, Molina, and WellCare.\n\n**📋 Available Information:**\n• Essential health benefits and coverage details\n• Medicaid plan options and eligibility\n• Billing structure and payment information\n• Provider network information\n• Prescription drug formularies\n\n**🔗 Navigation:** Go to PIC Actions → Click "Health Plan Details" to access provider information and documents.`
     }
     
     // Check for patient eligibility queries
     if (lowerInput.includes('eligibility') || lowerInput.includes('patient') && lowerInput.includes('coverage')) {
-      const pageInfo = knowledge.pages['Reserved Benefits']
-      return `Patient eligibility information can be accessed through the Request Patient Eligibility form. This will show you the patient's coverage details, reserved benefits, and financial information. Complete the form to view comprehensive benefit information including cost breakdowns and covered services.\n\n**Available Features:**\n${Object.entries(pageInfo.features).map(([name, desc]) => `• ${name}: ${desc}`).join('\n')}\n\n**Navigation:** ${pageInfo.navigation}`
+      return `Patient eligibility information can be accessed through the Request Patient Eligibility form. This will show you the patient's coverage details, reserved benefits, and financial information.\n\n**📋 Available Information:**\n• Patient coverage and benefit details\n• Financial summary and cost breakdown\n• Reserved benefits information\n• Provider and member details\n• Available services and procedures\n\n**🔗 Navigation:** Go to PIC Actions → Click "Request Patient Eligibility" to check patient coverage.`
     }
     
     // Check for claims submission queries
     if (lowerInput.includes('claims') || lowerInput.includes('submission') || lowerInput.includes('billing')) {
-      return `Claims submission is available through the Submit Claims form. This comprehensive form guides you through the entire claims process including patient information, diagnosis codes, procedure codes, and billing details. The form includes M.I.L.A. assistance for code lookup and validation.\n\n**Navigation:** Navigate to PIC Actions → Submit Claims`
+      return `Claims submission is available through the Submit Claims form. This comprehensive form guides you through the entire claims process including patient information, diagnosis codes, procedure codes, and billing details.\n\n**📋 Available Features:**\n• Step-by-step claims submission process\n• M.I.L.A. assistance for code lookup and validation\n• Patient and provider information entry\n• Diagnosis and procedure code management\n• Billing and payment details\n\n**🔗 Navigation:** Go to PIC Actions → Click "Submit Claims" to start the claims submission process.`
     }
     
     // Check for HEDIS screening queries
     if (lowerInput.includes('hedis') || lowerInput.includes('screening') || lowerInput.includes('quality')) {
-      return `HEDIS screening forms are available for quality measure documentation. These forms help document retinal imaging, patient demographics, and other quality measures required for HEDIS reporting. The forms include step-by-step guidance and validation.\n\n**Navigation:** Navigate to HEDIS tab → New Screening`
+      return `HEDIS screening forms are available for quality measure documentation. These forms help document retinal imaging, patient demographics, and other quality measures required for HEDIS reporting.\n\n**📋 Available Features:**\n• Retinal imaging documentation\n• Patient demographic collection\n• Quality measure tracking\n• Step-by-step guidance and validation\n• Progress tracking and completion status\n\n**🔗 Navigation:** Go to HEDIS tab → Click "New Screening" to start HEDIS documentation.`
     }
     
     // Check for general help topics
     for (const [topic, info] of Object.entries(knowledge.helpTopics)) {
       if (info.keywords.some(keyword => lowerInput.includes(keyword))) {
-        return `${info.response}\n\n**Action:** ${info.action}`
+        return `${info.response}\n\n**🔗 Action:** ${info.action}`
       }
     }
     
     // Check for general application features
     if (lowerInput.includes('mila') || lowerInput.includes('assistant') || lowerInput.includes('help')) {
       const milaInfo = knowledge.features['M.I.L.A. AI Assistant']
-      return `M.I.L.A. is your intelligent assistant for medical billing and form guidance. Here's what I can help you with:\n\n**Capabilities:**\n${milaInfo.capabilities.map(cap => `• ${cap}`).join('\n')}\n\n**Activation:** ${milaInfo.activation}`
+      return `M.I.L.A. is your intelligent assistant for medical billing and form guidance. Here's what I can help you with:\n\n**📋 Capabilities:**\n${milaInfo.capabilities.map(cap => `• ${cap}`).join('\n')}\n\n**🔗 Activation:** ${milaInfo.activation}`
     }
     
     // Check for PIC actions queries
     if (lowerInput.includes('pic') || lowerInput.includes('actions') || lowerInput.includes('quick access')) {
       const picInfo = knowledge.features['PIC Actions']
-      return `The PIC Actions page provides quick access to common actions. Here's what's available:\n\n**Available Actions:**\n${picInfo.availableActions.map(action => `• ${action}`).join('\n')}\n\n**Navigation:** ${picInfo.navigation}`
+      return `The PIC Actions page provides quick access to common actions. Here's what's available:\n\n**📋 Available Actions:**\n${picInfo.availableActions.map(action => `• ${action}`).join('\n')}\n\n**🔗 Navigation:** ${picInfo.navigation}`
     }
     
     return null

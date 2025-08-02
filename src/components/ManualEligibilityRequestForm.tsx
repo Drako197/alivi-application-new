@@ -403,7 +403,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="insuranceProvider"
                   value={formData.insuranceProvider}
                   onChange={handleInputChange}
-                  className="form-select transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white appearance-none cursor-pointer bg-white dark:bg-gray-700 pr-10 bg-[url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3e%3cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3e%3c/svg%3e')] bg-[length:1.5em_1.5em] bg-[position:right_0.75rem_center] bg-no-repeat"
                 >
                   <option value="">Select an Insurance Provider</option>
                   {insuranceProviders.map(provider => (
@@ -427,7 +427,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="otherInsuranceProvider"
                   value={formData.otherInsuranceProvider}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                   placeholder="Other Provider"
                 />
               </div>
@@ -504,7 +504,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                     name="emailAddress"
                     value={formData.emailAddress}
                     onChange={handleInputChange}
-                    className="form-input"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                     placeholder="email@domain.com"
                   />
                   {errors.emailAddress && (
@@ -530,7 +530,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                     name="faxNumber"
                     value={formData.faxNumber}
                     onChange={handleInputChange}
-                    className="form-input"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                     placeholder="000-000-0000"
                   />
                   {errors.faxNumber && (
@@ -582,7 +582,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                   placeholder="First Name"
                 />
                 {errors.firstName && (
@@ -600,7 +600,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                   placeholder="Last Name"
                 />
                 {errors.lastName && (
@@ -618,7 +618,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="streetAddress"
                   value={formData.streetAddress}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                   placeholder="Street Address"
                 />
                 {errors.streetAddress && (
@@ -636,7 +636,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="city"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                   placeholder="City"
                 />
                 {errors.city && (
@@ -653,7 +653,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  className="form-select transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white appearance-none cursor-pointer bg-white dark:bg-gray-700 pr-10 bg-[url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3e%3cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3e%3c/svg%3e')] bg-[length:1.5em_1.5em] bg-[position:right_0.75rem_center] bg-no-repeat"
                 >
                   <option value="">Select a State</option>
                   {usStates.map(state => (
@@ -677,7 +677,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                   name="zip"
                   value={formData.zip}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white"
                   placeholder="ZIP"
                 />
                 {errors.zip && (

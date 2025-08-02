@@ -687,19 +687,8 @@ export default function HealthPlanDetailsPage({ onBack }: HealthPlanDetailsPageP
   const handleViewDocument = (document: HealthPlanDocument) => {
     console.log('Viewing document:', document.title)
     
-    if (document.url && document.available) {
-      // Show external link warning
-      const confirmed = window.confirm(
-        `You are about to visit an external website: ${new URL(document.url).hostname}\n\nThis will open in a new tab. Do you want to continue?`
-      )
-      
-      if (confirmed) {
-        window.open(document.url, '_blank', 'noopener,noreferrer')
-      }
-    } else {
-      // Show fallback message
-      alert('This document is currently unavailable. Please contact the health plan provider directly for access.')
-    }
+    // Show informational message instead of external linking
+    alert(`Document: ${document.title}\n\nThis feature is currently in development. Please contact the health plan provider directly for access to this document.`)
   }
 
   const getDocumentTypeIcon = (type: string) => {

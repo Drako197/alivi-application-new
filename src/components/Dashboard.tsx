@@ -231,20 +231,12 @@ export default function Dashboard() {
       frequency: 72
     },
     {
-      id: 'frame-collections',
-      title: 'Frame Collections',
-      description: 'Access frame collection information',
-      icon: 'package',
+      id: 'frames-and-lenses',
+      title: 'Frames and Lenses',
+      description: 'Access frame collections and lens pricing information',
+      icon: 'eye',
       category: 'plans',
-      frequency: 65
-    },
-    {
-      id: 'lens-price-list',
-      title: 'Lens Price List',
-      description: 'View current lens pricing information',
-      icon: 'tag',
-      category: 'plans',
-      frequency: 58
+      frequency: 75
     },
     {
       id: 'um-prior-authorization',

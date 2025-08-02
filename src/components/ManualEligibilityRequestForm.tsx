@@ -248,30 +248,30 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center gap-4">
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  <Icon name="arrow-left" size={16} />
+                  Back
+                </button>
+              )}
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Manual Eligibility Request Form
               </h1>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
-                For network providers to request patient eligibility
-              </p>
             </div>
-            {onBack && (
-              <button
-                onClick={onBack}
-                className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                <Icon name="arrow-left" size={16} />
-                <span>Back</span>
-              </button>
-            )}
           </div>
         </div>
+      </div>
 
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Processing Notice */}
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
           <div className="flex items-start space-x-3">

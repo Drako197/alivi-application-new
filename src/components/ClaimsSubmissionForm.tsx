@@ -5,7 +5,7 @@ import HelperButton from './HelperButton'
 import MilaInputField from './MilaInputField'
 import HelperModal from './HelperModal'
 import ClaimAcceptedView from './ClaimAcceptedView'
-import ReservedBenefitsView from './ReservedBenefitsView'
+import ReservedBenefitsPage from './ReservedBenefitsPage'
 import { scrollToFirstError } from '../utils/validationUtils'
 
 interface ClaimsSubmissionFormProps {
@@ -927,7 +927,7 @@ export default function ClaimsSubmissionForm({
 
   if (showReservedBenefits) {
     stepContent = (
-      <ReservedBenefitsView
+      <ReservedBenefitsPage
         onBack={() => setShowReservedBenefits(false)}
         onPrint={() => console.log('Print reserved benefits')}
         onExport={() => console.log('Export reserved benefits')}

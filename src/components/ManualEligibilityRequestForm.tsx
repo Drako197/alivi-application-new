@@ -358,7 +358,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-group">
+              <div>
                 <label htmlFor="date" className="form-label">
                   Date
                 </label>
@@ -373,7 +373,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 />
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="locationNumber" className="form-label">
                   Location Number *
                 </label>
@@ -394,7 +394,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="insuranceProvider" className="form-label">
                   Insurance Provider *
                 </label>
@@ -417,7 +417,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="otherInsuranceProvider" className="form-label">
                   Other (if insurance provider is not in list)
                 </label>
@@ -432,7 +432,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 />
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="dateOfService" className="form-label">
                   Date of Service *
                 </label>
@@ -494,7 +494,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             {/* Email Method */}
             {formData.contactMethod === 'email' && (
               <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-                <div className="form-group" data-error={!!errors.emailAddress}>
+                <div data-error={!!errors.emailAddress}>
                   <label htmlFor="emailAddress" className="form-label">
                     Email Reply Address <span className="text-red-500">*</span>
                   </label>
@@ -520,7 +520,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             {/* Fax Method */}
             {formData.contactMethod === 'fax' && (
               <div className="space-y-4 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-                <div className="form-group" data-error={!!errors.faxNumber}>
+                <div data-error={!!errors.faxNumber}>
                   <label htmlFor="faxNumber" className="form-label">
                     Provider Fax-back Number <span className="text-red-500">*</span>
                   </label>
@@ -551,7 +551,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-group">
+              <div>
                 <label htmlFor="memberId" className="form-label">
                   Member ID *
                 </label>
@@ -572,7 +572,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="firstName" className="form-label">
                   First Name *
                 </label>
@@ -590,7 +590,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="lastName" className="form-label">
                   Last Name *
                 </label>
@@ -608,7 +608,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="streetAddress" className="form-label">
                   Street Address *
                 </label>
@@ -626,7 +626,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="city" className="form-label">
                   City *
                 </label>
@@ -644,7 +644,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="state" className="form-label">
                   State *
                 </label>
@@ -667,7 +667,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="zip" className="form-label">
                   ZIP *
                 </label>
@@ -685,7 +685,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
                 )}
               </div>
 
-              <div className="form-group">
+              <div>
                 <label htmlFor="dateOfBirth" className="form-label">
                   Date of Birth *
                 </label>

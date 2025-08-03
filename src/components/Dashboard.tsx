@@ -148,8 +148,9 @@ export default function Dashboard() {
     }
   }
 
-  // Mobile P.I.C. Action Data - Updated to match actual PIC actions
+  // Mobile P.I.C. Action Data - Updated to match desktop order exactly
   const mobileActions = [
+    // Claims & Eligibility
     {
       id: 'request-patient-eligibility',
       title: 'Request Patient Eligibility',
@@ -206,6 +207,8 @@ export default function Dashboard() {
       category: 'claims',
       frequency: 45
     },
+    
+    // Health Plans & Payments
     {
       id: 'health-plan-details',
       title: 'Health Plan Details',
@@ -238,6 +241,8 @@ export default function Dashboard() {
       category: 'plans',
       frequency: 75
     },
+    
+    // Authorization & Management
     {
       id: 'um-prior-authorization',
       title: 'UM Prior Authorization',
@@ -254,6 +259,8 @@ export default function Dashboard() {
       category: 'authorization',
       frequency: 75
     },
+    
+    // Resources & Tools
     {
       id: 'manual-eligibility-request',
       title: 'Manual Eligibility Request',
@@ -272,14 +279,14 @@ export default function Dashboard() {
     }
   ]
 
-  // Mobile filtering logic
+  // Mobile filtering logic - Maintain desktop order instead of frequency sorting
   const filteredMobileActions = mobileActions.filter(action => {
     const matchesSearch = action.title.toLowerCase().includes(mobileSearchTerm.toLowerCase()) ||
                          action.description.toLowerCase().includes(mobileSearchTerm.toLowerCase()) ||
                          action.category.toLowerCase().includes(mobileSearchTerm.toLowerCase())
     const matchesCategory = mobileSelectedCategory === 'all' || action.category === mobileSelectedCategory
     return matchesSearch && matchesCategory
-  }).sort((a, b) => b.frequency - a.frequency) // Sort by frequency (highest first)
+  }) // Removed frequency sorting to maintain desktop order
 
   // Mobile icon helper function - Updated to use Icon component
   const getMobileIcon = (iconName: string) => {

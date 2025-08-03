@@ -395,6 +395,40 @@ export default function Dashboard() {
     }
   }
 
+  // M.I.L.A. navigation handler
+  const handleMILANavigation = (destination: string) => {
+    switch (destination) {
+      case 'hedis-screening':
+        setActiveDesktopTab('hedis')
+        // TODO: Navigate to new screening form
+        break
+      case 'hedis-dashboard':
+        setActiveDesktopTab('hedis')
+        break
+      case 'pic-actions':
+        setActiveDesktopTab('pic')
+        break
+      case 'patient-eligibility':
+        setActiveDesktopTab('pic')
+        // TODO: Navigate to patient eligibility form
+        break
+      case 'claims-submission':
+        setActiveDesktopTab('pic')
+        // TODO: Navigate to claims submission form
+        break
+      case 'frames-and-lenses':
+        setActiveDesktopTab('pic')
+        // TODO: Navigate to frames and lenses page
+        break
+      case 'health-plan-details':
+        setActiveDesktopTab('pic')
+        // TODO: Navigate to health plan details page
+        break
+      default:
+        console.log('M.I.L.A. navigation requested:', destination)
+    }
+  }
+
   // Desktop content based on active tab
   const renderDesktopContent = () => {
     switch (activeDesktopTab) {
@@ -587,6 +621,7 @@ export default function Dashboard() {
                       currentForm="Dashboard"
                       currentField="general"
                       currentStep={1}
+                      onNavigate={handleMILANavigation}
                     />
                   </div>
                 </div>
@@ -901,51 +936,23 @@ export default function Dashboard() {
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
                 />
+                <HelperButton currentForm="PatientEligibility" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
-            ) : (
+            ) : mobileHEDISView === 'screening-form' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">
                   <button
-                    onClick={() => {
-                      setMobileHEDISView('landing')
-                      // Scroll to top when navigating back
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
+                    onClick={() => setMobileHEDISView('patient-search')}
                     className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                   >
                     <Icon name="arrow-left" size={20} />
                   </button>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">HEDIS Screening</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">New Screening</h2>
                 </div>
-                <NewScreeningForm 
-                  patient={{ 
-                    id: '1', 
-                    patientId: 'P001', 
-                    firstName: 'Test', 
-                    lastName: 'Patient', 
-                    dateOfBirth: '1990-01-01',
-                    pcpName: 'Dr. Smith',
-                    pcpLocation: 'Primary Care Clinic',
-                    lastVisit: '2024-01-15',
-                    status: 'active'
-                  }}
-                  isOpen={true}
-                  onClose={() => {
-                    setMobileHEDISView('landing')
-                    // Scroll to top when navigating back
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                  }}
-                  onSave={(data) => console.log('Screening saved:', data)}
-                  onComplete={(data) => {
-                    console.log('Screening completed:', data)
-                    setMobileHEDISView('landing')
-                    // Scroll to top when completing form
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                  }}
-                />
+                <NewScreeningForm />
+                <HelperButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
-            )}
-            <HelperButton currentForm="HEDIS" currentField="mobile" currentStep={1} />
+            ) : null}
           </div>
         )
       case 'pic':
@@ -953,37 +960,28 @@ export default function Dashboard() {
           <div className="mobile-main-content">
             {mobilePICView === 'landing' ? (
               <div className="p-4">
-                {/* Mobile P.I.C. Header */}
-                <div className="pic-actions-mobile-header mb-4">
-                  <h2 className="pic-actions-mobile-title text-xl font-bold text-gray-900 dark:text-white mb-3">P.I.C. Actions</h2>
-                  <p className="pic-actions-mobile-subtitle text-sm text-gray-600 dark:text-gray-400 mb-4">Quick access to all provider interface center actions</p>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">PIC Actions</h2>
+                  <button
+                    onClick={handleMobileMenuToggle}
+                    className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  >
+                    <Icon name="menu" size={24} />
+                  </button>
                 </div>
-              
+
                 {/* Mobile Search */}
-                <div className="pic-actions-mobile-search relative mb-4">
-                  <div className="pic-actions-mobile-search-icon absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                <div className="pic-actions-mobile-search mb-4">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search PIC actions..."
+                      value={mobileSearchTerm}
+                      onChange={(e) => setMobileSearchTerm(e.target.value)}
+                      className="pic-actions-mobile-search-input w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <Icon name="search" size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search actions..."
-                    value={mobileSearchTerm}
-                    onChange={(e) => setMobileSearchTerm(e.target.value)}
-                    className="pic-actions-mobile-search-input w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  {mobileSearchTerm && (
-                    <button
-                      onClick={() => setMobileSearchTerm('')}
-                      className="pic-actions-mobile-search-clear absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                      aria-label="Clear search"
-                    >
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  )}
                 </div>
 
                 {/* Mobile Category Filter */}
@@ -1094,113 +1092,70 @@ export default function Dashboard() {
             ) : mobilePICView === 'patient-eligibility' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">
-                  <button
-                    onClick={() => {
-                      setMobilePICView('landing')
-                      // Scroll to top when navigating back
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
-                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  >
+                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <Icon name="arrow-left" size={20} />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Eligibility</h2>
                 </div>
                 <PatientEligibilityForm />
-                <HelperButton currentForm="PatientEligibility" currentField="mobile" currentStep={1} />
+                <HelperButton currentForm="Prescription" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
             ) : mobilePICView === 'claims-submission' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">
-                  <button
-                    onClick={() => {
-                      setMobilePICView('landing')
-                      // Scroll to top when navigating back
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
-                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  >
+                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <Icon name="arrow-left" size={20} />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Claims Submission</h2>
                 </div>
                 <ClaimsSubmissionForm />
-                <HelperButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} />
+                <HelperButton currentForm="ManualEligibilityRequest" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
             ) : mobilePICView === 'prescription' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">
-                  <button
-                    onClick={() => {
-                      setMobilePICView('landing')
-                      // Scroll to top when navigating back
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
-                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  >
+                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <Icon name="arrow-left" size={20} />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Entry</h2>
                 </div>
                 <PrescriptionForm />
-                <HelperButton currentForm="Prescription" currentField="mobile" currentStep={1} />
+                <HelperButton currentForm="HealthPlanDetails" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
             ) : mobilePICView === 'manual-eligibility-request' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">
-                  <button
-                    onClick={() => {
-                      setMobilePICView('landing')
-                      // Scroll to top when navigating back
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
-                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  >
+                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <Icon name="arrow-left" size={20} />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Manual Eligibility Request</h2>
                 </div>
                 <ManualEligibilityRequestForm />
-                <HelperButton currentForm="ManualEligibilityRequest" currentField="mobile" currentStep={1} />
+                <HelperButton currentForm="FramesAndLenses" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
             ) : mobilePICView === 'health-plan-details' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">
-                  <button
-                    onClick={() => {
-                      setMobilePICView('landing')
-                      // Scroll to top when navigating back
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
-                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  >
+                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <Icon name="arrow-left" size={20} />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Health Plan Details</h2>
                 </div>
                 <HealthPlanDetailsPage />
-                <HelperButton currentForm="HealthPlanDetails" currentField="mobile" currentStep={1} />
+                <HelperButton currentForm="FramesAndLenses" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
             ) : mobilePICView === 'frames-and-lenses' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">
-                  <button
-                    onClick={() => {
-                      setMobilePICView('landing')
-                      // Scroll to top when navigating back
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
-                    className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  >
+                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <Icon name="arrow-left" size={20} />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Frames and Lenses</h2>
                 </div>
                 <FramesAndLensesPage />
-                <HelperButton currentForm="FramesAndLenses" currentField="mobile" currentStep={1} />
+                <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
             ) : null}
-            <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} />
           </div>
         )
       case 'reports':
@@ -1332,6 +1287,7 @@ export default function Dashboard() {
                       currentForm="Dashboard"
                       currentField="general"
                       currentStep={1}
+                      onNavigate={handleMILANavigation}
                     />
                   </div>
                 </div>

@@ -48,6 +48,8 @@ interface HelperModalProps {
     formCompletionRate: number
     averageSessionTime: number
   }
+  // Navigation prop for M.I.L.A. to perform actual navigation
+  onNavigate?: (destination: string) => void
 }
 
 // Medical billing knowledge base
@@ -121,7 +123,9 @@ export default function HelperModal({
   onCodeSelect,
   // New props for smart suggestions and proactive assistance
   formData,
-  userBehavior
+  userBehavior,
+  // Navigation prop for M.I.L.A. to perform actual navigation
+  onNavigate
 }: HelperModalProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -1130,37 +1134,72 @@ export default function HelperModal({
         
       case 'navigate_frames_lenses':
         // Navigate to Frames and Lenses page
-        addMessage('assistant', 'I\'ll help you navigate to the Frames and Lenses page. Go to PIC Actions and click "Frames and Lenses" to access all pricing documents.', 'fade-in')
+        if (onNavigate) {
+          onNavigate('frames-and-lenses')
+          addMessage('assistant', '✅ Taking you to the Frames and Lenses page now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the Frames and Lenses page. Go to PIC Actions and click "Frames and Lenses" to access all pricing documents.', 'fade-in')
+        }
         break
         
       case 'navigate_health_plans':
         // Navigate to Health Plan Details page
-        addMessage('assistant', 'I\'ll help you navigate to the Health Plan Details page. Go to PIC Actions and click "Health Plan Details" to access provider information and documents.', 'fade-in')
+        if (onNavigate) {
+          onNavigate('health-plan-details')
+          addMessage('assistant', '✅ Taking you to the Health Plan Details page now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the Health Plan Details page. Go to PIC Actions and click "Health Plan Details" to access provider information and documents.', 'fade-in')
+        }
         break
         
       case 'navigate_patient_eligibility':
         // Navigate to Patient Eligibility form
-        addMessage('assistant', 'I\'ll help you navigate to the Patient Eligibility form. Go to PIC Actions and click "Request Patient Eligibility" to check patient coverage.', 'fade-in')
+        if (onNavigate) {
+          onNavigate('patient-eligibility')
+          addMessage('assistant', '✅ Taking you to the Patient Eligibility form now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the Patient Eligibility form. Go to PIC Actions and click "Request Patient Eligibility" to check patient coverage.', 'fade-in')
+        }
         break
         
       case 'navigate_claims_submission':
         // Navigate to Claims Submission form
-        addMessage('assistant', 'I\'ll help you navigate to the Claims Submission form. Go to PIC Actions and click "Submit Claims" to start the claims submission process.', 'fade-in')
+        if (onNavigate) {
+          onNavigate('claims-submission')
+          addMessage('assistant', '✅ Taking you to the Claims Submission form now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the Claims Submission form. Go to PIC Actions and click "Submit Claims" to start the claims submission process.', 'fade-in')
+        }
         break
         
       case 'navigate_hedis_screening':
         // Navigate to HEDIS Screening
-        addMessage('assistant', 'I\'ll help you navigate to the HEDIS Screening. Go to the HEDIS tab and click "New Screening" to start HEDIS documentation.', 'fade-in')
+        if (onNavigate) {
+          onNavigate('hedis-screening')
+          addMessage('assistant', '✅ Taking you to the HEDIS Screening form now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the HEDIS Screening. Go to the HEDIS tab and click "New Screening" to start HEDIS documentation.', 'fade-in')
+        }
         break
         
       case 'navigate_hedis_dashboard':
         // Navigate to HEDIS Dashboard
-        addMessage('assistant', 'I\'ll help you navigate to the HEDIS Dashboard. Go to the HEDIS tab to access the dashboard and view existing screenings.', 'fade-in')
+        if (onNavigate) {
+          onNavigate('hedis-dashboard')
+          addMessage('assistant', '✅ Taking you to the HEDIS Dashboard now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the HEDIS Dashboard. Go to the HEDIS tab to access the dashboard and view existing screenings.', 'fade-in')
+        }
         break
         
       case 'navigate_pic_actions':
         // Navigate to PIC Actions
-        addMessage('assistant', 'I\'ll help you navigate to the PIC Actions page. This is your central hub for accessing all the main features and forms.', 'fade-in')
+        if (onNavigate) {
+          onNavigate('pic-actions')
+          addMessage('assistant', '✅ Taking you to the PIC Actions page now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the PIC Actions page. This is your central hub for accessing all the main features and forms.', 'fade-in')
+        }
         break
         
       default:

@@ -8,6 +8,7 @@ interface HelperButtonProps {
   currentStep?: number
   onFieldSuggestion?: (fieldName: string, suggestion: string) => void
   className?: string
+  onNavigate?: (destination: string) => void
 }
 
 export default function HelperButton({ 
@@ -15,7 +16,8 @@ export default function HelperButton({
   currentField, 
   currentStep,
   onFieldSuggestion,
-  className = ''
+  className = '',
+  onNavigate
 }: HelperButtonProps) {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false)
 
@@ -59,6 +61,7 @@ export default function HelperButton({
         currentField={currentField}
         currentStep={currentStep}
         onFieldSuggestion={onFieldSuggestion}
+        onNavigate={onNavigate}
       />
     </>
   )

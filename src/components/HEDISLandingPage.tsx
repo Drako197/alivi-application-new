@@ -263,6 +263,17 @@ function PatientSearchStep({ onPatientSelect, onNextStep }: PatientSearchStepPro
         currentForm="PatientSearchStep"
         currentField="patientId"
         currentStep={1}
+        onNavigate={(destination) => {
+          console.log('HEDIS navigation requested:', destination)
+          // Handle HEDIS-specific navigation
+          if (destination === 'hedis-screening') {
+            // Navigate to new screening
+            onNextStep()
+          } else if (destination === 'hedis-dashboard') {
+            // Stay on dashboard
+            console.log('Already on HEDIS dashboard')
+          }
+        }}
       />
       
 
@@ -639,6 +650,17 @@ function ScreeningDetailsForm({
           currentForm="ScreeningDetailsForm"
           currentField="dateOfScreening"
           currentStep={2}
+          onNavigate={(destination) => {
+            console.log('HEDIS navigation requested:', destination)
+            // Handle HEDIS-specific navigation
+            if (destination === 'hedis-screening') {
+              // Navigate to new screening
+              onNextStep()
+            } else if (destination === 'hedis-dashboard') {
+              // Stay on dashboard
+              console.log('Already on HEDIS dashboard')
+            }
+          }}
         />
       </div>
       
@@ -1472,6 +1494,17 @@ function RetinalImagesForm({
           currentForm="RetinalImagesForm"
           currentField="rightEyeImages"
           currentStep={3}
+          onNavigate={(destination) => {
+            console.log('HEDIS navigation requested:', destination)
+            // Handle HEDIS-specific navigation
+            if (destination === 'hedis-screening') {
+              // Navigate to new screening
+              onNextStep()
+            } else if (destination === 'hedis-dashboard') {
+              // Stay on dashboard
+              console.log('Already on HEDIS dashboard')
+            }
+          }}
         />
       </div>
       
@@ -2035,6 +2068,17 @@ function ReviewAndSubmitForm({
           currentForm="ReviewAndSubmitForm"
           currentField="review"
           currentStep={4}
+          onNavigate={(destination) => {
+            console.log('HEDIS navigation requested:', destination)
+            // Handle HEDIS-specific navigation
+            if (destination === 'hedis-screening') {
+              // Navigate to new screening
+              console.log('Already in review step')
+            } else if (destination === 'hedis-dashboard') {
+              // Stay on dashboard
+              console.log('Already on HEDIS dashboard')
+            }
+          }}
         />
       </div>
       
@@ -4267,6 +4311,17 @@ export default function HEDISLandingPage({
         currentForm="NewScreeningForm"
         currentField="diabetesMellitus"
         currentStep={1}
+        onNavigate={(destination) => {
+          console.log('HEDIS navigation requested:', destination)
+          // Handle HEDIS-specific navigation
+          if (destination === 'hedis-screening') {
+            // Navigate to new screening
+            handleTaskClick('screening')
+          } else if (destination === 'hedis-dashboard') {
+            // Stay on dashboard
+            console.log('Already on HEDIS dashboard')
+          }
+        }}
       />
 
 

@@ -709,19 +709,6 @@ export default function Dashboard() {
 
               {/* Stats Cards */}
               <div className="grid grid-cols-2 gap-4 mb-6">
-                {/* M.I.L.A. AI Assistant Card - First position */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mila-ai-assistant-card-mobile">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-                      <Icon name="bot" size={20} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">M.I.L.A. AI</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">Active</p>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 completed-screenings-card-mobile">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
@@ -754,6 +741,18 @@ export default function Dashboard() {
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Eligibility</p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">24</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 pending-actions-card-mobile">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mr-3">
+                      <Icon name="clock" size={20} className="text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{dashboardStats.savedScreenings + 3}</p>
                     </div>
                   </div>
                 </div>
@@ -792,6 +791,19 @@ export default function Dashboard() {
                     Submit Claims
                   </button>
                 </div>
+              </div>
+
+              {/* M.I.L.A. AI Assistant - First in second grouping */}
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white mb-6">
+                <h3 className="text-lg font-semibold mb-2">M.I.L.A. AI Assistant</h3>
+                <p className="text-sm text-blue-100 mb-4">
+                  Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
+                </p>
+                <HelperButton 
+                  currentForm="Dashboard"
+                  currentField="mobile"
+                  currentStep={1}
+                />
               </div>
 
               {/* Recent Activity */}
@@ -853,19 +865,6 @@ export default function Dashboard() {
                     Claim Status (88% usage)
                   </button>
                 </div>
-              </div>
-
-              {/* M.I.L.A. AI Assistant */}
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
-                <h3 className="text-lg font-semibold mb-2">M.I.L.A. AI Assistant</h3>
-                <p className="text-sm text-blue-100 mb-4">
-                  Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
-                </p>
-                <HelperButton 
-                  currentForm="Dashboard"
-                  currentField="mobile"
-                  currentStep={1}
-                />
               </div>
             </div>
           </div>

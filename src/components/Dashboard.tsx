@@ -390,12 +390,15 @@ export default function Dashboard() {
     switch (action) {
       case 'hedis':
         setActiveDesktopTab('hedis')
+        setActiveMobileTab('hedis')
         break
       case 'pic':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         break
       case 'eligibility':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         setPICNavigateTo('patient-eligibility')
         // Also handle mobile navigation
         setMobilePICView('patient-eligibility')
@@ -403,6 +406,7 @@ export default function Dashboard() {
         break
       case 'claims-submission':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         setPICNavigateTo('claims-submission')
         // Also handle mobile navigation
         setMobilePICView('claims-submission')
@@ -410,6 +414,7 @@ export default function Dashboard() {
         break
       case 'completed-screenings':
         setActiveDesktopTab('hedis')
+        setActiveMobileTab('hedis')
         // TODO: Navigate to completed screenings view
         break
       default:

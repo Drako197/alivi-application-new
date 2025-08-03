@@ -936,7 +936,10 @@ export default function Dashboard() {
         return (
           <div className="mobile-main-content">
             {mobileHEDISView === 'landing' ? (
-              <HEDISLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />
+              <div>
+                <HEDISLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />
+                <HelperButton currentForm="HEDIS" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
+              </div>
             ) : mobileHEDISView === 'patient-search' ? (
               <div className="p-4">
                 <div className="flex items-center mb-4">

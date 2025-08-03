@@ -424,18 +424,30 @@ export default function Dashboard() {
       case 'patient-eligibility':
         setActiveDesktopTab('pic')
         setPICNavigateTo('patient-eligibility')
+        // Also handle mobile navigation
+        setMobilePICView('patient-eligibility')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       case 'claims-submission':
         setActiveDesktopTab('pic')
         setPICNavigateTo('claims-submission')
+        // Also handle mobile navigation
+        setMobilePICView('claims-submission')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       case 'frames-and-lenses':
         setActiveDesktopTab('pic')
         setPICNavigateTo('frames-and-lenses')
+        // Also handle mobile navigation
+        setMobilePICView('frames-and-lenses')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       case 'health-plan-details':
         setActiveDesktopTab('pic')
         setPICNavigateTo('health-plan-details')
+        // Also handle mobile navigation
+        setMobilePICView('health-plan-details')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       default:
         console.log('M.I.L.A. navigation requested:', destination)
@@ -963,7 +975,26 @@ export default function Dashboard() {
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">New Screening</h2>
                 </div>
-                <NewScreeningForm />
+                <NewScreeningForm 
+                  patient={{ 
+                    id: '1', 
+                    patientId: 'P001', 
+                    firstName: 'Test', 
+                    lastName: 'Patient', 
+                    dateOfBirth: '1990-01-01',
+                    pcpName: 'Dr. Smith',
+                    pcpLocation: 'Primary Care Clinic',
+                    lastVisit: '2024-01-15',
+                    status: 'active'
+                  }}
+                  isOpen={true}
+                  onClose={() => setMobileHEDISView('patient-search')}
+                  onSave={(data) => console.log('Screening saved:', data)}
+                  onComplete={(data) => {
+                    console.log('Screening completed:', data)
+                    setMobileHEDISView('landing')
+                  }}
+                />
                 <HelperButton currentForm="ClaimsSubmission" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
               </div>
             ) : null}

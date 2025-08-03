@@ -874,6 +874,7 @@ export default function Dashboard() {
                   currentForm="Dashboard"
                   currentField="mobile"
                   currentStep={1}
+                  onNavigate={handleMILANavigation}
                 />
               </div>
 

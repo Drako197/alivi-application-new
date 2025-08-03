@@ -21,9 +21,10 @@ interface ActionItem {
 interface PICLandingPageProps {
   onUpdateBreadcrumb?: (path: string[]) => void
   resetToLanding?: number
+  navigateTo?: string
 }
 
-export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 }: PICLandingPageProps) {
+export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0, navigateTo }: PICLandingPageProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -38,6 +39,28 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0 
       }
     }
   }, [resetToLanding, onUpdateBreadcrumb])
+
+  // Handle external navigation
+  useEffect(() => {
+    if (navigateTo) {
+      setCurrentView(navigateTo as any)
+      // Update breadcrumb based on navigation
+      if (onUpdateBreadcrumb) {
+        const breadcrumbMap: { [key: string]: string[] } = {
+          'patient-eligibility': ['Dashboard', 'P.I.C.', 'Request Patient Eligibility'],
+          'claims-submission': ['Dashboard', 'P.I.C.', 'Claims Submission'],
+          'prescription': ['Dashboard', 'P.I.C.', 'Prescription Entry'],
+          'health-plan-details': ['Dashboard', 'P.I.C.', 'Health Plan Details'],
+          'frames-and-lenses': ['Dashboard', 'P.I.C.', 'Frames and Lenses'],
+          'manual-eligibility-request': ['Dashboard', 'P.I.C.', 'Manual Eligibility Request']
+        }
+        const breadcrumb = breadcrumbMap[navigateTo]
+        if (breadcrumb) {
+          onUpdateBreadcrumb(breadcrumb)
+        }
+      }
+    }
+  }, [navigateTo, onUpdateBreadcrumb])
 
   // Dummy data for actions
   const allActions: ActionItem[] = [

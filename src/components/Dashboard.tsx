@@ -46,6 +46,7 @@ export default function Dashboard() {
   const [hedisResetCounter, setHEDISResetCounter] = useState(0)
   const [mobileSearchTerm, setMobileSearchTerm] = useState('')
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
+  const [picNavigateTo, setPICNavigateTo] = useState<string | undefined>()
   
   // Mobile form state management
   const [mobilePICView, setMobilePICView] = useState<'landing' | 'patient-eligibility' | 'claims-submission' | 'prescription' | 'manual-eligibility-request' | 'health-plan-details' | 'frames-and-lenses'>('landing')
@@ -94,6 +95,17 @@ export default function Dashboard() {
   useEffect(() => {
     updateBreadcrumbPath(activeDesktopTab)
   }, [activeDesktopTab])
+
+  // Clear navigation state after it's been used
+  useEffect(() => {
+    if (picNavigateTo) {
+      // Clear the navigation state after a short delay to allow the component to process it
+      const timer = setTimeout(() => {
+        setPICNavigateTo(undefined)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [picNavigateTo])
 
   // Mobile action handlers
   const handleMobileAction = (actionId: string) => {
@@ -407,22 +419,23 @@ export default function Dashboard() {
         break
       case 'pic-actions':
         setActiveDesktopTab('pic')
+        setPICNavigateTo(undefined) // Reset to landing
         break
       case 'patient-eligibility':
         setActiveDesktopTab('pic')
-        // TODO: Navigate to patient eligibility form
+        setPICNavigateTo('patient-eligibility')
         break
       case 'claims-submission':
         setActiveDesktopTab('pic')
-        // TODO: Navigate to claims submission form
+        setPICNavigateTo('claims-submission')
         break
       case 'frames-and-lenses':
         setActiveDesktopTab('pic')
-        // TODO: Navigate to frames and lenses page
+        setPICNavigateTo('frames-and-lenses')
         break
       case 'health-plan-details':
         setActiveDesktopTab('pic')
-        // TODO: Navigate to health plan details page
+        setPICNavigateTo('health-plan-details')
         break
       default:
         console.log('M.I.L.A. navigation requested:', destination)
@@ -447,6 +460,7 @@ export default function Dashboard() {
             <PICLandingPage 
               onUpdateBreadcrumb={setBreadcrumbPath} 
               resetToLanding={picResetCounter}
+              navigateTo={picNavigateTo}
             />
           </div>
         )

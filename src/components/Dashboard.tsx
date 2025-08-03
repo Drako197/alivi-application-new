@@ -396,7 +396,17 @@ export default function Dashboard() {
         break
       case 'eligibility':
         setActiveDesktopTab('pic')
-        // TODO: Navigate directly to Patient Eligibility form
+        setPICNavigateTo('patient-eligibility')
+        // Also handle mobile navigation
+        setMobilePICView('patient-eligibility')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        break
+      case 'claims-submission':
+        setActiveDesktopTab('pic')
+        setPICNavigateTo('claims-submission')
+        // Also handle mobile navigation
+        setMobilePICView('claims-submission')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       case 'completed-screenings':
         setActiveDesktopTab('hedis')
@@ -723,14 +733,14 @@ export default function Dashboard() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-r-lg">Popular PIC Actions</h3>
                 <div className="space-y-3">
                   <button 
-                    onClick={() => handleQuickAction('pic')}
+                    onClick={() => handleQuickAction('eligibility')}
                     className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
                   >
                     <Icon name="user-check" size={16} className="inline mr-2" />
                     Request Patient Eligibility (95% usage)
                   </button>
                   <button 
-                    onClick={() => handleQuickAction('pic')}
+                    onClick={() => handleQuickAction('claims-submission')}
                     className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
                   >
                     <Icon name="upload" size={16} className="inline mr-2" />
@@ -905,22 +915,22 @@ export default function Dashboard() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Popular PIC Actions</h3>
                 <div className="space-y-3">
                   <button 
-                    onClick={() => handleQuickAction('pic')}
-                    className="w-full text-left p-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                    onClick={() => handleQuickAction('eligibility')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
                   >
                     <Icon name="user-check" size={16} className="inline mr-2" />
                     Request Patient Eligibility (95% usage)
                   </button>
                   <button 
-                    onClick={() => handleQuickAction('pic')}
-                    className="w-full text-left p-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                    onClick={() => handleQuickAction('claims-submission')}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
                   >
                     <Icon name="upload" size={16} className="inline mr-2" />
                     Claims Submission (92% usage)
                   </button>
                   <button 
                     onClick={() => handleQuickAction('pic')}
-                    className="w-full text-left p-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
                   >
                     <Icon name="search" size={16} className="inline mr-2" />
                     Claim Status (88% usage)
@@ -1411,14 +1421,14 @@ export default function Dashboard() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-r-lg">Popular PIC Actions</h3>
                 <div className="space-y-3">
                   <button 
-                    onClick={() => handleQuickAction('pic')}
+                    onClick={() => handleQuickAction('eligibility')}
                     className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
                   >
                     <Icon name="user-check" size={16} className="inline mr-2" />
                     Request Patient Eligibility (95% usage)
                   </button>
                   <button 
-                    onClick={() => handleQuickAction('pic')}
+                    onClick={() => handleQuickAction('claims-submission')}
                     className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
                   >
                     <Icon name="upload" size={16} className="inline mr-2" />

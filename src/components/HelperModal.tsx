@@ -762,7 +762,14 @@ export default function HelperModal({
       const context = createAIContext()
       
       // Use advanced search if the input looks like a search query
-      if (input.toLowerCase().includes('search') || input.toLowerCase().includes('find') || input.toLowerCase().includes('lookup')) {
+      // But exclude queries that are asking about forms or application features
+      const isFormQuery = input.toLowerCase().includes('form') || 
+                         input.toLowerCase().includes('pic') || 
+                         input.toLowerCase().includes('help') ||
+                         input.toLowerCase().includes('where') ||
+                         input.toLowerCase().includes('what')
+      
+      if ((input.toLowerCase().includes('search') || input.toLowerCase().includes('find') || input.toLowerCase().includes('lookup')) && !isFormQuery) {
         const searchQuery = input.replace(/search|find|lookup/gi, '').trim()
         // Use a simple search approach
         const searchResults = [

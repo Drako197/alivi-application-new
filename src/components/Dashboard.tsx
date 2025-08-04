@@ -12,6 +12,9 @@ import MILAEnhancedDemo from './MILAEnhancedDemo'
 import Icon from './Icon'
 import ScreeningDataService, { type CompletedScreening, type SavedScreening } from '../services/ScreeningDataService'
 import ScreeningDateService from '../services/ScreeningDateService'
+
+// Debug import
+console.log('ScreeningDateService imported:', typeof ScreeningDateService)
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
@@ -83,8 +86,14 @@ export default function Dashboard() {
     // Initialize the date management service
     const initializeServices = async () => {
       try {
+        console.log('Starting service initialization...')
         await ScreeningDataService.initialize()
+        console.log('ScreeningDataService initialized successfully')
+        
+        console.log('Initializing ScreeningDateService...')
         ScreeningDateService.initialize()
+        console.log('ScreeningDateService initialization completed')
+        
         loadDashboardData()
       } catch (error) {
         console.error('Error initializing services:', error)
@@ -434,6 +443,28 @@ export default function Dashboard() {
         ScreeningDateService.forceDateReset()
         ScreeningDateService.debugCurrentState()
         console.log('Date reset debug completed - check console for details')
+        break
+      case 'debug-saved-screenings':
+        // Debug saved screenings state
+        const savedScreenings = ScreeningDataService.getSavedScreenings()
+        console.log('=== Current Saved Screenings ===')
+        savedScreenings.forEach(screening => {
+          const savedDate = new Date(screening.dateSaved)
+          const now = new Date()
+          const daysSinceSaved = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24))
+          const daysUntilExpiration = 30 - daysSinceSaved
+          const status = daysUntilExpiration < 5 ? 'URGENT' : daysUntilExpiration < 10 ? 'WARNING' : 'SAFE'
+          console.log(`${screening.patientName}: ${daysUntilExpiration} days until expiration (${status})`)
+        })
+        console.log('=== End Debug ===')
+        break
+      case 'force-date-reset':
+        console.log('=== FORCING DATE RESET ===')
+        ScreeningDateService.forceDateReset()
+        ScreeningDateService.debugCurrentState()
+        console.log('=== DATE RESET COMPLETED ===')
+        // Reload the page to see the changes
+        window.location.reload()
         break
       default:
         console.log('Quick action clicked:', action)

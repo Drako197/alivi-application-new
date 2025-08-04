@@ -28,8 +28,15 @@ class ScreeningDateService {
     // Check if it's time to run the date reset
     this.checkAndResetDates()
     
+    // Force a date reset on initialization to ensure all dates are current
+    console.log('Forcing initial date reset...')
+    this.performDateReset()
+    
     // Set up interval for future checks (every 5 days)
     this.setupPeriodicCheck()
+    
+    // Debug current state
+    this.debugCurrentState()
     
     console.log('ScreeningDateService initialized')
   }

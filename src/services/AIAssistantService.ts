@@ -1004,6 +1004,11 @@ export class AIAssistantService {
       return `HEDIS screening forms are available for quality measure documentation. These forms help document retinal imaging, patient demographics, and other quality measures required for HEDIS reporting.\n\n**📋 Available Features:**\n• Retinal imaging documentation\n• Patient demographic collection\n• Quality measure tracking\n• Step-by-step guidance and validation\n• Progress tracking and completion status\n\n**🔗 Navigation:** Go to HEDIS tab → Click "New Screening" to start HEDIS documentation.`
     }
     
+    // Check for PIC forms queries (must come before general help to avoid conflicts)
+    if (lowerInput.includes('pic') && (lowerInput.includes('form') || lowerInput.includes('help'))) {
+      return `I can help you with PIC forms! The PIC Actions page contains all the forms you need for medical billing and claims processing.\n\n**📋 Available Forms:**\n• **Request Patient Eligibility** - Check patient coverage and benefits\n• **Submit Claims** - Complete claims submission process\n• **Prescription Form** - Document prescription details\n• **Manual Eligibility Request** - Manual eligibility verification\n• **Health Plan Details** - Access provider information and documents\n• **Frames and Lenses** - Lens pricing and frame options\n\n**🔗 Navigation:** Go to PIC Actions to access all these forms and more.`
+    }
+    
     // Check for general help topics
     for (const [topic, info] of Object.entries(knowledge.helpTopics)) {
       if (info.keywords.some(keyword => lowerInput.includes(keyword))) {

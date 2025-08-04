@@ -863,7 +863,7 @@ export default function HelperModal({
             )
           }
           
-          addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+          addMessage('enhanced', 'Application information available', 'fade-in', undefined, undefined, undefined, enhancedResponse)
         } else {
           // Create enhanced response based on the type of response
           let enhancedResponse: EnhancedResponse | undefined
@@ -896,7 +896,7 @@ export default function HelperModal({
                 ['Check the code spelling', 'Verify it\'s a valid medical code', 'Try searching for similar codes'],
                 [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
               )
-              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+              addMessage('enhanced', 'Invalid code information', 'fade-in', undefined, undefined, undefined, enhancedResponse)
             }
           } else if (response.includes('**Code:**') || response.includes('**Code Validation Result:**')) {
             // Extract code from various formats
@@ -927,7 +927,7 @@ export default function HelperModal({
                   { label: 'Show Help', action: 'show_help', style: 'info' }
                 ]
               )
-              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+              addMessage('enhanced', 'Code lookup results', 'fade-in', undefined, undefined, undefined, enhancedResponse)
             }
           } else if (response.includes('**Error:**') || response.includes('**Warning:**') || response.includes('❌ INVALID')) {
             // Error response
@@ -942,7 +942,7 @@ export default function HelperModal({
                 ['Check your input', 'Verify the information', 'Try a different approach'],
                 [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
               )
-              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+              addMessage('enhanced', 'Error information', 'fade-in', undefined, undefined, undefined, enhancedResponse)
             }
           } else if (response.includes('**Help:**') || response.includes('I can help')) {
             // Help response
@@ -955,7 +955,7 @@ export default function HelperModal({
                 { label: 'Provider Search', action: 'search_provider', style: 'info' }
               ]
             )
-            addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+            addMessage('enhanced', 'Help information available', 'fade-in', undefined, undefined, undefined, enhancedResponse)
           } else {
             // Check if this looks like a general/contextual response that shouldn't be enhanced
             if (response.includes('You\'re on **Step') || 
@@ -974,7 +974,7 @@ export default function HelperModal({
                   { label: 'Get Help', action: 'show_help', style: 'info' }
                 ]
               )
-              addMessage('enhanced', response, 'fade-in', undefined, undefined, undefined, enhancedResponse)
+              addMessage('enhanced', 'Information available', 'fade-in', undefined, undefined, undefined, enhancedResponse)
             }
           }
         }

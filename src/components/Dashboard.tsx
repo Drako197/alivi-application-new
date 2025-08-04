@@ -427,17 +427,21 @@ export default function Dashboard() {
     switch (destination) {
       case 'hedis-screening':
         setActiveDesktopTab('hedis')
+        setActiveMobileTab('hedis')
         // TODO: Navigate to new screening form
         break
       case 'hedis-dashboard':
         setActiveDesktopTab('hedis')
+        setActiveMobileTab('hedis')
         break
       case 'pic-actions':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         setPICNavigateTo(undefined) // Reset to landing
         break
       case 'patient-eligibility':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         setPICNavigateTo('patient-eligibility')
         // Also handle mobile navigation
         setMobilePICView('patient-eligibility')
@@ -445,6 +449,7 @@ export default function Dashboard() {
         break
       case 'claims-submission':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         setPICNavigateTo('claims-submission')
         // Also handle mobile navigation
         setMobilePICView('claims-submission')
@@ -452,6 +457,7 @@ export default function Dashboard() {
         break
       case 'frames-and-lenses':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         setPICNavigateTo('frames-and-lenses')
         // Also handle mobile navigation
         setMobilePICView('frames-and-lenses')
@@ -459,6 +465,7 @@ export default function Dashboard() {
         break
       case 'health-plan-details':
         setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
         setPICNavigateTo('health-plan-details')
         // Also handle mobile navigation
         setMobilePICView('health-plan-details')

@@ -853,14 +853,26 @@ export default function HelperModal({
             )
           } else {
             // Generic application response
-            enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
-              'Application Information',
-              'info',
-              [
-                { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'primary' },
-                { label: 'Get Help', action: 'show_help', style: 'info' }
-              ]
-            )
+            // Check if this is a Manual Eligibility form query
+            if (input.toLowerCase().includes('manual') && input.toLowerCase().includes('eligibility')) {
+              enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+                'Manual Eligibility Form Information',
+                'info',
+                [
+                  { label: 'Manual Eligibility Form', action: 'navigate_manual_eligibility', style: 'primary' },
+                  { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'info' }
+                ]
+              )
+            } else {
+              enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+                'Application Information',
+                'info',
+                [
+                  { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'primary' },
+                  { label: 'Get Help', action: 'show_help', style: 'info' }
+                ]
+              )
+            }
           }
           
           addMessage('enhanced', 'Application information available', 'fade-in', undefined, undefined, undefined, enhancedResponse)

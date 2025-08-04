@@ -11,6 +11,7 @@ import HEDISLandingPage from './HEDISLandingPage'
 import MILAEnhancedDemo from './MILAEnhancedDemo'
 import Icon from './Icon'
 import ScreeningDataService, { type CompletedScreening, type SavedScreening } from '../services/ScreeningDataService'
+import ScreeningDateService from '../services/ScreeningDateService'
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
 import PrescriptionForm from './PrescriptionForm'
@@ -79,7 +80,19 @@ export default function Dashboard() {
       }
     }
 
-    loadDashboardData()
+    // Initialize the date management service
+    const initializeServices = async () => {
+      try {
+        await ScreeningDataService.initialize()
+        ScreeningDateService.initialize()
+        loadDashboardData()
+      } catch (error) {
+        console.error('Error initializing services:', error)
+        loadDashboardData() // Still load data even if services fail
+      }
+    }
+
+    initializeServices()
   }, [])
 
   // Save tab state to localStorage whenever it changes
@@ -417,6 +430,11 @@ export default function Dashboard() {
         setActiveMobileTab('hedis')
         // TODO: Navigate to completed screenings view
         break
+      case 'debug-date-reset':
+        ScreeningDateService.forceDateReset()
+        ScreeningDateService.debugCurrentState()
+        console.log('Date reset debug completed - check console for details')
+        break
       default:
         console.log('Quick action clicked:', action)
     }
@@ -469,6 +487,14 @@ export default function Dashboard() {
         setPICNavigateTo('health-plan-details')
         // Also handle mobile navigation
         setMobilePICView('health-plan-details')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        break
+      case 'manual-eligibility-request':
+        setActiveDesktopTab('pic')
+        setActiveMobileTab('pic')
+        setPICNavigateTo('manual-eligibility-request')
+        // Also handle mobile navigation
+        setMobilePICView('manual-eligibility-request')
         window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       default:

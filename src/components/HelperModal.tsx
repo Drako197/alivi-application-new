@@ -1172,6 +1172,16 @@ export default function HelperModal({
         }
         break
         
+      case 'navigate_manual_eligibility':
+        // Navigate to Manual Eligibility Request form
+        if (onNavigate) {
+          onNavigate('manual-eligibility-request')
+          addMessage('assistant', '✅ Taking you to the Manual Eligibility Request form now!', 'fade-in')
+        } else {
+          addMessage('assistant', 'I\'ll help you navigate to the Manual Eligibility Request form. Go to PIC Actions and click "Manual Eligibility Request" to submit manual eligibility requests.', 'fade-in')
+        }
+        break
+        
       case 'navigate_hedis_screening':
         // Navigate to HEDIS Screening
         if (onNavigate) {

@@ -375,7 +375,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="locationNumber" className="form-label">
-                  Location Number *
+                  Location Number <span className="text-red-500">*</span>
                 </label>
                 <MilaInputField
                   value={formData.locationNumber}
@@ -396,7 +396,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="insuranceProvider" className="form-label">
-                  Insurance Provider *
+                  Insurance Provider <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="insuranceProvider"
@@ -434,7 +434,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="dateOfService" className="form-label">
-                  Date of Service *
+                  Date of Service <span className="text-red-500">*</span>
                 </label>
                 <DatePicker
                   name="dateOfService"
@@ -553,7 +553,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="memberId" className="form-label">
-                  Member ID *
+                  Member ID <span className="text-red-500">*</span>
                 </label>
                 <MilaInputField
                   value={formData.memberId}
@@ -574,7 +574,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="firstName" className="form-label">
-                  First Name *
+                  First Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -592,7 +592,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="lastName" className="form-label">
-                  Last Name *
+                  Last Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -610,7 +610,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="streetAddress" className="form-label">
-                  Street Address *
+                  Street Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -628,7 +628,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="city" className="form-label">
-                  City *
+                  City <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -646,7 +646,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="state" className="form-label">
-                  State *
+                  State <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="state"
@@ -669,7 +669,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="zip" className="form-label">
-                  ZIP *
+                  ZIP <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -687,7 +687,7 @@ export default function ManualEligibilityRequestForm({ onBack }: ManualEligibili
 
               <div>
                 <label htmlFor="dateOfBirth" className="form-label">
-                  Date of Birth *
+                  Date of Birth <span className="text-red-500">*</span>
                 </label>
                 <DatePicker
                   name="dateOfBirth"

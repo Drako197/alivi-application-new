@@ -1010,7 +1010,20 @@ export class AIAssistantService {
     }
     
     // Check for PIC forms queries (must come before general help to avoid conflicts)
-    if (lowerInput.includes('pic') && (lowerInput.includes('form') || lowerInput.includes('help'))) {
+    // More flexible pattern matching for PIC forms
+    const picFormPatterns = [
+      /pic.*form/i,
+      /find.*pic/i,
+      /help.*pic/i,
+      /pic.*help/i,
+      /pic.*find/i,
+      /forms.*pic/i,
+      /pic.*available/i,
+      /what.*pic/i,
+      /show.*pic/i
+    ]
+    
+    if (picFormPatterns.some(pattern => pattern.test(lowerInput))) {
       return `I can help you with PIC forms! The PIC Actions page contains all the forms you need for medical billing and claims processing.\n\n**📋 Available Forms:**\n• **Request Patient Eligibility** - Check patient coverage and benefits\n• **Submit Claims** - Complete claims submission process\n• **Prescription Form** - Document prescription details\n• **Manual Eligibility Request** - Manual eligibility verification\n• **Health Plan Details** - Access provider information and documents\n• **Frames and Lenses** - Lens pricing and frame options\n\n**🔗 Navigation:** Go to PIC Actions to access all these forms and more.`
     }
     
@@ -1031,6 +1044,11 @@ export class AIAssistantService {
     if (lowerInput.includes('pic') || lowerInput.includes('actions') || lowerInput.includes('quick access')) {
       const picInfo = knowledge.features['PIC Actions']
       return `The PIC Actions page provides quick access to common actions. Here's what's available:\n\n**📋 Available Actions:**\n${picInfo.availableActions.map(action => `• ${action}`).join('\n')}\n\n**🔗 Navigation:** ${picInfo.navigation}`
+    }
+    
+    // If we get here, the query wasn't recognized - provide helpful suggestions
+    if (lowerInput.includes('pic') || lowerInput.includes('form') || lowerInput.includes('help') || lowerInput.includes('find')) {
+      return `I'd be happy to help you! It looks like you're asking about forms or PIC actions. Here are some things I can help you with:\n\n**📋 Common Requests:**\n• **PIC Forms** - Access all medical billing forms\n• **Patient Eligibility** - Check patient coverage\n• **Claims Submission** - Submit medical claims\n• **Health Plan Details** - Provider information\n• **Frames and Lenses** - Pricing information\n\n**💡 Try asking:**\n• "I need help with PIC forms"\n• "Show me the patient eligibility form"\n• "Where can I submit claims?"\n• "Help me find health plan information"\n\n**🔗 Quick Access:** Go to PIC Actions to see all available forms and tools.`
     }
     
     return null

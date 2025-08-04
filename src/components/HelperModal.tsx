@@ -853,8 +853,17 @@ export default function HelperModal({
             )
           } else {
             // Generic application response
-            // Check if this is a Manual Eligibility form query
-            if (input.toLowerCase().includes('manual') && input.toLowerCase().includes('eligibility')) {
+            // Check if this is a PIC forms query
+            if (input.toLowerCase().includes('pic') && (input.toLowerCase().includes('form') || input.toLowerCase().includes('find') || input.toLowerCase().includes('help'))) {
+              enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
+                'PIC Forms Information',
+                'success',
+                [
+                  { label: 'PIC Actions', action: 'navigate_pic_actions', style: 'primary' },
+                  { label: 'Get Help', action: 'show_help', style: 'info' }
+                ]
+              )
+            } else if (input.toLowerCase().includes('manual') && input.toLowerCase().includes('eligibility')) {
               enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
                 'Manual Eligibility Form Information',
                 'info',

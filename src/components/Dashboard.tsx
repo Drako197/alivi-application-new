@@ -473,6 +473,7 @@ export default function Dashboard() {
 
   // M.I.L.A. navigation handler
   const handleMILANavigation = (destination: string) => {
+    console.log('Dashboard: handleMILANavigation called with destination:', destination)
     switch (destination) {
       case 'hedis-screening':
         setActiveDesktopTab('hedis')
@@ -484,9 +485,13 @@ export default function Dashboard() {
         setActiveMobileTab('hedis')
         break
       case 'pic-actions':
+        console.log('Dashboard: Navigating to PIC Actions')
+        console.log('Dashboard: Current activeDesktopTab:', activeDesktopTab)
+        console.log('Dashboard: Current activeMobileTab:', activeMobileTab)
         setActiveDesktopTab('pic')
         setActiveMobileTab('pic')
         setPICNavigateTo(undefined) // Reset to landing
+        console.log('Dashboard: Set tabs to pic, reset PICNavigateTo to undefined')
         break
       case 'patient-eligibility':
         setActiveDesktopTab('pic')

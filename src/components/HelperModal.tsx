@@ -1185,6 +1185,9 @@ export default function HelperModal({
         if (onNavigate) {
           onNavigate('patient-eligibility')
           addMessage('assistant', '✅ Taking you to the Patient Eligibility form now!', 'fade-in')
+          setTimeout(() => {
+            onClose()
+          }, 1500)
         } else {
           addMessage('assistant', 'I\'ll help you navigate to the Patient Eligibility form. Go to PIC Actions and click "Request Patient Eligibility" to check patient coverage.', 'fade-in')
         }
@@ -1195,6 +1198,9 @@ export default function HelperModal({
         if (onNavigate) {
           onNavigate('claims-submission')
           addMessage('assistant', '✅ Taking you to the Claims Submission form now!', 'fade-in')
+          setTimeout(() => {
+            onClose()
+          }, 1500)
         } else {
           addMessage('assistant', 'I\'ll help you navigate to the Claims Submission form. Go to PIC Actions and click "Submit Claims" to start the claims submission process.', 'fade-in')
         }
@@ -1205,6 +1211,9 @@ export default function HelperModal({
         if (onNavigate) {
           onNavigate('manual-eligibility-request')
           addMessage('assistant', '✅ Taking you to the Manual Eligibility Request form now!', 'fade-in')
+          setTimeout(() => {
+            onClose()
+          }, 1500)
         } else {
           addMessage('assistant', 'I\'ll help you navigate to the Manual Eligibility Request form. Go to PIC Actions and click "Manual Eligibility Request" to submit manual eligibility requests.', 'fade-in')
         }
@@ -1233,9 +1242,15 @@ export default function HelperModal({
       case 'navigate_pic_actions':
         // Navigate to PIC Actions
         if (onNavigate) {
+          console.log('HelperModal: Calling onNavigate with pic-actions')
           onNavigate('pic-actions')
           addMessage('assistant', '✅ Taking you to the PIC Actions page now!', 'fade-in')
+          // Close the modal after a short delay to let user see the confirmation
+          setTimeout(() => {
+            onClose()
+          }, 1500)
         } else {
+          console.log('HelperModal: onNavigate prop is not available')
           addMessage('assistant', 'I\'ll help you navigate to the PIC Actions page. This is your central hub for accessing all the main features and forms.', 'fade-in')
         }
         break

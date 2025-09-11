@@ -1003,11 +1003,11 @@ body {
 }
 
 .pic-action-card {
-  @apply relative p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 text-left;
+  @apply relative p-6 bg-transparent border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 text-left;
 }
 
 .pic-action-card:hover {
-  @apply transform -translate-y-1;
+  @apply transform -translate-y-1 bg-white dark:bg-gray-800;
 }
 
 .pic-action-icon {
@@ -1035,7 +1035,7 @@ body {
 }
 
 .pic-frequent-action {
-  @apply border border-blue-400 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:border-blue-500 dark:from-blue-900/25 dark:via-indigo-900/25 dark:to-purple-900/25;
+  @apply border border-blue-400 bg-transparent dark:border-blue-500;
 }
 
 .pic-frequent-action .pic-action-icon {
@@ -1043,7 +1043,7 @@ body {
 }
 
 .pic-frequent-action:hover {
-  @apply border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-200/50 dark:shadow-blue-900/20 transform -translate-y-1;
+  @apply border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-200/50 dark:shadow-blue-900/20 transform -translate-y-1 bg-white dark:bg-gray-800;
 }
 
 .pic-action-badge {
@@ -1084,7 +1084,7 @@ body {
 
 /* Variation 1: Teal to Emerald (Professional Healthcare) */
 .pic-frequent-action-v1 {
-  @apply border border-green-400 bg-gradient-to-br from-green-50 via-lime-50 to-emerald-50 dark:border-green-500 dark:from-green-900/25 dark:via-lime-900/25 dark:to-emerald-900/25;
+  @apply border border-green-400 bg-transparent dark:border-green-500;
 }
 
 .pic-frequent-action-v1 .pic-action-icon {
@@ -1092,12 +1092,12 @@ body {
 }
 
 .pic-frequent-action-v1:hover {
-  @apply border-green-500 dark:border-green-400 shadow-lg shadow-green-200/50 dark:shadow-green-900/20 transform -translate-y-1;
+  @apply border-green-500 dark:border-green-400 shadow-lg shadow-green-200/50 dark:shadow-green-900/20 transform -translate-y-1 bg-white dark:bg-gray-800;
 }
 
 /* Variation 2: Amber to Orange (Warm & Trustworthy) */
 .pic-frequent-action-v2 {
-  @apply border border-amber-400 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:border-amber-500 dark:from-amber-900/25 dark:via-orange-900/25 dark:to-red-900/25;
+  @apply border border-amber-400 bg-transparent dark:border-amber-500;
 }
 
 .pic-frequent-action-v2 .pic-action-icon {
@@ -1105,12 +1105,12 @@ body {
 }
 
 .pic-frequent-action-v2:hover {
-  @apply border-amber-500 dark:border-amber-400 shadow-lg shadow-amber-200/50 dark:shadow-amber-900/20 transform -translate-y-1;
+  @apply border-amber-500 dark:border-amber-400 shadow-lg shadow-amber-200/50 dark:shadow-amber-900/20 transform -translate-y-1 bg-white dark:bg-gray-800;
 }
 
 /* Variation 3: Indigo to Violet (Modern & Tech) */
 .pic-frequent-action-v3 {
-  @apply border border-indigo-400 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50 dark:border-indigo-500 dark:from-indigo-900/25 dark:via-violet-900/25 dark:to-purple-900/25;
+  @apply border border-indigo-400 bg-transparent dark:border-indigo-500;
 }
 
 .pic-frequent-action-v3 .pic-action-icon {
@@ -1118,7 +1118,7 @@ body {
 }
 
 .pic-frequent-action-v3:hover {
-  @apply border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/20 transform -translate-y-1;
+  @apply border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/20 transform -translate-y-1 bg-white dark:bg-gray-800;
 }
 
 /* HEDIS Landing Page Styles */
@@ -1292,27 +1292,46 @@ body {
 }
 
 .hedis-primary-action-card {
-  @apply bg-gradient-to-r from-teal-500 to-cyan-700 rounded-xl shadow-lg p-8 text-white;
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative overflow-hidden;
+  border-left: 4px solid #3B82F6;
+}
+
+.hedis-primary-action-card:hover {
+  @apply shadow-md border-blue-200 dark:border-blue-700;
+}
+
+/* Alternative subtle styling - Option 2 */
+.hedis-primary-action-card-subtle {
+  @apply bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative;
+}
+
+.hedis-primary-action-card-subtle:hover {
+  @apply shadow-md bg-white dark:bg-gray-800;
+}
+
+/* Alternative minimal styling - Option 3 */
+.hedis-primary-action-card-minimal {
+  @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 relative;
+}
+
+.hedis-primary-action-card-minimal:hover {
+  @apply shadow-sm border-gray-300 dark:border-gray-600;
 }
 
 .hedis-primary-action-header {
-  @apply flex items-start gap-6 mb-6;
+  @apply flex items-start gap-4 mb-6;
 }
 
 .hedis-primary-action-icon {
-  @apply w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0;
+  @apply w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0 relative;
 }
 
 .hedis-primary-action-icon svg {
-  @apply w-8 h-8 text-white;
-}
-
-.hedis-primary-action-icon {
-  @apply w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 relative;
+  @apply w-6 h-6 text-blue-600 dark:text-blue-400;
 }
 
 .hedis-icon-badge {
-  @apply absolute -top-2 -left-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg;
+  @apply absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-sm;
 }
 
 .hedis-icon-badge svg {
@@ -1324,11 +1343,11 @@ body {
 }
 
 .hedis-primary-action-title {
-  @apply text-3xl font-bold text-white mb-3;
+  @apply text-2xl font-bold text-gray-900 dark:text-white mb-3;
 }
 
 .hedis-primary-action-description {
-  @apply text-lg text-blue-100 leading-relaxed;
+  @apply text-base text-gray-600 dark:text-gray-400 leading-relaxed;
 }
 
 .hedis-primary-action-button {
@@ -1336,7 +1355,7 @@ body {
 }
 
 .hedis-hero-btn {
-  @apply px-8 py-4 bg-white text-blue-600 hover:bg-blue-50 font-semibold text-lg rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg;
+  @apply px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-base rounded-lg transition-colors duration-200 shadow-sm;
 }
 
 .hedis-secondary-actions-section {

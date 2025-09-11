@@ -4,6 +4,8 @@ import { PredictiveSuggestionsService } from './PredictiveSuggestionsService'
 import { WorkflowIntegrationService } from './WorkflowIntegrationService'
 import { MobileEnhancementsService } from './MobileEnhancementsService'
 import MedicalSpecialtiesService from './MedicalSpecialtiesService'
+import { GeminiAIService } from './GeminiAIService'
+import { MemoryService } from './MemoryService'
 
 export interface CodeLookupResult {
   code: string
@@ -51,6 +53,11 @@ export interface AIContext {
     formCompletionRate: number
     averageSessionTime: number
   }
+  // Memory-related context
+  userId?: string
+  sessionId?: string
+  userPreferences?: Record<string, any>
+  memoryEnabled?: boolean
   // Advanced Context Awareness - Item 6
   advancedContext?: {
     // Enhanced form field tracking with detailed metadata
@@ -162,21 +169,54 @@ export class AIAssistantService {
   // Local knowledge base for immediate responses
   private static LOCAL_KNOWLEDGE = {
     terminology: {
+      // Eye-related terms
       'OD': 'Oculus Dexter - Right Eye',
       'OS': 'Oculus Sinister - Left Eye',
       'OU': 'Oculus Uterque - Both Eyes',
+      
+      // Healthcare providers and organizations
       'PCP': 'Primary Care Physician',
       'HEDIS': 'Healthcare Effectiveness Data and Information Set',
       'PIC': 'Provider Interface Center',
       'NPI': 'National Provider Identifier',
+      'CMS': 'Centers for Medicare & Medicaid Services',
+      
+      // Medical coding systems
       'CPT': 'Current Procedural Terminology',
       'ICD': 'International Classification of Diseases',
       'HCPCS': 'Healthcare Common Procedure Coding System',
+      
+      // Billing and insurance terms
       'EOB': 'Explanation of Benefits',
       'ERA': 'Electronic Remittance Advice',
       'EDI': 'Electronic Data Interchange',
       'HIPAA': 'Health Insurance Portability and Accountability Act',
-      'CMS': 'Centers for Medicare & Medicaid Services'
+      
+      // Medical conditions with comprehensive definitions
+      'diabetes mellitus': 'A group of metabolic disorders characterized by high blood sugar levels over a prolonged period. Type 1 diabetes results from the pancreas not producing enough insulin, while Type 2 diabetes results from cells not responding properly to insulin. This condition requires careful management and monitoring.',
+      'diabetes': 'A chronic medical condition where the body cannot properly regulate blood sugar levels. There are two main types: Type 1 (insulin-dependent) and Type 2 (non-insulin dependent). Both require medical management and lifestyle modifications.',
+      'hypertension': 'High blood pressure - a condition where the force of blood against artery walls is consistently too high. Normal blood pressure is less than 120/80 mmHg. Hypertension increases the risk of heart disease, stroke, and kidney problems.',
+      'cataract': 'A clouding of the lens in the eye that affects vision. Most cataracts develop slowly and don\'t disturb eyesight early on, but over time they can interfere with vision. Surgery is the only effective treatment.',
+      'glaucoma': 'A group of eye conditions that damage the optic nerve, often caused by abnormally high pressure in the eye. It\'s one of the leading causes of blindness for people over 60 years old.',
+      'macular degeneration': 'An eye disease that causes vision loss in the center of the visual field due to damage to the retina. It\'s a common cause of vision loss in older adults.',
+      'diabetic retinopathy': 'A diabetes complication that affects the eyes, caused by damage to blood vessels in the retina. It can cause vision problems and blindness if left untreated.',
+      
+      // Medical procedures
+      'fundus photography': 'A medical imaging technique that captures detailed photographs of the retina, optic disc, and macula. Used for diagnosing and monitoring eye diseases.',
+      'dilation': 'The process of widening the pupil using eye drops to allow better examination of the retina and other internal structures of the eye.',
+      'eye exam': 'A comprehensive examination of the eyes and vision system, including visual acuity testing, eye pressure measurement, and examination of internal eye structures.',
+      
+      // Medical devices and treatments
+      'insulin': 'A hormone produced by the pancreas that regulates blood sugar levels. People with diabetes may need insulin therapy to manage their condition.',
+      'glucose': 'A simple sugar that serves as the primary source of energy for the body\'s cells. Blood glucose levels are monitored in diabetes management.',
+      'hemoglobin a1c': 'A blood test that measures average blood sugar levels over the past 2-3 months. Used to monitor diabetes control.',
+      
+      // Insurance and billing terms
+      'copay': 'A fixed amount paid by the patient for covered healthcare services, typically due at the time of service.',
+      'deductible': 'The amount a patient must pay for healthcare services before insurance coverage begins.',
+      'coinsurance': 'The percentage of healthcare costs that a patient pays after meeting their deductible.',
+      'prior authorization': 'Approval required from insurance before certain medical services or medications can be provided.',
+      'formulary': 'A list of prescription drugs covered by an insurance plan, often organized by tiers with different copay amounts.'
     },
     commonCodes: {
       'E11.9': 'Type 2 diabetes mellitus without complications',
@@ -194,6 +234,154 @@ export class AIAssistantService {
       '92228': 'Imaging of retina for detection or monitoring of disease; with remote analysis',
       '92229': 'Imaging of retina for detection or monitoring of disease; with point-of-care automated analysis'
     },
+    // Comprehensive CPT code lists for "show all" requests
+    cptCodeSets: {
+      'ophthalmology': [
+        { code: '92002', description: 'Ophthalmological services: medical examination and evaluation with initiation of diagnostic and treatment program; intermediate, new patient' },
+        { code: '92004', description: 'Ophthalmological services: medical examination and evaluation with initiation of diagnostic and treatment program; comprehensive, new patient' },
+        { code: '92012', description: 'Ophthalmological services: medical examination and evaluation, with initiation or continuation of diagnostic and treatment program; intermediate, established patient' },
+        { code: '92014', description: 'Ophthalmological services: medical examination and evaluation, with initiation or continuation of diagnostic and treatment program; comprehensive, established patient' },
+        { code: '92025', description: 'Computerized corneal topography, unilateral or bilateral, with interpretation and report' },
+        { code: '92060', description: 'Sensorimotor examination with multiple measurements of ocular deviation' },
+        { code: '92081', description: 'Visual field examination, unilateral or bilateral, with interpretation and report; limited examination' },
+        { code: '92082', description: 'Visual field examination, unilateral or bilateral, with interpretation and report; intermediate examination' },
+        { code: '92083', description: 'Visual field examination, unilateral or bilateral, with interpretation and report; extended examination' },
+        { code: '92132', description: 'Scanning computerized ophthalmic diagnostic imaging, anterior segment, with interpretation and report, unilateral or bilateral' },
+        { code: '92133', description: 'Scanning computerized ophthalmic diagnostic imaging, posterior segment, with interpretation and report, unilateral or bilateral; optic nerve' },
+        { code: '92134', description: 'Scanning computerized ophthalmic diagnostic imaging, posterior segment, with interpretation and report, unilateral or bilateral; retina' },
+        { code: '92227', description: 'Imaging of retina for detection or monitoring of disease; with remote clinical staff review and report' },
+        { code: '92228', description: 'Imaging of retina for detection or monitoring of disease; with remote physician or other qualified health care professional interpretation and report' },
+        { code: '92229', description: 'Imaging of retina for detection or monitoring of disease; point-of-care autonomous analysis and report' },
+        { code: '92235', description: 'Fluorescein angiography (includes multiframe imaging) with interpretation and report' },
+        { code: '92240', description: 'Indocyanine-green angiography (includes multiframe imaging) with interpretation and report' },
+        { code: '92250', description: 'Fundus photography with interpretation and report' },
+        { code: '92273', description: 'Electroretinography (ERG), with interpretation and report' },
+        { code: '92274', description: 'Electroretinography (ERG), with interpretation and report; multifocal' }
+      ],
+      'evaluation_management': [
+        { code: '99201', description: 'Office or other outpatient visit for the evaluation and management of a new patient' },
+        { code: '99202', description: 'Office or other outpatient visit for the evaluation and management of a new patient' },
+        { code: '99203', description: 'Office or other outpatient visit for the evaluation and management of a new patient' },
+        { code: '99204', description: 'Office or other outpatient visit for the evaluation and management of a new patient' },
+        { code: '99205', description: 'Office or other outpatient visit for the evaluation and management of a new patient' },
+        { code: '99211', description: 'Office or other outpatient visit for the evaluation and management of an established patient' },
+        { code: '99212', description: 'Office or other outpatient visit for the evaluation and management of an established patient' },
+        { code: '99213', description: 'Office or other outpatient visit for the evaluation and management of an established patient' },
+        { code: '99214', description: 'Office or other outpatient visit for the evaluation and management of an established patient' },
+        { code: '99215', description: 'Office or other outpatient visit for the evaluation and management of an established patient' }
+      ],
+      'surgery': [
+        { code: '66820', description: 'Discission of secondary membranous cataract (opacified posterior lens capsule and/or anterior hyaloid); stab incision technique' },
+        { code: '66821', description: 'Discission of secondary membranous cataract (opacified posterior lens capsule and/or anterior hyaloid); laser surgery' },
+        { code: '66830', description: 'Removal of secondary membranous cataract (opacified posterior lens capsule and/or anterior hyaloid) with corneo-scleral section, with or without iridectomy' },
+        { code: '66840', description: 'Removal of lens material; aspiration technique, 1 or more stages' },
+        { code: '66850', description: 'Removal of lens material; phacofragmentation technique (mechanical or ultrasonic), with aspiration' },
+        { code: '66852', description: 'Removal of lens material; pars plana approach, with or without vitrectomy' },
+        { code: '66920', description: 'Removal of lens material; intracapsular' },
+        { code: '66930', description: 'Removal of lens material; intracapsular, for dislocated lens' },
+        { code: '66940', description: 'Removal of lens material; extracapsular (other than 66840, 66850, 66852)' },
+        { code: '66982', description: 'Extracapsular cataract removal with insertion of intraocular lens prosthesis (1-stage procedure), manual or mechanical technique' },
+        { code: '66983', description: 'Intracapsular cataract extraction with insertion of intraocular lens prosthesis (1 stage procedure)' },
+        { code: '66984', description: 'Extracapsular cataract removal with insertion of intraocular lens prosthesis (1 stage procedure), manual or mechanical technique' }
+      ]
+    },
+    // Additional comprehensive code sets
+    icd10CodeSets: {
+      'diabetes': [
+        { code: 'E10.9', description: 'Type 1 diabetes mellitus without complications' },
+        { code: 'E11.9', description: 'Type 2 diabetes mellitus without complications' },
+        { code: 'E11.21', description: 'Type 2 diabetes mellitus with diabetic nephropathy' },
+        { code: 'E11.22', description: 'Type 2 diabetes mellitus with diabetic chronic kidney disease' },
+        { code: 'E11.311', description: 'Type 2 diabetes mellitus with unspecified diabetic retinopathy with macular edema' },
+        { code: 'E11.319', description: 'Type 2 diabetes mellitus with unspecified diabetic retinopathy without macular edema' },
+        { code: 'E11.321', description: 'Type 2 diabetes mellitus with mild nonproliferative diabetic retinopathy with macular edema' },
+        { code: 'E11.329', description: 'Type 2 diabetes mellitus with mild nonproliferative diabetic retinopathy without macular edema' }
+      ],
+      'eye_conditions': [
+        { code: 'H35.00', description: 'Unspecified background retinopathy' },
+        { code: 'H35.01', description: 'Changes in retinal vascular appearance' },
+        { code: 'H35.02', description: 'Exudative retinopathy' },
+        { code: 'H25.9', description: 'Unspecified age-related cataract' },
+        { code: 'H25.10', description: 'Age-related nuclear cataract, unspecified eye' },
+        { code: 'H40.9', description: 'Unspecified glaucoma' }
+      ],
+      'common_conditions': [
+        { code: 'I10', description: 'Essential (primary) hypertension' },
+        { code: 'Z12.11', description: 'Encounter for screening for malignant neoplasm of colon' },
+        { code: 'Z00.00', description: 'Encounter for general adult medical examination without abnormal findings' },
+        { code: 'Z01.00', description: 'Encounter for examination of eyes and vision without abnormal findings' },
+        { code: 'Z79.4', description: 'Long term (current) use of insulin' },
+        { code: 'Z79.84', description: 'Long term (current) use of oral hypoglycemic drugs' }
+      ]
+    },
+    hcpcsCodeSets: {
+      'durable_medical_equipment': [
+        { code: 'A4253', description: 'Blood glucose test or reagent strips for home blood glucose monitor' },
+        { code: 'A4255', description: 'Platforms for home blood glucose monitor' },
+        { code: 'E0607', description: 'Home blood glucose monitor' },
+        { code: 'E1390', description: 'Oxygen concentrator, single delivery port' },
+        { code: 'K0001', description: 'Standard wheelchair' },
+        { code: 'K0002', description: 'Standard hemi (low seat) wheelchair' }
+      ],
+      'vision_services': [
+        { code: 'V2020', description: 'Frames, purchases' },
+        { code: 'V2100', description: 'Sphere, single vision, plano to plus or minus 4.00, per lens' },
+        { code: 'V2101', description: 'Sphere, single vision, plus or minus 4.12 to plus or minus 7.00, per lens' },
+        { code: 'V2200', description: 'Sphere, bifocal, plano to plus or minus 4.00, per lens' },
+        { code: 'V2500', description: 'Contact lens, PMMA, spherical, per lens' },
+        { code: 'V2510', description: 'Contact lens, gas permeable, spherical, per lens' }
+      ]
+    },
+    posCodeSets: [
+      { code: '11', description: 'Office (most common for routine visits)' },
+      { code: '12', description: 'Home' },
+      { code: '21', description: 'Inpatient Hospital' },
+      { code: '22', description: 'On Campus-Outpatient Hospital' },
+      { code: '23', description: 'Emergency Room – Hospital' },
+      { code: '24', description: 'Ambulatory Surgical Center' },
+      { code: '31', description: 'Skilled Nursing Facility' },
+      { code: '49', description: 'Independent Clinic' },
+      { code: '50', description: 'Federally Qualified Health Center' },
+      { code: '71', description: 'Public Health Clinic' },
+      { code: '72', description: 'Rural Health Clinic' },
+      { code: '81', description: 'Independent Laboratory' },
+      { code: '99', description: 'Other Place of Service' }
+    ],
+    modifierCodeSets: [
+      { code: '22', description: 'Increased Procedural Services' },
+      { code: '25', description: 'Significant, Separately Identifiable Evaluation and Management Service' },
+      { code: '26', description: 'Professional Component' },
+      { code: '50', description: 'Bilateral Procedure' },
+      { code: '51', description: 'Multiple Procedures' },
+      { code: '52', description: 'Reduced Services' },
+      { code: '53', description: 'Discontinued Procedure' },
+      { code: '59', description: 'Distinct Procedural Service' },
+      { code: '76', description: 'Repeat Procedure by Same Physician' },
+      { code: '77', description: 'Repeat Procedure by Another Physician' },
+      { code: '90', description: 'Reference (Outside) Laboratory' },
+      { code: '95', description: 'Synchronous Telemedicine Service' }
+    ],
+    drugCodeSets: [
+      { code: 'J0135', description: 'Injection, adalimumab, 20 mg' },
+      { code: 'J0178', description: 'Injection, aflibercept, 1 mg' },
+      { code: 'J1100', description: 'Injection, dexamethasone sodium phosphate, 1 mg' },
+      { code: 'J1745', description: 'Injection, infliximab, 10 mg' },
+      { code: 'J2778', description: 'Injection, ranibizumab, 0.1 mg' },
+      { code: 'J3590', description: 'Unclassified biologics' },
+      { code: 'J7050', description: 'Infusion, normal saline solution, 250 cc' },
+      { code: 'J7060', description: 'Infusion, normal saline solution, 500 ml' }
+    ],
+    labCodeSets: [
+      { code: '80053', description: 'Comprehensive metabolic panel' },
+      { code: '80061', description: 'Lipid panel' },
+      { code: '82565', description: 'Creatinine; blood' },
+      { code: '82947', description: 'Glucose; quantitative, blood' },
+      { code: '83036', description: 'Hemoglobin; glycosylated (A1C)' },
+      { code: '84153', description: 'Prostate specific antigen (PSA); total' },
+      { code: '84443', description: 'Thyroid stimulating hormone (TSH)' },
+      { code: '85025', description: 'Blood count; complete (CBC), automated' },
+      { code: '87040', description: 'Culture, bacterial; blood, aerobic' }
+    ],
     formGuidance: {
       'PatientEligibilityForm': {
         'providerId': 'Enter your 10-digit National Provider Identifier (NPI) number. This is required for all claims submissions.',
@@ -852,17 +1040,124 @@ export class AIAssistantService {
       })
   }
 
-  // Enhanced processUserInput to include smart suggestions and proactive assistance
+  // Enhanced processUserInput with memory integration
   static async processUserInput(
     input: string,
     context: AIContext = {}
   ): Promise<string> {
-    // Get smart suggestions and proactive alerts
-    const suggestions = AIAssistantService.getSmartSuggestions(context)
-    const alerts = AIAssistantService.getProactiveAlerts(context)
+    console.log('🤖 Processing user input with memory-enhanced AI system:', input)
+    
+    // Initialize memory context
+    const userId = context.userId || 'anonymous'
+    const sessionId = context.sessionId || `session_${Date.now()}`
+    const memoryEnabled = context.memoryEnabled !== false
 
-    // Process the main input
-    let response = await AIAssistantService.processMainInput(input, context)
+    // Load user preferences from memory if available
+    let userPreferences: Record<string, any> = {}
+    if (memoryEnabled) {
+      try {
+        userPreferences = await MemoryService.getUserPreferences(userId)
+        console.log('🧠 Loaded user preferences:', userPreferences)
+      } catch (error) {
+        console.warn('Failed to load user preferences:', error)
+      }
+    }
+
+    // Enhanced context with memory data
+    const enhancedContext: AIContext = {
+      ...context,
+      userId,
+      sessionId,
+      userPreferences,
+      memoryEnabled
+    }
+
+    // Record medical term usage if applicable
+    if (memoryEnabled && this.isTerminologyQuestion(input.toLowerCase())) {
+      try {
+        const medicalTerms = this.extractMedicalTerms(input)
+        for (const term of medicalTerms) {
+          await MemoryService.recordMedicalTermUsage(term, userId, ['definition_request'])
+        }
+        console.log('📚 Recorded medical term usage:', medicalTerms)
+      } catch (error) {
+        console.warn('Failed to record medical term usage:', error)
+      }
+    }
+
+    // Store conversation context
+    if (memoryEnabled) {
+      try {
+        await MemoryService.storeConversationContext(userId, sessionId, {
+          formType: context.formType,
+          currentField: context.currentField,
+          currentStep: context.currentStep,
+          deviceType: context.deviceType,
+          userRole: context.userRole
+        })
+      } catch (error) {
+        console.warn('Failed to store conversation context:', error)
+      }
+    }
+
+    // Get smart suggestions and proactive alerts
+    const suggestions = AIAssistantService.getSmartSuggestions(enhancedContext)
+    const alerts = AIAssistantService.getProactiveAlerts(enhancedContext)
+
+    let response: string
+
+    // HYBRID ROUTING: Decide between local knowledge and Gemini AI
+    try {
+      console.log('🔍 Analyzing input for routing:', input)
+      const shouldUseGemini = GeminiAIService.shouldUseGemini(input, enhancedContext)
+      console.log('🤖 shouldUseGemini result:', shouldUseGemini)
+      
+      if (shouldUseGemini) {
+        console.log('🧠 Routing to Gemini AI for enhanced reasoning')
+        
+        // Try Gemini AI first for complex queries
+        const geminiResponse = await GeminiAIService.processWithGemini(input, enhancedContext)
+        
+        // If Gemini returns an error message, fall back to local processing
+        if (geminiResponse.includes('Configuration Error') || 
+            geminiResponse.includes('AI Service Temporarily Unavailable') ||
+            geminiResponse.includes('Rate Limit')) {
+          console.log('⚠️ Gemini fallback - using local knowledge')
+          response = await AIAssistantService.processMainInput(input, enhancedContext)
+          response = `${geminiResponse}\n\n---\n\n**Local Knowledge Response:**\n${response}`
+        } else {
+          response = `🧠 **Enhanced AI Response:**\n${geminiResponse}`
+        }
+      } else {
+        console.log('⚡ Using local knowledge base for fast response')
+        // Use local knowledge for simple queries, codes, and terminology
+        response = await AIAssistantService.processMainInput(input, enhancedContext)
+        console.log('📋 Local response generated:', response.substring(0, 100) + '...')
+      }
+    } catch (error) {
+      console.error('Hybrid routing error:', error)
+      // Always fall back to local knowledge if there's any error
+      response = await AIAssistantService.processMainInput(input, enhancedContext)
+      response = `⚠️ **Using Local Knowledge** (AI enhancement temporarily unavailable)\n\n${response}`
+    }
+
+    // Add personalization based on user preferences
+    if (memoryEnabled && userPreferences.response_style === 'detailed') {
+      response += `\n\n**📋 Additional Context:** This response is tailored to your detailed preference style.`
+    }
+
+    // Add related terms based on user's medical term usage
+    if (memoryEnabled) {
+      try {
+        const termUsage = await MemoryService.getMedicalTermUsage(userId, 5)
+        if (termUsage.length > 0) {
+          const relatedTerms = termUsage.slice(0, 3).map(t => t.term)
+          response += `\n\n**🔗 Related to your frequently asked terms:** ${relatedTerms.join(', ')}`
+        }
+      } catch (error) {
+        console.warn('Failed to get medical term usage:', error)
+      }
+    }
 
     // Add smart suggestions to response if available
     if (suggestions.length > 0) {
@@ -881,11 +1176,58 @@ export class AIAssistantService {
       })
     }
 
+    // Store the conversation in memory
+    if (memoryEnabled) {
+      try {
+        await MemoryService.saveConversation(
+          userId,
+          sessionId,
+          [
+            {
+              role: 'user',
+              content: input,
+              timestamp: Date.now()
+            },
+            {
+              role: 'assistant',
+              content: response,
+              timestamp: Date.now()
+            }
+          ],
+          {
+            formType: context.formType,
+            currentField: context.currentField,
+            currentStep: context.currentStep,
+            deviceType: context.deviceType,
+            userRole: context.userRole
+          },
+          `User asked: ${input.substring(0, 100)}...`
+        )
+      } catch (error) {
+        console.warn('Failed to save conversation:', error)
+      }
+    }
+
     return response
+  }
+
+  // Helper method to extract medical terms from input
+  private static extractMedicalTerms(input: string): string[] {
+    const medicalTerms = [
+      'diabetes mellitus', 'diabetes', 'hypertension', 'glaucoma', 'cataract',
+      'diabetic retinopathy', 'macular degeneration', 'copay', 'deductible',
+      'prior authorization', 'formulary', 'od', 'os', 'ou', 'npi', 'cpt',
+      'icd', 'hcpcs', 'hedis', 'pcp', 'eob', 'era', 'edi', 'hipaa', 'cms'
+    ]
+    
+    return medicalTerms.filter(term => 
+      input.toLowerCase().includes(term.toLowerCase())
+    )
   }
 
   // Helper method to process main input (existing logic)
   private static async processMainInput(input: string, context: AIContext): Promise<string> {
+    console.log('📋 processMainInput called with:', input)
     const lowerInput = input.toLowerCase()
     
     // Check for application knowledge queries first
@@ -971,8 +1313,9 @@ export class AIAssistantService {
       return response.content
     }
     
-    // Enhanced default response with context
-    return this.getEnhancedDefaultResponse(input, context)
+    // Use agile response system for all other queries including "show all" requests
+    console.log('📋 Calling getAgileResponse for:', input)
+    return await this.getAgileResponse(input, context)
   }
 
   private static handleApplicationKnowledgeQuery(input: string, context: AIContext): string | null {
@@ -1055,8 +1398,14 @@ export class AIAssistantService {
   }
 
   private static isTerminologyQuestion(input: string): boolean {
-    const terminologyKeywords = ['what is', 'what does', 'meaning of', 'define', 'term', 'abbreviation']
-    return terminologyKeywords.some(keyword => input.includes(keyword))
+    const terminologyKeywords = [
+      'what is', 'what does', 'meaning of', 'define', 'term', 'abbreviation',
+      'definition', 'explain', 'tell me about', 'describe', 'define the term',
+      'what does the term', 'what is the definition', 'can you define',
+      'explain the term', 'what is meant by', 'define diabetes', 'define hypertension',
+      'explain diabetes', 'tell me about diabetes', 'what is diabetes mellitus'
+    ]
+    return terminologyKeywords.some(keyword => input.toLowerCase().includes(keyword))
   }
 
   private static isICD10Lookup(input: string): boolean {
@@ -1084,15 +1433,163 @@ export class AIAssistantService {
     return formKeywords.some(keyword => input.includes(keyword))
   }
 
-  private static async handleTerminologyQuestion(input: string): Promise<AIAssistantResponse> {
-    // Check local knowledge first
-    for (const [term, definition] of Object.entries(this.LOCAL_KNOWLEDGE.terminology)) {
-      if (input.toLowerCase().includes(term.toLowerCase())) {
-        return {
-          type: 'terminology',
-          content: `**${term}** stands for "${definition}". This is commonly used in medical billing and documentation. I hope this helps clarify things for you!`,
-          data: { term, definition }
+  // Helper methods for enhanced terminology processing
+  private static calculateSimilarity(str1: string, str2: string): number {
+    const longer = str1.length > str2.length ? str1 : str2
+    const shorter = str1.length > str2.length ? str2 : str1
+    if (longer.length === 0) return 1.0
+    const distance = this.levenshteinDistance(longer, shorter)
+    return (longer.length - distance) / longer.length
+  }
+
+  private static levenshteinDistance(str1: string, str2: string): number {
+    const matrix = []
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i]
+    }
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j
+    }
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1]
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          )
         }
+      }
+    }
+    return matrix[str2.length][str1.length]
+  }
+
+  private static isBillingRelatedTerm(term: string): boolean {
+    const billingTerms = [
+      'copay', 'deductible', 'coinsurance', 'prior authorization', 'formulary',
+      'eob', 'era', 'edi', 'hipaa', 'cms', 'cpt', 'icd', 'hcpcs', 'npi'
+    ]
+    return billingTerms.some(billingTerm => term.toLowerCase().includes(billingTerm))
+  }
+
+  private static getBillingContext(term: string): string {
+    const contexts: { [key: string]: string } = {
+      'copay': 'Patients pay this amount at the time of service.',
+      'deductible': 'This amount must be met before insurance coverage begins.',
+      'coinsurance': 'This percentage is paid by the patient after meeting the deductible.',
+      'prior authorization': 'This approval is required before certain services can be provided.',
+      'formulary': 'This list determines which medications are covered and at what cost.',
+      'npi': 'This unique identifier is required for all healthcare providers.',
+      'cpt': 'These codes describe medical procedures and services.',
+      'icd': 'These codes classify diseases and medical conditions.',
+      'hcpcs': 'These codes cover supplies, equipment, and services not included in CPT.'
+    }
+    return contexts[term.toLowerCase()] || 'This term is important for accurate billing and coding.'
+  }
+
+  private static getRelatedTerms(term: string): string[] {
+    const relatedTermsMap: { [key: string]: string[] } = {
+      'diabetes': ['diabetes mellitus', 'insulin', 'glucose', 'hemoglobin a1c', 'diabetic retinopathy'],
+      'diabetes mellitus': ['diabetes', 'insulin', 'glucose', 'hemoglobin a1c', 'diabetic retinopathy'],
+      'hypertension': ['blood pressure', 'cardiovascular', 'heart disease'],
+      'glaucoma': ['eye pressure', 'optic nerve', 'vision loss'],
+      'cataract': ['lens', 'vision', 'surgery'],
+      'od': ['os', 'ou', 'eye', 'ophthalmology'],
+      'os': ['od', 'ou', 'eye', 'ophthalmology'],
+      'ou': ['od', 'os', 'eye', 'ophthalmology'],
+      'copay': ['deductible', 'coinsurance', 'insurance'],
+      'deductible': ['copay', 'coinsurance', 'insurance'],
+      'coinsurance': ['copay', 'deductible', 'insurance']
+    }
+    return relatedTermsMap[term.toLowerCase()] || []
+  }
+
+  private static getTerminologySuggestions(term: string): string[] {
+    const suggestionsMap: { [key: string]: string[] } = {
+      'diabetes': [
+        'Ask about diabetes billing codes',
+        'Request information about diabetic eye complications',
+        'Ask about diabetes management procedures'
+      ],
+      'hypertension': [
+        'Ask about hypertension billing codes',
+        'Request information about blood pressure monitoring',
+        'Ask about cardiovascular risk factors'
+      ],
+      'glaucoma': [
+        'Ask about glaucoma screening procedures',
+        'Request information about eye pressure monitoring',
+        'Ask about vision loss prevention'
+      ],
+      'od': [
+        'Ask about OS (left eye)',
+        'Request information about OU (both eyes)',
+        'Ask about eye examination procedures'
+      ],
+      'copay': [
+        'Ask about deductible amounts',
+        'Request information about coinsurance',
+        'Ask about insurance coverage details'
+      ]
+    }
+    return suggestionsMap[term.toLowerCase()] || [
+      'Ask for related billing codes',
+      'Request more detailed information',
+      'Ask about related procedures or conditions'
+    ]
+  }
+
+  private static async handleTerminologyQuestion(input: string): Promise<AIAssistantResponse> {
+    const inputLower = input.toLowerCase()
+    
+    // Enhanced matching with fuzzy logic for better term recognition
+    const matchedTerms = []
+    for (const [term, definition] of Object.entries(this.LOCAL_KNOWLEDGE.terminology)) {
+      const termLower = term.toLowerCase()
+      
+      // Exact match
+      if (inputLower.includes(termLower)) {
+        matchedTerms.push({ term, definition, matchType: 'exact' })
+      }
+      // Partial match for compound terms
+      else if (termLower.includes(' ') && termLower.split(' ').some(word => inputLower.includes(word))) {
+        matchedTerms.push({ term, definition, matchType: 'partial' })
+      }
+      // Fuzzy match for similar terms
+      else if (this.calculateSimilarity(inputLower, termLower) > 0.7) {
+        matchedTerms.push({ term, definition, matchType: 'fuzzy' })
+      }
+    }
+
+    // If we found matches, provide comprehensive response
+    if (matchedTerms.length > 0) {
+      const bestMatch = matchedTerms.find(m => m.matchType === 'exact') || matchedTerms[0]
+      const { term, definition } = bestMatch
+      
+      let content = `**${term.toUpperCase()}**\n\n${definition}\n\n`
+      
+      // Add billing context if relevant
+      if (this.isBillingRelatedTerm(term)) {
+        content += `**Billing Context:** This term is commonly used in medical billing and coding. `
+        content += this.getBillingContext(term)
+      }
+      
+      // Add related terms
+      const relatedTerms = this.getRelatedTerms(term)
+      if (relatedTerms.length > 0) {
+        content += `\n\n**Related Terms:** ${relatedTerms.join(', ')}`
+      }
+      
+      // Add follow-up suggestions
+      const suggestions = this.getTerminologySuggestions(term)
+      
+      return {
+        type: 'terminology',
+        content: content,
+        data: { term, definition, relatedTerms },
+        suggestions: suggestions
       }
     }
 
@@ -1111,9 +1608,13 @@ export class AIAssistantService {
           
           return {
             type: 'terminology',
-            content: `I found ${terms.length} medical term(s) for "${searchTerm}":\n\n${content}\n\nI hope this information is helpful for your work!`,
+            content: `I found ${terms.length} medical term(s) for "${searchTerm}":\n\n${content}\n\nIs there a specific aspect of these terms you'd like me to explain further?`,
             data: { terms, searchTerm },
-            suggestions: terms.map(term => term.term)
+            suggestions: [
+              'Ask for more details about any of these terms',
+              'Request billing codes related to these conditions',
+              'Ask about treatment options or procedures'
+            ]
           }
         }
       }
@@ -1121,11 +1622,16 @@ export class AIAssistantService {
       console.error('Medical terms lookup error:', error)
     }
 
-    // Fallback to general terminology help with M.I.L.A.'s personality
+    // Enhanced fallback with clarification options
     return {
       type: 'terminology',
-      content: 'I\'d be happy to help you with medical billing terminology! Medical terms can be confusing, but I\'m here to make them clearer. Try asking about terms like "OD", "OS", "PCP", "HEDIS", "NPI", or "CPT" and I\'ll provide helpful explanations.',
-      suggestions: ['OD', 'OS', 'PCP', 'HEDIS', 'NPI', 'CPT']
+      content: `I'd be happy to help you understand medical terminology! I can provide definitions for:\n\n• **Medical Conditions** (diabetes, hypertension, glaucoma, etc.)\n• **Medical Procedures** (eye exams, fundus photography, etc.)\n• **Billing Terms** (copay, deductible, prior authorization, etc.)\n• **Abbreviations** (OD, OS, PCP, NPI, etc.)\n• **Coding Systems** (ICD-10, CPT, HCPCS)\n\nCould you be more specific about what term you'd like me to define?`,
+      suggestions: [
+        'Try: "Define diabetes mellitus" or "What is hypertension?"',
+        'Ask: "Explain OD and OS" or "What does PCP mean?"',
+        'Request: "Define copay" or "What is prior authorization?"',
+        'Say: "Tell me about glaucoma" or "Explain fundus photography"'
+      ]
     }
   }
 
@@ -1690,7 +2196,61 @@ export class AIAssistantService {
 
   // Enhanced intent recognition with confidence scoring
   private static analyzeIntent(input: string): { intent: string; confidence: number; keywords: string[] } {
+    console.log('🎯 analyzeIntent called with:', input)
     const lowerInput = input.toLowerCase()
+    console.log('🎯 lowerInput:', lowerInput)
+    
+    // Special handling for "show all" requests
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        lowerInput.includes('cpt')) {
+      console.log('🎯 Intent Analysis: Detected show_all_cpt for input:', input)
+      return { intent: 'show_all_cpt', confidence: 3, keywords: ['show', 'all', 'cpt'] }
+    }
+    
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        lowerInput.includes('icd')) {
+      return { intent: 'show_all_icd10', confidence: 3, keywords: ['show', 'all', 'icd'] }
+    }
+    
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        lowerInput.includes('hcpcs')) {
+      return { intent: 'show_all_hcpcs', confidence: 3, keywords: ['show', 'all', 'hcpcs'] }
+    }
+    
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        (lowerInput.includes('pos') || lowerInput.includes('place of service'))) {
+      return { intent: 'show_all_pos', confidence: 3, keywords: ['show', 'all', 'pos'] }
+    }
+    
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        (lowerInput.includes('modifier') || lowerInput.includes('mod'))) {
+      return { intent: 'show_all_modifiers', confidence: 3, keywords: ['show', 'all', 'modifiers'] }
+    }
+    
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        lowerInput.includes('drug')) {
+      console.log('🎯 Intent Analysis: Detected show_all_drugs for input:', input)
+      return { intent: 'show_all_drugs', confidence: 3, keywords: ['show', 'all', 'drug'] }
+    }
+    
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        lowerInput.includes('lab')) {
+      return { intent: 'show_all_lab', confidence: 3, keywords: ['show', 'all', 'lab'] }
+    }
+    
+    if ((lowerInput.includes('show') || lowerInput.includes('list')) && 
+        (lowerInput.includes('all') || lowerInput.includes('every')) && 
+        (lowerInput.includes('codes') || lowerInput.includes('icd'))) {
+      return { intent: 'show_all_codes', confidence: 3, keywords: ['show', 'all', 'codes'] }
+    }
+    
     const intents = [
       { name: 'code_lookup', keywords: ['code', 'icd', 'cpt', 'hcpcs', 'diagnosis', 'procedure'], confidence: 0 },
       { name: 'terminology', keywords: ['what is', 'define', 'meaning', 'term', 'abbreviation'], confidence: 0 },
@@ -2124,6 +2684,22 @@ export class AIAssistantService {
     // High confidence responses
     if (intent.confidence >= 2) {
       switch (intent.intent) {
+        case 'show_all_cpt':
+          return this.handleShowAllCPTCodes(input)
+        case 'show_all_icd10':
+          return this.handleShowAllICD10Codes(input)
+        case 'show_all_hcpcs':
+          return this.handleShowAllHCPCSCodes(input)
+        case 'show_all_pos':
+          return this.handleShowAllPOSCodes()
+        case 'show_all_modifiers':
+          return this.handleShowAllModifierCodes()
+        case 'show_all_drugs':
+          return this.handleShowAllDrugCodes()
+        case 'show_all_lab':
+          return this.handleShowAllLabCodes()
+        case 'show_all_codes':
+          return this.handleShowAllCodes(input)
         case 'code_lookup':
           return await this.handleSpecificCodeLookup(input)
         case 'terminology':
@@ -3208,6 +3784,403 @@ Next Follow-up: [When to return]`
         'Compliance with billing guidelines',
         'Patient safety documentation'
       ]
+    }
+  }
+
+  // Handle "show all CPT codes" requests with proper formatting
+  private static handleShowAllCPTCodes(input: string): string {
+    console.log('🚀 handleShowAllCPTCodes called with input:', input)
+    const lowerInput = input.toLowerCase()
+    let selectedCategory = 'all'
+    
+    // Determine which category based on user input
+    if (lowerInput.includes('ophthalm') || lowerInput.includes('eye') || lowerInput.includes('vision')) {
+      selectedCategory = 'ophthalmology'
+    } else if (lowerInput.includes('surgery') || lowerInput.includes('surgical')) {
+      selectedCategory = 'surgery'
+    } else if (lowerInput.includes('evaluation') || lowerInput.includes('management') || lowerInput.includes('visit')) {
+      selectedCategory = 'evaluation_management'
+    }
+    
+    let response = '**📋 CPT Codes**\n\n'
+    
+    if (selectedCategory === 'all') {
+      // Show all categories
+      Object.entries(this.LOCAL_KNOWLEDGE.cptCodeSets).forEach(([category, codes]) => {
+        const categoryTitle = category.replace('_', ' & ').replace(/\b\w/g, l => l.toUpperCase())
+        response += `**${categoryTitle} Codes:**\n`
+        codes.forEach(code => {
+          response += `• **${code.code}** - ${code.description}\n`
+        })
+        response += '\n'
+      })
+    } else {
+      // Show specific category
+      const categoryTitle = selectedCategory.replace('_', ' & ').replace(/\b\w/g, l => l.toUpperCase())
+      const codes = this.LOCAL_KNOWLEDGE.cptCodeSets[selectedCategory]
+      response += `**${categoryTitle} Codes:**\n`
+      codes.forEach(code => {
+        response += `• **${code.code}** - ${code.description}\n`
+      })
+    }
+    
+    response += '\n💡 **Need a specific code?** Ask me about a particular procedure or condition!'
+    return response
+  }
+
+  // Handle "show all codes" requests
+  private static handleShowAllCodes(input: string): string {
+    const lowerInput = input.toLowerCase()
+    
+    if (lowerInput.includes('icd')) {
+      return this.handleShowAllICD10Codes()
+    } else if (lowerInput.includes('cpt')) {
+      return this.handleShowAllCPTCodes(input)
+    }
+    
+    // Show overview of all code types
+    let response = '**📋 Medical Billing Code Categories**\n\n'
+    
+    response += '**ICD-10 Diagnosis Codes:**\n'
+    Object.entries(this.knowledgeBase.commonCodes).slice(0, 10).forEach(([code, description]) => {
+      if (code.match(/^[A-Z]/)) { // ICD-10 pattern
+        response += `• **${code}** - ${description}\n`
+      }
+    })
+    
+    response += '\n**CPT Procedure Codes:**\n'
+    Object.entries(this.knowledgeBase.commonCodes).slice(0, 10).forEach(([code, description]) => {
+      if (code.match(/^\d/)) { // CPT pattern
+        response += `• **${code}** - ${description}\n`
+      }
+    })
+    
+    response += '\n💡 **For complete lists, ask:**\n'
+    response += '• "Show me all CPT codes"\n'
+    response += '• "Show me all ICD-10 codes"\n'
+    response += '• "List ophthalmology codes"\n'
+    
+    return response
+  }
+
+  // Handle "show all ICD-10 codes" requests
+  private static handleShowAllICD10Codes(input: string): string {
+    const lowerInput = input.toLowerCase()
+    let selectedCategory = 'all'
+    
+    // Determine which category based on user input
+    if (lowerInput.includes('diabetes')) {
+      selectedCategory = 'diabetes'
+    } else if (lowerInput.includes('eye') || lowerInput.includes('vision') || lowerInput.includes('retina')) {
+      selectedCategory = 'eye_conditions'
+    } else if (lowerInput.includes('common')) {
+      selectedCategory = 'common_conditions'
+    }
+    
+    let response = '**📋 ICD-10 Diagnosis Codes**\n\n'
+    
+    if (selectedCategory === 'all') {
+      // Show all categories
+      Object.entries(this.LOCAL_KNOWLEDGE.icd10CodeSets).forEach(([category, codes]) => {
+        const categoryTitle = category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+        response += `**${categoryTitle}:**\n`
+        codes.forEach(code => {
+          response += `• **${code.code}** - ${code.description}\n`
+        })
+        response += '\n'
+      })
+    } else {
+      // Show specific category
+      const categoryTitle = selectedCategory.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+      const codes = this.LOCAL_KNOWLEDGE.icd10CodeSets[selectedCategory]
+      response += `**${categoryTitle}:**\n`
+      codes.forEach(code => {
+        response += `• **${code.code}** - ${code.description}\n`
+      })
+    }
+    
+    response += '\n💡 **Need more codes?** Ask me about specific conditions like "diabetes codes" or "eye condition codes"!'
+    return response
+  }
+
+  // Handle "show all HCPCS codes" requests
+  private static handleShowAllHCPCSCodes(input: string): string {
+    const lowerInput = input.toLowerCase()
+    let selectedCategory = 'all'
+    
+    if (lowerInput.includes('vision') || lowerInput.includes('glasses') || lowerInput.includes('contact')) {
+      selectedCategory = 'vision_services'
+    } else if (lowerInput.includes('equipment') || lowerInput.includes('durable')) {
+      selectedCategory = 'durable_medical_equipment'
+    }
+    
+    let response = '**📋 HCPCS Codes (Medicare/Medicaid)**\n\n'
+    
+    if (selectedCategory === 'all') {
+      Object.entries(this.LOCAL_KNOWLEDGE.hcpcsCodeSets).forEach(([category, codes]) => {
+        const categoryTitle = category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+        response += `**${categoryTitle}:**\n`
+        codes.forEach(code => {
+          response += `• **${code.code}** - ${code.description}\n`
+        })
+        response += '\n'
+      })
+    } else {
+      const categoryTitle = selectedCategory.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+      const codes = this.LOCAL_KNOWLEDGE.hcpcsCodeSets[selectedCategory]
+      response += `**${categoryTitle}:**\n`
+      codes.forEach(code => {
+        response += `• **${code.code}** - ${code.description}\n`
+      })
+    }
+    
+    response += '\n💡 **HCPCS codes** are used for Medicare/Medicaid billing for supplies, equipment, and non-physician services!'
+    return response
+  }
+
+  // Handle "show all POS codes" requests
+  private static handleShowAllPOSCodes(): string {
+    let response = '**📋 Place of Service (POS) Codes**\n\n'
+    
+    this.LOCAL_KNOWLEDGE.posCodeSets.forEach(code => {
+      response += `• **${code.code}** - ${code.description}\n`
+    })
+    
+    response += '\n💡 **POS codes** indicate where medical services were performed. Code **11** (Office) is most common for routine visits!'
+    return response
+  }
+
+  // Handle "show all modifier codes" requests
+  private static handleShowAllModifierCodes(): string {
+    let response = '**📋 CPT Modifier Codes**\n\n'
+    
+    this.LOCAL_KNOWLEDGE.modifierCodeSets.forEach(code => {
+      response += `• **${code.code}** - ${code.description}\n`
+    })
+    
+    response += '\n💡 **Modifiers** provide additional information about procedures. **25** (Significant E&M) and **59** (Distinct Service) are commonly used!'
+    return response
+  }
+
+  // Handle "show all drug codes" requests
+  private static handleShowAllDrugCodes(): string {
+    console.log('🚀 handleShowAllDrugCodes called')
+    let response = '**📋 Drug Codes (J-Codes)**\n\n'
+    
+    this.LOCAL_KNOWLEDGE.drugCodeSets.forEach(code => {
+      response += `• **${code.code}** - ${code.description}\n`
+    })
+    
+    response += '\n💡 **J-codes** are used for injectable drugs, infusions, and certain oral drugs that cannot be self-administered!'
+    return response
+  }
+
+  // Handle "show all lab codes" requests
+  private static handleShowAllLabCodes(): string {
+    let response = '**📋 Laboratory Codes (80000-89999 series)**\n\n'
+    
+    this.LOCAL_KNOWLEDGE.labCodeSets.forEach(code => {
+      response += `• **${code.code}** - ${code.description}\n`
+    })
+    
+    response += '\n💡 **Lab codes** are for pathology and laboratory procedures. **80053** (Comprehensive Metabolic Panel) is commonly ordered!'
+    return response
+  }
+
+  // Test Gemini AI integration
+  static async testGeminiIntegration(): Promise<{ success: boolean; message: string; usageStats?: any }> {
+    console.log('🧪 Testing Gemini AI integration...')
+    
+    try {
+      // Test connection
+      const connectionTest = await GeminiAIService.testConnection()
+      
+      if (!connectionTest.success) {
+        return connectionTest
+      }
+
+      // Test hybrid routing
+      const testContext: AIContext = {
+        formType: 'general',
+        currentField: 'test',
+        currentStep: 1,
+        deviceType: 'desktop',
+        timeOfDay: 'morning',
+        sessionDuration: 0
+      }
+
+      // Test complex query (should route to Gemini)
+      const complexQuery = "Explain the difference between ICD-10 and CPT codes and when to use each"
+      const complexResponse = await this.processUserInput(complexQuery, testContext)
+
+      // Test simple query (should use local knowledge)
+      const simpleQuery = "What is OD?"
+      const simpleResponse = await this.processUserInput(simpleQuery, testContext)
+
+      // Get usage statistics
+      const usageStats = GeminiAIService.getUsageStats()
+
+      return {
+        success: true,
+        message: `✅ Gemini integration test successful!\n\nComplex Query Test: ${complexResponse.slice(0, 100)}...\n\nSimple Query Test: ${simpleResponse.slice(0, 100)}...`,
+        usageStats
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: `❌ Integration test failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      }
+    }
+  }
+
+  // Memory Management Helper Methods
+
+  // Set user preference
+  static async setUserPreference(
+    userId: string,
+    key: string,
+    value: any,
+    importance: 'low' | 'medium' | 'high' | 'critical' = 'medium'
+  ): Promise<boolean> {
+    try {
+      const result = await MemoryService.storeUserPreference(userId, key, value, importance)
+      return result !== null
+    } catch (error) {
+      console.error('Failed to set user preference:', error)
+      return false
+    }
+  }
+
+  // Get user preference
+  static async getUserPreference(userId: string, key: string, defaultValue?: any): Promise<any> {
+    try {
+      const preferences = await MemoryService.getUserPreferences(userId)
+      return preferences[key] ?? defaultValue
+    } catch (error) {
+      console.error('Failed to get user preference:', error)
+      return defaultValue
+    }
+  }
+
+  // Get user's medical term usage statistics
+  static async getUserMedicalTermStats(userId: string): Promise<{
+    totalTerms: number
+    mostUsedTerms: Array<{ term: string; usageCount: number }>
+    recentTerms: Array<{ term: string; lastUsed: string }>
+  }> {
+    try {
+      const termUsage = await MemoryService.getMedicalTermUsage(userId, 20)
+      const mostUsedTerms = termUsage
+        .sort((a, b) => b.usageCount - a.usageCount)
+        .slice(0, 5)
+        .map(t => ({ term: t.term, usageCount: t.usageCount }))
+      
+      const recentTerms = termUsage
+        .sort((a, b) => new Date(b.lastUsed).getTime() - new Date(a.lastUsed).getTime())
+        .slice(0, 5)
+        .map(t => ({ term: t.term, lastUsed: t.lastUsed }))
+
+      return {
+        totalTerms: termUsage.length,
+        mostUsedTerms,
+        recentTerms
+      }
+    } catch (error) {
+      console.error('Failed to get medical term stats:', error)
+      return {
+        totalTerms: 0,
+        mostUsedTerms: [],
+        recentTerms: []
+      }
+    }
+  }
+
+  // Get user's conversation history
+  static async getUserConversationHistory(userId: string, limit: number = 10): Promise<Array<{
+    id: string
+    summary: string
+    createdAt: string
+    messageCount: number
+  }>> {
+    try {
+      const conversations = await MemoryService.getUserConversations(userId, limit)
+      return conversations.map(conv => ({
+        id: conv.id,
+        summary: conv.summary || 'No summary available',
+        createdAt: conv.createdAt,
+        messageCount: conv.messages.length
+      }))
+    } catch (error) {
+      console.error('Failed to get conversation history:', error)
+      return []
+    }
+  }
+
+  // Get personalized suggestions based on user's history
+  static async getPersonalizedSuggestions(userId: string): Promise<string[]> {
+    try {
+      const termStats = await this.getUserMedicalTermStats(userId)
+      const preferences = await MemoryService.getUserPreferences(userId)
+      
+      const suggestions: string[] = []
+      
+      // Suggest based on frequently used terms
+      if (termStats.mostUsedTerms.length > 0) {
+        const topTerm = termStats.mostUsedTerms[0]
+        suggestions.push(`Ask about ${topTerm.term} billing codes`)
+        suggestions.push(`Learn more about ${topTerm.term} complications`)
+      }
+      
+      // Suggest based on user preferences
+      if (preferences.response_style === 'detailed') {
+        suggestions.push('Request comprehensive explanations for complex procedures')
+      }
+      
+      if (preferences.medical_level === 'advanced') {
+        suggestions.push('Ask about advanced billing strategies')
+        suggestions.push('Request information about complex coding scenarios')
+      }
+      
+      // Default suggestions if no history
+      if (suggestions.length === 0) {
+        suggestions.push('Ask about diabetes mellitus billing codes')
+        suggestions.push('Learn about hypertension management procedures')
+        suggestions.push('Request information about eye examination coding')
+      }
+      
+      return suggestions.slice(0, 3) // Return top 3 suggestions
+    } catch (error) {
+      console.error('Failed to get personalized suggestions:', error)
+      return ['Ask about medical billing codes', 'Learn about form completion', 'Request terminology definitions']
+    }
+  }
+
+  // Clear user memory (for privacy/reset)
+  static async clearUserMemory(userId: string): Promise<boolean> {
+    try {
+      // Get all user memories
+      const memories = await MemoryService.getMemory(userId)
+      
+      // Delete each memory entry
+      for (const memory of memories) {
+        await MemoryService.deleteMemory(memory.id)
+      }
+      
+      console.log(`Cleared ${memories.length} memory entries for user ${userId}`)
+      return true
+    } catch (error) {
+      console.error('Failed to clear user memory:', error)
+      return false
+    }
+  }
+
+  // Get memory statistics for admin/debugging
+  static async getMemoryStatistics(): Promise<any> {
+    try {
+      return await MemoryService.getMemoryStats()
+    } catch (error) {
+      console.error('Failed to get memory statistics:', error)
+      return null
     }
   }
 }

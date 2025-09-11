@@ -4,10 +4,13 @@ import PersonalizationService from '../services/PersonalizationService'
 import ProactiveSuggestionsService, { type ProactiveSuggestion } from '../services/ProactiveSuggestionsService'
 import { PredictiveSuggestionsService } from '../services/PredictiveSuggestionsService'
 import PersonalizationSettings from './PersonalizationSettings'
+import MemoryTest from './MemoryTest'
 import AIAssistantService, { type SmartSuggestion, type ProactiveAlert, type AIContext } from '../services/AIAssistantService'
 import { EnhancedVisualResponseService, type EnhancedResponse, type RichTextElement, type InteractiveElement, type VisualIndicator } from '../services/EnhancedVisualResponseService'
+import { SmartButtonService } from '../services/SmartButtonService'
 import { createPortal } from 'react-dom'
 import { getDemoUserFirstName } from '../utils/nameGenerator'
+import { TextFormatter, type FormattedText } from '../utils/textFormatter'
 
 interface Message {
   id: string
@@ -148,11 +151,18 @@ export default function HelperModal({
     lastTopic?: string
   }>({})
   const [codeSelectionMode, setCodeSelectionMode] = useState(false)
+  const [memoryStatus, setMemoryStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking')
+  const [userPreferences, setUserPreferences] = useState<Record<string, any>>({})
+  const [showMemoryTest, setShowMemoryTest] = useState(false)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Create AI context for enhanced responses
+  // Create AI context for enhanced responses with memory integration
   const createAIContext = (): AIContext => {
+    // Generate a consistent user ID for this session (in a real app, this would come from authentication)
+    const userId = `user_${localStorage.getItem('alivi_user_id') || 'demo_' + Date.now()}`
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
     return {
       formType: currentForm,
       currentField,
@@ -161,7 +171,11 @@ export default function HelperModal({
       userBehavior,
       deviceType: window.innerWidth < 768 ? 'mobile' : 'desktop',
       timeOfDay: getTimeOfDay(),
-      sessionDuration: Date.now() - (sessionStartTime || Date.now())
+      sessionDuration: Date.now() - (sessionStartTime || Date.now()),
+      // Memory-related context
+      userId,
+      sessionId,
+      memoryEnabled: true
     }
   }
 
@@ -180,6 +194,29 @@ export default function HelperModal({
     if (hour >= 17 && hour < 22) return 'evening'
     return 'night'
   }
+
+  // Check memory service status and load user preferences
+  useEffect(() => {
+    const checkMemoryStatus = async () => {
+      try {
+        const isAvailable = await AIAssistantService.getMemoryStatistics()
+        setMemoryStatus(isAvailable ? 'connected' : 'disconnected')
+        
+        if (isAvailable) {
+          const context = createAIContext()
+          const preferences = await AIAssistantService.getUserPreference(context.userId!, 'response_style', 'standard')
+          setUserPreferences({ response_style: preferences })
+        }
+      } catch (error) {
+        console.warn('Memory service not available:', error)
+        setMemoryStatus('disconnected')
+      }
+    }
+    
+    if (isOpen) {
+      checkMemoryStatus()
+    }
+  }, [isOpen])
 
   // Load smart suggestions and proactive alerts
   useEffect(() => {
@@ -795,10 +832,22 @@ export default function HelperModal({
           
           addMessage('enhanced', 'Search results found', 'fade-in', undefined, undefined, undefined, enhancedResponse)
         } else {
+          // Smart error response - only show relevant buttons
+          const errorButtons = SmartButtonService.generateContextualButtons(
+            'No results found',
+            input,
+            context,
+            'error'
+          )
+          
           const enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
             'No results found',
             ['Try a different search term', 'Check spelling', 'Use more specific terms'],
-            [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+            errorButtons.map(btn => ({ 
+              label: btn.label, 
+              action: btn.action, 
+              style: btn.style 
+            }))
           )
           
           addMessage('enhanced', 'No search results', 'fade-in', undefined, undefined, undefined, enhancedResponse)
@@ -919,10 +968,22 @@ export default function HelperModal({
             }
             
             if (invalidCode || response.includes('❌ INVALID')) {
+              // Smart error response for invalid codes
+              const errorButtons = SmartButtonService.generateSmartButtons(
+                errorMessage,
+                input,
+                context,
+                [{ label: 'Search Valid Codes', action: 'search_code', style: 'primary' }]
+              )
+              
               enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
                 errorMessage,
                 ['Check the code spelling', 'Verify it\'s a valid medical code', 'Try searching for similar codes'],
-                [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+                errorButtons.map(btn => ({ 
+                  label: btn.label, 
+                  action: btn.action, 
+                  style: btn.style 
+                }))
               )
               addMessage('enhanced', 'Invalid code information', 'fade-in', undefined, undefined, undefined, enhancedResponse)
             }
@@ -965,23 +1026,47 @@ export default function HelperModal({
             
             if (errorMatch || warningMatch || invalidMatch) {
               const errorText = errorMatch?.[1] || warningMatch?.[1] || 'Invalid code or query'
+              
+              // Smart error response
+              const errorButtons = SmartButtonService.generateContextualButtons(
+                errorText,
+                input,
+                context,
+                'error'
+              )
+              
               enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
                 errorText,
                 ['Check your input', 'Verify the information', 'Try a different approach'],
-                [{ label: 'Try Again', action: 'search_code', style: 'primary' }]
+                errorButtons.map(btn => ({ 
+                  label: btn.label, 
+                  action: btn.action, 
+                  style: btn.style 
+                }))
               )
               addMessage('enhanced', 'Error information', 'fade-in', undefined, undefined, undefined, enhancedResponse)
             }
           } else if (response.includes('**Help:**') || response.includes('I can help')) {
-            // Help response
-            enhancedResponse = EnhancedVisualResponseService.createHelpResponse(
-              'General Help',
+            // Smart help response
+            const helpButtons = SmartButtonService.generateSmartButtons(
               response,
-              ['Code Lookup', 'Provider Search', 'Form Guidance'],
+              input,
+              context,
               [
                 { label: 'Code Lookup', action: 'search_code', style: 'primary' },
                 { label: 'Provider Search', action: 'search_provider', style: 'info' }
               ]
+            )
+            
+            enhancedResponse = EnhancedVisualResponseService.createHelpResponse(
+              'General Help',
+              response,
+              ['Code Lookup', 'Provider Search', 'Form Guidance'],
+              helpButtons.map(btn => ({ 
+                label: btn.label, 
+                action: btn.action, 
+                style: btn.style 
+              }))
             )
             addMessage('enhanced', 'Help information available', 'fade-in', undefined, undefined, undefined, enhancedResponse)
           } else {
@@ -993,14 +1078,22 @@ export default function HelperModal({
               // This is a contextual response, don't enhance it
               addMessage('assistant', response, 'fade-in')
             } else {
-              // Regular response with status
+              // Regular response with smart contextual buttons
+              const contextualButtons = SmartButtonService.generateContextualButtons(
+                response,
+                input,
+                context,
+                'gemini' // This is a Gemini response if we got here
+              )
+              
               enhancedResponse = EnhancedVisualResponseService.createStatusResponse(
                 response,
                 'info',
-                [
-                  { label: 'Search Codes', action: 'search_code', style: 'primary' },
-                  { label: 'Get Help', action: 'show_help', style: 'info' }
-                ]
+                contextualButtons.map(btn => ({ 
+                  label: btn.label, 
+                  action: btn.action, 
+                  style: btn.style 
+                }))
               )
               addMessage('enhanced', 'Information available', 'fade-in', undefined, undefined, undefined, enhancedResponse)
             }
@@ -1009,10 +1102,23 @@ export default function HelperModal({
       }
     } catch (error) {
       console.error('Error processing message:', error)
+      
+      // Smart error handling
+      const errorButtons = SmartButtonService.generateContextualButtons(
+        'Sorry, I encountered an error processing your request.',
+        input,
+        createAIContext(),
+        'error'
+      )
+      
       const enhancedResponse = EnhancedVisualResponseService.createErrorResponse(
         'Sorry, I encountered an error processing your request.',
         ['Try rephrasing your question', 'Check your internet connection', 'Contact support if the problem persists'],
-        [{ label: 'Try Again', action: 'retry', style: 'primary' }]
+        errorButtons.map(btn => ({ 
+          label: btn.label, 
+          action: btn.action, 
+          style: btn.style 
+        }))
       )
       
       addMessage('enhanced', 'An error occurred while processing your request.', 'fade-in', undefined, undefined, undefined, enhancedResponse)
@@ -1083,6 +1189,62 @@ export default function HelperModal({
     )
   }
 
+  // Render formatted text with proper list formatting
+  const renderFormattedText = (text: string) => {
+    const formatted = TextFormatter.formatResponse(text)
+    
+    return (
+      <div className="space-y-2">
+        {formatted.map((item, index) => {
+          switch (item.type) {
+            case 'heading':
+              return (
+                <h4 key={index} className="font-semibold text-gray-900 dark:text-white mt-3 mb-1">
+                  {item.content}
+                </h4>
+              )
+              
+            case 'list':
+              return (
+                <ul key={index} className="ml-4 space-y-1">
+                  {item.items?.map((listItem, itemIndex) => (
+                    <li key={itemIndex} className="flex items-start">
+                      <span className="text-blue-500 mr-2 mt-1 text-xs">•</span>
+                      <span className="text-sm" dangerouslySetInnerHTML={{ 
+                        __html: listItem.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                      }} />
+                    </li>
+                  ))}
+                </ul>
+              )
+              
+            case 'bold':
+              return (
+                <div key={index} className="text-sm" dangerouslySetInnerHTML={{ 
+                  __html: item.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                }} />
+              )
+              
+            case 'code':
+              return (
+                <div key={index} className="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                  {item.content}
+                </div>
+              )
+              
+            case 'text':
+            default:
+              return (
+                <div key={index} className="text-sm" dangerouslySetInnerHTML={{ 
+                  __html: item.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                }} />
+              )
+          }
+        })}
+      </div>
+    )
+  }
+
   // Render interactive elements
   const renderInteractiveElement = (element: InteractiveElement, index: number) => {
     
@@ -1117,9 +1279,26 @@ export default function HelperModal({
     // Handle different action types
     switch (element.action) {
       case 'search_code':
-        // Trigger code search
-        addMessage('user', 'Search for medical codes', 'fade-in')
-        await processUserMessage('search medical codes')
+        // Trigger contextual code search based on current conversation
+        const lastMessages = messages.slice(-3) // Look at last 3 messages for context
+        let searchQuery = 'search medical codes'
+        
+        // Try to make the search more specific based on recent context
+        for (const msg of lastMessages) {
+          if (msg.content.includes('diabetes')) {
+            searchQuery = 'search diabetes codes'
+            break
+          } else if (msg.content.includes('retinopathy')) {
+            searchQuery = 'search retinopathy codes'
+            break
+          } else if (msg.content.includes('eye') || msg.content.includes('vision')) {
+            searchQuery = 'search ophthalmology codes'
+            break
+          }
+        }
+        
+        addMessage('user', `Search for medical codes`, 'fade-in')
+        await processUserMessage(searchQuery)
         break
         
       case 'show_help':
@@ -1323,9 +1502,29 @@ export default function HelperModal({
                 <div>
                   <h3 className="ai-helper-title text-white font-semibold">M.I.L.A.</h3>
                   <p className="ai-helper-subtitle text-white/80 text-xs">Medical Intelligence & Learning Assistant</p>
+                  {/* Memory Status Indicator */}
+                  <div className="flex items-center space-x-1 mt-1">
+                    <div className={`w-2 h-2 rounded-full ${
+                      memoryStatus === 'connected' ? 'bg-green-400' : 
+                      memoryStatus === 'disconnected' ? 'bg-red-400' : 
+                      'bg-yellow-400'
+                    }`}></div>
+                    <span className="text-xs text-white/60">
+                      {memoryStatus === 'connected' ? 'Memory Active' : 
+                       memoryStatus === 'disconnected' ? 'Memory Offline' : 
+                       'Checking Memory...'}
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowMemoryTest(true)}
+                  className="ai-helper-memory-test-btn p-2 text-white/80 hover:text-white transition-colors"
+                  title="Test Memory Integration"
+                >
+                  <Icon name="database" size={16} />
+                </button>
                 <button
                   onClick={() => setShowSettings(true)}
                   className="ai-helper-settings-btn p-2 text-white/80 hover:text-white transition-colors"
@@ -1360,7 +1559,14 @@ export default function HelperModal({
                         : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white shadow-md'
                     }`}
                   >
-                    <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                    {/* Use formatted text renderer for better list formatting */}
+                    {TextFormatter.hasListItems(message.content) ? (
+                      renderFormattedText(message.content)
+                    ) : (
+                      <div className="whitespace-pre-wrap text-sm" dangerouslySetInnerHTML={{ 
+                        __html: message.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                      }} />
+                    )}
                     
                     {/* Smart Suggestions */}
                     {message.suggestions && message.suggestions.length > 0 && (
@@ -1601,6 +1807,29 @@ export default function HelperModal({
                   <Icon name="send" size={16} />
                 </button>
               </form>
+              
+              {/* Development Test Button for Gemini AI */}
+              {import.meta.env.DEV && (
+                <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={async () => {
+                      try {
+                        addMessage('assistant', '🧪 Testing Gemini AI integration...', 'fade-in')
+                        const testResult = await AIAssistantService.testGeminiIntegration()
+                        addMessage('assistant', testResult.message, 'fade-in')
+                        if (testResult.usageStats) {
+                          addMessage('assistant', `📊 Usage Stats: ${testResult.usageStats.requestsThisMinute}/15 requests this minute`, 'fade-in')
+                        }
+                      } catch (error) {
+                        addMessage('assistant', `❌ Test failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'fade-in')
+                      }
+                    }}
+                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    🧪 Test Gemini AI
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>,
@@ -1612,6 +1841,15 @@ export default function HelperModal({
         <PersonalizationSettings
           isOpen={showSettings}
           onClose={() => setShowSettings(false)}
+        />,
+        document.body
+      )}
+
+      {/* Memory Test Modal */}
+      {showMemoryTest && createPortal(
+        <MemoryTest
+          isOpen={showMemoryTest}
+          onClose={() => setShowMemoryTest(false)}
         />,
         document.body
       )}

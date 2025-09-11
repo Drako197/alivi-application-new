@@ -24,6 +24,7 @@ import FramesAndLensesPage from './FramesAndLensesPage'
 import HelperButton from './HelperButton'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
+import ReportsPage from './ReportsPage'
 import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 export default function Dashboard() {
@@ -117,6 +118,21 @@ export default function Dashboard() {
   useEffect(() => {
     updateBreadcrumbPath(activeDesktopTab)
   }, [activeDesktopTab])
+
+  // Listen for navigation events from other components
+  useEffect(() => {
+    const handleNavigateToReports = () => {
+      setActiveDesktopTab('reports')
+      setActiveMobileTab('reports')
+      updateBreadcrumbPath('reports')
+    }
+
+    window.addEventListener('navigateToReports', handleNavigateToReports)
+    
+    return () => {
+      window.removeEventListener('navigateToReports', handleNavigateToReports)
+    }
+  }, [])
 
   // Clear navigation state after it's been used
   useEffect(() => {
@@ -563,11 +579,7 @@ export default function Dashboard() {
       case 'reports':
         return (
           <div className="dashboard-content">
-            <h1 className="welcome-title">Reports</h1>
-            <p className="welcome-subtitle">Analytics and reporting tools</p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">Reports content coming soon...</p>
-            </div>
+            <ReportsPage isOpen={true} />
           </div>
         )
       case 'analytics':
@@ -1296,11 +1308,8 @@ export default function Dashboard() {
         )
       case 'reports':
         return (
-          <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Reports</h2>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">Reports content coming soon...</p>
-            </div>
+          <div className="mobile-reports-content">
+            <ReportsPage isOpen={true} />
           </div>
         )
       case 'settings':

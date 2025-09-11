@@ -3724,8 +3724,11 @@ export default function HEDISLandingPage({
     if (taskId === 'screening') {
       updateScreeningStep(1, 'new') // Start new form with patient search
     } else if (taskId === 'reports') {
-      // Handle reports navigation
-      console.log('Navigate to reports')
+      // Navigate to reports tab
+      if (typeof window !== 'undefined') {
+        // Dispatch a custom event to notify Dashboard to switch to reports tab
+        window.dispatchEvent(new CustomEvent('navigateToReports'))
+      }
     }
   }
 

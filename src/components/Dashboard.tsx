@@ -25,6 +25,7 @@ import HelperButton from './HelperButton'
 import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import ReportsPage from './ReportsPage'
+import AnalyticsPage from './AnalyticsPage'
 import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 export default function Dashboard() {
@@ -127,10 +128,18 @@ export default function Dashboard() {
       updateBreadcrumbPath('reports')
     }
 
+    const handleNavigateToAnalytics = () => {
+      setActiveDesktopTab('analytics')
+      setActiveMobileTab('analytics')
+      updateBreadcrumbPath('analytics')
+    }
+
     window.addEventListener('navigateToReports', handleNavigateToReports)
+    window.addEventListener('navigateToAnalytics', handleNavigateToAnalytics)
     
     return () => {
       window.removeEventListener('navigateToReports', handleNavigateToReports)
+      window.removeEventListener('navigateToAnalytics', handleNavigateToAnalytics)
     }
   }, [])
 
@@ -585,11 +594,7 @@ export default function Dashboard() {
       case 'analytics':
         return (
           <div className="dashboard-content">
-            <h1 className="welcome-title">Analytics</h1>
-            <p className="welcome-subtitle">Data insights and visualizations</p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">Analytics content coming soon...</p>
-            </div>
+            <AnalyticsPage isOpen={true} />
           </div>
         )
       case 'users':
@@ -1156,11 +1161,11 @@ export default function Dashboard() {
                         .map((action) => (
                           <div 
                             key={action.id} 
-                            className="pic-actions-mobile-frequent-card bg-blue-50 dark:bg-blue-900/10 border border-blue-300 dark:border-blue-600 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-colors"
+                            className="pic-actions-mobile-frequent-card bg-white dark:bg-gray-800 border border-green-300 dark:border-green-600 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-400 dark:hover:border-green-500 hover:shadow-lg hover:shadow-green-200/50 dark:hover:shadow-green-900/20 hover:transform hover:-translate-y-1 transition-all duration-200"
                             onClick={() => handleMobileAction(action.id)}
                           >
                             <div className="flex items-center">
-                              <div className="pic-actions-mobile-frequent-icon flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
+                              <div className="pic-actions-mobile-frequent-icon flex-shrink-0 w-12 h-12 bg-gradient-to-r from-green-500 to-lime-500 rounded-lg flex items-center justify-center mr-4">
                                 {getMobileFrequentIcon(action.icon)}
                               </div>
                               <div className="pic-actions-mobile-frequent-content flex-1">
@@ -1187,7 +1192,7 @@ export default function Dashboard() {
                   {filteredMobileActions.map((action) => (
                     <div 
                       key={action.id} 
-                      className="pic-actions-mobile-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      className="pic-actions-mobile-card bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-white dark:hover:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-lg hover:transform hover:-translate-y-1 transition-all duration-200"
                       onClick={() => handleMobileAction(action.id)}
                     >
                       <div className="flex items-center">
@@ -1310,6 +1315,12 @@ export default function Dashboard() {
         return (
           <div className="mobile-reports-content">
             <ReportsPage isOpen={true} />
+          </div>
+        )
+      case 'analytics':
+        return (
+          <div className="mobile-analytics-content">
+            <AnalyticsPage isOpen={true} />
           </div>
         )
       case 'settings':

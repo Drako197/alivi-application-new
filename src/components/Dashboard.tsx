@@ -26,6 +26,7 @@ import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import ReportsPage from './ReportsPage'
 import AnalyticsPage from './AnalyticsPage'
+import Footer from './Footer'
 import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 export default function Dashboard() {
@@ -1758,6 +1759,9 @@ export default function Dashboard() {
           onToggleDarkMode={toggleDarkMode}
         />
       </div>
+
+      {/* Footer */}
+      <Footer />
     </>
   )
 } 

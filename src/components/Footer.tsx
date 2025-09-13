@@ -93,14 +93,6 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
                   PIC Actions
                 </button>
               </li>
-              <li>
-                <button 
-                  onClick={() => handleLinkClick('/settings')}
-                  className="footer-link text-sm text-gray-300 hover:text-blue-400 transition-colors"
-                >
-                  Settings
-                </button>
-              </li>
             </ul>
           </div>
 

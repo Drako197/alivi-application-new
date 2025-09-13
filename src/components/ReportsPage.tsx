@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Icon from './Icon'
-import { getDemoUserFirstName } from '../utils/nameGenerator'
+import { useAuth } from '../contexts/AuthContext'
 import HelperButton from './HelperButton'
 
 // Import widget components (we'll create these)
@@ -66,6 +66,7 @@ interface ReportsPageProps {
 }
 
 const ReportsPage: React.FC<ReportsPageProps> = ({ isOpen = true, onClose }) => {
+  const { user } = useAuth()
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedTimeRange, setSelectedTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d')
@@ -201,7 +202,6 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ isOpen = true, onClose }) => 
     )
   }
 
-  const demoName = getDemoUserFirstName()
 
   return (
     <div className="reports-page-container min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -215,7 +215,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ isOpen = true, onClose }) => 
                   Reports & Analytics
                 </h1>
                 <p className="reports-page-subtitle text-sm text-gray-500 dark:text-gray-400">
-                  Welcome back, {demoName}
+                  Welcome back, {user?.fullName || 'User'}
                 </p>
               </div>
             </div>

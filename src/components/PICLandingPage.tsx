@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { ReactElement } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 import Icon from './Icon'
 import PatientEligibilityForm from './PatientEligibilityForm'
 import ClaimsSubmissionForm from './ClaimsSubmissionForm'
@@ -25,6 +26,7 @@ interface PICLandingPageProps {
 }
 
 export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0, navigateTo }: PICLandingPageProps) {
+  const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -203,49 +205,63 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
   return (
     <div className="pic-landing-page">
       {/* Header */}
-      <div className="pic-header">
-        <div>
-          <h1 className="pic-title">P.I.C. Actions</h1>
-          <p className="pic-subtitle">Quick access to all provider interface center actions</p>
-        </div>
-        <div className="pic-view-toggle">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`pic-toggle-btn ${viewMode === 'grid' ? 'pic-toggle-active' : ''}`}
-          >
-            <Icon name="grid" size={16} />
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`pic-toggle-btn ${viewMode === 'list' ? 'pic-toggle-active' : ''}`}
-          >
-            <Icon name="list" size={16} />
-          </button>
+      <div className="pic-page-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-5">
+        <div className="pic-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="pic-header-main flex items-center justify-between py-6 h-20">
+            <div className="pic-header-title-section">
+              <h1 className="pic-page-title text-xl font-semibold text-gray-900 dark:text-white">
+                Welcome to your P.I.C. Actions, {user?.fullName || 'User'}!
+              </h1>
+              <div className="pic-page-subtitle flex items-center space-x-2 mt-1">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Provider Interface Center
+                </span>
+                <span className="pic-role-badge px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
+                  Field Technician
+                </span>
+              </div>
+            </div>
+            <div className="pic-header-right flex items-center space-x-4">
+              {/* Search Container */}
+              <div className="pic-search-container">
+                <Icon name="search" size={20} className="pic-search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search actions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pic-search-input"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <Icon name="x" size={16} />
+                  </button>
+                )}
+              </div>
+              {/* View Toggle */}
+              <div className="pic-view-toggle">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`pic-toggle-btn ${viewMode === 'grid' ? 'pic-toggle-active' : ''}`}
+                >
+                  <Icon name="grid" size={16} />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`pic-toggle-btn ${viewMode === 'list' ? 'pic-toggle-active' : ''}`}
+                >
+                  <Icon name="list" size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="pic-search">
-        <div className="pic-search-container">
-          <Icon name="search" size={20} className="pic-search-icon" />
-          <input
-            type="text"
-            placeholder="Search actions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pic-search-input"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              aria-label="Clear search"
-            >
-              <Icon name="x" size={16} />
-            </button>
-          )}
-        </div>
-      </div>
 
       {/* Category Filters */}
       <div className="pic-categories">

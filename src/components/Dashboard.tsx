@@ -26,8 +26,8 @@ import PatientSearchModal from './PatientSearchModal'
 import NewScreeningForm from './NewScreeningForm'
 import ReportsPage from './ReportsPage'
 import AnalyticsPage from './AnalyticsPage'
+import UsersPage from './UsersPage'
 import Footer from './Footer'
-import { getDemoUserFirstName } from '../utils/nameGenerator'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
@@ -601,11 +601,7 @@ export default function Dashboard() {
       case 'users':
         return (
           <div className="dashboard-content">
-            <h1 className="welcome-title">Users</h1>
-            <p className="welcome-subtitle">User management and administration</p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">Users content coming soon...</p>
-            </div>
+            <UsersPage isOpen={true} />
           </div>
         )
       case 'roles':
@@ -655,7 +651,7 @@ export default function Dashboard() {
           <div className="dashboard-content">
             {/* Welcome Section */}
             <div className="welcome-section">
-              <h1 className="welcome-title">Welcome back, {getDemoUserFirstName()}!</h1>
+              <h1 className="welcome-title">Welcome back, {user?.fullName || 'User'}!</h1>
               <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
             </div>
 
@@ -863,7 +859,7 @@ export default function Dashboard() {
               {/* Welcome Section */}
               <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  Welcome back, {getDemoUserFirstName()}!
+                  Welcome back, {user?.fullName || 'User'}!
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400">
                   Here's what's happening with your healthcare services today.
@@ -1324,6 +1320,12 @@ export default function Dashboard() {
             <AnalyticsPage isOpen={true} />
           </div>
         )
+      case 'users':
+        return (
+          <div className="mobile-users-content">
+            <UsersPage isOpen={true} />
+          </div>
+        )
       case 'settings':
         return (
           <div className="p-4">
@@ -1350,7 +1352,7 @@ export default function Dashboard() {
           <div className="dashboard-content">
             {/* Welcome Section */}
             <div className="welcome-section">
-              <h1 className="welcome-title">Welcome back, {getDemoUserFirstName()}!</h1>
+              <h1 className="welcome-title">Welcome back, {user?.fullName || 'User'}!</h1>
               <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
             </div>
 
@@ -1757,6 +1759,7 @@ export default function Dashboard() {
           onClose={() => setShowMobileMenu(false)}
           isDarkMode={isDarkMode}
           onToggleDarkMode={toggleDarkMode}
+          onNavigate={handleMobileTabChange}
         />
       </div>
 

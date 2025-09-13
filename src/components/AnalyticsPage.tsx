@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Icon from './Icon'
-import { getDemoUserFirstName } from '../utils/nameGenerator'
+import { useAuth } from '../contexts/AuthContext'
 import HelperButton from './HelperButton'
 
 // Import analytics widgets
@@ -49,6 +49,7 @@ interface AnalyticsPageProps {
 }
 
 const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ isOpen = true, onClose }) => {
+  const { user } = useAuth()
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedTimeframe, setSelectedTimeframe] = useState<'3M' | '6M' | '1Y' | '2Y'>('1Y')
@@ -192,64 +193,58 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ isOpen = true, onClose })
   return (
     <div className="analytics-page min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="analytics-page-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+      <div className="analytics-page-header bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="analytics-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="analytics-header-main flex items-center justify-between py-4">
-            <div className="analytics-header-title-section">
-              <h1 className="analytics-page-title text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="analytics-header-main flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-0 sm:h-16 space-y-4 sm:space-y-0">
+            {/* Title Section - Full Width on Mobile */}
+            <div className="analytics-header-title-section w-full sm:w-auto">
+              <h1 className="analytics-page-title text-xl font-semibold text-gray-900 dark:text-white">
                 Strategic Analytics
               </h1>
-              <p className="analytics-page-subtitle text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Predictive insights and strategic decision-making for {getDemoUserFirstName()}
+              <p className="analytics-page-subtitle text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Predictive insights for {user?.fullName || 'User'}
               </p>
             </div>
             
-            <div className="analytics-header-controls flex items-center space-x-4">
-              {/* Timeframe Selector */}
-              <div className="analytics-timeframe-selector">
-                <label className="analytics-timeframe-label text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
-                  Timeframe:
-                </label>
+            {/* Controls Section - Side by Side on Mobile */}
+            <div className="analytics-header-right w-full sm:w-auto">
+              <div className="flex flex-row sm:flex-row sm:items-center space-x-2 sm:space-x-4">
+                {/* Timeframe Selector */}
                 <select
                   value={selectedTimeframe}
                   onChange={(e) => setSelectedTimeframe(e.target.value as any)}
-                  className="analytics-timeframe-select bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="analytics-timeframe-select flex-1 sm:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 >
                   <option value="3M">3 Months</option>
                   <option value="6M">6 Months</option>
                   <option value="1Y">1 Year</option>
                   <option value="2Y">2 Years</option>
                 </select>
-              </div>
 
-              {/* Scenario Selector */}
-              <div className="analytics-scenario-selector">
-                <label className="analytics-scenario-label text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
-                  Scenario:
-                </label>
+                {/* Scenario Selector */}
                 <select
                   value={selectedScenario}
                   onChange={(e) => setSelectedScenario(e.target.value as any)}
-                  className="analytics-scenario-select bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="analytics-scenario-select flex-1 sm:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 >
                   <option value="conservative">Conservative</option>
                   <option value="realistic">Realistic</option>
                   <option value="optimistic">Optimistic</option>
                 </select>
-              </div>
 
-              {/* Export Button */}
-              <button className="analytics-export-btn inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <Icon name="download" size={16} className="mr-2" />
-                Export
-              </button>
+                {/* Export Button */}
+                <button className="analytics-export-btn hidden sm:inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <Icon name="download" size={16} className="mr-2" />
+                  Export
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="analytics-page-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="analytics-page-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:pb-6">
         <div className="analytics-widgets-grid grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* Executive Overview - Full Width */}
           <div className="analytics-executive-overview-widget lg:col-span-2 xl:col-span-3">
@@ -288,10 +283,15 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ isOpen = true, onClose })
       </div>
 
       {/* Mila Assistant */}
-      <HelperButton 
-        context="analytics"
-        className="analytics-page-mila-assistant fixed bottom-6 right-6 z-50"
-      />
+      <div className="analytics-page-mila-assistant" style={{ 
+        position: 'fixed', 
+        bottom: '5rem', 
+        right: '1rem', 
+        zIndex: 99999,
+        maxWidth: 'calc(100vw - 2rem)'
+      }}>
+        <HelperButton />
+      </div>
     </div>
   )
 }

@@ -201,7 +201,8 @@ body {
   }
   
   .mobile-side-menu {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-50;
+    @apply fixed inset-0 bg-black bg-opacity-50;
+    z-index: 10001 !important;
   }
   
   .mobile-side-menu-content {
@@ -219,6 +220,8 @@ body {
   /* Header Classes */
   .header {
     @apply bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700;
+    position: relative;
+    z-index: 1000;
   }
   
   .header-content {
@@ -239,6 +242,7 @@ body {
     right: 1.5rem !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
+    z-index: 10000 !important;
   }
   
   .user-avatar {
@@ -246,7 +250,8 @@ body {
   }
   
   .user-dropdown {
-    @apply absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50;
+    @apply absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2;
+    z-index: 10001 !important;
   }
   
   .user-dropdown-container {
@@ -382,7 +387,8 @@ body {
   
   /* Enhanced Mobile Side Menu Animations */
   .mobile-side-menu {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 ease-in-out;
+    @apply fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out;
+    z-index: 10001 !important;
   }
   
   .mobile-side-menu-content {
@@ -1151,7 +1157,7 @@ body {
 }
 
 .hedis-date-card {
-  @apply flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4;
+  @apply flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4;
 }
 
 .hedis-date-icon {
@@ -1293,7 +1299,6 @@ body {
 
 .hedis-primary-action-card {
   @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative overflow-hidden;
-  border-left: 4px solid #3B82F6;
 }
 
 .hedis-primary-action-card:hover {

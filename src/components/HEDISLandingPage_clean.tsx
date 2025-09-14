@@ -4158,7 +4158,6 @@ export default function HEDISLandingPage({
 
       {/* Dashboard Content Container */}
       <div className="dashboard-content">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Integrated Alerts */}
         {showSaveAlert && (
           <div className="hedis-integrated-alert show">
@@ -4304,7 +4303,6 @@ export default function HEDISLandingPage({
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       {/* Completed Screening List Modal */}

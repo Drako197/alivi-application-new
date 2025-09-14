@@ -4123,31 +4123,34 @@ export default function HEDISLandingPage({
       {/* Header Section */}
       <div className="hedis-page-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="hedis-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="hedis-header-main flex items-center justify-between py-6 h-20">
-            <div className="hedis-header-title-section">
-              <h1 className="hedis-page-title text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="hedis-header-main flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 space-y-4 sm:space-y-0">
+            {/* Title Section - Full Width on Mobile */}
+            <div className="hedis-header-title-section w-full sm:w-auto">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Welcome to your HEDIS Patient Screening, Demo User!
               </h1>
-              <div className="hedis-page-subtitle flex items-center space-x-2 mt-1">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  HEDIS Quality Measures
-                </span>
-                <span className="hedis-role-badge px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
-                  {userRole}
-                </span>
+              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                HEDIS Quality Measures
+              </div>
+              <div className="hedis-role-badge px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full inline-block mt-2">
+                {userRole}
               </div>
             </div>
-            <div className="hedis-header-right flex items-center space-x-4">
-              <div className="hedis-date-section">
-                <div className="hedis-date-card">
-                  <div className="hedis-date-icon">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="hedis-date-content">
-                    <div className="hedis-date-label">Today</div>
-                    <div className="hedis-date-value">{formatDate(currentTime)}</div>
+            
+            {/* Controls Section - Side by Side on Mobile */}
+            <div className="hedis-header-right w-full sm:w-auto">
+              <div className="flex flex-row sm:flex-row sm:items-center space-x-2 sm:space-x-4">
+                <div className="hedis-date-section">
+                  <div className="hedis-date-card">
+                    <div className="hedis-date-icon">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="hedis-date-content">
+                      <div className="hedis-date-label">Today</div>
+                      <div className="hedis-date-value">{formatDate(currentTime)}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -4156,9 +4159,7 @@ export default function HEDISLandingPage({
         </div>
       </div>
 
-      {/* Dashboard Content Container */}
-      <div className="dashboard-content">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content */}
         {/* Integrated Alerts */}
         {showSaveAlert && (
           <div className="hedis-integrated-alert show">
@@ -4305,7 +4306,6 @@ export default function HEDISLandingPage({
           </div>
         </div>
       </div>
-      </div>
 
       {/* Completed Screening List Modal */}
       {showCompletedScreeningListModal && (
@@ -4343,7 +4343,6 @@ export default function HEDISLandingPage({
           }
         }}
       />
-
 
     </div>
   )

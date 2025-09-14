@@ -54,6 +54,10 @@ const HEDISLandingPage = (): ReactElement => {
   
   // Main view state
   const [currentView, setCurrentView] = useState<'dashboard' | 'screening'>('dashboard')
+  const [currentScreeningStep, setCurrentScreeningStep] = useState(0)
+  const [formMode, setFormMode] = useState<'new' | 'edit' | 'view'>('new')
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+  const [currentFormId, setCurrentFormId] = useState<string | undefined>(undefined)
   
   // Modal states
   const [showPatientSearchModal, setShowPatientSearchModal] = useState(false)
@@ -62,6 +66,33 @@ const HEDISLandingPage = (): ReactElement => {
   
   // Alert states
   const [showSaveAlert, setShowSaveAlert] = useState(false)
+  
+  // Screening form data
+  const [screeningDetails, setScreeningDetails] = useState<ScreeningDetails>({
+    dateOfScreening: '',
+    placeOfService: '',
+    pcpLocation: '',
+    practicePhone: '305-555-5555',
+    practiceFax: '305-555-5556',
+    practiceEmail: 'Contact@gableseyecare.com',
+    practiceName: 'Coral Gables Eye Care',
+    practiceLocation: '2525 Ponce De Leon Blv',
+    officeContact: 'Tom Brady',
+    diabetesMellitus: '',
+    diabetesType: '',
+    lastEyeExam: '',
+    ocularHistory: [],
+    ocularSurgery: [],
+    ocularHistoryOther: '',
+    ocularSurgeryOther: ''
+  })
+  
+  const [retinalImages, setRetinalImages] = useState<RetinalImages>({
+    rightEyeMissing: false,
+    leftEyeMissing: false,
+    rightEyeImages: [],
+    leftEyeImages: []
+  })
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -111,10 +142,23 @@ const HEDISLandingPage = (): ReactElement => {
     return icons[iconName] || icons['chart-bar']
   }
 
+  const updateScreeningStep = (step: number, mode?: 'new' | 'edit' | 'view' | 'dashboard', formId?: string) => {
+    setCurrentScreeningStep(step)
+    if (mode) setFormMode(mode as 'new' | 'edit' | 'view')
+    if (formId) setCurrentFormId(formId)
+
+    // Switch to screening view when step > 0, dashboard when step = 0
+    if (step > 0) {
+      setCurrentView('screening')
+    } else {
+      setCurrentView('dashboard')
+    }
+  }
+
   const handleTaskClick = (taskType: string) => {
     console.log('Task clicked:', taskType)
     if (taskType === 'screening') {
-      setShowPatientSearchModal(true)
+      updateScreeningStep(1, 'new') // Start new form with patient search
     } else if (taskType === 'reports') {
       // Navigate to reports tab
       if (typeof window !== 'undefined') {
@@ -126,9 +170,11 @@ const HEDISLandingPage = (): ReactElement => {
   const handleFormCardClick = (cardId: string) => {
     console.log('Form card clicked:', cardId)
     if (cardId === 'completed') {
-      setShowCompletedScreeningListModal(true)
+      // Show a simple placeholder for completed forms
+      alert('Completed Forms: This would show a list of completed patient screenings. Feature coming soon!')
     } else if (cardId === 'saved') {
-      setShowSavedScreeningListModal(true)
+      // Show a simple placeholder for saved forms
+      alert('Saved Forms: This would show a list of saved draft forms. Feature coming soon!')
     }
   }
 
@@ -172,6 +218,214 @@ const HEDISLandingPage = (): ReactElement => {
     }
   ]
 
+  // Render screening workflow if in screening view
+  if (currentView === 'screening') {
+    return (
+      <div className="hedis-screening-page min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Header */}
+        <div className="hedis-page-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div className="hedis-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="hedis-header-main flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 space-y-4 sm:space-y-0">
+              <div className="hedis-header-title-section w-full sm:w-auto">
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {currentScreeningStep === 1 ? 'Patient Search' : 
+                   currentScreeningStep === 2 ? 'Screening Details' : 
+                   currentScreeningStep === 3 ? 'Retinal Images' : 
+                   currentScreeningStep === 4 ? 'Review & Submit' : 'HEDIS Screening'}
+                </h1>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Step {currentScreeningStep} of 4
+                </div>
+              </div>
+              <div className="hedis-header-right w-full sm:w-auto">
+                <button
+                  onClick={() => updateScreeningStep(0, 'dashboard')}
+                  className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Back to Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {currentScreeningStep === 1 && (
+            <div className="hedis-screening-step-content">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Patient Search
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Search for a patient to begin the screening process.
+              </p>
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Patient Search</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    This would normally show a patient search interface. For demo purposes, click continue to proceed.
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => updateScreeningStep(0, 'dashboard')}
+                      className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Mock patient selection
+                        setSelectedPatient({
+                          id: 'demo-patient-1',
+                          patientId: 'P-12345',
+                          firstName: 'John',
+                          lastName: 'Doe',
+                          dateOfBirth: '1985-03-15',
+                          pcpName: 'Dr. Sarah Wilson',
+                          pcpLocation: 'Main Clinic',
+                          lastVisit: '2024-01-15',
+                          status: 'active'
+                        })
+                        updateScreeningStep(2, 'new')
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Continue with Demo Patient
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentScreeningStep === 2 && selectedPatient && (
+            <div className="hedis-screening-step-content">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Screening Details
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Patient: {selectedPatient.firstName} {selectedPatient.lastName} (ID: {selectedPatient.patientId})
+              </p>
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Screening Details Form</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    This would show the detailed screening form. For demo purposes, click continue to proceed.
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => updateScreeningStep(1, 'new')}
+                      className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => updateScreeningStep(3, 'new')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Continue to Images
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentScreeningStep === 3 && selectedPatient && (
+            <div className="hedis-screening-step-content">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Retinal Images
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Patient: {selectedPatient.firstName} {selectedPatient.lastName} (ID: {selectedPatient.patientId})
+              </p>
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Retinal Images Upload</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    This would show the retinal image upload interface. For demo purposes, click continue to proceed.
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => updateScreeningStep(2, 'new')}
+                      className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => updateScreeningStep(4, 'new')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Review & Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentScreeningStep === 4 && selectedPatient && (
+            <div className="hedis-screening-step-content">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Review & Submit
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Patient: {selectedPatient.firstName} {selectedPatient.lastName} (ID: {selectedPatient.patientId})
+              </p>
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Review & Submit</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    Review all screening information and submit the form.
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => updateScreeningStep(3, 'new')}
+                      className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowSaveAlert(true)
+                        setTimeout(() => setShowSaveAlert(false), 5000)
+                        updateScreeningStep(0, 'dashboard')
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      Submit Screening
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Dashboard view
   return (
     <div className="hedis-landing-page min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Page Header */}

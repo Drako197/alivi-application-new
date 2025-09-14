@@ -28,6 +28,9 @@ import ReportsPage from './ReportsPage'
 import AnalyticsPage from './AnalyticsPage'
 import UsersPage from './UsersPage'
 import SettingsPage from './SettingsPage'
+import ProfilePage from './ProfilePage'
+import RolesPage from './RolesPage'
+import AuditLogPage from './AuditLogPage'
 import Footer from './Footer'
 
 export default function Dashboard() {
@@ -406,6 +409,7 @@ export default function Dashboard() {
       'reports': 'Reports',
       'analytics': 'Analytics',
       'users': 'Users',
+      'profile': 'Profile',
       'roles': 'Roles & Permissions',
       'audit': 'Audit Log',
       'settings': 'Settings'
@@ -605,24 +609,22 @@ export default function Dashboard() {
             <UsersPage isOpen={true} />
           </div>
         )
-      case 'roles':
-        return (
-          <div className="dashboard-content">
-            <h1 className="welcome-title">Roles & Permissions</h1>
-            <p className="welcome-subtitle">Access control and security</p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">Roles & Permissions content coming soon...</p>
-            </div>
-          </div>
-        )
       case 'audit':
         return (
           <div className="dashboard-content">
-            <h1 className="welcome-title">Audit Log</h1>
-            <p className="welcome-subtitle">System activity and security logs</p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-gray-600 dark:text-gray-400">Audit Log content coming soon...</p>
-            </div>
+            <AuditLogPage />
+          </div>
+        )
+      case 'profile':
+        return (
+          <div className="dashboard-content">
+            <ProfilePage />
+          </div>
+        )
+      case 'roles':
+        return (
+          <div className="dashboard-content">
+            <RolesPage />
           </div>
         )
       case 'settings':
@@ -635,14 +637,15 @@ export default function Dashboard() {
       default:
         return (
           <div className="dashboard-content">
-            {/* Welcome Section */}
-            <div className="welcome-section">
-              <h1 className="welcome-title">Welcome back, {user?.fullName || 'User'}!</h1>
-              <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
-            </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {/* Welcome Section */}
+              <div className="welcome-section">
+                <h1 className="welcome-title">Welcome back, {user?.fullName || 'User'}!</h1>
+                <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
+              </div>
 
-            {/* Stats Grid - Updated with real data */}
-            <div className="stats-grid">
+              {/* Stats Grid - Updated with real data */}
+              <div className="stats-grid">
               <div className="stat-card completed-screenings-card">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -829,6 +832,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         )
@@ -1312,6 +1316,24 @@ export default function Dashboard() {
             <UsersPage isOpen={true} />
           </div>
         )
+      case 'profile':
+        return (
+          <div className="mobile-main-content">
+            <ProfilePage />
+          </div>
+        )
+      case 'roles':
+        return (
+          <div className="mobile-main-content">
+            <RolesPage />
+          </div>
+        )
+      case 'audit':
+        return (
+          <div className="mobile-main-content">
+            <AuditLogPage />
+          </div>
+        )
       case 'settings':
         return (
           <div className="mobile-main-content">
@@ -1601,8 +1623,8 @@ export default function Dashboard() {
                           <div style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
                             <button 
                               onClick={() => {
-                                console.log('Profile clicked!')
-                                // TODO: Navigate to profile page
+                                handleDesktopTabChange('profile')
+                                setShowUserDropdown(false)
                               }}
                               style={{ 
                                 width: '100%', 

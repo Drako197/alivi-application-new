@@ -11,23 +11,8 @@ interface SettingsPageProps {
 const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) => {
   const { user } = useAuth()
   const { theme, setTheme } = useTheme()
-  const [activeTab, setActiveTab] = useState('profile')
+  const [activeTab, setActiveTab] = useState('practice')
   const [settings, setSettings] = useState({
-    // User & Security Settings
-    profile: {
-      fullName: user?.fullName || '',
-      email: user?.email || '',
-      role: 'Administrator',
-      department: 'Billing',
-      phone: '',
-      timezone: 'America/New_York'
-    },
-    security: {
-      twoFactorEnabled: false,
-      sessionTimeout: 30,
-      passwordExpiry: 90,
-      loginNotifications: true
-    },
     // Practice & Organization Settings
     practice: {
       name: 'Alivi Health Solutions',
@@ -45,32 +30,48 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) =
       lateFeePercentage: 1.5,
       minimumPaymentAmount: 25.00
     },
-    // Notification Settings
+    // System Notification Settings
     notifications: {
-      emailNotifications: true,
-      smsNotifications: false,
-      smsPhoneNumber: '',
+      systemEmailNotifications: true,
+      systemSmsNotifications: false,
+      systemSmsPhoneNumber: '',
       claimDenials: true,
       paymentAlerts: true,
       systemUpdates: true,
       arAgingAlerts: true
     },
-    // Interface Settings
+    // System Interface Settings
     interface: {
-      theme: theme,
-      language: 'en',
-      dateFormat: 'MM/DD/YYYY',
-      timeFormat: '12h',
-      currency: 'USD',
-      decimalPlaces: 2
+      defaultTheme: theme,
+      defaultLanguage: 'en',
+      defaultDateFormat: 'MM/DD/YYYY',
+      defaultTimeFormat: '12h',
+      defaultCurrency: 'USD',
+      defaultDecimalPlaces: 2
     }
   })
 
   const [hasChanges, setHasChanges] = useState(false)
+  const [originalSettings, setOriginalSettings] = useState<typeof settings | null>(null)
   const [confirmationMessage, setConfirmationMessage] = useState<{
     type: 'success' | 'error' | 'info'
     message: string
   } | null>(null)
+
+  // Initialize original settings for change tracking
+  useEffect(() => {
+    if (!originalSettings) {
+      setOriginalSettings(JSON.parse(JSON.stringify(settings)))
+    }
+  }, [settings, originalSettings])
+
+  // Track changes by comparing current settings with original
+  useEffect(() => {
+    if (originalSettings) {
+      const hasDataChanged = JSON.stringify(settings) !== JSON.stringify(originalSettings)
+      setHasChanges(hasDataChanged)
+    }
+  }, [settings, originalSettings])
 
   // Sync settings theme with context theme
   useEffect(() => {
@@ -78,17 +79,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) =
       ...prev,
       interface: {
         ...prev.interface,
-        theme: theme
+        defaultTheme: theme
       }
     }))
   }, [theme])
 
   const tabs = [
-    { id: 'profile', name: 'Profile & Security', icon: 'user', description: 'Manage your account and security settings' },
     { id: 'practice', name: 'Practice Settings', icon: 'building', description: 'Organization and practice information' },
     { id: 'billing', name: 'Billing & Financial', icon: 'dollar-sign', description: 'Billing rules and financial settings' },
-    { id: 'notifications', name: 'Notifications', icon: 'bell', description: 'Email and alert preferences' },
-    { id: 'interface', name: 'Interface', icon: 'settings', description: 'Display and language preferences' }
+    { id: 'notifications', name: 'System Notifications', icon: 'bell', description: 'System-wide notification settings' },
+    { id: 'interface', name: 'System Interface', icon: 'settings', description: 'System-wide display and language preferences' }
   ]
 
   const handleInputChange = (section: string, field: string, value: any) => {
@@ -99,7 +99,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) =
         [field]: value
       }
     }))
-    setHasChanges(true)
 
     // Show specific confirmations for important changes
     if (section === 'security' && field === 'twoFactorEnabled') {
@@ -150,141 +149,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) =
   const handleSave = () => {
     // In a real application, this would save to a backend
     console.log('Saving settings:', settings)
+    setOriginalSettings(JSON.parse(JSON.stringify(settings)))
     setHasChanges(false)
     showConfirmation('success', 'Settings saved successfully!')
   }
 
   const handleReset = () => {
-    // Reset to default values
+    // Reset to original values
+    if (originalSettings) {
+      setSettings(JSON.parse(JSON.stringify(originalSettings)))
+    }
     setHasChanges(false)
-    showConfirmation('info', 'Settings reset to default values')
+    showConfirmation('info', 'Settings reset to original values')
   }
 
-  const renderProfileSettings = () => (
-    <div className="space-y-6">
-      {/* Profile Information */}
-      <div className="settings-section">
-        <h3 className="settings-section-title">Profile Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="settings-field">
-            <label className="settings-label">Full Name</label>
-            <input
-              type="text"
-              value={settings.profile.fullName}
-              onChange={(e) => handleInputChange('profile', 'fullName', e.target.value)}
-              className="settings-input"
-            />
-          </div>
-          <div className="settings-field">
-            <label className="settings-label">Email Address</label>
-            <input
-              type="email"
-              value={settings.profile.email}
-              onChange={(e) => handleInputChange('profile', 'email', e.target.value)}
-              className="settings-input"
-            />
-          </div>
-          <div className="settings-field">
-            <label className="settings-label">Role</label>
-            <select
-              value={settings.profile.role}
-              onChange={(e) => handleInputChange('profile', 'role', e.target.value)}
-              className="settings-select"
-            >
-              <option value="Administrator">Administrator</option>
-              <option value="Billing Manager">Billing Manager</option>
-              <option value="Billing Specialist">Billing Specialist</option>
-              <option value="Field Technician">Field Technician</option>
-            </select>
-          </div>
-          <div className="settings-field">
-            <label className="settings-label">Department</label>
-            <select
-              value={settings.profile.department}
-              onChange={(e) => handleInputChange('profile', 'department', e.target.value)}
-              className="settings-select"
-            >
-              <option value="Billing">Billing</option>
-              <option value="Administration">Administration</option>
-              <option value="Field Operations">Field Operations</option>
-              <option value="IT">IT</option>
-            </select>
-          </div>
-          <div className="settings-field">
-            <label className="settings-label">Phone Number</label>
-            <input
-              type="tel"
-              value={settings.profile.phone}
-              onChange={(e) => handleInputChange('profile', 'phone', e.target.value)}
-              className="settings-input"
-              placeholder="(555) 123-4567"
-            />
-          </div>
-          <div className="settings-field">
-            <label className="settings-label">Timezone</label>
-            <select
-              value={settings.profile.timezone}
-              onChange={(e) => handleInputChange('profile', 'timezone', e.target.value)}
-              className="settings-select"
-            >
-              <option value="America/New_York">Eastern Time</option>
-              <option value="America/Chicago">Central Time</option>
-              <option value="America/Denver">Mountain Time</option>
-              <option value="America/Los_Angeles">Pacific Time</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Security Settings */}
-      <div className="settings-section">
-        <h3 className="settings-section-title">Security Settings</h3>
-        <div className="space-y-4">
-          <div className="settings-toggle">
-            <div>
-              <label className="settings-label">Two-Factor Authentication</label>
-              <p className="settings-description">Add an extra layer of security to your account</p>
-            </div>
-            <label className={`settings-switch ${settings.security.twoFactorEnabled ? 'settings-switch-active' : ''}`}>
-              <input
-                type="checkbox"
-                checked={settings.security.twoFactorEnabled}
-                onChange={(e) => handleInputChange('security', 'twoFactorEnabled', e.target.checked)}
-              />
-              <span className="settings-slider"></span>
-            </label>
-          </div>
-          <div className="settings-field">
-            <label className="settings-label">Session Timeout (minutes)</label>
-            <select
-              value={settings.security.sessionTimeout}
-              onChange={(e) => handleInputChange('security', 'sessionTimeout', parseInt(e.target.value))}
-              className="settings-select"
-            >
-              <option value={15}>15 minutes</option>
-              <option value={30}>30 minutes</option>
-              <option value={60}>1 hour</option>
-              <option value={120}>2 hours</option>
-            </select>
-          </div>
-          <div className="settings-toggle">
-            <div>
-              <label className="settings-label">Login Notifications</label>
-              <p className="settings-description">Get notified when someone logs into your account</p>
-            </div>
-            <label className={`settings-switch ${settings.security.loginNotifications ? 'settings-switch-active' : ''}`}>
-              <input
-                type="checkbox"
-                checked={settings.security.loginNotifications}
-                onChange={(e) => handleInputChange('security', 'loginNotifications', e.target.checked)}
-              />
-              <span className="settings-slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
 
   const renderPracticeSettings = () => (
     <div className="space-y-6">
@@ -659,8 +537,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) =
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'profile':
-        return renderProfileSettings()
       case 'practice':
         return renderPracticeSettings()
       case 'billing':
@@ -670,7 +546,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) =
       case 'interface':
         return renderInterfaceSettings()
       default:
-        return renderProfileSettings()
+        return renderPracticeSettings()
     }
   }
 
@@ -681,7 +557,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ isOpen = true, onClose }) =
       {/* Header */}
       <div className="settings-page-header bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="settings-page-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="settings-page-header-inner flex items-center justify-between h-16">
+          <div className="settings-page-header-inner flex items-center justify-between py-6">
             <div className="settings-page-header-left flex items-center space-x-4">
               <div className="settings-page-title-section">
                 <h1 className="settings-page-title text-xl font-semibold text-gray-900 dark:text-white">

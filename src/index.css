@@ -1129,7 +1129,7 @@ body {
 
 /* HEDIS Landing Page Styles */
 .hedis-landing-page {
-  @apply max-w-7xl mx-auto p-6 space-y-8;
+  @apply min-h-screen bg-gray-50 dark:bg-gray-900;
 }
 
 .hedis-header {
@@ -1515,18 +1515,34 @@ body {
   @apply text-green-400 hover:text-green-600 dark:hover:text-green-300;
 }
 
+/* Desktop HEDIS header layout */
+@media (min-width: 640px) {
+  .hedis-header-main {
+    @apply items-center justify-between py-6 !important;
+  }
+  
+  .hedis-header-title-section {
+    @apply flex-shrink-0;
+  }
+  
+  .hedis-header-right {
+    @apply flex-shrink-0;
+  }
+}
+
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
-  .hedis-header {
-    @apply flex-col items-start;
+  /* Mobile-friendly HEDIS header layout */
+  .hedis-header-main {
+    @apply py-6;
   }
   
-  .hedis-greeting-section {
-    @apply w-full;
+  .hedis-header-title-section h1 {
+    @apply text-lg leading-tight;
   }
   
-  .hedis-role-badge {
-    @apply w-full bg-blue-100 dark:bg-blue-900;
+  .hedis-header-right {
+    @apply mt-4;
   }
   
   .hedis-date-section {
@@ -1534,6 +1550,14 @@ body {
   }
   
   .hedis-date-card {
+    @apply w-full;
+  }
+  
+  .hedis-header {
+    @apply flex-col items-start;
+  }
+  
+  .hedis-greeting-section {
     @apply w-full;
   }
   

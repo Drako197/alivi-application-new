@@ -208,11 +208,11 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ isOpen = true, onClose }) => 
       {/* Header */}
       <div className="reports-page-header bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="reports-page-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="reports-page-header-inner flex items-center justify-between h-16">
+          <div className="reports-page-header-inner flex items-center justify-between py-6">
             <div className="reports-page-header-left flex items-center space-x-4">
               <div className="reports-page-title-section">
                 <h1 className="reports-page-title text-xl font-semibold text-gray-900 dark:text-white">
-                  Reports & Analytics
+                  Reports
                 </h1>
                 <p className="reports-page-subtitle text-sm text-gray-500 dark:text-gray-400">
                   Welcome back, {user?.fullName || 'User'}
@@ -267,7 +267,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ isOpen = true, onClose }) => 
       </div>
 
       {/* Main Content */}
-      <div className="reports-page-main-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="reports-page-main-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mobile View Selector - Only visible on mobile */}
         <div className="reports-page-mobile-view-selector sm:hidden mb-6">
           <div className="reports-page-mobile-view-tabs flex space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">

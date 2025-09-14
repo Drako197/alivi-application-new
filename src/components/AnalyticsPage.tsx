@@ -195,7 +195,7 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ isOpen = true, onClose })
       {/* Header */}
       <div className="analytics-page-header bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="analytics-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="analytics-header-main flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-0 sm:h-16 space-y-4 sm:space-y-0">
+          <div className="analytics-header-main flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 space-y-4 sm:space-y-0">
             {/* Title Section - Full Width on Mobile */}
             <div className="analytics-header-title-section w-full sm:w-auto">
               <h1 className="analytics-page-title text-xl font-semibold text-gray-900 dark:text-white">
@@ -244,7 +244,7 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ isOpen = true, onClose })
       </div>
 
       {/* Main Content */}
-      <div className="analytics-page-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:pb-6">
+      <div className="analytics-page-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="analytics-widgets-grid grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* Executive Overview - Full Width */}
           <div className="analytics-executive-overview-widget lg:col-span-2 xl:col-span-3">

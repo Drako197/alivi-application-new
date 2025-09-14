@@ -408,7 +408,7 @@ const UsersPage: React.FC<UsersPageProps> = ({ isOpen = true, onClose }) => {
       {/* Header */}
       <div className="users-page-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="users-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="users-header-main py-4">
+          <div className="users-header-main py-6">
             <div className="users-header-title-section">
               <h1 className="users-page-title text-2xl font-bold text-gray-900 dark:text-white">
                 User Management
@@ -519,7 +519,7 @@ const UsersPage: React.FC<UsersPageProps> = ({ isOpen = true, onClose }) => {
       )}
 
       {/* Main Content */}
-      <div className="users-page-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="users-page-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Users Grid */}
         <div className="users-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredUsers.map((user) => (

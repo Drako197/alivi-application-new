@@ -262,9 +262,10 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
         </div>
       </div>
 
-
-      {/* Category Filters */}
-      <div className="pic-categories">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Category Filters */}
+        <div className="pic-categories">
         <div className="pic-categories-container">
           {categories.map((category) => (
             <button
@@ -358,6 +359,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
             ))}
           </div>
         )}
+      </div>
       </div>
       
       {/* M.I.L.A. AI Assistant */}

@@ -151,6 +151,11 @@ export default function HelperModal({
     setShowExampleQuestions(true)
     console.log('MILA storage cleared for testing')
   }
+
+  // Make clearMILAStorage available globally for console testing
+  if (import.meta.env.DEV) {
+    (window as any).clearMILAStorage = clearMILAStorage
+  }
   
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')

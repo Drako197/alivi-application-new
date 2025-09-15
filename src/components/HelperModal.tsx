@@ -145,6 +145,7 @@ export default function HelperModal({
   const [showSettings, setShowSettings] = useState(false)
   const [hasShownSuggestions, setHasShownSuggestions] = useState(false)
   const [hasWelcomedUser, setHasWelcomedUser] = useState(false)
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
   const [conversationContext, setConversationContext] = useState<{
     lastCode?: string
     lastTopic?: string
@@ -240,11 +241,16 @@ export default function HelperModal({
     }
   }, [isOpen, currentField, currentStep, formData])
 
-  // Check if user has been welcomed in this session
+  // Check if user has been welcomed and has interacted before
   useEffect(() => {
-    const sessionWelcomed = sessionStorage.getItem('mila_welcomed_user')
-    if (sessionWelcomed === 'true') {
+    const hasBeenWelcomed = localStorage.getItem('mila_welcomed_user')
+    const hasInteracted = localStorage.getItem('mila_user_interacted')
+    
+    if (hasBeenWelcomed === 'true') {
       setHasWelcomedUser(true)
+    }
+    if (hasInteracted === 'true') {
+      setHasUserInteracted(true)
     }
   }, [])
 
@@ -371,7 +377,7 @@ export default function HelperModal({
       
       // Mark user as welcomed for this session
       setHasWelcomedUser(true)
-      sessionStorage.setItem('mila_welcomed_user', 'true')
+      localStorage.setItem('mila_welcomed_user', 'true')
       
       // Show proactive suggestions after a short delay
       // DISABLED: Proactive suggestions turned off as requested
@@ -424,10 +430,12 @@ export default function HelperModal({
         if (!hasWelcomedUser) {
           const generalWelcome = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
           addMessage('assistant', generalWelcome, 'fade-in')
-        } else {
+        } else if (!hasUserInteracted) {
+          // Only show repeated greeting if user hasn't interacted yet
           const contextualMessage = `I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
           addMessage('assistant', contextualMessage, 'fade-in')
         }
+        // If user has interacted before, don't show any greeting
       }
     } catch (error) {
       console.error('Error loading predictive suggestions:', error)
@@ -436,10 +444,11 @@ export default function HelperModal({
       if (!hasWelcomedUser) {
         const fallbackMessage = `Hi there, ${demoName}! I'm M.I.L.A., your Medical Intelligence & Learning Assistant. I'm here to help with your medical billing questions!`
         addMessage('assistant', fallbackMessage, 'fade-in')
-      } else {
+      } else if (!hasUserInteracted) {
         const fallbackMessage = `I'm here to help with your medical billing questions!`
         addMessage('assistant', fallbackMessage, 'fade-in')
       }
+      // If user has interacted before, don't show any greeting
     }
   }
 
@@ -1134,6 +1143,12 @@ export default function HelperModal({
 
     // Record the query for personalization
     PersonalizationService.recordQuery(userInput, 'general', true, 0)
+
+    // Mark user as having interacted with MILA
+    if (!hasUserInteracted) {
+      setHasUserInteracted(true)
+      localStorage.setItem('mila_user_interacted', 'true')
+    }
 
     setIsTyping(true)
     

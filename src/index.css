@@ -3555,6 +3555,18 @@ select {
   animation: stepCompletedPulse 2s ease-in-out infinite;
 }
 
+/* PIC Form Progress Container */
+.pic-form-progress {
+  @apply flex-1 flex justify-center mb-6;
+}
+
+/* Mobile optimizations for PIC form progress */
+@media (max-width: 768px) {
+  .pic-form-progress {
+    @apply mb-4;
+  }
+}
+
 @keyframes stepCompletedPulse {
   0%, 100% {
     transform: scale(1);

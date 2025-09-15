@@ -3351,9 +3351,14 @@ export default function HEDISLandingPage({
     // Ensure we have valid data
     const chartData = data && data.length > 0 ? data : [50, 55, 60, 45, 70, 65, 80, 75, 85, 90, 88, 92, 87, 95, 89, 93, 91, 88, 94, 96, 89, 92, 87, 90, 93, 88, 91, 89, 94, 87]
     
+    // Debug logging
+    console.log('LineChart Debug:', { data, chartData, title, color })
+    
     return (
       <div className="hedis-chart-container">
         <h4 className="hedis-chart-title text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">{title}</h4>
+        {/* Debug info */}
+        <div className="text-xs text-gray-500 mb-2">Data points: {chartData.length}, Sample: {chartData.slice(0, 3).join(', ')}</div>
         <div className="hedis-chart-content h-40 flex items-end space-x-1 relative">
           {/* Chart background grid lines */}
           <div className="absolute inset-0 flex flex-col justify-between">
@@ -3365,7 +3370,7 @@ export default function HEDISLandingPage({
           {chartData.map((value, index) => (
             <div key={index} className="hedis-chart-bar flex-1 bg-gray-100 dark:bg-gray-700 rounded-t relative group">
               <div 
-                className={`hedis-chart-fill bg-gradient-to-t from-${color}-500 to-${color}-400 rounded-t transition-all duration-700 ease-out hover:from-${color}-600 hover:to-${color}-500`}
+                className="hedis-chart-fill bg-gradient-to-t from-blue-500 to-blue-400 rounded-t transition-all duration-700 ease-out hover:from-blue-600 hover:to-blue-500"
                 style={{ height: `${Math.max(value, 5)}%` }}
               />
               {/* Hover tooltip */}

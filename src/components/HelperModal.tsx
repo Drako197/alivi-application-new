@@ -175,6 +175,7 @@ export default function HelperModal({
   const [hasWelcomedUser, setHasWelcomedUser] = useState(false)
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
   const [showExampleQuestions, setShowExampleQuestions] = useState(false)
+  const [processingExampleQuestion, setProcessingExampleQuestion] = useState<string | null>(null)
   const [conversationContext, setConversationContext] = useState<{
     lastCode?: string
     lastTopic?: string
@@ -374,13 +375,38 @@ export default function HelperModal({
     }, 1500)
   }
 
-  const handleExampleQuestionClick = (question: string) => {
+  const handleExampleQuestionClick = async (question: string) => {
+    setProcessingExampleQuestion(question)
     setInputValue(question)
     setShowExampleQuestions(false)
-    // Focus the input field
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 100)
+    
+    // Automatically submit the question to show how MILA works
+    setTimeout(async () => {
+      // Simulate the form submission
+      const userInput = question.trim()
+      setInputValue('')
+
+      // Record the query for personalization
+      PersonalizationService.recordQuery(userInput, 'general', true, 0)
+
+      // Mark user as having interacted with MILA
+      if (!hasUserInteracted) {
+        setHasUserInteracted(true)
+        localStorage.setItem('mila_user_interacted', 'true')
+      }
+      
+      // Hide example questions when user starts interacting
+      setShowExampleQuestions(false)
+
+      setIsTyping(true)
+      
+      // Simulate AI processing time with typing animation
+      setTimeout(async () => {
+        await processUserMessage(userInput)
+        setIsTyping(false)
+        setProcessingExampleQuestion(null)
+      }, 1000)
+    }, 500) // Small delay to show the question in the input field first
   }
 
   // Auto-scroll to bottom when new messages are added
@@ -1870,18 +1896,23 @@ export default function HelperModal({
                 <div className="grid grid-cols-1 gap-2">
                   <button
                     onClick={() => handleExampleQuestionClick("What is the ICD-10 code for diabetes?")}
-                    className="example-question-btn w-full text-left p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-md hover:bg-blue-50 dark:hover:bg-blue-900/20 group"
+                    disabled={processingExampleQuestion === "What is the ICD-10 code for diabetes?"}
+                    className="example-question-btn w-full text-left p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-md hover:bg-blue-50 dark:hover:bg-blue-900/20 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
-                        <Icon name="search" size={14} className="text-blue-600 dark:text-blue-400" />
+                        {processingExampleQuestion === "What is the ICD-10 code for diabetes?" ? (
+                          <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                        ) : (
+                          <Icon name="search" size={14} className="text-blue-600 dark:text-blue-400" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">
-                          Medical Codes
+                          {processingExampleQuestion === "What is the ICD-10 code for diabetes?" ? "Processing..." : "Medical Codes"}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          "What is the ICD-10 code for diabetes?"
+                          {processingExampleQuestion === "What is the ICD-10 code for diabetes?" ? "Getting MILA's response..." : '"What is the ICD-10 code for diabetes?"'}
                         </p>
                       </div>
                       <div className="flex-shrink-0">
@@ -1892,18 +1923,23 @@ export default function HelperModal({
 
                   <button
                     onClick={() => handleExampleQuestionClick("How do I submit a claim for eye exam?")}
-                    className="example-question-btn w-full text-left p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500 transition-all duration-200 hover:shadow-md hover:bg-green-50 dark:hover:bg-green-900/20 group"
+                    disabled={processingExampleQuestion === "How do I submit a claim for eye exam?"}
+                    className="example-question-btn w-full text-left p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500 transition-all duration-200 hover:shadow-md hover:bg-green-50 dark:hover:bg-green-900/20 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
-                        <Icon name="file-text" size={14} className="text-green-600 dark:text-green-400" />
+                        {processingExampleQuestion === "How do I submit a claim for eye exam?" ? (
+                          <div className="animate-spin w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full"></div>
+                        ) : (
+                          <Icon name="file-text" size={14} className="text-green-600 dark:text-green-400" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-green-700 dark:group-hover:text-green-300">
-                          Form Help
+                          {processingExampleQuestion === "How do I submit a claim for eye exam?" ? "Processing..." : "Form Help"}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          "How do I submit a claim for eye exam?"
+                          {processingExampleQuestion === "How do I submit a claim for eye exam?" ? "Getting MILA's response..." : '"How do I submit a claim for eye exam?"'}
                         </p>
                       </div>
                       <div className="flex-shrink-0">
@@ -1914,18 +1950,23 @@ export default function HelperModal({
 
                   <button
                     onClick={() => handleExampleQuestionClick("What does PFT mean in medical billing?")}
-                    className="example-question-btn w-full text-left p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500 transition-all duration-200 hover:shadow-md hover:bg-purple-50 dark:hover:bg-purple-900/20 group"
+                    disabled={processingExampleQuestion === "What does PFT mean in medical billing?"}
+                    className="example-question-btn w-full text-left p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500 transition-all duration-200 hover:shadow-md hover:bg-purple-50 dark:hover:bg-purple-900/20 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
-                        <Icon name="help-circle" size={14} className="text-purple-600 dark:text-purple-400" />
+                        {processingExampleQuestion === "What does PFT mean in medical billing?" ? (
+                          <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full"></div>
+                        ) : (
+                          <Icon name="help-circle" size={14} className="text-purple-600 dark:text-purple-400" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-300">
-                          Terminology
+                          {processingExampleQuestion === "What does PFT mean in medical billing?" ? "Processing..." : "Terminology"}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          "What does PFT mean in medical billing?"
+                          {processingExampleQuestion === "What does PFT mean in medical billing?" ? "Getting MILA's response..." : '"What does PFT mean in medical billing?"'}
                         </p>
                       </div>
                       <div className="flex-shrink-0">

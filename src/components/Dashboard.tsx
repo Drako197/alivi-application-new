@@ -1107,7 +1107,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="text-xs bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 px-2 py-1 rounded-full font-medium">
-                      95% success
+                      95%
                     </div>
                   </div>
                   <div className="space-y-3">

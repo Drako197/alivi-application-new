@@ -411,10 +411,16 @@ export default function HelperModal({
   // Add predictive suggestions when assistant opens (only once per session)
   useEffect(() => {
     console.log('Predictive suggestions useEffect - isOpen:', isOpen, 'currentForm:', currentForm, 'currentField:', currentField, 'hasShownSuggestions:', hasShownSuggestions, 'hasUserInteracted:', hasUserInteracted)
-    if (isOpen && currentForm && currentField && !hasShownSuggestions && !hasUserInteracted) {
-      console.log('Loading predictive suggestions...')
-      loadPredictiveSuggestions()
-      setHasShownSuggestions(true)
+    if (isOpen && currentForm && currentField && !hasShownSuggestions) {
+      // Only load suggestions if user hasn't interacted yet
+      if (!hasUserInteracted) {
+        console.log('Loading predictive suggestions...')
+        loadPredictiveSuggestions()
+        setHasShownSuggestions(true)
+      } else {
+        console.log('User has interacted - skipping predictive suggestions')
+        setHasShownSuggestions(true) // Mark as shown to prevent re-triggering
+      }
     }
   }, [isOpen, currentForm, currentField, currentStep, hasShownSuggestions, hasUserInteracted])
 

@@ -1047,7 +1047,20 @@ export default function Dashboard() {
                       currentStep={1}
                       onNavigate={handleMILANavigation}
                     />
+                  
+                  {/* MILA AI Assistant Image */}
+                  <div className="mila-assistant-image-container mt-6">
+                    <img 
+                      src="/images/mila-assistant-card.png" 
+                      alt="MILA AI Assistant" 
+                      className="mila-assistant-image w-full h-auto rounded-lg opacity-90 hover:opacity-100 transition-opacity duration-300"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
                   </div>
+                </div>
                   </>
                 )}
               </div>

@@ -1067,7 +1067,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="text-xs bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 px-2 py-1 rounded-full font-medium">
-                      {dashboardStats.completedScreenings} completed
+                      {dashboardStats.completedScreenings > 99 ? '99+' : dashboardStats.completedScreenings}
                     </div>
                   </div>
                 <div className="space-y-3">
@@ -1107,7 +1107,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="text-xs bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 px-2 py-1 rounded-full font-medium">
-                      95% success rate
+                      95% success
                     </div>
                   </div>
                   <div className="space-y-3">

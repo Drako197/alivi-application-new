@@ -415,9 +415,6 @@ export default function HelperModal({
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1]
-      console.log('Scroll effect - lastMessage:', lastMessage.type, 'hasUserMessageBefore:', messages.some((msg, index) => 
-        index < messages.length - 1 && msg.type === 'user'
-      ))
       
       // Only scroll and highlight if the last message is from the assistant AND it's not the initial welcome
       if (lastMessage.type === 'assistant' && lastAssistantMessageRef.current) {
@@ -427,15 +424,12 @@ export default function HelperModal({
         )
         
         if (hasUserMessageBefore) {
-          console.log('Scrolling and highlighting new assistant response')
           setTimeout(() => {
             const messagesContainer = document.querySelector('.ai-helper-messages')
             if (messagesContainer && lastAssistantMessageRef.current) {
               const containerHeight = messagesContainer.clientHeight
               const messageTop = lastAssistantMessageRef.current.offsetTop
               const scrollPosition = messageTop - (containerHeight / 2)
-              
-              console.log('Scrolling to position:', scrollPosition, 'messageTop:', messageTop, 'containerHeight:', containerHeight)
               
               messagesContainer.scrollTo({
                 top: Math.max(0, scrollPosition),
@@ -449,8 +443,6 @@ export default function HelperModal({
               }, 10000) // 10 seconds
             }
           }, 100) // Small delay to ensure the message is rendered
-        } else {
-          console.log('Not scrolling - no user message before this assistant message')
         }
       }
     }

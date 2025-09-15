@@ -3567,6 +3567,77 @@ select {
   }
 }
 
+/* PIC Step Indicators Styling */
+.pic-step-indicators-container {
+  @apply flex items-center justify-center space-x-4 w-full;
+}
+
+.pic-step-item {
+  @apply flex flex-col items-center space-y-2;
+}
+
+.pic-step-number {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-all duration-200;
+}
+
+.pic-step-label {
+  @apply text-xs font-medium text-center;
+}
+
+/* PIC Step States - Active */
+.pic-step-active .pic-step-number {
+  @apply bg-blue-600 border-blue-600 text-white shadow-lg;
+}
+
+.pic-step-active .pic-step-label {
+  @apply text-blue-600 dark:text-blue-400 font-medium;
+}
+
+/* PIC Step States - Completed */
+.pic-step-completed .pic-step-number {
+  @apply bg-gradient-to-br from-green-400 to-green-600 border-green-500 text-white shadow-md;
+}
+
+.pic-step-completed .pic-step-label {
+  @apply text-green-600 dark:text-green-400 font-medium;
+}
+
+/* PIC Step States - Inactive */
+.pic-step-inactive .pic-step-number {
+  @apply bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400;
+}
+
+.pic-step-inactive .pic-step-label {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+/* Mobile optimizations for PIC step indicators */
+@media (max-width: 768px) {
+  .pic-step-indicators-container {
+    @apply space-x-2 px-2;
+  }
+  
+  .pic-step-item {
+    @apply space-y-1;
+  }
+  
+  .pic-step-number {
+    @apply w-10 h-10 text-base;
+  }
+}
+
+@media (max-width: 640px) {
+  .pic-step-label {
+    @apply text-xs;
+  }
+}
+
+@media (max-width: 480px) {
+  .pic-step-label {
+    @apply text-xs max-w-16 text-center leading-tight;
+  }
+}
+
 @keyframes stepCompletedPulse {
   0%, 100% {
     transform: scale(1);

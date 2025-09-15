@@ -2011,23 +2011,6 @@ export default function HelperModal({
               {import.meta.env.DEV && (
                 <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 flex space-x-2">
                   <button
-                    onClick={async () => {
-                      try {
-                        addMessage('assistant', '🧪 Testing Gemini AI integration...', 'fade-in')
-                        const testResult = await AIAssistantService.testGeminiIntegration()
-                        addMessage('assistant', testResult.message, 'fade-in')
-                        if (testResult.usageStats) {
-                          addMessage('assistant', `📊 Usage Stats: ${testResult.usageStats.requestsThisMinute}/15 requests this minute`, 'fade-in')
-                        }
-                      } catch (error) {
-                        addMessage('assistant', `❌ Test failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'fade-in')
-                      }
-                    }}
-                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    🧪 Test Gemini AI
-                  </button>
-                  <button
                     onClick={clearMILAStorage}
                     className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
                   >

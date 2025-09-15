@@ -3340,6 +3340,85 @@ export default function HEDISLandingPage({
   // State for current view and breadcrumb
   const [currentView, setCurrentView] = useState<'dashboard' | 'screening'>('dashboard')
   const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([])
+  
+  // Modern dashboard state
+  const [dashboardLoading, setDashboardLoading] = useState(true)
+  const [metricsLoading, setMetricsLoading] = useState(false)
+  const [selectedTimeRange, setSelectedTimeRange] = useState('30D')
+
+  // Chart Components
+  const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => (
+    <div className="hedis-chart-container">
+      <h4 className="hedis-chart-title text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">{title}</h4>
+      <div className="hedis-chart-content h-32 flex items-end space-x-1">
+        {data.map((value, index) => (
+          <div key={index} className="hedis-chart-bar flex-1 bg-gray-200 dark:bg-gray-700 rounded-t">
+            <div 
+              className={`hedis-chart-fill bg-${color}-500 rounded-t transition-all duration-500 ease-out`}
+              style={{ height: `${value}%` }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const BarChart = ({ data, title, color = "green" }: { data: number[], title: string, color?: string }) => (
+    <div className="hedis-chart-container">
+      <h4 className="hedis-chart-title text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">{title}</h4>
+      <div className="hedis-chart-content h-32 flex items-end space-x-1">
+        {data.map((value, index) => (
+          <div key={index} className="hedis-chart-bar flex-1 bg-gray-200 dark:bg-gray-700 rounded">
+            <div 
+              className={`hedis-chart-fill bg-${color}-500 rounded transition-all duration-500 ease-out`}
+              style={{ height: `${value}%` }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  // Skeleton Loading Component
+  const SkeletonCard = ({ className = "", height = "h-32" }: { className?: string, height?: string }) => (
+    <div className={`hedis-skeleton-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+      <div className="animate-pulse">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3"></div>
+            <div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+            </div>
+          </div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+        </div>
+        <div className={`bg-gray-200 dark:bg-gray-700 rounded ${height}`}></div>
+      </div>
+    </div>
+  )
+
+  // Get chart data based on selected time range
+  const getChartData = (range: string) => {
+    const baseData = {
+      '7D': {
+        screenings: [65, 72, 68, 85, 78, 92, 88],
+        quality: [78, 82, 85, 88, 90, 87, 92],
+        compliance: [85, 88, 87, 92, 89, 94, 91]
+      },
+      '30D': {
+        screenings: [70, 75, 82, 78, 85, 90, 88, 92, 87, 94, 89, 96, 91, 88, 85, 89, 92, 87, 90, 93, 88, 91, 86, 89, 92, 87, 90, 88, 91, 89],
+        quality: [82, 85, 87, 89, 91, 88, 92, 89, 94, 90, 87, 91, 88, 85, 89, 92, 87, 90, 88, 91, 89, 86, 88, 90, 87, 91, 89, 92, 88, 90],
+        compliance: [88, 90, 92, 89, 91, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87]
+      },
+      '90D': {
+        screenings: Array.from({length: 90}, (_, i) => 70 + Math.random() * 25),
+        quality: Array.from({length: 90}, (_, i) => 80 + Math.random() * 15),
+        compliance: Array.from({length: 90}, (_, i) => 85 + Math.random() * 10)
+      }
+    }
+    return baseData[range as keyof typeof baseData] || baseData['30D']
+  }
 
   // Function to update breadcrumbs based on current step
   const updateBreadcrumbs = (step: number, patientName?: string) => {
@@ -3388,6 +3467,32 @@ export default function HEDISLandingPage({
       }
     }
   }, [resetToLanding, onUpdateBreadcrumb])
+
+  // Load dashboard data
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setDashboardLoading(true)
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setDashboardLoading(false)
+    }
+    loadDashboardData()
+  }, [])
+
+  // Refresh metrics function
+  const refreshMetrics = async () => {
+    setMetricsLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 800))
+    setMetricsLoading(false)
+  }
+
+  // Get current chart data
+  const chartData = getChartData(selectedTimeRange)
+
+  // Handle M.I.L.A. navigation (placeholder)
+  const handleMILANavigation = (destination: string) => {
+    console.log('M.I.L.A. navigation to:', destination)
+  }
 
   const [screeningFormData, setScreeningFormData] = useState<{
     details: ScreeningDetails
@@ -4125,48 +4230,54 @@ export default function HEDISLandingPage({
     )
   }
 
-  // Original HEDIS landing page content
+  // Modern HEDIS Analytics Dashboard
   return (
-    <div className="hedis-landing-page">
-      {/* Header Section */}
-      <div className="hedis-page-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="hedis-header-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="hedis-header-main flex items-center justify-between py-6 h-20">
-            <div className="hedis-header-title-section">
-              <h1 className="hedis-page-title text-xl font-semibold text-gray-900 dark:text-white">
-                Welcome to your HEDIS Patient Screening, Demo User!
+    <div className="hedis-analytics-dashboard">
+      {/* Modern Header Section */}
+      <div className="hedis-modern-header bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 border-b border-blue-200 dark:border-blue-700">
+        <div className="hedis-header-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="hedis-header-content flex items-center justify-between py-6 h-20">
+            <div className="hedis-header-left">
+              <h1 className="hedis-main-title text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                HEDIS Quality Dashboard
               </h1>
-              <div className="hedis-page-subtitle flex items-center space-x-2 mt-1">
+              <div className="hedis-header-subtitle flex items-center space-x-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  HEDIS Quality Measures
+                  Welcome back, {user?.fullName || 'User'}
                 </span>
-                <span className="hedis-role-badge px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
+                <span className="hedis-user-role-badge px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
                   {userRole}
                 </span>
+                <div className="hedis-live-indicator flex items-center text-xs text-green-600 dark:text-green-400">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+                  Live Data
+                </div>
               </div>
             </div>
             <div className="hedis-header-right flex items-center space-x-4">
-              <div className="hedis-date-section">
-                <div className="hedis-date-card">
-                  <div className="hedis-date-icon">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="hedis-date-content">
-                    <div className="hedis-date-label">Today</div>
-                    <div className="hedis-date-value">{formatDate(currentTime)}</div>
+              <div className="hedis-date-display">
+                <div className="hedis-date-card bg-white/50 dark:bg-gray-800/50 rounded-lg p-3 border border-white/20">
+                  <div className="flex items-center space-x-2">
+                    <Icon name="calendar" size={18} className="text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <div className="hedis-date-label text-xs text-gray-500 dark:text-gray-400">Today</div>
+                      <div className="hedis-date-value text-sm font-medium text-gray-900 dark:text-white">{formatDate(currentTime)}</div>
+                    </div>
                   </div>
                 </div>
               </div>
+              <button className="hedis-refresh-btn p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-white/20 hover:bg-white/70 dark:hover:bg-gray-700/50 transition-colors">
+                <Icon name="refresh-cw" size={18} className="text-gray-600 dark:text-gray-400" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Dashboard Content Container */}
-      <div className="dashboard-content">
+      {/* Modern Dashboard Content */}
+      <div className="hedis-dashboard-content">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
         {/* Integrated Alerts */}
         {showSaveAlert && (
           <div className="hedis-integrated-alert show">
@@ -4224,89 +4335,278 @@ export default function HEDISLandingPage({
           </div>
         )}
 
-        {/* Primary Action - New Patient Screening */}
-        <div className="hedis-primary-action-section">
-          <div className="hedis-primary-action-card">
-            <div className="hedis-primary-action-header">
-              <div className="hedis-primary-action-icon">
-                <div className="hedis-icon-badge">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
+        {/* Modern KPI Overview Section */}
+        <div className="hedis-kpi-section mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {dashboardLoading ? (
+              <>
+                <SkeletonCard height="h-24" />
+                <SkeletonCard height="h-24" />
+                <SkeletonCard height="h-24" />
+                <SkeletonCard height="h-24" />
+              </>
+            ) : (
+              <>
+                {/* Total Screenings Card */}
+                <div className="hedis-kpi-card group bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-blue-100 dark:bg-blue-800 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-700 transition-colors">
+                      <Icon name="activity" size={24} className="text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="text-xs text-blue-600 dark:text-blue-400 font-medium px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded-full">
+                      +15% this month
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.completedPatientForms}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Screenings</p>
+                    <div className="mt-3 flex items-center text-xs text-blue-600 dark:text-blue-400">
+                      <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-1.5 mr-2">
+                        <div className="bg-blue-500 h-1.5 rounded-full" style={{width: '78%'}}></div>
+                      </div>
+                      <span>78% of target</span>
+                    </div>
+                  </div>
                 </div>
-                {getIcon('eye')}
-              </div>
-              <div className="hedis-primary-action-content">
-                <h2 className="hedis-primary-action-title">New Patient Screening</h2>
-                <p className="hedis-primary-action-description">
-                  Start a new patient screening form to collect comprehensive health data and assessments. 
-                  This is your primary workflow for patient evaluation and documentation.
-                </p>
-              </div>
-            </div>
-            <div className="hedis-primary-action-button">
-              <button 
-                className="hedis-hero-btn"
-                onClick={() => handleTaskClick('screening')}
-              >
-                Start New Screening
-              </button>
-            </div>
+
+                {/* Quality Compliance Card */}
+                <div className="hedis-kpi-card group bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-green-100 dark:bg-green-800 rounded-lg group-hover:bg-green-200 dark:group-hover:bg-green-700 transition-colors">
+                      <Icon name="shield-check" size={24} className="text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="text-xs text-green-600 dark:text-green-400 font-medium px-2 py-1 bg-green-100 dark:bg-green-800 rounded-full">
+                      Excellent
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">92%</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Quality Compliance</p>
+                    <div className="mt-3 flex items-center text-xs text-green-600 dark:text-green-400">
+                      <Icon name="trending-up" size={12} className="mr-1" />
+                      <span>Above industry standard</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Average Screening Time Card */}
+                <div className="hedis-kpi-card group bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-purple-100 dark:bg-purple-800 rounded-lg group-hover:bg-purple-200 dark:group-hover:bg-purple-700 transition-colors">
+                      <Icon name="clock" size={24} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="text-xs text-purple-600 dark:text-purple-400 font-medium px-2 py-1 bg-purple-100 dark:bg-purple-800 rounded-full">
+                      -2 min
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">12.5</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Avg. Screening Time (min)</p>
+                    <div className="mt-3 flex items-center text-xs text-purple-600 dark:text-purple-400">
+                      <Icon name="trending-down" size={12} className="mr-1" />
+                      <span>Improved efficiency</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pending Reviews Card */}
+                <div className="hedis-kpi-card group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-amber-100 dark:bg-amber-800 rounded-lg group-hover:bg-amber-200 dark:group-hover:bg-amber-700 transition-colors">
+                      <Icon name="eye" size={24} className="text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="text-xs text-amber-600 dark:text-amber-400 font-medium px-2 py-1 bg-amber-100 dark:bg-amber-800 rounded-full">
+                      {dashboardStats.savedPatientForms > 5 ? 'High' : 'Normal'}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.savedPatientForms}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Pending Reviews</p>
+                    <div className="mt-3 flex items-center text-xs text-amber-600 dark:text-amber-400">
+                      <Icon name="clock" size={12} className="mr-1" />
+                      <span>Avg. 1.2 days to review</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Secondary Actions and Quick Access - Horizontal Layout */}
-        <div className="hedis-secondary-actions-section">
-          <div className="hedis-secondary-actions-grid">
-            {/* HEDIS Reports */}
-            <div className="hedis-secondary-action-card">
-              <div className="hedis-secondary-action-header">
-                <div className="hedis-secondary-action-icon">
-                  {getIcon('chart-bar')}
-                </div>
-                <div className="hedis-secondary-action-content">
-                  <h3 className="hedis-secondary-action-title">HEDIS Reports</h3>
-                  <p className="hedis-secondary-action-description">
-                    Access comprehensive HEDIS reports and analytics for quality measurement and compliance tracking.
-                  </p>
-                </div>
-              </div>
-              <div className="hedis-secondary-action-button">
-                <button 
-                  className="hedis-secondary-btn"
-                  onClick={() => handleTaskClick('reports')}
-                >
-                  View Reports
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Access */}
-            <div className="hedis-dashboard-compact">
-              <h3 className="hedis-compact-title">Quick Access</h3>
-              <div className="hedis-compact-grid">
-                {dashboardCards.map((card) => (
-                  <div 
-                    key={card.id}
-                    className={`hedis-compact-card hedis-${card.id}-card group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
-                    onClick={() => handleFormCardClick(card.id)}
-                  >
-                    <div className={`hedis-compact-icon hedis-${card.id}-icon`}>
-                      {getIcon(card.icon)}
-                    </div>
-                    <div className="hedis-compact-content">
-                      <div className="hedis-compact-header">
-                        <span className="hedis-compact-number">{card.number}</span>
-                        <span className="hedis-compact-label">{card.label}</span>
-                      </div>
-                      <div className={`hedis-compact-badge ${card.id === 'completed' ? 'hedis-badge-view-only' : 'hedis-badge-continue-editing'}`}>
-                        <span>{card.id === 'completed' ? 'View Only' : 'Continue Editing'}</span>
-                        <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
+        {/* Performance Analytics Section */}
+        <div className="hedis-analytics-section mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {dashboardLoading ? (
+              <>
+                <SkeletonCard className="lg:col-span-2" height="h-64" />
+                <SkeletonCard height="h-64" />
+              </>
+            ) : (
+              <>
+                {/* Screening Trends Chart */}
+                <div className="hedis-chart-card lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="hedis-section-title text-lg font-semibold text-gray-900 dark:text-white">Screening Performance Trends</h3>
+                    <div className="hedis-time-range-buttons flex space-x-2">
+                      {['7D', '30D', '90D'].map((range) => (
+                        <button
+                          key={range}
+                          onClick={() => setSelectedTimeRange(range)}
+                          className={`hedis-time-range-btn px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                            selectedTimeRange === range
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {range}
+                        </button>
+                      ))}
                     </div>
                   </div>
+                  <div className="hedis-chart-wrapper mb-4">
+                    <LineChart data={chartData.screenings} title={`Screening Volume (${selectedTimeRange})`} color="blue" />
+                  </div>
+                  <div className="hedis-chart-metrics grid grid-cols-3 gap-4 text-center">
+                    <div className="hedis-metric">
+                      <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">87%</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Completion Rate</p>
+                    </div>
+                    <div className="hedis-metric">
+                      <p className="text-2xl font-bold text-green-600 dark:text-green-400">92%</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Quality Score</p>
+                    </div>
+                    <div className="hedis-metric">
+                      <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">12.5</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Avg. Time (min)</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* M.I.L.A. AI Assistant Card - Enhanced */}
+                <div className="hedis-mila-assistant-card bg-gradient-to-br from-blue-500 via-purple-600 to-purple-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center mb-4">
+                    <div className="p-2 bg-white/20 rounded-lg mr-3">
+                      <Icon name="bot" size={24} className="text-white" />
+                    </div>
+                    <h3 className="hedis-assistant-title text-lg font-semibold">M.I.L.A. AI Assistant</h3>
+                  </div>
+                  <p className="hedis-assistant-description text-sm text-blue-100 mb-6">
+                    Your Medical Intelligence & Learning Assistant for HEDIS quality measures and patient screening guidance.
+                  </p>
+                  <div className="hedis-assistant-features space-y-3 mb-6">
+                    <div className="flex items-center text-xs text-blue-100">
+                      <Icon name="search" size={12} className="mr-2" />
+                      <span>Quality measure lookup</span>
+                    </div>
+                    <div className="flex items-center text-xs text-blue-100">
+                      <Icon name="check-circle" size={12} className="mr-2" />
+                      <span>Screening validation</span>
+                    </div>
+                    <div className="flex items-center text-xs text-blue-100">
+                      <Icon name="brain" size={12} className="mr-2" />
+                      <span>Smart recommendations</span>
+                    </div>
+                  </div>
+                  <HelperButton 
+                    currentForm="HEDIS"
+                    currentField="dashboard"
+                    currentStep={1}
+                    onNavigate={handleMILANavigation}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Enhanced Primary Actions */}
+        <div className="hedis-primary-actions-section mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* New Patient Screening - Enhanced */}
+            <div className="hedis-primary-action-card group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+                    <Icon name="user-plus" size={24} className="text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="hedis-action-title text-lg font-semibold text-gray-900 dark:text-white">New Screening</h3>
+                    <p className="hedis-action-subtitle text-sm text-gray-500 dark:text-gray-400">Start patient assessment</p>
+                  </div>
+                </div>
+                <div className="hedis-action-badge text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+                  Primary
+                </div>
+              </div>
+              <p className="hedis-action-description text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Begin a comprehensive HEDIS quality measure screening for a new patient.
+              </p>
+              <button 
+                className="hedis-primary-btn w-full group/button bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center"
+                onClick={() => handleTaskClick('screening')}
+              >
+                <span>Start New Screening</span>
+                <Icon name="arrow-right" size={16} className="ml-2 group-hover/button:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* HEDIS Reports */}
+            <div className="hedis-reports-card group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-green-300 dark:hover:border-green-600 transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
+                    <Icon name="bar-chart-3" size={24} className="text-green-600 dark:text-green-400" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="hedis-action-title text-lg font-semibold text-gray-900 dark:text-white">HEDIS Reports</h3>
+                    <p className="hedis-action-subtitle text-sm text-gray-500 dark:text-gray-400">Quality analytics</p>
+                  </div>
+                </div>
+                <div className="hedis-completion-counter text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">
+                  {dashboardStats.completedPatientForms} reports
+                </div>
+              </div>
+              <p className="hedis-action-description text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Access comprehensive HEDIS quality measure reports and compliance analytics.
+              </p>
+              <button 
+                className="hedis-secondary-btn w-full group/button bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg transition-colors flex items-center justify-center"
+                onClick={() => handleTaskClick('reports')}
+              >
+                <span>View Reports</span>
+                <Icon name="arrow-right" size={16} className="ml-2 group-hover/button:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Quick Access Dashboard */}
+            <div className="hedis-quick-access-card group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
+                    <Icon name="zap" size={24} className="text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="hedis-action-title text-lg font-semibold text-gray-900 dark:text-white">Quick Access</h3>
+                    <p className="hedis-action-subtitle text-sm text-gray-500 dark:text-gray-400">Continue work</p>
+                  </div>
+                </div>
+                <div className="hedis-saved-counter text-xs text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-1 rounded-full">
+                  {dashboardStats.savedPatientForms} saved
+                </div>
+              </div>
+              <p className="hedis-action-description text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Continue working on saved screenings or access frequently used forms.
+              </p>
+              <div className="hedis-quick-access-buttons space-y-2">
+                {dashboardCards.slice(0, 2).map((card) => (
+                  <button 
+                    key={card.id}
+                    className="hedis-quick-access-btn w-full text-left p-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors flex items-center justify-between"
+                    onClick={() => handleFormCardClick(card.id)}
+                  >
+                    <span>{card.label} ({card.number})</span>
+                    <Icon name="chevron-right" size={14} />
+                  </button>
                 ))}
               </div>
             </div>

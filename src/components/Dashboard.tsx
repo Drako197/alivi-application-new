@@ -864,7 +864,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> 
 
               {/* Enhanced KPI Cards with Animations */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -1539,7 +1539,7 @@ export default function Dashboard() {
         return <MobileProfile />
       case 'hedis':
         return (
-          <div className="mobile-main-content">
+          <div className="mobile-main-content pb-0">
             {mobileHEDISView === 'landing' ? (
               <div>
                 <HEDISLandingPage onUpdateBreadcrumb={setBreadcrumbPath} />

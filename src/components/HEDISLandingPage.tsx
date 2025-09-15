@@ -4563,13 +4563,12 @@ export default function HEDISLandingPage({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {dashboardLoading ? (
               <>
-                <SkeletonCard className="lg:col-span-2" height="h-64" />
-                <SkeletonCard height="h-64" />
+                <SkeletonCard className="lg:col-span-3" height="h-64" />
               </>
             ) : (
               <>
                 {/* Screening Trends Chart */}
-                <div className="hedis-chart-card lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="hedis-chart-card lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="hedis-section-title text-lg font-semibold text-gray-900 dark:text-white">Screening Performance Trends</h3>
                     <div className="hedis-time-range-buttons flex space-x-2">

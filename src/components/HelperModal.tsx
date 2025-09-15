@@ -185,6 +185,7 @@ export default function HelperModal({
   const [userPreferences, setUserPreferences] = useState<Record<string, any>>({})
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const lastAssistantMessageRef = useRef<HTMLDivElement>(null)
 
   // Create AI context for enhanced responses with memory integration
   const createAIContext = (): AIContext => {
@@ -409,9 +410,21 @@ export default function HelperModal({
     }, 500) // Small delay to show the question in the input field first
   }
 
-  // Auto-scroll to bottom when new messages are added
+  // Auto-scroll to the last assistant message when new assistant messages are added
   useEffect(() => {
-    messagesContainerRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1]
+      // Only scroll if the last message is from the assistant
+      if (lastMessage.type === 'assistant' && lastAssistantMessageRef.current) {
+        setTimeout(() => {
+          lastAssistantMessageRef.current?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          })
+        }, 100) // Small delay to ensure the message is rendered
+      }
+    }
   }, [messages])
 
   // Focus input when assistant opens
@@ -1639,9 +1652,12 @@ export default function HelperModal({
 
             {/* Messages */}
             <div className="ai-helper-messages flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message, index) => (
+              {messages.map((message, index) => {
+                const isLastAssistantMessage = message.type === 'assistant' && index === messages.length - 1
+                return (
                 <div
                   key={message.id}
+                  ref={isLastAssistantMessage ? lastAssistantMessageRef : null}
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-${message.animation || 'fade-in'}`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
@@ -1744,7 +1760,8 @@ export default function HelperModal({
                     </div>
                   </div>
                 </div>
-              ))}
+                )
+              })}
               
               {isTyping && (
                 <div className="flex justify-start animate-fade-in">

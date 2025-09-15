@@ -1017,47 +1017,46 @@ export default function Dashboard() {
                 </div>
 
                 {/* M.I.L.A. AI Assistant Card - Enhanced */}
-                <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-purple-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 desktop-mila-ai-assistant-card">
-                  <div className="flex items-center mb-4">
-                    <div className="p-2 bg-white/20 rounded-lg mr-3">
-                      <Icon name="bot" size={24} className="text-white" />
+                <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-purple-700 rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 desktop-mila-ai-assistant-card relative overflow-hidden">
+                  <div className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 bg-white/20 rounded-lg mr-3">
+                        <Icon name="bot" size={24} className="text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold">M.I.L.A. AI Assistant</h3>
                     </div>
-                    <h3 className="text-lg font-semibold">M.I.L.A. AI Assistant</h3>
+                    <p className="text-sm text-blue-100 mb-6">
+                      Your Medical Intelligence & Learning Assistant is ready to help with medical billing, codes, and form guidance.
+                    </p>
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center text-xs text-blue-100">
+                        <Icon name="zap" size={12} className="mr-2" />
+                        <span>Instant medical code lookup</span>
+                      </div>
+                      <div className="flex items-center text-xs text-blue-100">
+                        <Icon name="check-circle" size={12} className="mr-2" />
+                        <span>Real-time form validation</span>
+                      </div>
+                      <div className="flex items-center text-xs text-blue-100">
+                        <Icon name="brain" size={12} className="mr-2" />
+                        <span>Smart suggestions & insights</span>
+                      </div>
+                    </div>
+                      <HelperButton 
+                        currentForm="Dashboard"
+                        currentField="general"
+                        currentStep={1}
+                        onNavigate={handleMILANavigation}
+                      />
                   </div>
-                  <p className="text-sm text-blue-100 mb-6">
-                    Your Medical Intelligence & Learning Assistant is ready to help with medical billing, codes, and form guidance.
-                  </p>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-xs text-blue-100">
-                      <Icon name="zap" size={12} className="mr-2" />
-                      <span>Instant medical code lookup</span>
-                    </div>
-                    <div className="flex items-center text-xs text-blue-100">
-                      <Icon name="check-circle" size={12} className="mr-2" />
-                      <span>Real-time form validation</span>
-                    </div>
-                    <div className="flex items-center text-xs text-blue-100">
-                      <Icon name="brain" size={12} className="mr-2" />
-                      <span>Smart suggestions & insights</span>
-                    </div>
-                  </div>
-                    <HelperButton 
-                      currentForm="Dashboard"
-                      currentField="general"
-                      currentStep={1}
-                      onNavigate={handleMILANavigation}
-                    />
                   
-                  {/* MILA AI Assistant Image */}
-                  <div className="mila-assistant-image-container mt-6">
+                  {/* MILA AI Assistant Image - Full width at bottom */}
+                  <div className="mila-assistant-image-container absolute bottom-0 left-0 right-0">
                     <img 
                       src="/images/mila-assistant-card.png" 
                       alt="MILA AI Assistant" 
-                      className="mila-assistant-image w-full h-auto rounded-lg opacity-90 hover:opacity-100 transition-opacity duration-300"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
+                      className="mila-assistant-image w-full h-auto rounded-b-xl opacity-90 hover:opacity-100 transition-opacity duration-300"
+                      style={{ minHeight: '100px', backgroundColor: 'rgba(255,255,255,0.1)', border: '2px dashed rgba(255,255,255,0.3)' }}
                     />
                   </div>
                 </div>

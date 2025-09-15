@@ -3346,47 +3346,186 @@ export default function HEDISLandingPage({
   const [metricsLoading, setMetricsLoading] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState('30D')
 
-  // Chart Components
+  // Chart Components - Clean area chart with simplified data points
   const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
-    // Ensure we have valid data
-    const chartData = data && data.length > 0 ? data : [50, 55, 60, 45, 70, 65, 80, 75, 85, 90, 88, 92, 87, 95, 89, 93, 91, 88, 94, 96, 89, 92, 87, 90, 93, 88, 91, 89, 94, 87]
+    // Simplify data to max 12 points for clean visualization
+    const simplifyData = (rawData: number[]) => {
+      if (rawData.length <= 12) return rawData
+      
+      const step = Math.floor(rawData.length / 12)
+      const simplified = []
+      for (let i = 0; i < rawData.length; i += step) {
+        // Average the values in each bucket for smoother trends
+        const bucket = rawData.slice(i, i + step)
+        const avg = Math.round(bucket.reduce((sum, val) => sum + val, 0) / bucket.length)
+        simplified.push(avg)
+      }
+      return simplified.slice(0, 12) // Ensure max 12 points
+    }
     
-    // Debug logging
-    console.log('LineChart Debug:', { data, chartData, title, color })
+    // Generate appropriate data based on time range
+    const generateTimeRangeData = () => {
+      if (selectedTimeRange === '7D') {
+        return [42, 38, 45, 52, 48, 55, 61] // 7 days
+      } else if (selectedTimeRange === '30D') {
+        return [35, 42, 38, 45, 52, 48, 55, 61, 58, 65, 72, 68] // 12 data points for month
+      } else {
+        return [28, 35, 42, 38, 45, 52, 48, 55, 61, 58, 65, 72] // 12 data points for quarter
+      }
+    }
+    
+    const rawData = data && data.length > 0 ? data : generateTimeRangeData()
+    const chartData = rawData // Don't simplify for 7D, use all points
+    
+    // Calculate scaling
+    const maxValue = Math.max(...chartData)
+    const minValue = Math.min(...chartData)
+    const range = maxValue - minValue
+    const chartHeight = 160
+    
+    // Generate smooth curve path using bezier curves
+    const generateSmoothPath = (points: {x: number, y: number}[]) => {
+      if (points.length < 2) return ''
+      
+      let path = `M ${points[0].x} ${points[0].y}`
+      
+      for (let i = 1; i < points.length; i++) {
+        const prev = points[i - 1]
+        const curr = points[i]
+        const next = points[i + 1]
+        
+        if (i === 1) {
+          // First curve
+          const cp1x = prev.x + (curr.x - prev.x) * 0.3
+          const cp1y = prev.y
+          const cp2x = curr.x - (curr.x - prev.x) * 0.3
+          const cp2y = curr.y
+          path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`
+        } else if (i === points.length - 1) {
+          // Last curve
+          const cp1x = prev.x + (curr.x - prev.x) * 0.3
+          const cp1y = prev.y
+          const cp2x = curr.x - (curr.x - prev.x) * 0.3
+          const cp2y = curr.y
+          path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`
+        } else {
+          // Middle curves
+          const cp1x = prev.x + (curr.x - prev.x) * 0.3
+          const cp1y = prev.y + (curr.y - prev.y) * 0.3
+          const cp2x = curr.x - (next.x - prev.x) * 0.1
+          const cp2y = curr.y - (next.y - prev.y) * 0.1
+          path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`
+        }
+      }
+      
+      return path
+    }
+    
+    const points = chartData.map((value, index) => ({
+      x: (index / (chartData.length - 1)) * 300, // Use full width of 300
+      y: range > 0 ? ((maxValue - value) / range) * 100 + 20 : 80
+    }))
+    
+    const smoothPath = generateSmoothPath(points)
+    const areaPath = smoothPath + ` L 300 140 L 0 140 Z`
     
     return (
       <div className="hedis-chart-container">
         <h4 className="hedis-chart-title text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">{title}</h4>
-        {/* Debug info */}
-        <div className="text-xs text-gray-500 mb-2">Data points: {chartData.length}, Sample: {chartData.slice(0, 3).join(', ')}</div>
-        <div className="hedis-chart-content h-40 flex items-end space-x-1 relative">
-          {/* Chart background grid lines */}
-          <div className="absolute inset-0 flex flex-col justify-between">
-            {[0, 25, 50, 75, 100].map((line) => (
-              <div key={line} className="border-t border-gray-200 dark:border-gray-700 opacity-30"></div>
+        <div className="hedis-chart-content relative bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-lg p-4" style={{ height: `${chartHeight}px` }}>
+          
+          {/* SVG Chart */}
+          <svg className="absolute inset-4 w-full h-full" viewBox="0 0 300 140" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.2"/>
+                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.02"/>
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            
+            {/* Grid lines */}
+            {[20, 50, 80, 110].map((y) => (
+              <line key={y} x1="0" y1={y} x2="300" y2={y} stroke="#E5E7EB" strokeWidth="0.5" opacity="0.5"/>
             ))}
-          </div>
-          {/* Chart bars */}
-          {chartData.map((value, index) => (
-            <div key={index} className="hedis-chart-bar flex-1 bg-gray-100 dark:bg-gray-700 rounded-t relative group">
-              <div 
-                className="hedis-chart-fill bg-gradient-to-t from-blue-500 to-blue-400 rounded-t transition-all duration-700 ease-out hover:from-blue-600 hover:to-blue-500"
-                style={{ height: `${Math.max(value, 5)}%` }}
-              />
-              {/* Hover tooltip */}
-              <div className="hedis-chart-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                {value} screenings
-              </div>
-            </div>
-          ))}
+            
+            {/* Area fill */}
+            <path d={areaPath} fill="url(#chartGradient)" />
+            
+            {/* Main line */}
+            <path 
+              d={smoothPath} 
+              fill="none" 
+              stroke="#3B82F6" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              filter="url(#glow)"
+            />
+            
+            {/* Data points */}
+            {points.map((point, index) => (
+              <g key={index}>
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r="4"
+                  fill="white"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  className="hover:r-5 transition-all duration-200 cursor-pointer drop-shadow-sm"
+                />
+                {/* Hover area */}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r="12"
+                  fill="transparent"
+                  className="cursor-pointer hover:fill-blue-50 hover:fill-opacity-20"
+                  onMouseEnter={(e) => {
+                    const tooltip = e.target.parentElement?.querySelector('.tooltip')
+                    if (tooltip) tooltip.style.opacity = '1'
+                  }}
+                  onMouseLeave={(e) => {
+                    const tooltip = e.target.parentElement?.querySelector('.tooltip')
+                    if (tooltip) tooltip.style.opacity = '0'
+                  }}
+                />
+                {/* Tooltip */}
+                <g className="tooltip" style={{ opacity: 0, transition: 'opacity 0.2s' }}>
+                  <rect
+                    x={point.x - 15}
+                    y={point.y - 25}
+                    width="30"
+                    height="16"
+                    fill="#1F2937"
+                    rx="4"
+                  />
+                  <text
+                    x={point.x}
+                    y={point.y - 15}
+                    textAnchor="middle"
+                    fill="white"
+                    fontSize="8"
+                  >
+                    {chartData[index]}
+                  </text>
+                </g>
+              </g>
+            ))}
+          </svg>
         </div>
+        
         {/* Chart labels */}
-        <div className="hedis-chart-labels flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
-          <span>0</span>
-          <span>25</span>
-          <span>50</span>
-          <span>75</span>
-          <span>100</span>
+        <div className="hedis-chart-labels flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2 px-4">
+          <span>{selectedTimeRange === '7D' ? 'Week Start' : selectedTimeRange === '30D' ? 'Month Start' : 'Quarter Start'}</span>
+          <span>Mid Point</span>
+          <span>{selectedTimeRange === '7D' ? 'Week End' : selectedTimeRange === '30D' ? 'Month End' : 'Quarter End'}</span>
         </div>
       </div>
     )
@@ -3431,17 +3570,21 @@ export default function HEDISLandingPage({
   const getChartData = (range: string) => {
     const baseData = {
       '7D': {
-        screenings: [45, 52, 38, 65, 58, 72, 68], // Normalized to 0-100 range for chart display
+        screenings: [35, 48, 42, 68, 55, 78, 72], // More varied 7-day data
         quality: [78, 82, 85, 88, 90, 87, 92],
         compliance: [85, 88, 87, 92, 89, 94, 91]
       },
       '30D': {
-        screenings: [50, 55, 62, 58, 65, 70, 68, 72, 67, 74, 69, 76, 71, 68, 65, 69, 72, 67, 70, 73, 68, 71, 66, 69, 72, 67, 70, 68, 71, 69], // Normalized to 0-100 range
+        screenings: [42, 38, 65, 58, 72, 68, 45, 52, 78, 85, 62, 58, 75, 82, 68, 72, 55, 48, 88, 92, 65, 58, 78, 85, 52, 45, 82, 88, 68, 72], // More varied 30-day data
         quality: [82, 85, 87, 89, 91, 88, 92, 89, 94, 90, 87, 91, 88, 85, 89, 92, 87, 90, 88, 91, 89, 86, 88, 90, 87, 91, 89, 92, 88, 90],
         compliance: [88, 90, 92, 89, 91, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87]
       },
       '90D': {
-        screenings: Array.from({length: 90}, (_, i) => 45 + Math.random() * 35), // Normalized to 0-100 range
+        screenings: Array.from({length: 90}, (_, i) => {
+          // Create more realistic patterns with some trends and variations
+          const baseValue = 40 + Math.sin(i / 10) * 15 + Math.random() * 20
+          return Math.max(25, Math.min(95, baseValue))
+        }),
         quality: Array.from({length: 90}, (_, i) => 80 + Math.random() * 15),
         compliance: Array.from({length: 90}, (_, i) => 85 + Math.random() * 10)
       }

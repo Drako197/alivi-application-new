@@ -256,12 +256,16 @@ export default function HelperModal({
   useEffect(() => {
     const hasBeenWelcomed = localStorage.getItem('mila_welcomed_user')
     const hasInteracted = localStorage.getItem('mila_user_interacted')
+    const hasShownSuggestionsBefore = localStorage.getItem('mila_has_shown_suggestions')
     
     if (hasBeenWelcomed === 'true') {
       setHasWelcomedUser(true)
     }
     if (hasInteracted === 'true') {
       setHasUserInteracted(true)
+    }
+    if (hasShownSuggestionsBefore === 'true') {
+      setHasShownSuggestions(true)
     }
   }, [])
 
@@ -401,7 +405,7 @@ export default function HelperModal({
   // Reset suggestions when modal closes
   useEffect(() => {
     if (!isOpen) {
-      setHasShownSuggestions(false)
+      // Don't reset hasShownSuggestions - keep it persistent to prevent repeated greetings
       setShowPredictiveSuggestions(false)
       setPredictiveSuggestions([])
     }
@@ -414,8 +418,10 @@ export default function HelperModal({
       if (!hasUserInteracted) {
         loadPredictiveSuggestions()
         setHasShownSuggestions(true)
+        localStorage.setItem('mila_has_shown_suggestions', 'true')
       } else {
         setHasShownSuggestions(true) // Mark as shown to prevent re-triggering
+        localStorage.setItem('mila_has_shown_suggestions', 'true')
       }
     }
   }, [isOpen, currentForm, currentField, currentStep, hasShownSuggestions, hasUserInteracted])

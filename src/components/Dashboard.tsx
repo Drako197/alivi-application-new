@@ -1056,7 +1056,6 @@ export default function Dashboard() {
                       src="/images/mila-assistant-card.png" 
                       alt="MILA AI Assistant" 
                       className="mila-assistant-image w-full h-auto rounded-b-xl opacity-90 hover:opacity-100 transition-opacity duration-300"
-                      style={{ minHeight: '100px', backgroundColor: 'rgba(255,255,255,0.1)', border: '2px dashed rgba(255,255,255,0.3)' }}
                     />
                   </div>
                 </div>

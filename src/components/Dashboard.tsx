@@ -1,4 +1,4 @@
-pic-form-progressimport { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Sidebar from './Sidebar'
 import MobileHeader from './MobileHeader'

@@ -4234,9 +4234,9 @@ export default function HEDISLandingPage({
   return (
     <div className="hedis-analytics-dashboard">
       {/* Modern Header Section - Hidden on Mobile */}
-      <div className="hedis-modern-header hidden md:block bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 border-b border-blue-200 dark:border-blue-700">
+      <div className="hedis-modern-header hidden md:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="hedis-header-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="hedis-header-content bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-white/20 dark:border-gray-700 flex items-center justify-between py-6 h-20 px-6">
+          <div className="hedis-header-content flex items-center justify-between py-6 h-20">
             <div className="hedis-header-left">
               <h1 className="hedis-main-title text-2xl font-bold text-gray-900 dark:text-white mb-1">
                 HEDIS Quality Dashboard
@@ -4274,13 +4274,13 @@ export default function HEDISLandingPage({
         </div>
       </div>
 
-      {/* Mobile-Only Header - Left Aligned to Match Reports/Analytics */}
-      <div className="hedis-mobile-header md:hidden bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-200 dark:border-blue-700 px-4 py-3">
-        <div className="text-left">
-          <h1 className="hedis-mobile-title text-lg font-bold text-gray-900 dark:text-white">
+      {/* Mobile-Only Header - White Background with Left-Aligned Title */}
+      <div className="hedis-mobile-header md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+        <div>
+          <h1 className="hedis-mobile-title text-left text-lg font-bold text-gray-900 dark:text-white">
             HEDIS Quality Dashboard
           </h1>
-          <div className="hedis-mobile-subtitle flex items-center space-x-2 mt-1">
+          <div className="hedis-mobile-subtitle flex items-center justify-center space-x-2 mt-1">
             <span className="text-xs text-gray-600 dark:text-gray-400">
               Welcome back, {user?.fullName || 'User'}
             </span>

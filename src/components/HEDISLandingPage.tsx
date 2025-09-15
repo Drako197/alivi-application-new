@@ -4280,7 +4280,7 @@ export default function HEDISLandingPage({
           <h1 className="hedis-mobile-title text-left text-lg font-bold text-gray-900 dark:text-white">
             HEDIS Quality Dashboard
           </h1>
-          <div className="hedis-mobile-subtitle flex items-center justify-center space-x-2 mt-1">
+          <div className="hedis-mobile-subtitle flex items-center space-x-2 mt-1">
             <span className="text-xs text-gray-600 dark:text-gray-400">
               Welcome back, {user?.fullName || 'User'}
             </span>

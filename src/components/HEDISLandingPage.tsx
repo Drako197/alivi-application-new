@@ -4292,6 +4292,19 @@ export default function HEDISLandingPage({
         </div>
       </div>
 
+      {/* Mobile Date Card */}
+      <div className="hedis-mobile-date-section md:hidden px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+        <div className="hedis-mobile-date-card bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="flex items-center space-x-2">
+            <Icon name="calendar" size={18} className="text-blue-600 dark:text-blue-400" />
+            <div>
+              <div className="hedis-mobile-date-label text-xs text-gray-500 dark:text-gray-400">Today</div>
+              <div className="hedis-mobile-date-value text-sm font-medium text-gray-900 dark:text-white">{formatDate(currentTime)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Modern Dashboard Content */}
       <div className="hedis-dashboard-content">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">

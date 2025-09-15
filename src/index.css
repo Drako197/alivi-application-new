@@ -3638,6 +3638,37 @@ select {
   }
 }
 
+/* PIC Form Actions Container */
+.pic-form-actions {
+  @apply flex flex-col sm:flex-row gap-4 justify-end mt-8 pt-6 border-t border-gray-200 dark:border-gray-700;
+}
+
+/* PIC Button Styles */
+.pic-btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70;
+}
+
+.pic-btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md;
+}
+
+.pic-btn-tertiary {
+  @apply bg-transparent border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md;
+}
+
+/* Mobile optimizations for PIC form actions */
+@media (max-width: 640px) {
+  .pic-form-actions {
+    @apply flex-col gap-3;
+  }
+  
+  .pic-btn-primary,
+  .pic-btn-secondary,
+  .pic-btn-tertiary {
+    @apply w-full justify-center;
+  }
+}
+
 @keyframes stepCompletedPulse {
   0%, 100% {
     transform: scale(1);

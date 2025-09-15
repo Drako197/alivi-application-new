@@ -4,7 +4,6 @@ import PersonalizationService from '../services/PersonalizationService'
 import ProactiveSuggestionsService, { type ProactiveSuggestion } from '../services/ProactiveSuggestionsService'
 import { PredictiveSuggestionsService } from '../services/PredictiveSuggestionsService'
 import PersonalizationSettings from './PersonalizationSettings'
-import MemoryTest from './MemoryTest'
 import AIAssistantService, { type SmartSuggestion, type ProactiveAlert, type AIContext } from '../services/AIAssistantService'
 import { EnhancedVisualResponseService, type EnhancedResponse, type RichTextElement, type InteractiveElement, type VisualIndicator } from '../services/EnhancedVisualResponseService'
 import { SmartButtonService } from '../services/SmartButtonService'
@@ -153,7 +152,6 @@ export default function HelperModal({
   const [codeSelectionMode, setCodeSelectionMode] = useState(false)
   const [memoryStatus, setMemoryStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking')
   const [userPreferences, setUserPreferences] = useState<Record<string, any>>({})
-  const [showMemoryTest, setShowMemoryTest] = useState(false)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -1519,13 +1517,6 @@ export default function HelperModal({
               </div>
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => setShowMemoryTest(true)}
-                  className="ai-helper-memory-test-btn p-2 text-white/80 hover:text-white transition-colors"
-                  title="Test Memory Integration"
-                >
-                  <Icon name="database" size={16} />
-                </button>
-                <button
                   onClick={() => setShowSettings(true)}
                   className="ai-helper-settings-btn p-2 text-white/80 hover:text-white transition-colors"
                 >
@@ -1845,14 +1836,6 @@ export default function HelperModal({
         document.body
       )}
 
-      {/* Memory Test Modal */}
-      {showMemoryTest && createPortal(
-        <MemoryTest
-          isOpen={showMemoryTest}
-          onClose={() => setShowMemoryTest(false)}
-        />,
-        document.body
-      )}
     </>
   )
 } 

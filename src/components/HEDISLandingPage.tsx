@@ -4293,7 +4293,7 @@ export default function HEDISLandingPage({
       </div>
 
       {/* Mobile Date Card */}
-      <div className="hedis-mobile-date-section md:hidden px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+      <div className="hedis-mobile-date-section md:hidden px-4 py-3 bg-gray-50 dark:bg-gray-800/50">
         <div className="hedis-mobile-date-card bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="flex items-center space-x-2">
             <Icon name="calendar" size={18} className="text-blue-600 dark:text-blue-400" />

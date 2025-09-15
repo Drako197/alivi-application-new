@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import type { ReactElement } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Sidebar from './Sidebar'
 import MobileHeader from './MobileHeader'
@@ -44,7 +43,6 @@ export default function Dashboard() {
     return saved || 'dashboard'
   })
   
-  const [mobileTabChangeCount, setMobileTabChangeCount] = useState(0)
   
   const [activeDesktopTab, setActiveDesktopTab] = useState(() => {
     const saved = localStorage.getItem('activeDesktopTab')
@@ -55,6 +53,128 @@ export default function Dashboard() {
   const [picResetCounter, setPICResetCounter] = useState(0)
   const [hedisResetCounter, setHEDISResetCounter] = useState(0)
   const [mobileSearchTerm, setMobileSearchTerm] = useState('')
+  const [dashboardLoading, setDashboardLoading] = useState(true)
+  const [metricsLoading, setMetricsLoading] = useState(false)
+  const [selectedTimeRange, setSelectedTimeRange] = useState('7D')
+  
+  // Sample chart data based on time range
+  const getChartData = (timeRange: string) => {
+    switch (timeRange) {
+      case '7D':
+        return {
+          revenue: [85, 87, 90, 88, 92, 89, 94],
+          claims: [92, 89, 91, 94, 92, 90, 92],
+          denials: [8, 11, 9, 6, 8, 10, 8]
+        }
+      case '30D':
+        return {
+          revenue: [82, 85, 88, 86, 90, 87, 92, 89, 94, 91, 93, 90, 95, 92, 88, 91, 89, 93, 90, 94, 87, 92, 89, 91, 88, 90, 93, 91, 94, 92],
+          claims: [89, 91, 88, 92, 90, 94, 87, 91, 89, 93, 90, 88, 92, 89, 91, 88, 90, 92, 89, 94, 87, 91, 88, 90, 92, 89, 91, 88, 90, 92],
+          denials: [11, 9, 12, 8, 10, 6, 13, 9, 11, 7, 10, 12, 8, 11, 9, 12, 10, 8, 11, 6, 13, 9, 12, 10, 8, 11, 9, 12, 10, 8]
+        }
+      case '90D':
+        return {
+          revenue: Array.from({length: 90}, (_, i) => 80 + Math.sin(i / 10) * 10 + Math.random() * 5),
+          claims: Array.from({length: 90}, (_, i) => 85 + Math.cos(i / 8) * 8 + Math.random() * 4),
+          denials: Array.from({length: 90}, (_, i) => 10 - Math.sin(i / 12) * 3 + Math.random() * 2)
+        }
+      default:
+        return {
+          revenue: [85, 87, 90, 88, 92, 89, 94],
+          claims: [92, 89, 91, 94, 92, 90, 92],
+          denials: [8, 11, 9, 6, 8, 10, 8]
+        }
+    }
+  }
+
+  const chartData = getChartData(selectedTimeRange)
+  const performanceData = [92, 89, 8, 23]
+  const performanceLabels = ['Clean Claims', 'Success Rate', 'Denial Rate', 'Avg Days']
+  const performanceColors = [
+    'from-green-400 to-green-600',
+    'from-blue-400 to-blue-600', 
+    'from-red-400 to-red-600',
+    'from-amber-400 to-amber-600'
+  ]
+
+  // Skeleton loading component
+  const SkeletonCard = ({ className = "", height = "h-32" }: { className?: string, height?: string }) => (
+    <div className={`bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+      <div className="animate-pulse">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3"></div>
+            <div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+            </div>
+          </div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+        </div>
+        <div className={`bg-gray-200 dark:bg-gray-700 rounded ${height}`}></div>
+      </div>
+    </div>
+  )
+
+  // Simple Line Chart Component
+  const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
+    const maxValue = Math.max(...data)
+    const points = data.map((value, index) => {
+      const x = (index / (data.length - 1)) * 100
+      const y = 100 - (value / maxValue) * 100
+      return `${x},${y}`
+    }).join(' ')
+
+    return (
+      <div className="w-full h-32 relative">
+        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <polyline
+            fill="none"
+            stroke={`rgb(var(--color-${color}-500))`}
+            strokeWidth="2"
+            points={points}
+            className="drop-shadow-sm"
+          />
+          <defs>
+            <linearGradient id={`gradient-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" className={`text-${color}-400`} stopOpacity="0.3" />
+              <stop offset="100%" className={`text-${color}-400`} stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          <polyline
+            fill={`url(#gradient-${color})`}
+            stroke="none"
+            points={`0,100 ${points} 100,100`}
+          />
+        </svg>
+        <div className="absolute top-2 left-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+          {title}
+        </div>
+      </div>
+    )
+  }
+
+  // Bar Chart Component
+  const BarChart = ({ data, labels, colors }: { data: number[], labels: string[], colors: string[] }) => {
+    const maxValue = Math.max(...data)
+    
+    return (
+      <div className="w-full h-32 flex items-end justify-between space-x-2">
+        {data.map((value, index) => (
+          <div key={index} className="flex-1 flex flex-col items-center">
+            <div 
+              className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80`}
+              style={{ height: `${(value / maxValue) * 100}%`, minHeight: '4px' }}
+              title={`${labels[index]}: ${value}%`}
+            />
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+              {labels[index]}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState('all')
   const [picNavigateTo, setPICNavigateTo] = useState<string | undefined>()
   
@@ -69,6 +189,88 @@ export default function Dashboard() {
     recentCompletedScreenings: [] as CompletedScreening[],
     recentSavedScreenings: [] as SavedScreening[]
   })
+
+  // Simulate loading states and data fetching
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setDashboardLoading(true)
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // Load actual data
+      const completedScreenings = ScreeningDataService.getCompletedScreenings()
+      const savedScreenings = ScreeningDataService.getSavedScreenings()
+      
+      setDashboardStats({
+        completedScreenings: completedScreenings.length,
+        savedScreenings: savedScreenings.length,
+        recentCompletedScreenings: completedScreenings.slice(-3),
+        recentSavedScreenings: savedScreenings.slice(-3)
+      })
+      
+      setDashboardLoading(false)
+    }
+    
+    loadDashboardData()
+  }, [])
+
+  // Function to refresh metrics with loading state
+  const refreshMetrics = async () => {
+    setMetricsLoading(true)
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 800))
+    
+    // Reload data
+    const completedScreenings = ScreeningDataService.getCompletedScreenings()
+    const savedScreenings = ScreeningDataService.getSavedScreenings()
+    
+    setDashboardStats({
+      completedScreenings: completedScreenings.length,
+      savedScreenings: savedScreenings.length,
+      recentCompletedScreenings: completedScreenings.slice(-3),
+      recentSavedScreenings: savedScreenings.slice(-3)
+    })
+    
+    setMetricsLoading(false)
+  }
+
+  // Export functionality
+  const exportDashboardData = () => {
+    const exportData = {
+      timestamp: new Date().toISOString(),
+      timeRange: selectedTimeRange,
+      metrics: {
+        completedScreenings: dashboardStats.completedScreenings,
+        savedScreenings: dashboardStats.savedScreenings,
+        eligibilityRequests: 24,
+        pendingActions: dashboardStats.savedScreenings + 3
+      },
+      performance: {
+        cleanClaimRate: '92%',
+        denialRate: '8%',
+        avgDaysToPayment: 23,
+        successRate: '95%'
+      },
+      charts: {
+        revenue: chartData.revenue,
+        claims: chartData.claims,
+        denials: chartData.denials
+      }
+    }
+    
+    const dataStr = JSON.stringify(exportData, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
 
   // Load real data on component mount
   useEffect(() => {
@@ -378,7 +580,6 @@ export default function Dashboard() {
 
   const handleMobileTabChange = (tab: string) => {
     setActiveMobileTab(tab)
-    setMobileTabChangeCount(prev => prev + 1)
     // Scroll to top when changing tabs on mobile
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -635,203 +836,408 @@ export default function Dashboard() {
 
       default:
         return (
-          <div className="dashboard-content">
+          <div className="dashboard-content animate-fadeIn">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              {/* Welcome Section */}
-              <div className="welcome-section">
-                <h1 className="welcome-title">Welcome back, {user?.fullName || 'User'}!</h1>
-                <p className="welcome-subtitle">Here's what's happening with your healthcare services today.</p>
-              </div>
-
-              {/* Stats Grid - Updated with real data */}
-              <div className="stats-grid">
-              <div className="stat-card completed-screenings-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-green-100 dark:bg-green-900">
-                      <Icon name="check-circle" size={20} className="text-green-600 dark:text-green-400" />
-                    </div>
+              {/* Modern Welcome Section with Time-based Greeting */}
+              <div className="welcome-section mb-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                      Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.fullName || 'User'}!
+                    </h1>
+                    <p className="text-lg text-gray-600 dark:text-gray-400">
+                      Here's your medical billing overview for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    </p>
                   </div>
-                  <div className="ml-4">
-                    <p className="stat-label">Completed Screenings</p>
-                    <p className="stat-value">{dashboardStats.completedScreenings}</p>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={refreshMetrics}
+                      disabled={metricsLoading}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50"
+                    >
+                      <Icon name={metricsLoading ? "refresh-cw" : "refresh-ccw"} size={16} className={metricsLoading ? "animate-spin" : ""} />
+                      <span className="text-sm font-medium">{metricsLoading ? 'Updating...' : 'Refresh'}</span>
+                    </button>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Last updated</div>
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">{new Date().toLocaleTimeString()}</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="stat-card saved-screenings-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-blue-100 dark:bg-blue-900">
-                      <Icon name="save" size={20} className="text-blue-600 dark:text-blue-400" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="stat-label">Saved Screenings</p>
-                    <p className="stat-value">{dashboardStats.savedScreenings}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="stat-card eligibility-requests-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-purple-100 dark:bg-purple-900">
-                      <Icon name="user-check" size={20} className="text-purple-600 dark:text-purple-400" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="stat-label">Eligibility Requests</p>
-                    <p className="stat-value">24</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="stat-card pending-actions-card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="stat-icon bg-yellow-100 dark:bg-yellow-900">
-                      <Icon name="clock" size={20} className="text-yellow-600 dark:text-yellow-400" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="stat-label">Pending Actions</p>
-                    <p className="stat-value">{dashboardStats.savedScreenings + 3}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions - Updated with real form links */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* M.I.L.A. AI Assistant Card */}
-              <div className="stat-card mila-ai-assistant-detail-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-r-lg flex items-center">
-                  <Icon name="bot" size={20} className="mr-2" />
-                  M.I.L.A. AI Assistant
-                </h3>
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
-                    Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
-                  </p>
-                  <div className="px-4 space-y-2">
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
-                      Inline form integration for medical codes
-                    </div>
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2"></span>
-                      Contextual help across all forms
-                    </div>
-                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                      One-click code insertion & validation
-                    </div>
-                  </div>
-                  <div className="px-4">
-                    <HelperButton 
-                      currentForm="Dashboard"
-                      currentField="general"
-                      currentStep={1}
-                      onNavigate={handleMILANavigation}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="stat-card quick-actions-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-r-lg">Quick Actions</h3>
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => handleQuickAction('hedis')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                  >
-                    <Icon name="plus" size={16} className="inline mr-2" />
-                    Start New HEDIS Screening
-                  </button>
-                  <button 
-                    onClick={() => handleQuickAction('eligibility')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                  >
-                    <Icon name="user-check" size={16} className="inline mr-2" />
-                    Request Patient Eligibility
-                  </button>
-                  <button 
-                    onClick={() => handleQuickAction('completed-screenings')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                  >
-                    <Icon name="file-text" size={16} className="inline mr-2" />
-                    View Completed Screenings
-                  </button>
-                  <button 
-                    onClick={() => handleQuickAction('pic')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                  >
-                    <Icon name="upload" size={16} className="inline mr-2" />
-                    Submit Claims
-                  </button>
-                </div>
-              </div>
-
-              <div className="stat-card recent-activity-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-r-lg">Recent Activity</h3>
-                <div className="space-y-3">
-                  {dashboardStats.recentCompletedScreenings.length > 0 ? (
-                    dashboardStats.recentCompletedScreenings.map((screening, index) => (
-                      <div key={screening.id} className="flex items-center text-sm">
-                        <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {screening.patientName} - Screening completed
-                        </span>
+              {/* Enhanced KPI Cards with Animations */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {dashboardLoading ? (
+                  <>
+                    <SkeletonCard height="h-24" />
+                    <SkeletonCard height="h-24" />
+                    <SkeletonCard height="h-24" />
+                    <SkeletonCard height="h-24" />
+                  </>
+                ) : (
+                  <>
+                    {/* Completed Screenings Card */}
+                    <div className="group bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-completed-screenings-card">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="p-3 bg-green-100 dark:bg-green-800 rounded-lg group-hover:bg-green-200 dark:group-hover:bg-green-700 transition-colors">
+                          <Icon name="check-circle" size={24} className="text-green-600 dark:text-green-400" />
+                        </div>
+                        <div className="text-xs text-green-600 dark:text-green-400 font-medium px-2 py-1 bg-green-100 dark:bg-green-800 rounded-full">
+                          +12% this week
+                        </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      No recent completed screenings
+                      <div>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.completedScreenings}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Completed Screenings</p>
+                        <div className="mt-3 flex items-center text-xs text-green-600 dark:text-green-400">
+                          <div className="w-full bg-green-200 dark:bg-green-800 rounded-full h-1.5 mr-2">
+                            <div className="bg-green-500 h-1.5 rounded-full" style={{width: '85%'}}></div>
+                          </div>
+                          <span>85% goal</span>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  {dashboardStats.recentSavedScreenings.length > 0 && (
-                    <div className="flex items-center text-sm">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
-                      <span className="text-gray-600 dark:text-gray-400">
-                        {dashboardStats.recentSavedScreenings.length} saved screening{dashboardStats.recentSavedScreenings.length !== 1 ? 's' : ''} pending
-                      </span>
+
+                {/* Saved Screenings Card */}
+                <div className="group bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-saved-screenings-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-blue-100 dark:bg-blue-800 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-700 transition-colors">
+                      <Icon name="save" size={24} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                  )}
-                  <div className="flex items-center text-sm">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                    <span className="text-gray-600 dark:text-gray-400">Patient eligibility request submitted</span>
+                    <div className="text-xs text-orange-600 dark:text-orange-400 font-medium px-2 py-1 bg-orange-100 dark:bg-orange-800 rounded-full">
+                      {dashboardStats.savedScreenings > 0 ? 'Action needed' : 'Up to date'}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.savedScreenings}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Saved Screenings</p>
+                    <div className="mt-3 flex items-center text-xs text-blue-600 dark:text-blue-400">
+                      <Icon name="clock" size={12} className="mr-1" />
+                      <span>Pending completion</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Revenue Cycle Card */}
+                <div className="group bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-eligibility-requests-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-purple-100 dark:bg-purple-800 rounded-lg group-hover:bg-purple-200 dark:group-hover:bg-purple-700 transition-colors">
+                      <Icon name="user-check" size={24} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="text-xs text-purple-600 dark:text-purple-400 font-medium px-2 py-1 bg-purple-100 dark:bg-purple-800 rounded-full">
+                      94% success
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">24</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Eligibility Requests</p>
+                    <div className="mt-3 flex items-center text-xs text-purple-600 dark:text-purple-400">
+                      <div className="w-full bg-purple-200 dark:bg-purple-800 rounded-full h-1.5 mr-2">
+                        <div className="bg-purple-500 h-1.5 rounded-full" style={{width: '94%'}}></div>
+                      </div>
+                      <span>94%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Claims Performance Card */}
+                <div className="group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-pending-actions-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-amber-100 dark:bg-amber-800 rounded-lg group-hover:bg-amber-200 dark:group-hover:bg-amber-700 transition-colors">
+                      <Icon name="clock" size={24} className="text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="text-xs text-red-600 dark:text-red-400 font-medium px-2 py-1 bg-red-100 dark:bg-red-800 rounded-full">
+                      {dashboardStats.savedScreenings + 3 > 5 ? 'High priority' : 'Normal'}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.savedScreenings + 3}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Pending Actions</p>
+                    <div className="mt-3 flex items-center text-xs text-amber-600 dark:text-amber-400">
+                      <Icon name="trending-up" size={12} className="mr-1" />
+                      <span>Avg. 2.3 days to complete</span>
+                    </div>
+                  </div>
+                </div>
+                  </>
+                )}
+              </div>
+
+              {/* Performance Analytics Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                {dashboardLoading ? (
+                  <>
+                    <SkeletonCard className="lg:col-span-2" height="h-64" />
+                    <SkeletonCard height="h-64" />
+                  </>
+                ) : (
+                  <>
+                {/* Revenue Cycle Chart */}
+                <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 desktop-revenue-cycle-chart-container">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Revenue Cycle Performance</h3>
+                    <div className="flex space-x-2">
+                      {['7D', '30D', '90D'].map((range) => (
+                        <button
+                          key={range}
+                          onClick={() => setSelectedTimeRange(range)}
+                          className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                            selectedTimeRange === range
+                              ? 'text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-400'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          {range}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-6">
+                    {/* Interactive Revenue Trend Chart */}
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
+                      <LineChart data={chartData.revenue} title={`Revenue Trend (${selectedTimeRange})`} color="blue" />
+                    </div>
+                    
+                    {/* Performance Metrics Bar Chart */}
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Performance Overview</h4>
+                      <BarChart data={performanceData} labels={performanceLabels} colors={performanceColors} />
+                    </div>
+                    
+                    {/* Claims Processing Chart */}
+                    <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
+                      <LineChart data={chartData.claims} title={`Claims Success Rate (${selectedTimeRange})`} color="green" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* M.I.L.A. AI Assistant Card - Enhanced */}
+                <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-purple-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 desktop-mila-ai-assistant-card">
+                  <div className="flex items-center mb-4">
+                    <div className="p-2 bg-white/20 rounded-lg mr-3">
+                      <Icon name="bot" size={24} className="text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold">M.I.L.A. AI Assistant</h3>
+                  </div>
+                  <p className="text-sm text-blue-100 mb-6">
+                    Your Medical Intelligence & Learning Assistant is ready to help with medical billing, codes, and form guidance.
+                  </p>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-xs text-blue-100">
+                      <Icon name="zap" size={12} className="mr-2" />
+                      <span>Instant medical code lookup</span>
+                    </div>
+                    <div className="flex items-center text-xs text-blue-100">
+                      <Icon name="check-circle" size={12} className="mr-2" />
+                      <span>Real-time form validation</span>
+                    </div>
+                    <div className="flex items-center text-xs text-blue-100">
+                      <Icon name="brain" size={12} className="mr-2" />
+                      <span>Smart suggestions & insights</span>
+                    </div>
+                  </div>
+                  <HelperButton 
+                    currentForm="Dashboard"
+                    currentField="general"
+                    currentStep={1}
+                    onNavigate={handleMILANavigation}
+                  />
+                </div>
+                  </>
+                )}
+              </div>
+
+              {/* Primary Action Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {/* HEDIS Forms Card */}
+                <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 desktop-hedis-forms-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+                        <Icon name="eye" size={24} className="text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">HEDIS Screenings</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Diabetic retinal screening forms</p>
+                      </div>
+                    </div>
+                    <div className="text-xs bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 px-2 py-1 rounded-full font-medium">
+                      {dashboardStats.completedScreenings} completed
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => handleQuickAction('hedis')}
+                      className="w-full flex items-center justify-between p-3 text-left bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors group/button"
+                    >
+                      <div className="flex items-center">
+                        <Icon name="plus" size={16} className="text-blue-600 dark:text-blue-400 mr-3" />
+                        <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Start New Screening</span>
+                      </div>
+                      <Icon name="arrow-right" size={14} className="text-blue-500 dark:text-blue-400 group-hover/button:translate-x-1 transition-transform" />
+                    </button>
+                    <button 
+                      onClick={() => handleQuickAction('completed-screenings')}
+                      className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors group/button"
+                    >
+                      <div className="flex items-center">
+                        <Icon name="file-text" size={16} className="text-gray-600 dark:text-gray-400 mr-3" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">View Completed Forms</span>
+                      </div>
+                      <Icon name="arrow-right" size={14} className="text-gray-500 dark:text-gray-400 group-hover/button:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* PIC Actions Card */}
+                <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-300 desktop-pic-actions-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
+                        <Icon name="upload" size={24} className="text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">P.I.C. Actions</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Claims & eligibility management</p>
+                      </div>
+                    </div>
+                    <div className="text-xs bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 px-2 py-1 rounded-full font-medium">
+                      95% success rate
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => handleQuickAction('eligibility')}
+                      className="w-full flex items-center justify-between p-3 text-left bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg transition-colors group/button"
+                    >
+                      <div className="flex items-center">
+                        <Icon name="user-check" size={16} className="text-purple-600 dark:text-purple-400 mr-3" />
+                        <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Patient Eligibility</span>
+                      </div>
+                      <Icon name="arrow-right" size={14} className="text-purple-500 dark:text-purple-400 group-hover/button:translate-x-1 transition-transform" />
+                    </button>
+                    <button 
+                      onClick={() => handleQuickAction('pic')}
+                      className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors group/button"
+                    >
+                      <div className="flex items-center">
+                        <Icon name="upload" size={16} className="text-gray-600 dark:text-gray-400 mr-3" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Submit Claims</span>
+                      </div>
+                      <Icon name="arrow-right" size={14} className="text-gray-500 dark:text-gray-400 group-hover/button:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recent Activity & Alerts Card */}
+                <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 desktop-recent-activity-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
+                        <Icon name="activity" size={24} className="text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Latest updates & alerts</p>
+                      </div>
+                    </div>
+                    <div className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full font-medium">
+                      Live
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {dashboardStats.recentCompletedScreenings.length > 0 ? (
+                      dashboardStats.recentCompletedScreenings.map((screening) => (
+                        <div key={screening.id} className="flex items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                          <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{screening.patientName}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Screening completed • Just now</p>
+                          </div>
+                          <Icon name="check-circle" size={16} className="text-green-500" />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4">
+                        <Icon name="inbox" size={32} className="text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No recent activity</p>
+                      </div>
+                    )}
+                    {dashboardStats.recentSavedScreenings.length > 0 && (
+                      <div className="flex items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            {dashboardStats.recentSavedScreenings.length} saved screening{dashboardStats.recentSavedScreenings.length !== 1 ? 's' : ''}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Pending completion • Action needed</p>
+                        </div>
+                        <Icon name="clock" size={16} className="text-yellow-500" />
+                      </div>
+                    )}
+                    <div className="flex items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Eligibility request submitted</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Processing • 2 min ago</p>
+                      </div>
+                      <Icon name="user-check" size={16} className="text-blue-500" />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="stat-card popular-pic-actions-card">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-r-lg">Popular PIC Actions</h3>
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => handleQuickAction('eligibility')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
-                  >
-                    <Icon name="user-check" size={16} className="inline mr-2" />
-                    Request Patient Eligibility (95% usage)
-                  </button>
-                  <button 
-                    onClick={() => handleQuickAction('claims-submission')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
-                  >
-                    <Icon name="upload" size={16} className="inline mr-2" />
-                    Claims Submission (92% usage)
-                  </button>
-                  <button 
-                    onClick={() => handleQuickAction('pic')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
-                  >
-                    <Icon name="search" size={16} className="inline mr-2" />
-                    Claim Status (88% usage)
-                  </button>
+              {/* Quick Insights Section */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 desktop-quick-insights-section">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Today's Insights</h3>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={exportDashboardData}
+                      className="flex items-center space-x-2 px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                    >
+                      <Icon name="download" size={14} />
+                      <span>Export</span>
+                    </button>
+                    <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">View all reports</button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Top Performing Actions */}
+                  <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-800 rounded-lg mb-3">
+                      <Icon name="trending-up" size={20} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Top Action</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Patient Eligibility</p>
+                    <p className="text-lg font-bold text-purple-600 dark:text-purple-400">95%</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">success rate</p>
+                  </div>
+
+                  {/* Processing Time */}
+                  <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-800 rounded-lg mb-3">
+                      <Icon name="clock" size={20} className="text-green-600 dark:text-green-400" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Avg. Processing</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Time to complete</p>
+                    <p className="text-lg font-bold text-green-600 dark:text-green-400">2.3</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">days</p>
+                  </div>
+
+                  {/* Revenue Impact */}
+                  <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-lg mb-3">
+                      <Icon name="dollar-sign" size={20} className="text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Revenue Impact</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">This week</p>
+                    <p className="text-lg font-bold text-blue-600 dark:text-blue-400">+12%</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">vs. last week</p>
+                  </div>
                 </div>
               </div>
-            </div>
             </div>
           </div>
         )
@@ -843,71 +1249,182 @@ export default function Dashboard() {
     switch (activeMobileTab) {
       case 'dashboard':
         return (
-          <div className="mobile-main-content">
+          <div className="mobile-main-content animate-slideInUp">
             <div className="p-4">
-              {/* Welcome Section */}
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  Welcome back, {user?.fullName || 'User'}!
+              {/* Modern Welcome Section */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800 mobile-welcome-section">
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                  Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.fullName || 'User'}! 👋
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Here's what's happening with your healthcare services today.
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  Here's your medical billing overview for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                 </p>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Last updated: {new Date().toLocaleTimeString()}
+                  </div>
+                  <button
+                    onClick={refreshMetrics}
+                    disabled={metricsLoading}
+                    className="flex items-center space-x-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 text-xs"
+                  >
+                    <Icon name={metricsLoading ? "refresh-cw" : "refresh-ccw"} size={12} className={metricsLoading ? "animate-spin" : ""} />
+                    <span>{metricsLoading ? 'Updating...' : 'Refresh'}</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Stats Cards */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 completed-screenings-card-mobile">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
-                      <Icon name="check-circle" size={20} className="text-green-600 dark:text-green-400" />
+              {/* Enhanced Stats Cards with Loading */}
+              <div className="grid grid-cols-2 gap-3 mb-6 mobile-stats-cards-container">
+                {dashboardLoading ? (
+                  <>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3"></div>
+                        <div className="flex-1">
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Completed</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{dashboardStats.completedScreenings}</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3"></div>
+                        <div className="flex-1">
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                        </div>
+                      </div>
                     </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3"></div>
+                        <div className="flex-1">
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3"></div>
+                        <div className="flex-1">
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Completed Screenings Card */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-completed-screenings-card">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center mr-3">
+                          <Icon name="check-circle" size={18} className="text-green-600 dark:text-green-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-green-600 dark:text-green-400 font-medium mb-1">Completed</p>
+                          <div className="flex items-baseline">
+                            <p className="text-xl font-bold text-gray-900 dark:text-white">{dashboardStats.completedScreenings}</p>
+                            <span className="text-xs text-green-600 dark:text-green-400 ml-1">+12%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Saved Screenings Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-saved-screenings-card">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center mr-3">
+                          <Icon name="save" size={18} className="text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">Saved</p>
+                          <div className="flex items-baseline">
+                            <p className="text-xl font-bold text-gray-900 dark:text-white">{dashboardStats.savedScreenings}</p>
+                            <span className="text-xs text-orange-600 dark:text-orange-400 ml-1">Action</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Eligibility Requests Card */}
+                    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-eligibility-requests-card">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-3">
+                          <Icon name="user-check" size={18} className="text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mb-1">Eligibility</p>
+                          <div className="flex items-baseline">
+                            <p className="text-xl font-bold text-gray-900 dark:text-white">24</p>
+                            <span className="text-xs text-purple-600 dark:text-purple-400 ml-1">94%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pending Actions Card */}
+                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-pending-actions-card">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-amber-100 dark:bg-amber-800 rounded-lg flex items-center justify-center mr-3">
+                          <Icon name="clock" size={18} className="text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-1">Pending</p>
+                          <div className="flex items-baseline">
+                            <p className="text-xl font-bold text-gray-900 dark:text-white">{dashboardStats.savedScreenings + 3}</p>
+                            <span className="text-xs text-red-600 dark:text-red-400 ml-1">{dashboardStats.savedScreenings + 3 > 5 ? 'High' : 'Normal'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Mobile Performance Overview */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 mobile-performance-overview-section">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Performance</h3>
+                  <div className="flex space-x-1">
+                    {['7D', '30D'].map((range) => (
+                      <button
+                        key={range}
+                        onClick={() => setSelectedTimeRange(range)}
+                        className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                          selectedTimeRange === range
+                            ? 'text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-400'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {range}
+                      </button>
+                    ))}
                   </div>
                 </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 saved-screenings-card-mobile">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
-                      <Icon name="save" size={20} className="text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Saved</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{dashboardStats.savedScreenings}</p>
-                    </div>
-                  </div>
+                
+                {/* Mobile Mini Chart */}
+                <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg mb-4">
+                  <LineChart data={chartData.revenue.slice(-7)} title={`Revenue Trend (${selectedTimeRange})`} color="blue" />
                 </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 eligibility-requests-card-mobile">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3">
-                      <Icon name="user-check" size={20} className="text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Eligibility</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">24</p>
-                    </div>
+                
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <p className="text-lg font-bold text-green-600 dark:text-green-400">92%</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Clean Claims</p>
                   </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 pending-actions-card-mobile">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mr-3">
-                      <Icon name="clock" size={20} className="text-yellow-600 dark:text-yellow-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{dashboardStats.savedScreenings + 3}</p>
-                    </div>
+                  <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    <p className="text-lg font-bold text-red-600 dark:text-red-400">8%</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Denial Rate</p>
                   </div>
                 </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 mobile-quick-actions-section">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
                 <div className="space-y-3">
                   <button 
@@ -942,7 +1459,7 @@ export default function Dashboard() {
               </div>
 
               {/* M.I.L.A. AI Assistant - First in second grouping */}
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white mb-6">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white mb-6 mobile-mila-ai-assistant-card">
                 <h3 className="text-lg font-semibold mb-2">M.I.L.A. AI Assistant</h3>
                 <p className="text-sm text-blue-100 mb-4">
                   Your Medical Intelligence & Learning Assistant is here to help with medical billing questions, codes, and form guidance.
@@ -956,11 +1473,11 @@ export default function Dashboard() {
               </div>
 
               {/* Recent Activity */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 mobile-recent-activity-section">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
                 <div className="space-y-3">
                   {dashboardStats.recentCompletedScreenings.length > 0 ? (
-                    dashboardStats.recentCompletedScreenings.map((screening, index) => (
+                    dashboardStats.recentCompletedScreenings.map((screening) => (
                       <div key={screening.id} className="flex items-center text-sm">
                         <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
                         <span className="text-gray-600 dark:text-gray-400">
@@ -989,7 +1506,7 @@ export default function Dashboard() {
               </div>
 
               {/* Popular PIC Actions */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 mobile-popular-pic-actions-section">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Popular PIC Actions</h3>
                 <div className="space-y-3">
                   <button 
@@ -1098,12 +1615,6 @@ export default function Dashboard() {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">PIC Actions</h2>
-                  <button
-                    onClick={handleMobileMenuToggle}
-                    className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  >
-                    <Icon name="menu" size={24} />
-                  </button>
                 </div>
 
                 {/* Mobile Search */}
@@ -1315,12 +1826,6 @@ export default function Dashboard() {
             <UsersPage isOpen={true} />
           </div>
         )
-      case 'profile':
-        return (
-          <div className="mobile-main-content">
-            <ProfilePage />
-          </div>
-        )
       case 'roles':
         return (
           <div className="mobile-main-content">
@@ -1482,7 +1987,7 @@ export default function Dashboard() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-r-lg">Recent Activity</h3>
                 <div className="space-y-3">
                   {dashboardStats.recentCompletedScreenings.length > 0 ? (
-                    dashboardStats.recentCompletedScreenings.map((screening, index) => (
+                    dashboardStats.recentCompletedScreenings.map((screening) => (
                       <div key={screening.id} className="flex items-center text-sm">
                         <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
                         <span className="text-gray-600 dark:text-gray-400">

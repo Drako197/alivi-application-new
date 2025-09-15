@@ -2591,8 +2591,8 @@ export class AIAssistantService {
     }
   }
 
-  // Get personalized suggestions based on user history
-  private static getPersonalizedSuggestions(context: any): string[] {
+  // Get personalized suggestions based on context
+  private static getContextualPersonalizedSuggestions(context: any): string[] {
     const suggestions: string[] = []
 
     // Based on form type preferences
@@ -2654,7 +2654,7 @@ export class AIAssistantService {
     this.learnFromInteraction(input, response, context, success)
 
     // Add personalized suggestions if available
-    const personalizedSuggestions = this.getPersonalizedSuggestions(context)
+    const personalizedSuggestions = this.getContextualPersonalizedSuggestions(context)
     if (personalizedSuggestions.length > 0 && success) {
       response += '\n\n💡 **Personalized Tip**: ' + personalizedSuggestions[0]
     }

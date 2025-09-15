@@ -170,7 +170,6 @@ class MedicalSpecialtiesService {
         'FVC': 'Forced Vital Capacity',
         'DLCO': 'Diffusing Capacity for Carbon Monoxide',
         'ABG': 'Arterial Blood Gas',
-        'PFT': 'Pulmonary Function Test',
         'CPAP': 'Continuous Positive Airway Pressure',
         'BiPAP': 'Bilevel Positive Airway Pressure',
         'O2': 'Oxygen'

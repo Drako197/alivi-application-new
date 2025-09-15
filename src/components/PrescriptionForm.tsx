@@ -373,21 +373,21 @@ export default function PrescriptionForm({
   }
 
   return (
-    <div className="hedis-screening-page">
-      <div className="hedis-screening-content">
+    <div className="pic-prescription-form">
+      <div className="pic-form-content">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="pic-form-header flex items-center justify-between mb-6">
+          <div className="pic-header-content">
+            <h1 className="pic-form-title text-2xl font-bold text-gray-900 dark:text-white">
               Prescription Detail
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="pic-form-subtitle text-gray-600 dark:text-gray-400 mt-1">
               Enter the patient's prescription parameters
             </p>
           </div>
           
           {/* Quick Actions */}
-          <div className="flex gap-2">
+          <div className="pic-quick-actions flex gap-2">
             <button
               type="button"
               onClick={copyODtoOS}
@@ -410,9 +410,9 @@ export default function PrescriptionForm({
         </div>
 
         {/* Refractive Correction Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="pic-refractive-correction-section bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
+          <div className="pic-section-header px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="pic-section-title text-lg font-semibold text-gray-900 dark:text-white">
               Refractive Correction <span className="text-red-500">*</span>
             </h2>
           </div>

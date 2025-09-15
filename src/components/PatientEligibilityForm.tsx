@@ -527,22 +527,22 @@ export default function PatientEligibilityForm({
   // Step Indicators Component
   const StepIndicators = ({ currentStep }: { currentStep: number }) => {
     return (
-      <div className="step-indicators-container">
-        <div className={`step-item ${currentStep > 1 ? 'step-completed' : currentStep === 1 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">1</div>
-          <div className="step-label">Patient Info</div>
+      <div className="pic-step-indicators-container">
+        <div className={`pic-step-item ${currentStep > 1 ? 'pic-step-completed' : currentStep === 1 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">1</div>
+          <div className="pic-step-label">Patient Info</div>
         </div>
-        <div className={`step-item ${currentStep > 2 ? 'step-completed' : currentStep === 2 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">2</div>
-          <div className="step-label">Eligibility Type</div>
+        <div className={`pic-step-item ${currentStep > 2 ? 'pic-step-completed' : currentStep === 2 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">2</div>
+          <div className="pic-step-label">Eligibility Type</div>
         </div>
-        <div className={`step-item ${currentStep > 3 ? 'step-completed' : currentStep === 3 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">3</div>
-          <div className="step-label">Current Eligibility</div>
+        <div className={`pic-step-item ${currentStep > 3 ? 'pic-step-completed' : currentStep === 3 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">3</div>
+          <div className="pic-step-label">Current Eligibility</div>
         </div>
-        <div className={`step-item ${currentStep > 4 ? 'step-completed' : currentStep === 4 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">4</div>
-          <div className="step-label">Reserved Benefits</div>
+        <div className={`pic-step-item ${currentStep > 4 ? 'pic-step-completed' : currentStep === 4 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">4</div>
+          <div className="pic-step-label">Reserved Benefits</div>
         </div>
       </div>
     )
@@ -551,7 +551,7 @@ export default function PatientEligibilityForm({
   // Current Eligibility Results Component
   const CurrentEligibilityResults = () => {
     return (
-      <div className="screening-form-content relative">
+      <div className="pic-eligibility-results-content relative">
         {/* Enhanced Header with Status Indicators */}
         <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6 mb-6">
           <div className="flex items-center justify-between">
@@ -1513,11 +1513,11 @@ export default function PatientEligibilityForm({
             </div>
 
             {/* Action Buttons */}
-            <div className="form-actions">
+            <div className="pic-form-actions">
               <button
                 type="button"
                 onClick={handleViewReservedBenefits}
-                className="btn-tertiary"
+                className="pic-btn-tertiary"
               >
                 <Icon name="heart" size={20} className="mr-2" />
                 View Reserved Benefits
@@ -1526,7 +1526,7 @@ export default function PatientEligibilityForm({
                 type="button"
                 onClick={handleVerifyEligibility}
                 disabled={isSubmitting}
-                className="btn-primary"
+                className="pic-btn-primary"
               >
                 {isSubmitting ? (
                   <>
@@ -1550,16 +1550,16 @@ export default function PatientEligibilityForm({
   // Render the header ONCE, and the step content below
   if (showReservedBenefits) {
     return (
-      <div className="hedis-screening-page">
+      <div className="pic-patient-eligibility-form">
         {stepContent}
       </div>
     );
   }
 
   return (
-    <div className="hedis-screening-page">
-      <div className="hedis-screening-header">
-        <div className="hedis-screening-progress">
+    <div className="pic-patient-eligibility-form">
+      <div className="pic-form-header">
+        <div className="pic-form-progress">
           <StepIndicators currentStep={currentStep} />
         </div>
       </div>

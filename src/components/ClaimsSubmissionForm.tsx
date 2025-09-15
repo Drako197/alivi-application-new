@@ -765,31 +765,31 @@ export default function ClaimsSubmissionForm({
   // Step Indicators Component
   const StepIndicators = ({ currentStep }: { currentStep: number }) => {
     return (
-      <div className="step-indicators-container">
+      <div className="pic-step-indicators-container">
         {/* Mobile-friendly step indicators */}
-        <div className={`step-item ${currentStep > 1 ? 'step-completed' : currentStep === 1 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">1</div>
-          <div className="step-label">Provider & Setup</div>
+        <div className={`pic-step-item ${currentStep > 1 ? 'pic-step-completed' : currentStep === 1 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">1</div>
+          <div className="pic-step-label">Provider & Setup</div>
         </div>
-        <div className={`step-item ${currentStep > 2 ? 'step-completed' : currentStep === 2 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">2</div>
-          <div className="step-label">Claim Details</div>
+        <div className={`pic-step-item ${currentStep > 2 ? 'pic-step-completed' : currentStep === 2 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">2</div>
+          <div className="pic-step-label">Claim Details</div>
         </div>
-        <div className={`step-item ${currentStep > 3 ? 'step-completed' : currentStep === 3 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">3</div>
-          <div className="step-label">Prescription</div>
+        <div className={`pic-step-item ${currentStep > 3 ? 'pic-step-completed' : currentStep === 3 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">3</div>
+          <div className="pic-step-label">Prescription</div>
         </div>
-        <div className={`step-item ${currentStep > 4 ? 'step-completed' : currentStep === 4 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">4</div>
-          <div className="step-label">Lens Choice</div>
+        <div className={`pic-step-item ${currentStep > 4 ? 'pic-step-completed' : currentStep === 4 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">4</div>
+          <div className="pic-step-label">Lens Choice</div>
         </div>
-        <div className={`step-item ${currentStep > 5 ? 'step-completed' : currentStep === 5 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">5</div>
-          <div className="step-label">Frame Selection</div>
+        <div className={`pic-step-item ${currentStep > 5 ? 'pic-step-completed' : currentStep === 5 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">5</div>
+          <div className="pic-step-label">Frame Selection</div>
         </div>
-        <div className={`step-item ${currentStep > 6 ? 'step-completed' : currentStep === 6 ? 'step-active' : 'step-inactive'}`}>
-          <div className="step-number">6</div>
-          <div className="step-label">Review & Submit</div>
+        <div className={`pic-step-item ${currentStep > 6 ? 'pic-step-completed' : currentStep === 6 ? 'pic-step-active' : 'pic-step-inactive'}`}>
+          <div className="pic-step-number">6</div>
+          <div className="pic-step-label">Review & Submit</div>
         </div>
       </div>
     )
@@ -798,17 +798,17 @@ export default function ClaimsSubmissionForm({
   // Success Message Component
   const ClaimsSubmissionSuccess = () => {
     return (
-      <div className="hedis-screening-success">
-        <div className="hedis-screening-success-icon">
+      <div className="pic-claims-submission-success">
+        <div className="pic-success-icon">
           <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
         </div>
-        <h3 className="hedis-screening-success-title">Claim Submitted Successfully!</h3>
-        <p className="hedis-screening-success-description">
+        <h3 className="pic-success-title">Claim Submitted Successfully!</h3>
+        <p className="pic-success-description">
           Your claim has been submitted and is being processed. You will receive a confirmation email shortly.
         </p>
-        <div className="hedis-screening-success-actions">
+        <div className="pic-success-actions">
           <button
             onClick={() => {
               setFormData({
@@ -4470,9 +4470,9 @@ export default function ClaimsSubmissionForm({
 
   // Main return
   return (
-    <div className="hedis-screening-page">
+    <div className="pic-claims-submission-form">
       {/* Header with breadcrumb and step indicators */}
-      <div className="hedis-screening-header">
+      <div className="pic-form-header">
         {currentStep <= 6 && (
           <StepIndicators currentStep={currentStep} />
         )}

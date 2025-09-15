@@ -3347,21 +3347,45 @@ export default function HEDISLandingPage({
   const [selectedTimeRange, setSelectedTimeRange] = useState('30D')
 
   // Chart Components
-  const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => (
-    <div className="hedis-chart-container">
-      <h4 className="hedis-chart-title text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">{title}</h4>
-      <div className="hedis-chart-content h-32 flex items-end space-x-1">
-        {data.map((value, index) => (
-          <div key={index} className="hedis-chart-bar flex-1 bg-gray-200 dark:bg-gray-700 rounded-t">
-            <div 
-              className={`hedis-chart-fill bg-${color}-500 rounded-t transition-all duration-500 ease-out`}
-              style={{ height: `${value}%` }}
-            />
+  const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
+    // Ensure we have valid data
+    const chartData = data && data.length > 0 ? data : [50, 55, 60, 45, 70, 65, 80, 75, 85, 90, 88, 92, 87, 95, 89, 93, 91, 88, 94, 96, 89, 92, 87, 90, 93, 88, 91, 89, 94, 87]
+    
+    return (
+      <div className="hedis-chart-container">
+        <h4 className="hedis-chart-title text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">{title}</h4>
+        <div className="hedis-chart-content h-40 flex items-end space-x-1 relative">
+          {/* Chart background grid lines */}
+          <div className="absolute inset-0 flex flex-col justify-between">
+            {[0, 25, 50, 75, 100].map((line) => (
+              <div key={line} className="border-t border-gray-200 dark:border-gray-700 opacity-30"></div>
+            ))}
           </div>
-        ))}
+          {/* Chart bars */}
+          {chartData.map((value, index) => (
+            <div key={index} className="hedis-chart-bar flex-1 bg-gray-100 dark:bg-gray-700 rounded-t relative group">
+              <div 
+                className={`hedis-chart-fill bg-gradient-to-t from-${color}-500 to-${color}-400 rounded-t transition-all duration-700 ease-out hover:from-${color}-600 hover:to-${color}-500`}
+                style={{ height: `${Math.max(value, 5)}%` }}
+              />
+              {/* Hover tooltip */}
+              <div className="hedis-chart-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                {value} screenings
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Chart labels */}
+        <div className="hedis-chart-labels flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <span>0</span>
+          <span>25</span>
+          <span>50</span>
+          <span>75</span>
+          <span>100</span>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   const BarChart = ({ data, title, color = "green" }: { data: number[], title: string, color?: string }) => (
     <div className="hedis-chart-container">
@@ -3402,17 +3426,17 @@ export default function HEDISLandingPage({
   const getChartData = (range: string) => {
     const baseData = {
       '7D': {
-        screenings: [65, 72, 68, 85, 78, 92, 88],
+        screenings: [45, 52, 38, 65, 58, 72, 68], // Normalized to 0-100 range for chart display
         quality: [78, 82, 85, 88, 90, 87, 92],
         compliance: [85, 88, 87, 92, 89, 94, 91]
       },
       '30D': {
-        screenings: [70, 75, 82, 78, 85, 90, 88, 92, 87, 94, 89, 96, 91, 88, 85, 89, 92, 87, 90, 93, 88, 91, 86, 89, 92, 87, 90, 88, 91, 89],
+        screenings: [50, 55, 62, 58, 65, 70, 68, 72, 67, 74, 69, 76, 71, 68, 65, 69, 72, 67, 70, 73, 68, 71, 66, 69, 72, 67, 70, 68, 71, 69], // Normalized to 0-100 range
         quality: [82, 85, 87, 89, 91, 88, 92, 89, 94, 90, 87, 91, 88, 85, 89, 92, 87, 90, 88, 91, 89, 86, 88, 90, 87, 91, 89, 92, 88, 90],
         compliance: [88, 90, 92, 89, 91, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87, 90, 92, 88, 91, 89, 87]
       },
       '90D': {
-        screenings: Array.from({length: 90}, (_, i) => 70 + Math.random() * 25),
+        screenings: Array.from({length: 90}, (_, i) => 45 + Math.random() * 35), // Normalized to 0-100 range
         quality: Array.from({length: 90}, (_, i) => 80 + Math.random() * 15),
         compliance: Array.from({length: 90}, (_, i) => 85 + Math.random() * 10)
       }
@@ -3488,6 +3512,17 @@ export default function HEDISLandingPage({
 
   // Get current chart data
   const chartData = getChartData(selectedTimeRange)
+  
+  // Ensure we always have data for the chart
+  const screeningData = chartData?.screenings || [50, 55, 60, 45, 70, 65, 80, 75, 85, 90, 88, 92, 87, 95, 89, 93, 91, 88, 94, 96, 89, 92, 87, 90, 93, 88, 91, 89, 94, 87]
+  
+  // Debug logging
+  console.log('Chart Data Debug:', {
+    selectedTimeRange,
+    chartData,
+    screeningData,
+    dataLength: screeningData?.length
+  })
 
   // Handle M.I.L.A. navigation (placeholder)
   const handleMILANavigation = (destination: string) => {
@@ -4607,42 +4642,7 @@ export default function HEDISLandingPage({
                     </div>
                   </div>
                   <div className="hedis-chart-wrapper mb-4">
-                    <LineChart data={chartData.screenings} title={`Screening Volume (${selectedTimeRange})`} color="blue" />
-                  </div>
-                  <div className="hedis-chart-metrics grid grid-cols-3 gap-4 text-center">
-                    <div className="hedis-metric bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-center justify-center mb-2">
-                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">87%</p>
-                        <div className="hedis-trend-indicator ml-2 flex items-center">
-                          <Icon name="trending-up" size={16} className="text-green-500" />
-                          <span className="text-xs text-green-600 dark:text-green-400 ml-1">+5.2%</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Completion Rate</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">vs last period</p>
-                    </div>
-                    <div className="hedis-metric bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-                      <div className="flex items-center justify-center mb-2">
-                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">92%</p>
-                        <div className="hedis-trend-indicator ml-2 flex items-center">
-                          <Icon name="trending-up" size={16} className="text-green-500" />
-                          <span className="text-xs text-green-600 dark:text-green-400 ml-1">+2.1%</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Quality Score</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">vs last period</p>
-                    </div>
-                    <div className="hedis-metric bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-                      <div className="flex items-center justify-center mb-2">
-                        <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">12.5</p>
-                        <div className="hedis-trend-indicator ml-2 flex items-center">
-                          <Icon name="trending-down" size={16} className="text-green-500" />
-                          <span className="text-xs text-green-600 dark:text-green-400 ml-1">-1.2</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Avg. Time (min)</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">vs last period</p>
-                    </div>
+                    <LineChart data={screeningData} title={`Screening Volume (${selectedTimeRange})`} color="blue" />
                   </div>
                   
                   {/* Performance Insights Section */}

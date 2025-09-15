@@ -864,7 +864,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-              </div> 
+              </div>
 
               {/* Enhanced KPI Cards with Animations */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -882,11 +882,11 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="p-3 bg-green-100 dark:bg-green-800 rounded-lg group-hover:bg-green-200 dark:group-hover:bg-green-700 transition-colors">
                           <Icon name="check-circle" size={24} className="text-green-600 dark:text-green-400" />
-                        </div>
+                    </div>
                         <div className="text-xs text-green-600 dark:text-green-400 font-medium px-2 py-1 bg-green-100 dark:bg-green-800 rounded-full">
                           +12% this week
-                        </div>
-                      </div>
+                  </div>
+                  </div>
                       <div>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.completedScreenings}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Completed Screenings</p>
@@ -896,8 +896,8 @@ export default function Dashboard() {
                           </div>
                           <span>85% goal</span>
                         </div>
-                      </div>
-                    </div>
+                </div>
+              </div>
 
                 {/* Saved Screenings Card */}
                 <div className="group bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-saved-screenings-card">
@@ -907,7 +907,7 @@ export default function Dashboard() {
                     </div>
                     <div className="text-xs text-orange-600 dark:text-orange-400 font-medium px-2 py-1 bg-orange-100 dark:bg-orange-800 rounded-full">
                       {dashboardStats.savedScreenings > 0 ? 'Action needed' : 'Up to date'}
-                    </div>
+                  </div>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.savedScreenings}</p>
@@ -915,9 +915,9 @@ export default function Dashboard() {
                     <div className="mt-3 flex items-center text-xs text-blue-600 dark:text-blue-400">
                       <Icon name="clock" size={12} className="mr-1" />
                       <span>Pending completion</span>
-                    </div>
                   </div>
                 </div>
+              </div>
 
                 {/* Revenue Cycle Card */}
                 <div className="group bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-eligibility-requests-card">
@@ -927,7 +927,7 @@ export default function Dashboard() {
                     </div>
                     <div className="text-xs text-purple-600 dark:text-purple-400 font-medium px-2 py-1 bg-purple-100 dark:bg-purple-800 rounded-full">
                       94% success
-                    </div>
+                  </div>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">24</p>
@@ -938,8 +938,8 @@ export default function Dashboard() {
                       </div>
                       <span>94%</span>
                     </div>
-                  </div>
                 </div>
+              </div>
 
                 {/* Claims Performance Card */}
                 <div className="group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-pending-actions-card">
@@ -949,7 +949,7 @@ export default function Dashboard() {
                     </div>
                     <div className="text-xs text-red-600 dark:text-red-400 font-medium px-2 py-1 bg-red-100 dark:bg-red-800 rounded-full">
                       {dashboardStats.savedScreenings + 3 > 5 ? 'High priority' : 'Normal'}
-                    </div>
+                  </div>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{dashboardStats.savedScreenings + 3}</p>
@@ -957,12 +957,12 @@ export default function Dashboard() {
                     <div className="mt-3 flex items-center text-xs text-amber-600 dark:text-amber-400">
                       <Icon name="trending-up" size={12} className="mr-1" />
                       <span>Avg. 2.3 days to complete</span>
-                    </div>
-                  </div>
+                </div>
+              </div>
                 </div>
                   </>
                 )}
-              </div>
+            </div>
 
               {/* Performance Analytics Section */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
@@ -1037,13 +1037,13 @@ export default function Dashboard() {
                       <span>Smart suggestions & insights</span>
                     </div>
                   </div>
-                  <HelperButton 
-                    currentForm="Dashboard"
-                    currentField="general"
-                    currentStep={1}
-                    onNavigate={handleMILANavigation}
-                  />
-                </div>
+                    <HelperButton 
+                      currentForm="Dashboard"
+                      currentField="general"
+                      currentStep={1}
+                      onNavigate={handleMILANavigation}
+                    />
+                  </div>
                   </>
                 )}
               </div>
@@ -1066,9 +1066,9 @@ export default function Dashboard() {
                       {dashboardStats.completedScreenings} completed
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <button 
-                      onClick={() => handleQuickAction('hedis')}
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => handleQuickAction('hedis')}
                       className="w-full flex items-center justify-between p-3 text-left bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors group/button"
                     >
                       <div className="flex items-center">
@@ -1076,8 +1076,8 @@ export default function Dashboard() {
                         <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Start New Screening</span>
                       </div>
                       <Icon name="arrow-right" size={14} className="text-blue-500 dark:text-blue-400 group-hover/button:translate-x-1 transition-transform" />
-                    </button>
-                    <button 
+                  </button>
+                  <button 
                       onClick={() => handleQuickAction('completed-screenings')}
                       className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors group/button"
                     >
@@ -1086,7 +1086,7 @@ export default function Dashboard() {
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">View Completed Forms</span>
                       </div>
                       <Icon name="arrow-right" size={14} className="text-gray-500 dark:text-gray-400 group-hover/button:translate-x-1 transition-transform" />
-                    </button>
+                  </button>
                   </div>
                 </div>
 
@@ -1107,7 +1107,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <button 
+                  <button 
                       onClick={() => handleQuickAction('eligibility')}
                       className="w-full flex items-center justify-between p-3 text-left bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg transition-colors group/button"
                     >
@@ -1116,9 +1116,9 @@ export default function Dashboard() {
                         <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Patient Eligibility</span>
                       </div>
                       <Icon name="arrow-right" size={14} className="text-purple-500 dark:text-purple-400 group-hover/button:translate-x-1 transition-transform" />
-                    </button>
-                    <button 
-                      onClick={() => handleQuickAction('pic')}
+                  </button>
+                  <button 
+                    onClick={() => handleQuickAction('pic')}
                       className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors group/button"
                     >
                       <div className="flex items-center">
@@ -1126,9 +1126,9 @@ export default function Dashboard() {
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Submit Claims</span>
                       </div>
                       <Icon name="arrow-right" size={14} className="text-gray-500 dark:text-gray-400 group-hover/button:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
+                  </button>
                 </div>
+              </div>
 
                 {/* Recent Activity & Alerts Card */}
                 <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 desktop-recent-activity-card">
@@ -1147,7 +1147,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    {dashboardStats.recentCompletedScreenings.length > 0 ? (
+                  {dashboardStats.recentCompletedScreenings.length > 0 ? (
                       dashboardStats.recentCompletedScreenings.map((screening) => (
                         <div key={screening.id} className="flex items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                           <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
@@ -1156,15 +1156,15 @@ export default function Dashboard() {
                             <p className="text-xs text-gray-500 dark:text-gray-400">Screening completed • Just now</p>
                           </div>
                           <Icon name="check-circle" size={16} className="text-green-500" />
-                        </div>
-                      ))
-                    ) : (
+                      </div>
+                    ))
+                  ) : (
                       <div className="text-center py-4">
                         <Icon name="inbox" size={32} className="text-gray-400 dark:text-gray-500 mx-auto mb-2" />
                         <p className="text-sm text-gray-500 dark:text-gray-400">No recent activity</p>
-                      </div>
-                    )}
-                    {dashboardStats.recentSavedScreenings.length > 0 && (
+                    </div>
+                  )}
+                  {dashboardStats.recentSavedScreenings.length > 0 && (
                       <div className="flex items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                         <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
                         <div className="flex-1">
@@ -1174,8 +1174,8 @@ export default function Dashboard() {
                           <p className="text-xs text-gray-500 dark:text-gray-400">Pending completion • Action needed</p>
                         </div>
                         <Icon name="clock" size={16} className="text-yellow-500" />
-                      </div>
-                    )}
+                    </div>
+                  )}
                     <div className="flex items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
                       <div className="flex-1">
@@ -1193,22 +1193,22 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Today's Insights</h3>
                   <div className="flex items-center space-x-3">
-                    <button
+                  <button 
                       onClick={exportDashboardData}
                       className="flex items-center space-x-2 px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
-                    >
+                  >
                       <Icon name="download" size={14} />
                       <span>Export</span>
-                    </button>
+                  </button>
                     <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">View all reports</button>
-                  </div>
                 </div>
+              </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Top Performing Actions */}
                   <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-800 rounded-lg mb-3">
                       <Icon name="trending-up" size={20} className="text-purple-600 dark:text-purple-400" />
-                    </div>
+            </div>
                     <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Top Action</h4>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Patient Eligibility</p>
                     <p className="text-lg font-bold text-purple-600 dark:text-purple-400">95%</p>
@@ -1279,12 +1279,12 @@ export default function Dashboard() {
                 {dashboardLoading ? (
                   <>
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
-                      <div className="flex items-center">
+                  <div className="flex items-center">
                         <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3"></div>
                         <div className="flex-1">
                           <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
                           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
-                        </div>
+                    </div>
                       </div>
                     </div>
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
@@ -1329,54 +1329,54 @@ export default function Dashboard() {
                             <p className="text-xl font-bold text-gray-900 dark:text-white">{dashboardStats.completedScreenings}</p>
                             <span className="text-xs text-green-600 dark:text-green-400 ml-1">+12%</span>
                           </div>
-                        </div>
-                      </div>
                     </div>
+                  </div>
+                </div>
 
                     {/* Saved Screenings Card */}
                     <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-saved-screenings-card">
-                      <div className="flex items-center">
+                  <div className="flex items-center">
                         <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center mr-3">
                           <Icon name="save" size={18} className="text-blue-600 dark:text-blue-400" />
-                        </div>
+                    </div>
                         <div className="flex-1">
                           <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">Saved</p>
                           <div className="flex items-baseline">
                             <p className="text-xl font-bold text-gray-900 dark:text-white">{dashboardStats.savedScreenings}</p>
                             <span className="text-xs text-orange-600 dark:text-orange-400 ml-1">Action</span>
                           </div>
-                        </div>
-                      </div>
                     </div>
+                  </div>
+                </div>
 
                     {/* Eligibility Requests Card */}
                     <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-eligibility-requests-card">
-                      <div className="flex items-center">
+                  <div className="flex items-center">
                         <div className="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-3">
                           <Icon name="user-check" size={18} className="text-purple-600 dark:text-purple-400" />
-                        </div>
+                    </div>
                         <div className="flex-1">
                           <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mb-1">Eligibility</p>
                           <div className="flex items-baseline">
                             <p className="text-xl font-bold text-gray-900 dark:text-white">24</p>
                             <span className="text-xs text-purple-600 dark:text-purple-400 ml-1">94%</span>
                           </div>
-                        </div>
-                      </div>
                     </div>
+                  </div>
+                </div>
 
                     {/* Pending Actions Card */}
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-pending-actions-card">
-                      <div className="flex items-center">
+                  <div className="flex items-center">
                         <div className="w-10 h-10 bg-amber-100 dark:bg-amber-800 rounded-lg flex items-center justify-center mr-3">
                           <Icon name="clock" size={18} className="text-amber-600 dark:text-amber-400" />
-                        </div>
+                    </div>
                         <div className="flex-1">
                           <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-1">Pending</p>
                           <div className="flex items-baseline">
                             <p className="text-xl font-bold text-gray-900 dark:text-white">{dashboardStats.savedScreenings + 3}</p>
                             <span className="text-xs text-red-600 dark:text-red-400 ml-1">{dashboardStats.savedScreenings + 3 > 5 ? 'High' : 'Normal'}</span>
-                          </div>
+                    </div>
                         </div>
                       </div>
                     </div>

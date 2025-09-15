@@ -176,6 +176,7 @@ export default function HelperModal({
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
   const [showExampleQuestions, setShowExampleQuestions] = useState(false)
   const [processingExampleQuestion, setProcessingExampleQuestion] = useState<string | null>(null)
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null)
   const [conversationContext, setConversationContext] = useState<{
     lastCode?: string
     lastTopic?: string
@@ -410,18 +411,30 @@ export default function HelperModal({
     }, 500) // Small delay to show the question in the input field first
   }
 
-  // Auto-scroll to the last assistant message when new assistant messages are added
+  // Auto-scroll to position the last assistant message halfway up the chat window
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1]
       // Only scroll if the last message is from the assistant
       if (lastMessage.type === 'assistant' && lastAssistantMessageRef.current) {
         setTimeout(() => {
-          lastAssistantMessageRef.current?.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'nearest'
-          })
+          const messagesContainer = document.querySelector('.ai-helper-messages')
+          if (messagesContainer && lastAssistantMessageRef.current) {
+            const containerHeight = messagesContainer.clientHeight
+            const messageTop = lastAssistantMessageRef.current.offsetTop
+            const scrollPosition = messageTop - (containerHeight / 2)
+            
+            messagesContainer.scrollTo({
+              top: Math.max(0, scrollPosition),
+              behavior: 'smooth'
+            })
+            
+            // Highlight the new message for 10 seconds
+            setHighlightedMessageId(lastMessage.id)
+            setTimeout(() => {
+              setHighlightedMessageId(null)
+            }, 10000) // 10 seconds
+          }
         }, 100) // Small delay to ensure the message is rendered
       }
     }
@@ -1670,6 +1683,8 @@ export default function HelperModal({
                         : message.type === 'alert'
                         ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 text-gray-900 dark:text-white shadow-md border border-yellow-200 dark:border-yellow-700'
                         : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white shadow-md'
+                    } ${
+                      highlightedMessageId === message.id ? 'animate-highlight-pulse border-2 border-blue-500' : ''
                     }`}
                   >
                     {/* Use formatted text renderer for better list formatting */}

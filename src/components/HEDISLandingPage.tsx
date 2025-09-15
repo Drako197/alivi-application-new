@@ -4301,9 +4301,6 @@ export default function HEDISLandingPage({
                   </div>
                 </div>
               </div>
-              <button className="hedis-refresh-btn p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-white/20 hover:bg-white/70 dark:hover:bg-gray-700/50 transition-colors">
-                <Icon name="refresh-cw" size={18} className="text-gray-600 dark:text-gray-400" />
-              </button>
             </div>
           </div>
         </div>

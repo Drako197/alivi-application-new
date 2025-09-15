@@ -139,6 +139,18 @@ export default function HelperModal({
     }
     return getDemoUserFirstName()
   }
+
+  // Clear MILA localStorage for testing (development only)
+  const clearMILAStorage = () => {
+    localStorage.removeItem('mila_welcomed_user')
+    localStorage.removeItem('mila_user_interacted')
+    localStorage.removeItem('mila_has_shown_suggestions')
+    setHasWelcomedUser(false)
+    setHasUserInteracted(false)
+    setHasShownSuggestions(false)
+    setShowExampleQuestions(true)
+    console.log('MILA storage cleared for testing')
+  }
   
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -424,9 +436,12 @@ export default function HelperModal({
 
   // Show example questions when MILA opens and user hasn't interacted
   useEffect(() => {
+    console.log('Example questions useEffect - isOpen:', isOpen, 'hasUserInteracted:', hasUserInteracted, 'messages.length:', messages.length)
     if (isOpen && !hasUserInteracted && messages.length === 0) {
+      console.log('Showing example questions')
       setShowExampleQuestions(true)
     } else if (isOpen && hasUserInteracted) {
+      console.log('Hiding example questions - user has interacted')
       setShowExampleQuestions(false)
     }
   }, [isOpen, hasUserInteracted, messages.length])
@@ -1946,9 +1961,9 @@ export default function HelperModal({
                 </button>
               </form>
               
-              {/* Development Test Button for Gemini AI */}
+              {/* Development Test Buttons */}
               {import.meta.env.DEV && (
-                <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 flex space-x-2">
                   <button
                     onClick={async () => {
                       try {
@@ -1965,6 +1980,12 @@ export default function HelperModal({
                     className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   >
                     🧪 Test Gemini AI
+                  </button>
+                  <button
+                    onClick={clearMILAStorage}
+                    className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                  >
+                    🔄 Reset MILA
                   </button>
                 </div>
               )}

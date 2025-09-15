@@ -366,6 +366,7 @@ export default function HelperModal({
 
   // Add initial welcome message and setup personalization (only once per session)
   useEffect(() => {
+    console.log('Welcome useEffect - isOpen:', isOpen, 'messages.length:', messages.length, 'hasWelcomedUser:', hasWelcomedUser, 'hasUserInteracted:', hasUserInteracted)
     if (isOpen && messages.length === 0 && !hasWelcomedUser) {
       // Initialize personalization
       PersonalizationService.incrementSessionCount()
@@ -409,11 +410,13 @@ export default function HelperModal({
 
   // Add predictive suggestions when assistant opens (only once per session)
   useEffect(() => {
-    if (isOpen && currentForm && currentField && !hasShownSuggestions) {
+    console.log('Predictive suggestions useEffect - isOpen:', isOpen, 'currentForm:', currentForm, 'currentField:', currentField, 'hasShownSuggestions:', hasShownSuggestions, 'hasUserInteracted:', hasUserInteracted)
+    if (isOpen && currentForm && currentField && !hasShownSuggestions && !hasUserInteracted) {
+      console.log('Loading predictive suggestions...')
       loadPredictiveSuggestions()
       setHasShownSuggestions(true)
     }
-  }, [isOpen, currentForm, currentField, currentStep, hasShownSuggestions])
+  }, [isOpen, currentForm, currentField, currentStep, hasShownSuggestions, hasUserInteracted])
 
   const loadPredictiveSuggestions = async () => {
     try {
@@ -443,8 +446,11 @@ export default function HelperModal({
           addMessage('assistant', generalWelcome, 'fade-in')
         } else if (!hasUserInteracted) {
           // Only show repeated greeting if user hasn't interacted yet
+          console.log('Showing repeated greeting - hasUserInteracted:', hasUserInteracted)
           const contextualMessage = `I'm here to help with your ${currentForm} form. You can ask me about codes, terminology, form help, or any medical billing questions!`
           addMessage('assistant', contextualMessage, 'fade-in')
+        } else {
+          console.log('User has interacted - not showing repeated greeting')
         }
         // If user has interacted before, don't show any greeting
       }

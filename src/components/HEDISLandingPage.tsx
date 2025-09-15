@@ -4607,38 +4607,6 @@ export default function HEDISLandingPage({
                   </div>
                 </div>
 
-                {/* M.I.L.A. AI Assistant Card - Enhanced */}
-                <div className="hedis-mila-assistant-card bg-gradient-to-br from-blue-500 via-purple-600 to-purple-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-center mb-4">
-                    <div className="p-2 bg-white/20 rounded-lg mr-3">
-                      <Icon name="bot" size={24} className="text-white" />
-                    </div>
-                    <h3 className="hedis-assistant-title text-lg font-semibold">M.I.L.A. AI Assistant</h3>
-                  </div>
-                  <p className="hedis-assistant-description text-sm text-blue-100 mb-6">
-                    Your Medical Intelligence & Learning Assistant for HEDIS quality measures and patient screening guidance.
-                  </p>
-                  <div className="hedis-assistant-features space-y-3 mb-6">
-                    <div className="flex items-center text-xs text-blue-100">
-                      <Icon name="search" size={12} className="mr-2" />
-                      <span>Quality measure lookup</span>
-                    </div>
-                    <div className="flex items-center text-xs text-blue-100">
-                      <Icon name="check-circle" size={12} className="mr-2" />
-                      <span>Screening validation</span>
-                    </div>
-                    <div className="flex items-center text-xs text-blue-100">
-                      <Icon name="brain" size={12} className="mr-2" />
-                      <span>Smart recommendations</span>
-                    </div>
-                  </div>
-                  <HelperButton 
-                    currentForm="HEDIS"
-                    currentField="dashboard"
-                    currentStep={1}
-                    onNavigate={handleMILANavigation}
-                  />
-                </div>
               </>
             )}
           </div>

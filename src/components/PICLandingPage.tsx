@@ -101,15 +101,65 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
 
   const picChartData = getPICChartData(selectedTimeRange)
 
-  // PIC Dashboard stats
-  const picStats = {
-    claimsProcessed: 1247,
-    eligibilityRequests: 892,
-    successRate: 94.2,
-    avgProcessingTime: 2.8,
-    pendingClaims: 23,
-    rejectedClaims: 15
+  // PIC Dashboard stats based on time range
+  const getPICStats = (timeRange: string) => {
+    switch (timeRange) {
+      case '7D':
+        return {
+          claimsProcessed: 287,
+          eligibilityRequests: 198,
+          successRate: 96.1,
+          avgProcessingTime: 2.3,
+          trend: {
+            claimsProcessed: { value: +18, isPositive: true },
+            eligibilityRequests: { value: +12, isPositive: true },
+            successRate: { value: +3.2, isPositive: true },
+            avgProcessingTime: { value: -22, isPositive: true }
+          }
+        }
+      case '30D':
+        return {
+          claimsProcessed: 1247,
+          eligibilityRequests: 892,
+          successRate: 94.2,
+          avgProcessingTime: 2.8,
+          trend: {
+            claimsProcessed: { value: +12, isPositive: true },
+            eligibilityRequests: { value: +8, isPositive: true },
+            successRate: { value: +2.1, isPositive: true },
+            avgProcessingTime: { value: -15, isPositive: true }
+          }
+        }
+      case '90D':
+        return {
+          claimsProcessed: 3891,
+          eligibilityRequests: 2764,
+          successRate: 92.8,
+          avgProcessingTime: 3.1,
+          trend: {
+            claimsProcessed: { value: +7, isPositive: true },
+            eligibilityRequests: { value: +5, isPositive: true },
+            successRate: { value: -1.2, isPositive: false },
+            avgProcessingTime: { value: +8, isPositive: false }
+          }
+        }
+      default:
+        return {
+          claimsProcessed: 1247,
+          eligibilityRequests: 892,
+          successRate: 94.2,
+          avgProcessingTime: 2.8,
+          trend: {
+            claimsProcessed: { value: +12, isPositive: true },
+            eligibilityRequests: { value: +8, isPositive: true },
+            successRate: { value: +2.1, isPositive: true },
+            avgProcessingTime: { value: -15, isPositive: true }
+          }
+        }
+    }
   }
+
+  const picStats = getPICStats(selectedTimeRange)
 
   // Chart Components for PIC Analytics
   const PICLineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
@@ -478,7 +528,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
               
               {/* Action Buttons */}
               <div className="pic-header-actions flex items-center space-x-2">
-                <button 
+                <button
                   onClick={() => setMetricsLoading(true)}
                   className="pic-refresh-btn flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
                 >
@@ -510,12 +560,18 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   {/* Claims Processed Card */}
                   <div className="pic-claims-processed-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 animate-slideInUp">
                     <div className="pic-kpi-header flex items-center justify-between mb-4">
-                      <div className="pic-kpi-icon w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                        <Icon name="file-check" size={24} className="text-white" />
+                      <div className="pic-kpi-icon w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                        <Icon name="file-check" size={24} className="text-blue-600 dark:text-blue-400" />
                       </div>
-                      <div className="pic-kpi-trend flex items-center space-x-1 text-green-600 dark:text-green-400">
-                        <Icon name="trending-up" size={16} />
-                        <span className="text-sm font-medium">+12%</span>
+                      <div className={`pic-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.claimsProcessed.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.claimsProcessed.isPositive ? "trending-up" : "trending-down"} size={16} />
+                        <span className="text-sm font-medium">
+                          {picStats.trend.claimsProcessed.isPositive ? '+' : ''}{picStats.trend.claimsProcessed.value}%
+                        </span>
                       </div>
                     </div>
                     <div className="pic-kpi-content">
@@ -531,12 +587,18 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   {/* Eligibility Requests Card */}
                   <div className="pic-eligibility-requests-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 animate-slideInUp" style={{animationDelay: '0.1s'}}>
                     <div className="pic-kpi-header flex items-center justify-between mb-4">
-                      <div className="pic-kpi-icon w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                        <Icon name="user-check" size={24} className="text-white" />
+                      <div className="pic-kpi-icon w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                        <Icon name="user-check" size={24} className="text-green-600 dark:text-green-400" />
                       </div>
-                      <div className="pic-kpi-trend flex items-center space-x-1 text-green-600 dark:text-green-400">
-                        <Icon name="trending-up" size={16} />
-                        <span className="text-sm font-medium">+8%</span>
+                      <div className={`pic-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.eligibilityRequests.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.eligibilityRequests.isPositive ? "trending-up" : "trending-down"} size={16} />
+                        <span className="text-sm font-medium">
+                          {picStats.trend.eligibilityRequests.isPositive ? '+' : ''}{picStats.trend.eligibilityRequests.value}%
+                        </span>
                       </div>
                     </div>
                     <div className="pic-kpi-content">
@@ -552,12 +614,18 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   {/* Success Rate Card */}
                   <div className="pic-success-rate-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 animate-slideInUp" style={{animationDelay: '0.2s'}}>
                     <div className="pic-kpi-header flex items-center justify-between mb-4">
-                      <div className="pic-kpi-icon w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <Icon name="target" size={24} className="text-white" />
+                      <div className="pic-kpi-icon w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                        <Icon name="target" size={24} className="text-purple-600 dark:text-purple-400" />
                       </div>
-                      <div className="pic-kpi-trend flex items-center space-x-1 text-green-600 dark:text-green-400">
-                        <Icon name="trending-up" size={16} />
-                        <span className="text-sm font-medium">+2.1%</span>
+                      <div className={`pic-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.successRate.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.successRate.isPositive ? "trending-up" : "trending-down"} size={16} />
+                        <span className="text-sm font-medium">
+                          {picStats.trend.successRate.isPositive ? '+' : ''}{picStats.trend.successRate.value}%
+                        </span>
                       </div>
                     </div>
                     <div className="pic-kpi-content">
@@ -573,12 +641,18 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   {/* Processing Time Card */}
                   <div className="pic-processing-time-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 animate-slideInUp" style={{animationDelay: '0.3s'}}>
                     <div className="pic-kpi-header flex items-center justify-between mb-4">
-                      <div className="pic-kpi-icon w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center">
-                        <Icon name="clock" size={24} className="text-white" />
+                      <div className="pic-kpi-icon w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
+                        <Icon name="clock" size={24} className="text-amber-600 dark:text-amber-400" />
                       </div>
-                      <div className="pic-kpi-trend flex items-center space-x-1 text-green-600 dark:text-green-400">
-                        <Icon name="trending-down" size={16} />
-                        <span className="text-sm font-medium">-15%</span>
+                      <div className={`pic-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.avgProcessingTime.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.avgProcessingTime.isPositive ? "trending-down" : "trending-up"} size={16} />
+                        <span className="text-sm font-medium">
+                          {picStats.trend.avgProcessingTime.value > 0 ? '+' : ''}{picStats.trend.avgProcessingTime.value}%
+                        </span>
                       </div>
                     </div>
                     <div className="pic-kpi-content">
@@ -605,19 +679,19 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                 <p className="pic-section-subtitle text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Quick access to your most used forms and tools
                 </p>
-              </div>
-            </div>
-            
+        </div>
+      </div>
+
             <div className="pic-primary-actions-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {frequentActions.map((action, index) => (
-                <div
-                  key={action.id}
-                  onClick={() => handleActionClick(action)}
+          {frequentActions.map((action, index) => (
+            <div
+              key={action.id}
+              onClick={() => handleActionClick(action)}
                   className="pic-primary-action-card group bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer"
                 >
                   <div className="pic-action-header flex items-center justify-between mb-4">
-                    <div className="pic-action-icon-wrapper w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Icon name={action.icon} size={24} className="text-white" />
+                    <div className="pic-action-icon-wrapper w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <Icon name={action.icon} size={24} className="text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="pic-action-badge">
                       <span className="pic-badge-popular bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-medium px-2 py-1 rounded-full flex items-center space-x-1">
@@ -646,49 +720,8 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
             </div>
           </div>
 
-          {/* Analytics Charts Section */}
-          <div className="pic-analytics-section mb-8 animate-slideInUp" style={{animationDelay: '0.5s'}}>
-            <div className="pic-section-header mb-6">
-              <h2 className="pic-section-title text-xl font-semibold text-gray-900 dark:text-white">
-                Analytics Overview
-              </h2>
-              <p className="pic-section-subtitle text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Track your PIC performance metrics and trends
-              </p>
-            </div>
-            
-            <div className="pic-charts-grid grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Claims Volume Chart */}
-              <div className="pic-chart-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
-                <PICLineChart 
-                  data={picChartData.claims} 
-                  title="Claims Volume" 
-                  color="blue" 
-                />
-              </div>
-              
-              {/* Eligibility Requests Chart */}
-              <div className="pic-chart-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
-                <PICLineChart 
-                  data={picChartData.eligibility} 
-                  title="Eligibility Requests" 
-                  color="green" 
-                />
-              </div>
-              
-              {/* Success Rate Chart */}
-              <div className="pic-chart-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
-                <PICLineChart 
-                  data={picChartData.success} 
-                  title="Success Rate %" 
-                  color="purple" 
-                />
-              </div>
-            </div>
-          </div>
-
           {/* All Actions Section */}
-          <div className="pic-all-actions-section animate-slideInUp" style={{animationDelay: '0.6s'}}>
+          <div className="pic-all-actions-section animate-slideInUp" style={{animationDelay: '0.5s'}}>
             <div className="pic-section-header flex items-center justify-between mb-6">
               <div>
                 <h2 className="pic-section-title text-xl font-semibold text-gray-900 dark:text-white">
@@ -748,8 +781,8 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                       </div>
                       {action.frequency >= 80 && (
                         <span className="pic-badge-popular bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-medium px-2 py-1 rounded-full">
-                          Popular
-                        </span>
+                  Popular
+                </span>
                       )}
                     </div>
                     
@@ -771,7 +804,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                 ))}
               </div>
             )}
-          </div>
+            </div>
         </div>
       </div>
 
@@ -787,8 +820,20 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
               ) : (
                 <>
                   <div className="pic-mobile-kpi-card bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                    <div className="pic-mobile-kpi-icon w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center mb-3">
-                      <Icon name="file-check" size={16} className="text-white" />
+                    <div className="pic-mobile-kpi-header flex items-center justify-between mb-3">
+                      <div className="pic-mobile-kpi-icon w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-md flex items-center justify-center">
+                        <Icon name="file-check" size={16} className="text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className={`pic-mobile-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.claimsProcessed.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.claimsProcessed.isPositive ? "trending-up" : "trending-down"} size={12} />
+                        <span className="text-xs font-medium">
+                          {picStats.trend.claimsProcessed.isPositive ? '+' : ''}{picStats.trend.claimsProcessed.value}%
+                        </span>
+                      </div>
                     </div>
                     <div className="pic-mobile-kpi-value text-xl font-bold text-gray-900 dark:text-white">
                       {picStats.claimsProcessed.toLocaleString()}
@@ -799,8 +844,20 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   </div>
                   
                   <div className="pic-mobile-kpi-card bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                    <div className="pic-mobile-kpi-icon w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-md flex items-center justify-center mb-3">
-                      <Icon name="user-check" size={16} className="text-white" />
+                    <div className="pic-mobile-kpi-header flex items-center justify-between mb-3">
+                      <div className="pic-mobile-kpi-icon w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-md flex items-center justify-center">
+                        <Icon name="user-check" size={16} className="text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className={`pic-mobile-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.eligibilityRequests.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.eligibilityRequests.isPositive ? "trending-up" : "trending-down"} size={12} />
+                        <span className="text-xs font-medium">
+                          {picStats.trend.eligibilityRequests.isPositive ? '+' : ''}{picStats.trend.eligibilityRequests.value}%
+                        </span>
+                      </div>
                     </div>
                     <div className="pic-mobile-kpi-value text-xl font-bold text-gray-900 dark:text-white">
                       {picStats.eligibilityRequests.toLocaleString()}
@@ -811,8 +868,20 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   </div>
                   
                   <div className="pic-mobile-kpi-card bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                    <div className="pic-mobile-kpi-icon w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-md flex items-center justify-center mb-3">
-                      <Icon name="target" size={16} className="text-white" />
+                    <div className="pic-mobile-kpi-header flex items-center justify-between mb-3">
+                      <div className="pic-mobile-kpi-icon w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-md flex items-center justify-center">
+                        <Icon name="target" size={16} className="text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div className={`pic-mobile-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.successRate.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.successRate.isPositive ? "trending-up" : "trending-down"} size={12} />
+                        <span className="text-xs font-medium">
+                          {picStats.trend.successRate.isPositive ? '+' : ''}{picStats.trend.successRate.value}%
+                        </span>
+                      </div>
                     </div>
                     <div className="pic-mobile-kpi-value text-xl font-bold text-gray-900 dark:text-white">
                       {picStats.successRate}%
@@ -823,8 +892,20 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   </div>
                   
                   <div className="pic-mobile-kpi-card bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                    <div className="pic-mobile-kpi-icon w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-md flex items-center justify-center mb-3">
-                      <Icon name="clock" size={16} className="text-white" />
+                    <div className="pic-mobile-kpi-header flex items-center justify-between mb-3">
+                      <div className="pic-mobile-kpi-icon w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-md flex items-center justify-center">
+                        <Icon name="clock" size={16} className="text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className={`pic-mobile-kpi-trend flex items-center space-x-1 ${
+                        picStats.trend.avgProcessingTime.isPositive 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        <Icon name={picStats.trend.avgProcessingTime.isPositive ? "trending-down" : "trending-up"} size={12} />
+                        <span className="text-xs font-medium">
+                          {picStats.trend.avgProcessingTime.value > 0 ? '+' : ''}{picStats.trend.avgProcessingTime.value}%
+                        </span>
+                      </div>
                     </div>
                     <div className="pic-mobile-kpi-value text-xl font-bold text-gray-900 dark:text-white">
                       {picStats.avgProcessingTime}d
@@ -845,14 +926,14 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
             </h2>
             <div className="pic-mobile-actions-grid grid grid-cols-1 gap-3">
               {frequentActions.map((action) => (
-                <div
-                  key={action.id}
-                  onClick={() => handleActionClick(action)}
+              <div
+                key={action.id}
+                onClick={() => handleActionClick(action)}
                   className="pic-mobile-action-card bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-200"
-                >
-                  <div className="pic-mobile-action-icon w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                    <Icon name={action.icon} size={20} className="text-white" />
-                  </div>
+              >
+                  <div className="pic-mobile-action-icon w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                    <Icon name={action.icon} size={20} className="text-blue-600 dark:text-blue-400" />
+                </div>
                   <div className="pic-mobile-action-content flex-1">
                     <h3 className="pic-mobile-action-title text-sm font-semibold text-gray-900 dark:text-white">
                       {action.name}
@@ -887,7 +968,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                   className="pic-mobile-search-input w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
                 />
               </div>
-            </div>
+                </div>
             
             {filteredActions.length === 0 ? (
               <div className="pic-mobile-empty-state text-center py-8">
@@ -915,12 +996,12 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                       </p>
                     </div>
                     <Icon name="arrow-right" size={14} className="text-gray-400" />
-                  </div>
-                ))}
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
+          </div>
+      </div>
       </div>
       
       {/* M.I.L.A. AI Assistant */}

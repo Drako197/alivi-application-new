@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+pic-form-progressimport { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Sidebar from './Sidebar'
 import MobileHeader from './MobileHeader'
@@ -629,11 +629,15 @@ export default function Dashboard() {
     } else if (index === 1 && breadcrumbPath[1] === 'H.E.D.I.S.') {
       // Clicking on H.E.D.I.S. should take us back to HEDIS dashboard
       setActiveDesktopTab('hedis')
+      // Reset HEDIS component to landing page
+      setHEDISResetCounter(prev => prev + 1)
       // The HEDIS component will update the breadcrumb to show just Dashboard > H.E.D.I.S.
     } else if (index === 1 && breadcrumbPath[1] === 'P.I.C.') {
       // Clicking on P.I.C. should take us back to PIC landing page
       setActiveDesktopTab('pic')
       setBreadcrumbPath(['Dashboard', 'P.I.C.'])
+      // Reset PIC component to landing page
+      setPICResetCounter(prev => prev + 1)
     }
     // For future sub-pages, we can add more logic here
   }
@@ -836,38 +840,38 @@ export default function Dashboard() {
 
       default:
         return (
-          <div className="dashboard-content animate-fadeIn">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="dashboard-main-content animate-fadeIn">
+            <div className="dashboard-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {/* Modern Welcome Section with Time-based Greeting */}
-              <div className="welcome-section mb-8">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <div className="dashboard-welcome-section mb-8">
+                <div className="dashboard-welcome-header flex items-center justify-between">
+                  <div className="dashboard-welcome-text">
+                    <h1 className="dashboard-welcome-title text-3xl font-bold text-gray-900 dark:text-white mb-2">
                       Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.fullName || 'User'}!
                     </h1>
-                    <p className="text-lg text-gray-600 dark:text-gray-400">
+                    <p className="dashboard-welcome-subtitle text-lg text-gray-600 dark:text-gray-400">
                       Here's your medical billing overview for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="dashboard-welcome-actions flex items-center space-x-4">
                     <button
                       onClick={refreshMetrics}
                       disabled={metricsLoading}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50"
+                      className="dashboard-refresh-btn flex items-center space-x-2 px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50"
                     >
                       <Icon name={metricsLoading ? "refresh-cw" : "refresh-ccw"} size={16} className={metricsLoading ? "animate-spin" : ""} />
                       <span className="text-sm font-medium">{metricsLoading ? 'Updating...' : 'Refresh'}</span>
                     </button>
-                    <div className="text-right">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Last updated</div>
-                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">{new Date().toLocaleTimeString()}</div>
+                    <div className="dashboard-last-updated text-right">
+                      <div className="dashboard-last-updated-label text-sm text-gray-500 dark:text-gray-400">Last updated</div>
+                      <div className="dashboard-last-updated-time text-sm font-medium text-gray-700 dark:text-gray-300">{new Date().toLocaleTimeString()}</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Enhanced KPI Cards with Animations */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="dashboard-kpi-section grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {dashboardLoading ? (
                   <>
                     <SkeletonCard height="h-24" />
@@ -965,7 +969,7 @@ export default function Dashboard() {
             </div>
 
               {/* Performance Analytics Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              <div className="dashboard-analytics-section grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                 {dashboardLoading ? (
                   <>
                     <SkeletonCard className="lg:col-span-2" height="h-64" />
@@ -974,15 +978,15 @@ export default function Dashboard() {
                 ) : (
                   <>
                 {/* Revenue Cycle Chart */}
-                <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 desktop-revenue-cycle-chart-container">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Revenue Cycle Performance</h3>
-                    <div className="flex space-x-2">
+                <div className="dashboard-revenue-chart-card lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="dashboard-chart-header flex items-center justify-between mb-6">
+                    <h3 className="dashboard-chart-title text-lg font-semibold text-gray-900 dark:text-white">Revenue Cycle Performance</h3>
+                    <div className="dashboard-time-selector flex space-x-2">
                       {['7D', '30D', '90D'].map((range) => (
                         <button
                           key={range}
                           onClick={() => setSelectedTimeRange(range)}
-                          className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                          className={`dashboard-time-btn px-3 py-1 text-xs font-medium rounded-full transition-colors ${
                             selectedTimeRange === range
                               ? 'text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-400'
                               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -993,20 +997,20 @@ export default function Dashboard() {
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-6">
+                  <div className="dashboard-charts-container space-y-6">
                     {/* Interactive Revenue Trend Chart */}
-                    <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
+                    <div className="dashboard-revenue-trend-chart p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
                       <LineChart data={chartData.revenue} title={`Revenue Trend (${selectedTimeRange})`} color="blue" />
                     </div>
                     
                     {/* Performance Metrics Bar Chart */}
-                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Performance Overview</h4>
+                    <div className="dashboard-performance-chart p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <h4 className="dashboard-performance-chart-title text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Performance Overview</h4>
                       <BarChart data={performanceData} labels={performanceLabels} colors={performanceColors} />
                     </div>
                     
                     {/* Claims Processing Chart */}
-                    <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
+                    <div className="dashboard-claims-chart p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
                       <LineChart data={chartData.claims} title={`Claims Success Rate (${selectedTimeRange})`} color="green" />
                     </div>
                   </div>
@@ -1189,52 +1193,52 @@ export default function Dashboard() {
               </div>
 
               {/* Quick Insights Section */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 desktop-quick-insights-section">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Today's Insights</h3>
-                  <div className="flex items-center space-x-3">
+              <div className="dashboard-insights-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="dashboard-insights-header flex items-center justify-between mb-6">
+                  <h3 className="dashboard-insights-title text-lg font-semibold text-gray-900 dark:text-white">Today's Insights</h3>
+                  <div className="dashboard-insights-actions flex items-center space-x-3">
                   <button 
                       onClick={exportDashboardData}
-                      className="flex items-center space-x-2 px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                      className="dashboard-export-btn flex items-center space-x-2 px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
                   >
                       <Icon name="download" size={14} />
                       <span>Export</span>
                   </button>
-                    <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">View all reports</button>
+                    <button className="dashboard-view-reports-btn text-sm text-blue-600 dark:text-blue-400 hover:underline">View all reports</button>
                 </div>
               </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="dashboard-insights-grid grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Top Performing Actions */}
-                  <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-800 rounded-lg mb-3">
+                  <div className="dashboard-top-action-card text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg">
+                    <div className="dashboard-insight-icon inline-flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-800 rounded-lg mb-3">
                       <Icon name="trending-up" size={20} className="text-purple-600 dark:text-purple-400" />
             </div>
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Top Action</h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Patient Eligibility</p>
-                    <p className="text-lg font-bold text-purple-600 dark:text-purple-400">95%</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">success rate</p>
+                    <h4 className="dashboard-insight-title text-sm font-semibold text-gray-900 dark:text-white mb-1">Top Action</h4>
+                    <p className="dashboard-insight-subtitle text-xs text-gray-600 dark:text-gray-400 mb-2">Patient Eligibility</p>
+                    <p className="dashboard-insight-value text-lg font-bold text-purple-600 dark:text-purple-400">95%</p>
+                    <p className="dashboard-insight-label text-xs text-gray-500 dark:text-gray-500">success rate</p>
                   </div>
 
                   {/* Processing Time */}
-                  <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-800 rounded-lg mb-3">
+                  <div className="dashboard-processing-time-card text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
+                    <div className="dashboard-insight-icon inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-800 rounded-lg mb-3">
                       <Icon name="clock" size={20} className="text-green-600 dark:text-green-400" />
                     </div>
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Avg. Processing</h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Time to complete</p>
-                    <p className="text-lg font-bold text-green-600 dark:text-green-400">2.3</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">days</p>
+                    <h4 className="dashboard-insight-title text-sm font-semibold text-gray-900 dark:text-white mb-1">Avg. Processing</h4>
+                    <p className="dashboard-insight-subtitle text-xs text-gray-600 dark:text-gray-400 mb-2">Time to complete</p>
+                    <p className="dashboard-insight-value text-lg font-bold text-green-600 dark:text-green-400">2.3</p>
+                    <p className="dashboard-insight-label text-xs text-gray-500 dark:text-gray-500">days</p>
                   </div>
 
                   {/* Revenue Impact */}
-                  <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-lg mb-3">
+                  <div className="dashboard-revenue-impact-card text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
+                    <div className="dashboard-insight-icon inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-lg mb-3">
                       <Icon name="dollar-sign" size={20} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Revenue Impact</h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">This week</p>
-                    <p className="text-lg font-bold text-blue-600 dark:text-blue-400">+12%</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">vs. last week</p>
+                    <h4 className="dashboard-insight-title text-sm font-semibold text-gray-900 dark:text-white mb-1">Revenue Impact</h4>
+                    <p className="dashboard-insight-subtitle text-xs text-gray-600 dark:text-gray-400 mb-2">This week</p>
+                    <p className="dashboard-insight-value text-lg font-bold text-blue-600 dark:text-blue-400">+12%</p>
+                    <p className="dashboard-insight-label text-xs text-gray-500 dark:text-gray-500">vs. last week</p>
                   </div>
                 </div>
               </div>
@@ -1249,7 +1253,7 @@ export default function Dashboard() {
     switch (activeMobileTab) {
       case 'dashboard':
         return (
-          <div className="mobile-main-content animate-slideInUp">
+          <div className="mobile-dashboard-content animate-slideInUp">
             <div className="p-4">
               {/* Modern Welcome Section */}
               <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800 mobile-welcome-section">
@@ -1610,203 +1614,11 @@ export default function Dashboard() {
         )
       case 'pic':
         return (
-          <div className="mobile-main-content">
-            {mobilePICView === 'landing' ? (
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">PIC Actions</h2>
-                </div>
-
-                {/* Mobile Search */}
-                <div className="pic-actions-mobile-search mb-4">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search PIC actions..."
-                      value={mobileSearchTerm}
-                      onChange={(e) => setMobileSearchTerm(e.target.value)}
-                      className="pic-actions-mobile-search-input w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <Icon name="search" size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  </div>
-                </div>
-
-                {/* Mobile Category Filter */}
-                <div className="pic-actions-mobile-categories mb-4">
-                  <select 
-                    value={mobileSelectedCategory}
-                    onChange={(e) => setMobileSelectedCategory(e.target.value)}
-                    className="pic-actions-mobile-category-select w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="all">All Categories</option>
-                    <option value="eligibility">Eligibility</option>
-                    <option value="claims">Claims</option>
-                    <option value="plans">Health Plans & Payments</option>
-                    <option value="authorization">Authorization</option>
-                    <option value="resources">Resources & Tools</option>
-                  </select>
-                </div>
-
-                {/* Mobile Frequently Used Actions */}
-                {mobileSearchTerm === '' && mobileSelectedCategory === 'all' && (
-                  <div className="pic-actions-mobile-frequent mb-6">
-                    <h3 className="pic-actions-mobile-frequent-title text-lg font-semibold text-gray-900 dark:text-white mb-3">Frequently Used Actions</h3>
-                    <div className="pic-actions-mobile-frequent-list space-y-3">
-                      {mobileActions
-                        .filter(action => action.frequency >= 80)
-                        .slice(0, 3)
-                        .map((action) => (
-                          <div 
-                            key={action.id} 
-                            className="pic-actions-mobile-frequent-card bg-white dark:bg-gray-800 border border-green-300 dark:border-green-600 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-400 dark:hover:border-green-500 hover:shadow-lg hover:shadow-green-200/50 dark:hover:shadow-green-900/20 hover:transform hover:-translate-y-1 transition-all duration-200"
-                            onClick={() => handleMobileAction(action.id)}
-                          >
-                            <div className="flex items-center">
-                              <div className="pic-actions-mobile-frequent-icon flex-shrink-0 w-12 h-12 bg-gradient-to-r from-green-500 to-lime-500 rounded-lg flex items-center justify-center mr-4">
-                                {getMobileFrequentIcon(action.icon)}
-                              </div>
-                              <div className="pic-actions-mobile-frequent-content flex-1">
-                                <h3 className="pic-actions-mobile-frequent-title text-sm font-medium text-gray-900 dark:text-white">{action.title}</h3>
-                                <p className="pic-actions-mobile-frequent-description text-xs text-gray-500 dark:text-gray-400 mt-1">{action.description}</p>
-                              </div>
-                              <div className="pic-actions-mobile-frequent-badge flex-shrink-0">
-                                <span className="pic-actions-mobile-frequent-badge-popular inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                  </svg>
-                                  Popular
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Mobile Action Cards */}
-                <div className="pic-actions-mobile-cards space-y-3">
-                  {filteredMobileActions.map((action) => (
-                    <div 
-                      key={action.id} 
-                      className="pic-actions-mobile-card bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-white dark:hover:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-lg hover:transform hover:-translate-y-1 transition-all duration-200"
-                      onClick={() => handleMobileAction(action.id)}
-                    >
-                      <div className="flex items-center">
-                        <div className="pic-actions-mobile-card-icon flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
-                          {getMobileIcon(action.icon)}
-                        </div>
-                        <div className="pic-actions-mobile-card-content flex-1">
-                          <h3 className="pic-actions-mobile-card-title text-sm font-medium text-gray-900 dark:text-white">{action.title}</h3>
-                          <p className="pic-actions-mobile-card-description text-xs text-gray-500 dark:text-gray-400 mt-1">{action.description}</p>
-                        </div>
-                        <div className="pic-actions-mobile-card-badge flex-shrink-0">
-                          {action.frequency >= 80 ? (
-                            <span className="pic-actions-mobile-card-badge-popular inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                              </svg>
-                              Popular
-                            </span>
-                          ) : action.frequency >= 60 ? (
-                            <span className="pic-actions-mobile-card-badge-active inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 11-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                              </svg>
-                              Active
-                            </span>
-                          ) : action.frequency >= 40 ? (
-                            <span className="pic-actions-mobile-card-badge-regular inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                              </svg>
-                              Regular
-                            </span>
-                          ) : (
-                            <span className="pic-actions-mobile-card-badge-new inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                              </svg>
-                              New
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* M.I.L.A. AI Assistant */}
-                <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
-              </div>
-            ) : mobilePICView === 'patient-eligibility' ? (
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <Icon name="arrow-left" size={20} />
-                  </button>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Eligibility</h2>
-                </div>
-                <PatientEligibilityForm />
-                <HelperButton currentForm="Prescription" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
-              </div>
-            ) : mobilePICView === 'claims-submission' ? (
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <Icon name="arrow-left" size={20} />
-                  </button>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Claims Submission</h2>
-                </div>
-                <ClaimsSubmissionForm />
-                <HelperButton currentForm="ManualEligibilityRequest" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
-              </div>
-            ) : mobilePICView === 'prescription' ? (
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <Icon name="arrow-left" size={20} />
-                  </button>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prescription Entry</h2>
-                </div>
-                <PrescriptionForm />
-                <HelperButton currentForm="HealthPlanDetails" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
-              </div>
-            ) : mobilePICView === 'manual-eligibility-request' ? (
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <Icon name="arrow-left" size={20} />
-                  </button>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Manual Eligibility Request</h2>
-                </div>
-                <ManualEligibilityRequestForm />
-                <HelperButton currentForm="FramesAndLenses" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
-              </div>
-            ) : mobilePICView === 'health-plan-details' ? (
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <Icon name="arrow-left" size={20} />
-                  </button>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Health Plan Details</h2>
-                </div>
-                <HealthPlanDetailsPage />
-                <HelperButton currentForm="FramesAndLenses" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
-              </div>
-            ) : mobilePICView === 'frames-and-lenses' ? (
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  <button onClick={() => { setMobilePICView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="mr-3 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <Icon name="arrow-left" size={20} />
-                  </button>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Frames and Lenses</h2>
-                </div>
-                <FramesAndLensesPage />
-                <HelperButton currentForm="PIC" currentField="mobile" currentStep={1} onNavigate={handleMILANavigation} />
-              </div>
-            ) : null}
-          </div>
+          <PICLandingPage 
+            onUpdateBreadcrumb={setBreadcrumbPath}
+            resetToLanding={picResetCounter}
+            navigateTo={picNavigateTo}
+          />
         )
       case 'reports':
         return (

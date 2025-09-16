@@ -498,7 +498,8 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
       {/* Modern Header */}
       <div className="pic-modern-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="pic-header-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="pic-header-main flex items-center justify-between py-4">
+          {/* Desktop Layout */}
+          <div className="pic-header-main hidden lg:flex items-center justify-between py-4">
             <div className="pic-header-left">
               <h1 className="pic-main-title text-2xl font-bold text-gray-900 dark:text-white">
                 P.I.C. Dashboard
@@ -538,6 +539,54 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                 <button className="pic-export-btn flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                   <Icon name="download" size={16} />
                   <span className="hidden sm:inline">Export</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Layout */}
+          <div className="pic-mobile-header-main lg:hidden py-4">
+            {/* Header Left - Full Width */}
+            <div className="pic-header-left w-full mb-4">
+              <h1 className="pic-main-title text-2xl font-bold text-gray-900 dark:text-white">
+                P.I.C. Dashboard
+              </h1>
+              <p className="pic-main-subtitle text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Provider Interface Center • Welcome back, {user?.fullName || 'User'}!
+              </p>
+            </div>
+            
+            {/* Header Right - Underneath */}
+            <div className="pic-header-right flex items-center justify-between">
+              {/* Time Range Selector */}
+              <div className="pic-time-selector flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                {['7D', '30D', '90D'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setSelectedTimeRange(range)}
+                    className={`pic-time-btn px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                      selectedTimeRange === range
+                        ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                    }`}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="pic-header-actions flex items-center space-x-2">
+                <button
+                  onClick={() => setMetricsLoading(true)}
+                  className="pic-refresh-btn flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+                >
+                  <Icon name="refresh-cw" size={16} />
+                  <span className="text-sm">Refresh</span>
+                </button>
+                <button className="pic-export-btn flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                  <Icon name="download" size={16} />
+                  <span className="text-sm">Export</span>
                 </button>
               </div>
             </div>

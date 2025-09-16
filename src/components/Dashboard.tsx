@@ -1076,7 +1076,7 @@ export default function Dashboard() {
                 ) : (
                   <>
                     {/* Completed Screenings Card */}
-                    <div className="group bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-completed-screenings-card">
+                    <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 border border-green-200 dark:border-green-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-completed-screenings-card">
                       <div className="flex items-center justify-between mb-4">
                         <div className="p-3 bg-green-100 dark:bg-green-800 rounded-lg group-hover:bg-green-200 dark:group-hover:bg-green-700 transition-colors">
                           <Icon name="check-circle" size={24} className="text-green-600 dark:text-green-400" />
@@ -1098,7 +1098,7 @@ export default function Dashboard() {
               </div>
 
                 {/* Saved Screenings Card */}
-                <div className="group bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-saved-screenings-card">
+                <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 border border-blue-200 dark:border-blue-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-saved-screenings-card">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-3 bg-blue-100 dark:bg-blue-800 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-700 transition-colors">
                       <Icon name="save" size={24} className="text-blue-600 dark:text-blue-400" />
@@ -1118,7 +1118,7 @@ export default function Dashboard() {
               </div>
 
                 {/* Revenue Cycle Card */}
-                <div className="group bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-eligibility-requests-card">
+                <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 border border-purple-200 dark:border-purple-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-eligibility-requests-card">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-3 bg-purple-100 dark:bg-purple-800 rounded-lg group-hover:bg-purple-200 dark:group-hover:bg-purple-700 transition-colors">
                       <Icon name="user-check" size={24} className="text-purple-600 dark:text-purple-400" />
@@ -1140,7 +1140,7 @@ export default function Dashboard() {
               </div>
 
                 {/* Claims Performance Card */}
-                <div className="group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-pending-actions-card">
+                <div className="group bg-white dark:bg-gray-800 rounded-xl p-6 border border-amber-200 dark:border-amber-800 hover:shadow-lg hover:scale-105 transition-all duration-300 desktop-pending-actions-card">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-3 bg-amber-100 dark:bg-amber-800 rounded-lg group-hover:bg-amber-200 dark:group-hover:bg-amber-700 transition-colors">
                       <Icon name="clock" size={24} className="text-amber-600 dark:text-amber-400" />
@@ -1527,7 +1527,7 @@ export default function Dashboard() {
                 ) : (
                   <>
                     {/* Completed Screenings Card */}
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-completed-screenings-card">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-green-200 dark:border-green-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-completed-screenings-card">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center mr-3">
                           <Icon name="check-circle" size={18} className="text-green-600 dark:text-green-400" />
@@ -1543,7 +1543,7 @@ export default function Dashboard() {
                 </div>
 
                     {/* Saved Screenings Card */}
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-saved-screenings-card">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-saved-screenings-card">
                   <div className="flex items-center">
                         <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center mr-3">
                           <Icon name="save" size={18} className="text-blue-600 dark:text-blue-400" />
@@ -1559,7 +1559,7 @@ export default function Dashboard() {
                 </div>
 
                     {/* Eligibility Requests Card */}
-                    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-eligibility-requests-card">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-purple-200 dark:border-purple-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-eligibility-requests-card">
                   <div className="flex items-center">
                         <div className="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-3">
                           <Icon name="user-check" size={18} className="text-purple-600 dark:text-purple-400" />
@@ -1575,7 +1575,7 @@ export default function Dashboard() {
                 </div>
 
                     {/* Pending Actions Card */}
-                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-pending-actions-card">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-amber-200 dark:border-amber-800 shadow-sm hover:shadow-md transition-all duration-300 mobile-pending-actions-card">
                   <div className="flex items-center">
                         <div className="w-10 h-10 bg-amber-100 dark:bg-amber-800 rounded-lg flex items-center justify-center mr-3">
                           <Icon name="clock" size={18} className="text-amber-600 dark:text-amber-400" />

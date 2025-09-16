@@ -2074,6 +2074,23 @@ export default function HelperModal({
                   >
                     🔄 Reset MILA
                   </button>
+                  <button
+                    onClick={() => {
+                      console.log('Testing highlight - current highlightedMessageId:', highlightedMessageId)
+                      if (messages.length > 0) {
+                        const lastMessage = messages[messages.length - 1]
+                        console.log('Setting highlight for last message:', lastMessage.id)
+                        setHighlightedMessageId(lastMessage.id)
+                        setTimeout(() => {
+                          setHighlightedMessageId(null)
+                          console.log('Test highlight removed')
+                        }, 5000)
+                      }
+                    }}
+                    className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                  >
+                    🧪 Test Highlight
+                  </button>
                 </div>
               )}
             </div>

@@ -505,7 +505,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                 P.I.C. Dashboard
               </h1>
               <p className="pic-main-subtitle text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Provider Interface Center • Welcome back, {user?.fullName || 'User'}!
+                Provider Interface Center
               </p>
             </div>
             
@@ -552,7 +552,7 @@ export default function PICLandingPage({ onUpdateBreadcrumb, resetToLanding = 0,
                 P.I.C. Dashboard
               </h1>
               <p className="pic-main-subtitle text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Provider Interface Center • Welcome back, {user?.fullName || 'User'}!
+                Provider Interface Center
               </p>
             </div>
             

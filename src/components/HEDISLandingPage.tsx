@@ -10,6 +10,32 @@ import Icon from './Icon'
 
 import ScreeningDataService from '../services/ScreeningDataService'
 import type { CompletedScreening, SavedScreening, DashboardStats } from '../services/ScreeningDataService'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js'
+import { Line, Bar } from 'react-chartjs-2'
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
 
 // TypeScript Interfaces
 interface Patient {
@@ -3346,8 +3372,84 @@ export default function HEDISLandingPage({
   const [metricsLoading, setMetricsLoading] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState('30D')
 
-  // Chart Components - Clean area chart with simplified data points
+  // Chart.js LineChart component for Revenue Trend
   const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
+    const colorMap = {
+      blue: { border: '#3B82F6', background: 'rgba(59, 130, 246, 0.1)' },
+      green: { border: '#10B981', background: 'rgba(16, 185, 129, 0.1)' },
+      purple: { border: '#8B5CF6', background: 'rgba(139, 92, 246, 0.1)' }
+    }
+    const colors = colorMap[color as keyof typeof colorMap] || colorMap.blue
+    const labels = data.map((_, index) => `Day ${index + 1}`)
+    
+    const chartData = {
+      labels,
+      datasets: [
+        {
+          label: title,
+          data: data,
+          borderColor: colors.border,
+          backgroundColor: colors.background,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4, // Smooth curves
+          pointBackgroundColor: colors.border,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        }
+      ]
+    }
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderColor: colors.border,
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: false,
+          callbacks: {
+            title: () => title,
+            label: (context: any) => `Value: ${context.parsed.y}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          display: false
+        },
+        y: {
+          display: false
+        }
+      },
+      elements: {
+        point: {
+          hoverBackgroundColor: colors.border
+        }
+      }
+    }
+
+    return (
+      <div className="w-full h-32 relative">
+        <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">{title}</div>
+        <div className="h-24">
+          <Line data={chartData} options={options} />
+        </div>
+      </div>
+    )
+  }
+
+  // Legacy Chart Components - Clean area chart with simplified data points (keeping for compatibility)
+  const LegacyLineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
     // Simplify data to max 12 points for clean visualization
     const simplifyData = (rawData: number[]) => {
       if (rawData.length <= 12) return rawData
@@ -3658,18 +3760,50 @@ export default function HEDISLandingPage({
     setMetricsLoading(false)
   }
 
+  // Export dashboard data function
+  const exportDashboardData = () => {
+    const data = {
+      timeRange: selectedTimeRange,
+      screeningVolumeData: screeningVolumeData,
+      timestamp: new Date().toISOString()
+    }
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `hedis-screening-volume-${selectedTimeRange.toLowerCase()}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   // Get current chart data
   const chartData = getChartData(selectedTimeRange)
   
-  // Ensure we always have data for the chart
-  const screeningData = chartData?.screenings || [50, 55, 60, 45, 70, 65, 80, 75, 85, 90, 88, 92, 87, 95, 89, 93, 91, 88, 94, 96, 89, 92, 87, 90, 93, 88, 91, 89, 94, 87]
+  // Screening volume data for HEDIS dashboard
+  const getScreeningVolumeData = (timeRange: string) => {
+    switch (timeRange) {
+      case '7D':
+        return [42, 38, 45, 52, 48, 55, 61]
+      case '30D':
+        return [35, 42, 38, 45, 52, 48, 55, 61, 58, 65, 72, 68, 75, 71, 78, 82, 79, 85, 88, 91, 87, 93, 89, 95, 92, 88, 91, 89, 94, 87]
+      case '90D':
+        return Array.from({length: 90}, (_, i) => 30 + Math.sin(i / 10) * 15 + Math.random() * 8)
+      default:
+        return [42, 38, 45, 52, 48, 55, 61]
+    }
+  }
+
+  const screeningVolumeData = getScreeningVolumeData(selectedTimeRange)
   
   // Debug logging
   console.log('Chart Data Debug:', {
     selectedTimeRange,
     chartData,
-    screeningData,
-    dataLength: screeningData?.length
+    screeningVolumeData,
+    dataLength: screeningVolumeData?.length
   })
 
   // Handle M.I.L.A. navigation (placeholder)
@@ -4422,12 +4556,9 @@ export default function HEDISLandingPage({
           <div className="hedis-header-content flex items-center justify-between py-6 h-20">
             <div className="hedis-header-left">
               <h1 className="hedis-main-title text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                HEDIS Quality Dashboard
+                H.E.D.I.S. Dashboard
               </h1>
               <div className="hedis-header-subtitle flex items-center space-x-3">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Welcome back, {user?.fullName || 'User'}
-                </span>
                 <span className="hedis-user-role-badge px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
                   {userRole}
                 </span>
@@ -4458,12 +4589,9 @@ export default function HEDISLandingPage({
       <div className="hedis-mobile-header md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
         <div>
           <h1 className="hedis-mobile-title text-left text-lg font-bold text-gray-900 dark:text-white">
-            HEDIS Quality Dashboard
+            H.E.D.I.S. Dashboard
           </h1>
           <div className="hedis-mobile-subtitle flex items-center space-x-2 mt-1">
-            <span className="text-xs text-gray-600 dark:text-gray-400">
-              Welcome back, {user?.fullName || 'User'}
-            </span>
             <div className="hedis-mobile-live-indicator flex items-center text-xs text-green-600 dark:text-green-400">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></div>
               Live
@@ -4747,12 +4875,12 @@ export default function HEDISLandingPage({
               </>
             ) : (
               <>
-                {/* Screening Trends Chart */}
+                {/* Screening Volume Chart */}
                 <div className="hedis-chart-card lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center justify-between mb-6">
                     <div className="hedis-chart-header-left">
-                      <h3 className="hedis-section-title text-lg font-semibold text-gray-900 dark:text-white mb-1">Screening Performance Trends</h3>
-                      <p className="hedis-chart-subtitle text-sm text-gray-500 dark:text-gray-400">Real-time HEDIS quality measure analytics</p>
+                      <h3 className="hedis-section-title text-lg font-semibold text-gray-900 dark:text-white mb-1">Screening Volume</h3>
+                      <p className="hedis-chart-subtitle text-sm text-gray-500 dark:text-gray-400">HEDIS quality measure screening performance</p>
                     </div>
                     <div className="hedis-chart-header-right flex items-center space-x-3">
                       <div className="hedis-time-range-buttons flex space-x-2">
@@ -4787,7 +4915,9 @@ export default function HEDISLandingPage({
                     </div>
                   </div>
                   <div className="hedis-chart-wrapper mb-4">
-                    <LineChart data={screeningData} title={`Screening Volume (${selectedTimeRange})`} color="blue" />
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
+                      <LineChart data={screeningVolumeData} title={`Screening Volume (${selectedTimeRange})`} color="blue" />
+                    </div>
                   </div>
                   
                   {/* Performance Insights Section */}

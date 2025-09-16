@@ -202,7 +202,7 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ isOpen = true, onClose })
                 Strategic Analytics
               </h1>
               <p className="analytics-page-subtitle text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Predictive insights for {user?.fullName || 'User'}
+                Predictive insights and advanced analytics
               </p>
             </div>
             

@@ -215,7 +215,7 @@ const ReportsPage: React.FC<ReportsPageProps> = ({ isOpen = true, onClose }) => 
                   Reports
                 </h1>
                 <p className="reports-page-subtitle text-sm text-gray-500 dark:text-gray-400">
-                  Welcome back, {user?.fullName || 'User'}
+                  Performance Reports & Data Insights
                 </p>
               </div>
             </div>

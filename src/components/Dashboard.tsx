@@ -203,8 +203,8 @@ export default function Dashboard() {
         console.log(`Days ${value}: normalized to ${normalized}`)
         return normalized
       } else if (label.includes('Denial Rate')) {
-        // For denial rate, invert the scale (lower is better)
-        const normalized = Math.max(100 - value, 10)
+        // For denial rate, use a different scale (0-20% range maps to 0-100% height)
+        const normalized = Math.min((value / 20) * 100, 100)
         console.log(`Denial Rate ${value}: normalized to ${normalized}`)
         return normalized
       } else {

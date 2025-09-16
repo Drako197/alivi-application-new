@@ -9,7 +9,8 @@
     "build:prod": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "update-dates": "node scripts/update-saved-dates.js"
+    "update-dates": "node scripts/update-saved-dates.js",
+    "setup-gemini": "node setup-gemini.js"
   },
   "dependencies": {
     "@fontsource/lato": "^5.2.6",

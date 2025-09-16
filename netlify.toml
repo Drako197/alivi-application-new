@@ -3,4 +3,7 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "18" 
+  NODE_VERSION = "18"
+  # Note: VITE_GEMINI_API_KEY should be set in Netlify dashboard
+  # Go to Site Settings > Environment Variables
+  # Add: VITE_GEMINI_API_KEY = "your_actual_api_key_here" 

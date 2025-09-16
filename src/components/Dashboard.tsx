@@ -88,14 +88,48 @@ export default function Dashboard() {
   }
 
   const chartData = getChartData(selectedTimeRange)
-  const performanceData = [92, 89, 8, 23]
-  const performanceLabels = ['Clean Claims', 'Success Rate', 'Denial Rate', 'Avg Days']
-  const performanceColors = [
-    'from-green-400 to-green-600',
-    'from-blue-400 to-blue-600', 
-    'from-red-400 to-red-600',
-    'from-amber-400 to-amber-600'
-  ]
+  
+  // Dynamic Performance Data based on time range
+  const getPerformanceData = (timeRange: string) => {
+    const baseData = {
+      '7D': {
+        data: [94, 91, 6, 2.1],
+        labels: ['Clean Claims %', 'Success Rate %', 'Denial Rate %', 'Avg Days'],
+        colors: [
+          'from-green-400 to-green-600',
+          'from-blue-400 to-blue-600', 
+          'from-red-400 to-red-600',
+          'from-amber-400 to-amber-600'
+        ]
+      },
+      '30D': {
+        data: [92, 89, 8, 2.3],
+        labels: ['Clean Claims %', 'Success Rate %', 'Denial Rate %', 'Avg Days'],
+        colors: [
+          'from-green-400 to-green-600',
+          'from-blue-400 to-blue-600', 
+          'from-red-400 to-red-600',
+          'from-amber-400 to-amber-600'
+        ]
+      },
+      '90D': {
+        data: [90, 87, 10, 2.5],
+        labels: ['Clean Claims %', 'Success Rate %', 'Denial Rate %', 'Avg Days'],
+        colors: [
+          'from-green-400 to-green-600',
+          'from-blue-400 to-blue-600', 
+          'from-red-400 to-red-600',
+          'from-amber-400 to-amber-600'
+        ]
+      }
+    }
+    return baseData[timeRange as keyof typeof baseData] || baseData['30D']
+  }
+  
+  const performanceMetrics = getPerformanceData(selectedTimeRange)
+  const performanceData = performanceMetrics.data
+  const performanceLabels = performanceMetrics.labels
+  const performanceColors = performanceMetrics.colors
 
   // Skeleton loading component
   const SkeletonCard = ({ className = "", height = "h-32" }: { className?: string, height?: string }) => (
@@ -161,14 +195,23 @@ export default function Dashboard() {
     return (
       <div className="w-full h-32 flex items-end justify-between space-x-2">
         {data.map((value, index) => (
-          <div key={index} className="flex-1 flex flex-col items-center">
+          <div key={index} className="flex-1 flex flex-col items-center group">
             <div 
-              className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80`}
+              className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80 relative group-hover:shadow-lg`}
               style={{ height: `${(value / maxValue) * 100}%`, minHeight: '4px' }}
-              title={`${labels[index]}: ${value}%`}
-            />
+              title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'}`}
+            >
+              {/* Value display on hover */}
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                {value}{labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'}
+              </div>
+            </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
               {labels[index]}
+            </div>
+            {/* Value display below bar */}
+            <div className="text-xs font-semibold text-gray-800 dark:text-gray-200 mt-1">
+              {value}{labels[index].includes('%') ? '' : labels[index].includes('Days') ? 'd' : '%'}
             </div>
           </div>
         ))}
@@ -1428,11 +1471,11 @@ export default function Dashboard() {
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <p className="text-lg font-bold text-green-600 dark:text-green-400">92%</p>
+                    <p className="text-lg font-bold text-green-600 dark:text-green-400">{performanceData[0]}%</p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">Clean Claims</p>
                   </div>
                   <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                    <p className="text-lg font-bold text-red-600 dark:text-red-400">8%</p>
+                    <p className="text-lg font-bold text-red-600 dark:text-red-400">{performanceData[2]}%</p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">Denial Rate</p>
                   </div>
                 </div>

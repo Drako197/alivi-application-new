@@ -1291,6 +1291,9 @@ export default function HelperModal({
     // Hide example questions when user starts interacting
     setShowExampleQuestions(false)
 
+    // Add user message to the conversation
+    addMessage('user', userInput, 'fade-in')
+
     setIsTyping(true)
     
     // Simulate AI processing time with typing animation

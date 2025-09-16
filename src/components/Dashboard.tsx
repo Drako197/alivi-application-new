@@ -30,6 +30,32 @@ import ProfilePage from './ProfilePage'
 import RolesPage from './RolesPage'
 import AuditLogPage from './AuditLogPage'
 import Footer from './Footer'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js'
+import { Line, Bar } from 'react-chartjs-2'
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
@@ -152,138 +178,95 @@ export default function Dashboard() {
 
   // Simple Line Chart Component
   const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
-    const maxValue = Math.max(...data)
-    const minValue = Math.min(...data)
-    const range = maxValue - minValue
-    
     // Color mapping
     const colorMap = {
-      blue: { stroke: '#3B82F6', fill: '#3B82F6', gradient: ['#60A5FA', '#3B82F6'] },
-      green: { stroke: '#10B981', fill: '#10B981', gradient: ['#34D399', '#10B981'] },
-      purple: { stroke: '#8B5CF6', fill: '#8B5CF6', gradient: ['#A78BFA', '#8B5CF6'] }
+      blue: { border: '#3B82F6', background: 'rgba(59, 130, 246, 0.1)' },
+      green: { border: '#10B981', background: 'rgba(16, 185, 129, 0.1)' },
+      purple: { border: '#8B5CF6', background: 'rgba(139, 92, 246, 0.1)' }
     }
     
     const colors = colorMap[color as keyof typeof colorMap] || colorMap.blue
     
-    // Create smooth curve using Catmull-Rom spline
-    const createSmoothPath = (data: number[]) => {
-      if (data.length < 2) return ''
-      
-      const points = data.map((value, index) => {
-        const x = (index / (data.length - 1)) * 100
-        const y = range > 0 ? 100 - ((value - minValue) / range) * 80 - 10 : 50
-        return { x, y }
-      })
-      
-      if (points.length === 2) {
-        return `M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y}`
-      }
-      
-      let path = `M ${points[0].x},${points[0].y}`
-      
-      // Use smooth curves with better control points
-      for (let i = 1; i < points.length; i++) {
-        const prev = points[i - 1]
-        const curr = points[i]
-        
-        if (i === 1) {
-          // First curve - smooth start
-          const cp1x = prev.x + (curr.x - prev.x) * 0.3
-          const cp1y = prev.y
-          const cp2x = curr.x - (curr.x - prev.x) * 0.3
-          const cp2y = curr.y
-          path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
-        } else if (i === points.length - 1) {
-          // Last curve - smooth end
-          const cp1x = prev.x + (curr.x - prev.x) * 0.3
-          const cp1y = prev.y
-          const cp2x = curr.x - (curr.x - prev.x) * 0.3
-          const cp2y = curr.y
-          path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
-        } else {
-          // Middle curves - use adjacent points for smoothness
-          const next = points[i + 1]
-          const tension = 0.3
-          
-          const cp1x = prev.x + (curr.x - prev.x) * tension
-          const cp1y = prev.y + (curr.y - prev.y) * tension
-          const cp2x = curr.x - (next.x - curr.x) * tension
-          const cp2y = curr.y - (next.y - curr.y) * tension
-          
-          path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
+    // Generate labels for the data points
+    const labels = data.map((_, index) => `Day ${index + 1}`)
+    
+    const chartData = {
+      labels,
+      datasets: [
+        {
+          label: title,
+          data: data,
+          borderColor: colors.border,
+          backgroundColor: colors.background,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4, // Smooth curves
+          pointBackgroundColor: colors.border,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
         }
-      }
-      
-      return path
+      ]
     }
     
-    const smoothPath = createSmoothPath(data)
-    const points = data.map((value, index) => {
-      const x = (index / (data.length - 1)) * 100
-      const y = range > 0 ? 100 - ((value - minValue) / range) * 80 - 10 : 50
-      return `${x},${y}`
-    }).join(' ')
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderColor: colors.border,
+          borderWidth: 1,
+          callbacks: {
+            label: function(context: any) {
+              const value = context.parsed.y
+              const unit = title.includes('Revenue') ? 'K' : '%'
+              return `${value.toFixed(1)}${unit}`
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          display: false
+        },
+        y: {
+          display: true,
+          position: 'left' as const,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#6B7280',
+            font: {
+              size: 10
+            },
+            callback: function(value: any) {
+              const unit = title.includes('Revenue') ? 'K' : '%'
+              return `${value}${unit}`
+            }
+          }
+        }
+      },
+      elements: {
+        point: {
+          hoverBackgroundColor: colors.border
+        }
+      }
+    }
 
     return (
       <div className="w-full h-32 relative">
         <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">{title}</div>
-        <svg className="w-full h-24" viewBox="0 0 100 100" preserveAspectRatio="none">
-          {/* Grid lines */}
-          <defs>
-            <pattern id={`grid-${color}`} width="10" height="10" patternUnits="userSpaceOnUse">
-              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#E5E7EB" strokeWidth="0.5" opacity="0.3"/>
-            </pattern>
-            <linearGradient id={`gradient-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor={colors.gradient[0]} stopOpacity="0.3" />
-              <stop offset="100%" stopColor={colors.gradient[1]} stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
-          
-          {/* Grid background */}
-          <rect width="100" height="100" fill={`url(#grid-${color})`} />
-          
-          {/* Area fill - using smooth path */}
-          <path
-            fill={`url(#gradient-${color})`}
-            d={`${smoothPath} L 100,100 L 0,100 Z`}
-          />
-          
-          {/* Smooth line */}
-          <path
-            fill="none"
-            stroke={colors.stroke}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d={smoothPath}
-            className="drop-shadow-sm"
-          />
-          
-          {/* Data points */}
-          {data.map((value, index) => {
-            const x = (index / (data.length - 1)) * 100
-            const y = range > 0 ? 100 - ((value - minValue) / range) * 80 - 10 : 50
-            return (
-              <circle
-                key={index}
-                cx={x}
-                cy={y}
-                r="2"
-                fill={colors.fill}
-                stroke="white"
-                strokeWidth="1"
-                className="hover:r-3 transition-all duration-200 cursor-pointer"
-                title={`${value.toFixed(1)}${title.includes('Revenue') ? 'K' : '%'}`}
-              />
-            )
-          })}
-        </svg>
-        
-        {/* Y-axis labels */}
-        <div className="absolute left-0 top-6 h-20 flex flex-col justify-between text-xs text-gray-500 dark:text-gray-400">
-          <span>{maxValue.toFixed(0)}{title.includes('Revenue') ? 'K' : '%'}</span>
-          <span>{((maxValue + minValue) / 2).toFixed(0)}{title.includes('Revenue') ? 'K' : '%'}</span>
-          <span>{minValue.toFixed(0)}{title.includes('Revenue') ? 'K' : '%'}</span>
+        <div className="h-24">
+          <Line data={chartData} options={options} />
         </div>
       </div>
     )
@@ -291,54 +274,98 @@ export default function Dashboard() {
 
   // Bar Chart Component
   const BarChart = ({ data, labels, colors }: { data: number[], labels: string[], colors: string[] }) => {
-    // Normalize data for better visual representation
-    const normalizedData = data.map((value, index) => {
-      const label = labels[index]
-      if (label.includes('Days')) {
-        // For days, use a scale where 5 days = 100% height
-        return Math.min((value / 5) * 100, 100)
-      } else if (label.includes('Denial Rate')) {
-        // For denial rate, use a different scale (0-20% range maps to 0-100% height)
-        return Math.min((value / 20) * 100, 100)
-      } else {
-        // For percentages (Clean Claims, Success Rate), use as-is
-        return value
+    // Convert Tailwind gradient classes to Chart.js colors
+    const colorMap: { [key: string]: string } = {
+      'from-green-400 to-green-600': '#10B981',
+      'from-blue-400 to-blue-600': '#3B82F6',
+      'from-red-400 to-red-600': '#EF4444',
+      'from-amber-400 to-amber-600': '#F59E0B',
+      'from-purple-400 to-purple-600': '#8B5CF6',
+      'from-pink-400 to-pink-600': '#EC4899',
+      'from-indigo-400 to-indigo-600': '#6366F1',
+      'from-cyan-400 to-cyan-600': '#06B6D4'
+    }
+    
+    const chartColors = colors.map(colorClass => 
+      colorMap[colorClass] || '#6B7280'
+    )
+    
+    const chartData = {
+      labels: labels.map(label => label.replace(' %', '').replace(' Days', '')),
+      datasets: [
+        {
+          label: 'Performance Metrics',
+          data: data,
+          backgroundColor: chartColors.map(color => `${color}80`), // Add transparency
+          borderColor: chartColors,
+          borderWidth: 1,
+          borderRadius: 4,
+          borderSkipped: false,
+        }
+      ]
+    }
+    
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderColor: '#374151',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context: any) {
+              const value = context.parsed.y
+              const label = labels[context.dataIndex]
+              const unit = label.includes('Days') ? ' days' : '%'
+              return `${value}${unit}`
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#6B7280',
+            font: {
+              size: 10
+            },
+            maxRotation: 0
+          }
+        },
+        y: {
+          display: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#6B7280',
+            font: {
+              size: 10
+            },
+            callback: function(value: any) {
+              return `${value}%`
+            }
+          }
+        }
       }
-    })
-    
-    const maxValue = Math.max(...normalizedData)
-    
+    }
+
     return (
-      <div className="w-full h-32 relative flex justify-between items-end space-x-2">
-        {data.map((value, index) => {
-          const heightPercentage = (normalizedData[index] / maxValue) * 100
-          const actualHeight = (heightPercentage / 100) * 128 // 128px is h-32
-          
-          return (
-          <div key={index} className="flex-1 flex flex-col items-center group relative">
-            <div 
-              className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80 relative group-hover:shadow-lg`}
-              style={{ 
-                height: `${actualHeight}px`,
-                minHeight: '8px'
-              }}
-              title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'}`}
-            >
-              {/* Value display on hover */}
-              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                {value}{labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'}
-              </div>
-            </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-              {labels[index]}
-            </div>
-            {/* Value display below bar */}
-            <div className="text-xs font-semibold text-gray-800 dark:text-gray-200 mt-1">
-              {value}{labels[index].includes('%') ? '' : labels[index].includes('Days') ? 'd' : '%'}
-            </div>
-          </div>
-          )
-        })}
+      <div className="w-full h-32 relative">
+        <div className="h-24">
+          <Bar data={chartData} options={options} />
+        </div>
       </div>
     )
   }
@@ -1199,22 +1226,22 @@ export default function Dashboard() {
                       <div className="flex items-center text-xs text-blue-100">
                         <Icon name="zap" size={12} className="mr-2" />
                         <span>Instant medical code lookup</span>
-                      </div>
+                    </div>
                       <div className="flex items-center text-xs text-blue-100">
                         <Icon name="check-circle" size={12} className="mr-2" />
                         <span>Real-time form validation</span>
-                      </div>
+                    </div>
                       <div className="flex items-center text-xs text-blue-100">
                         <Icon name="brain" size={12} className="mr-2" />
                         <span>Smart suggestions & insights</span>
-                      </div>
                     </div>
-                      <HelperButton 
-                        currentForm="Dashboard"
-                        currentField="general"
-                        currentStep={1}
-                        onNavigate={handleMILANavigation}
-                      />
+                  </div>
+                    <HelperButton 
+                      currentForm="Dashboard"
+                      currentField="general"
+                      currentStep={1}
+                      onNavigate={handleMILANavigation}
+                    />
                   </div>
                   
                   {/* MILA AI Assistant Image - Full width at bottom */}
@@ -1224,7 +1251,7 @@ export default function Dashboard() {
                       alt="MILA AI Assistant" 
                       className="mila-assistant-image w-full h-auto rounded-b-xl opacity-90 hover:opacity-100 transition-opacity duration-300"
                     />
-                  </div>
+                </div>
                 </div>
                   </>
                 )}

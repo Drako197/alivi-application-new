@@ -415,8 +415,6 @@ export default function HelperModal({
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1]
-      console.log('Scroll effect triggered - lastMessage type:', lastMessage.type, 'messages.length:', messages.length)
-      
       // Only scroll and highlight if the last message is from the assistant (or enhanced) AND it's not the initial welcome
       if ((lastMessage.type === 'assistant' || lastMessage.type === 'enhanced') && lastAssistantMessageRef.current) {
         // Check if this is a response to a user question (not initial welcome)
@@ -425,21 +423,14 @@ export default function HelperModal({
           msg.type === 'user'
         )
         
-        console.log('hasUserMessageBefore:', hasUserMessageBefore, 'lastAssistantMessageRef.current exists:', !!lastAssistantMessageRef.current)
-        console.log('All message types:', messages.map(m => m.type))
-        
         if (hasUserMessageBefore) {
-          console.log('Attempting to scroll and highlight...')
           setTimeout(() => {
             const messagesContainer = document.querySelector('.ai-helper-messages')
-            console.log('messagesContainer found:', !!messagesContainer, 'lastAssistantMessageRef.current exists:', !!lastAssistantMessageRef.current)
             
             if (messagesContainer && lastAssistantMessageRef.current) {
               const containerHeight = messagesContainer.clientHeight
               const messageTop = lastAssistantMessageRef.current.offsetTop
               const scrollPosition = messageTop - (containerHeight / 2)
-              
-              console.log('Scrolling - containerHeight:', containerHeight, 'messageTop:', messageTop, 'scrollPosition:', scrollPosition)
               
               messagesContainer.scrollTo({
                 top: Math.max(0, scrollPosition),
@@ -447,19 +438,13 @@ export default function HelperModal({
               })
               
               // Highlight the new message for 10 seconds
-              console.log('Setting highlight for message:', lastMessage.id)
               setHighlightedMessageId(lastMessage.id)
               setTimeout(() => {
                 setHighlightedMessageId(null)
-                console.log('Highlight removed')
               }, 10000) // 10 seconds
             }
           }, 100) // Small delay to ensure the message is rendered
-        } else {
-          console.log('Not scrolling - no user message before this assistant message')
         }
-      } else {
-        console.log('Not scrolling - lastMessage type:', lastMessage.type, 'or no ref')
       }
     }
   }, [messages])
@@ -1694,9 +1679,6 @@ export default function HelperModal({
             <div className="ai-helper-messages flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message, index) => {
                 const isLastAssistantMessage = (message.type === 'assistant' || message.type === 'enhanced') && index === messages.length - 1
-                if (isLastAssistantMessage) {
-                  console.log('Rendering last assistant message with ref:', message.id, 'index:', index, 'type:', message.type)
-                }
                 return (
                 <div
                   key={message.id}

@@ -165,7 +165,7 @@ export default function Dashboard() {
     
     const colors = colorMap[color as keyof typeof colorMap] || colorMap.blue
     
-    // Create smooth curve using SVG path with cubic bezier curves
+    // Create smooth curve using Catmull-Rom spline
     const createSmoothPath = (data: number[]) => {
       if (data.length < 2) return ''
       
@@ -175,33 +175,41 @@ export default function Dashboard() {
         return { x, y }
       })
       
+      if (points.length === 2) {
+        return `M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y}`
+      }
+      
       let path = `M ${points[0].x},${points[0].y}`
       
+      // Use smooth curves with better control points
       for (let i = 1; i < points.length; i++) {
         const prev = points[i - 1]
         const curr = points[i]
-        const next = points[i + 1]
         
         if (i === 1) {
-          // First curve
-          const cp1x = prev.x + (curr.x - prev.x) / 3
+          // First curve - smooth start
+          const cp1x = prev.x + (curr.x - prev.x) * 0.3
           const cp1y = prev.y
-          const cp2x = curr.x - (curr.x - prev.x) / 3
+          const cp2x = curr.x - (curr.x - prev.x) * 0.3
           const cp2y = curr.y
           path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
         } else if (i === points.length - 1) {
-          // Last curve
-          const cp1x = prev.x + (curr.x - prev.x) / 3
+          // Last curve - smooth end
+          const cp1x = prev.x + (curr.x - prev.x) * 0.3
           const cp1y = prev.y
-          const cp2x = curr.x - (curr.x - prev.x) / 3
+          const cp2x = curr.x - (curr.x - prev.x) * 0.3
           const cp2y = curr.y
           path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
         } else {
-          // Middle curves - use previous and next points for smoother curves
-          const cp1x = prev.x + (curr.x - prev.x) / 3
-          const cp1y = prev.y + (curr.y - prev.y) / 3
-          const cp2x = curr.x - (curr.x - prev.x) / 3
-          const cp2y = curr.y - (curr.y - prev.y) / 3
+          // Middle curves - use adjacent points for smoothness
+          const next = points[i + 1]
+          const tension = 0.3
+          
+          const cp1x = prev.x + (curr.x - prev.x) * tension
+          const cp1y = prev.y + (curr.y - prev.y) * tension
+          const cp2x = curr.x - (next.x - curr.x) * tension
+          const cp2y = curr.y - (next.y - curr.y) * tension
+          
           path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
         }
       }
@@ -245,6 +253,8 @@ export default function Dashboard() {
             fill="none"
             stroke={colors.stroke}
             strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             d={smoothPath}
             className="drop-shadow-sm"
           />

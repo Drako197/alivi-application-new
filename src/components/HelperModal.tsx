@@ -417,8 +417,8 @@ export default function HelperModal({
       const lastMessage = messages[messages.length - 1]
       console.log('Scroll effect triggered - lastMessage type:', lastMessage.type, 'messages.length:', messages.length)
       
-      // Only scroll and highlight if the last message is from the assistant AND it's not the initial welcome
-      if (lastMessage.type === 'assistant' && lastAssistantMessageRef.current) {
+      // Only scroll and highlight if the last message is from the assistant (or enhanced) AND it's not the initial welcome
+      if ((lastMessage.type === 'assistant' || lastMessage.type === 'enhanced') && lastAssistantMessageRef.current) {
         // Check if this is a response to a user question (not initial welcome)
         const hasUserMessageBefore = messages.some((msg, index) => 
           index < messages.length - 1 && msg.type === 'user'
@@ -1688,9 +1688,9 @@ export default function HelperModal({
             {/* Messages */}
             <div className="ai-helper-messages flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message, index) => {
-                const isLastAssistantMessage = message.type === 'assistant' && index === messages.length - 1
+                const isLastAssistantMessage = (message.type === 'assistant' || message.type === 'enhanced') && index === messages.length - 1
                 if (isLastAssistantMessage) {
-                  console.log('Rendering last assistant message with ref:', message.id, 'index:', index)
+                  console.log('Rendering last assistant message with ref:', message.id, 'index:', index, 'type:', message.type)
                 }
                 return (
                 <div

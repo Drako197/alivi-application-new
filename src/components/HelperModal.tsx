@@ -420,11 +420,13 @@ export default function HelperModal({
       // Only scroll and highlight if the last message is from the assistant (or enhanced) AND it's not the initial welcome
       if ((lastMessage.type === 'assistant' || lastMessage.type === 'enhanced') && lastAssistantMessageRef.current) {
         // Check if this is a response to a user question (not initial welcome)
+        // Look for any user message in the conversation history
         const hasUserMessageBefore = messages.some((msg, index) => 
-          index < messages.length - 1 && msg.type === 'user'
+          msg.type === 'user'
         )
         
         console.log('hasUserMessageBefore:', hasUserMessageBefore, 'lastAssistantMessageRef.current exists:', !!lastAssistantMessageRef.current)
+        console.log('All message types:', messages.map(m => m.type))
         
         if (hasUserMessageBefore) {
           console.log('Attempting to scroll and highlight...')

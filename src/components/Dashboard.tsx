@@ -190,30 +190,45 @@ export default function Dashboard() {
 
   // Bar Chart Component
   const BarChart = ({ data, labels, colors }: { data: number[], labels: string[], colors: string[] }) => {
+    // Debug logging
+    console.log('BarChart data:', data)
+    console.log('BarChart labels:', labels)
+    
     // Normalize data for better visual representation
     const normalizedData = data.map((value, index) => {
       const label = labels[index]
       if (label.includes('Days')) {
         // For days, use a scale where 5 days = 100% height
-        return Math.min((value / 5) * 100, 100)
+        const normalized = Math.min((value / 5) * 100, 100)
+        console.log(`Days ${value}: normalized to ${normalized}`)
+        return normalized
       } else if (label.includes('Denial Rate')) {
         // For denial rate, invert the scale (lower is better)
-        return Math.max(100 - value, 10)
+        const normalized = Math.max(100 - value, 10)
+        console.log(`Denial Rate ${value}: normalized to ${normalized}`)
+        return normalized
       } else {
         // For percentages (Clean Claims, Success Rate), use as-is
+        console.log(`Percentage ${value}: using as-is`)
         return value
       }
     })
     
+    console.log('Normalized data:', normalizedData)
     const maxValue = Math.max(...normalizedData)
+    console.log('Max value:', maxValue)
     
     return (
       <div className="w-full h-32 flex items-end justify-between space-x-2">
-        {data.map((value, index) => (
+        {data.map((value, index) => {
+          const heightPercentage = (normalizedData[index] / maxValue) * 100
+          console.log(`${labels[index]} (${value}): normalized=${normalizedData[index]}, height=${heightPercentage}%`)
+          
+          return (
           <div key={index} className="flex-1 flex flex-col items-center group">
             <div 
               className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80 relative group-hover:shadow-lg`}
-              style={{ height: `${(normalizedData[index] / maxValue) * 100}%`, minHeight: '8px' }}
+              style={{ height: `${heightPercentage}%`, minHeight: '8px' }}
               title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'}`}
             >
               {/* Value display on hover */}
@@ -229,7 +244,8 @@ export default function Dashboard() {
               {value}{labels[index].includes('%') ? '' : labels[index].includes('Days') ? 'd' : '%'}
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
     )
   }

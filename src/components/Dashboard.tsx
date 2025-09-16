@@ -165,6 +165,51 @@ export default function Dashboard() {
     
     const colors = colorMap[color as keyof typeof colorMap] || colorMap.blue
     
+    // Create smooth curve using SVG path with cubic bezier curves
+    const createSmoothPath = (data: number[]) => {
+      if (data.length < 2) return ''
+      
+      const points = data.map((value, index) => {
+        const x = (index / (data.length - 1)) * 100
+        const y = range > 0 ? 100 - ((value - minValue) / range) * 80 - 10 : 50
+        return { x, y }
+      })
+      
+      let path = `M ${points[0].x},${points[0].y}`
+      
+      for (let i = 1; i < points.length; i++) {
+        const prev = points[i - 1]
+        const curr = points[i]
+        const next = points[i + 1]
+        
+        if (i === 1) {
+          // First curve
+          const cp1x = prev.x + (curr.x - prev.x) / 3
+          const cp1y = prev.y
+          const cp2x = curr.x - (curr.x - prev.x) / 3
+          const cp2y = curr.y
+          path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
+        } else if (i === points.length - 1) {
+          // Last curve
+          const cp1x = prev.x + (curr.x - prev.x) / 3
+          const cp1y = prev.y
+          const cp2x = curr.x - (curr.x - prev.x) / 3
+          const cp2y = curr.y
+          path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
+        } else {
+          // Middle curves - use previous and next points for smoother curves
+          const cp1x = prev.x + (curr.x - prev.x) / 3
+          const cp1y = prev.y + (curr.y - prev.y) / 3
+          const cp2x = curr.x - (curr.x - prev.x) / 3
+          const cp2y = curr.y - (curr.y - prev.y) / 3
+          path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${curr.x},${curr.y}`
+        }
+      }
+      
+      return path
+    }
+    
+    const smoothPath = createSmoothPath(data)
     const points = data.map((value, index) => {
       const x = (index / (data.length - 1)) * 100
       const y = range > 0 ? 100 - ((value - minValue) / range) * 80 - 10 : 50
@@ -189,18 +234,18 @@ export default function Dashboard() {
           {/* Grid background */}
           <rect width="100" height="100" fill={`url(#grid-${color})`} />
           
-          {/* Area fill */}
-          <polygon
+          {/* Area fill - using smooth path */}
+          <path
             fill={`url(#gradient-${color})`}
-            points={`0,100 ${points} 100,100`}
+            d={`${smoothPath} L 100,100 L 0,100 Z`}
           />
           
-          {/* Line */}
-          <polyline
+          {/* Smooth line */}
+          <path
             fill="none"
             stroke={colors.stroke}
             strokeWidth="2"
-            points={points}
+            d={smoothPath}
             className="drop-shadow-sm"
           />
           

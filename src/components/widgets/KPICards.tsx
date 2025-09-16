@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Icon from '../Icon'
 
 interface KPICard {
@@ -18,17 +18,6 @@ const KPICards: React.FC<KPICardsProps> = ({ data }) => {
   const [currentPage, setCurrentPage] = useState(0)
   const cardsPerPage = 3
   const totalPages = Math.ceil(data.length / cardsPerPage)
-  
-  // Auto-advance carousel every 8 seconds
-  useEffect(() => {
-    if (totalPages <= 1) return
-    
-    const interval = setInterval(() => {
-      setCurrentPage((prev) => (prev + 1) % totalPages)
-    }, 8000)
-    
-    return () => clearInterval(interval)
-  }, [totalPages])
   
   // Navigation functions
   const goToPrevious = () => {

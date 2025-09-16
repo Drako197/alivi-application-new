@@ -153,36 +153,82 @@ export default function Dashboard() {
   // Simple Line Chart Component
   const LineChart = ({ data, title, color = "blue" }: { data: number[], title: string, color?: string }) => {
     const maxValue = Math.max(...data)
+    const minValue = Math.min(...data)
+    const range = maxValue - minValue
+    
+    // Color mapping
+    const colorMap = {
+      blue: { stroke: '#3B82F6', fill: '#3B82F6', gradient: ['#60A5FA', '#3B82F6'] },
+      green: { stroke: '#10B981', fill: '#10B981', gradient: ['#34D399', '#10B981'] },
+      purple: { stroke: '#8B5CF6', fill: '#8B5CF6', gradient: ['#A78BFA', '#8B5CF6'] }
+    }
+    
+    const colors = colorMap[color as keyof typeof colorMap] || colorMap.blue
+    
     const points = data.map((value, index) => {
       const x = (index / (data.length - 1)) * 100
-      const y = 100 - (value / maxValue) * 100
+      const y = range > 0 ? 100 - ((value - minValue) / range) * 80 - 10 : 50
       return `${x},${y}`
     }).join(' ')
 
     return (
       <div className="w-full h-32 relative">
-        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">{title}</div>
+        <svg className="w-full h-24" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {/* Grid lines */}
+          <defs>
+            <pattern id={`grid-${color}`} width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#E5E7EB" strokeWidth="0.5" opacity="0.3"/>
+            </pattern>
+            <linearGradient id={`gradient-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor={colors.gradient[0]} stopOpacity="0.3" />
+              <stop offset="100%" stopColor={colors.gradient[1]} stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          
+          {/* Grid background */}
+          <rect width="100" height="100" fill={`url(#grid-${color})`} />
+          
+          {/* Area fill */}
+          <polygon
+            fill={`url(#gradient-${color})`}
+            points={`0,100 ${points} 100,100`}
+          />
+          
+          {/* Line */}
           <polyline
             fill="none"
-            stroke={`rgb(var(--color-${color}-500))`}
+            stroke={colors.stroke}
             strokeWidth="2"
             points={points}
             className="drop-shadow-sm"
           />
-          <defs>
-            <linearGradient id={`gradient-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" className={`text-${color}-400`} stopOpacity="0.3" />
-              <stop offset="100%" className={`text-${color}-400`} stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
-          <polyline
-            fill={`url(#gradient-${color})`}
-            stroke="none"
-            points={`0,100 ${points} 100,100`}
-          />
+          
+          {/* Data points */}
+          {data.map((value, index) => {
+            const x = (index / (data.length - 1)) * 100
+            const y = range > 0 ? 100 - ((value - minValue) / range) * 80 - 10 : 50
+            return (
+              <circle
+                key={index}
+                cx={x}
+                cy={y}
+                r="2"
+                fill={colors.fill}
+                stroke="white"
+                strokeWidth="1"
+                className="hover:r-3 transition-all duration-200 cursor-pointer"
+                title={`${value.toFixed(1)}${title.includes('Revenue') ? 'K' : '%'}`}
+              />
+            )
+          })}
         </svg>
-        <div className="absolute top-2 left-2 text-xs font-medium text-gray-600 dark:text-gray-400">
-          {title}
+        
+        {/* Y-axis labels */}
+        <div className="absolute left-0 top-6 h-20 flex flex-col justify-between text-xs text-gray-500 dark:text-gray-400">
+          <span>{maxValue.toFixed(0)}{title.includes('Revenue') ? 'K' : '%'}</span>
+          <span>{((maxValue + minValue) / 2).toFixed(0)}{title.includes('Revenue') ? 'K' : '%'}</span>
+          <span>{minValue.toFixed(0)}{title.includes('Revenue') ? 'K' : '%'}</span>
         </div>
       </div>
     )
@@ -212,7 +258,6 @@ export default function Dashboard() {
         {data.map((value, index) => {
           const heightPercentage = (normalizedData[index] / maxValue) * 100
           const actualHeight = (heightPercentage / 100) * 128 // 128px is h-32
-          console.log(`${labels[index]}: value=${value}, normalized=${normalizedData[index]}, height=${heightPercentage}%, actualHeight=${actualHeight}px`)
           
           return (
           <div key={index} className="flex-1 flex flex-col items-center group relative">
@@ -220,11 +265,9 @@ export default function Dashboard() {
               className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80 relative group-hover:shadow-lg`}
               style={{ 
                 height: `${actualHeight}px`,
-                minHeight: '8px',
-                border: '1px solid rgba(0,0,0,0.2)', // Temporary visual debug
-                backgroundColor: 'rgba(255,0,0,0.1)' // Temporary debug background
+                minHeight: '8px'
               }}
-              title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'} (${heightPercentage}% height, ${actualHeight}px)`}
+              title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'}`}
             >
               {/* Value display on hover */}
               <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">

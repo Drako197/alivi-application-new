@@ -208,21 +208,23 @@ export default function Dashboard() {
     const maxValue = Math.max(...normalizedData)
     
     return (
-      <div className="w-full h-32 flex items-end justify-between space-x-2">
+      <div className="w-full h-32 relative flex justify-between items-end space-x-2">
         {data.map((value, index) => {
           const heightPercentage = (normalizedData[index] / maxValue) * 100
-          console.log(`${labels[index]}: value=${value}, normalized=${normalizedData[index]}, height=${heightPercentage}%`)
+          const actualHeight = (heightPercentage / 100) * 128 // 128px is h-32
+          console.log(`${labels[index]}: value=${value}, normalized=${normalizedData[index]}, height=${heightPercentage}%, actualHeight=${actualHeight}px`)
           
           return (
-          <div key={index} className="flex-1 flex flex-col items-center group">
+          <div key={index} className="flex-1 flex flex-col items-center group relative">
             <div 
               className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80 relative group-hover:shadow-lg`}
               style={{ 
-                height: `${heightPercentage}%`, 
+                height: `${actualHeight}px`,
                 minHeight: '8px',
-                border: '1px solid rgba(0,0,0,0.2)' // Temporary visual debug
+                border: '1px solid rgba(0,0,0,0.2)', // Temporary visual debug
+                backgroundColor: 'rgba(255,0,0,0.1)' // Temporary debug background
               }}
-              title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'} (${heightPercentage}% height)`}
+              title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'} (${heightPercentage}% height, ${actualHeight}px)`}
             >
               {/* Value display on hover */}
               <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">

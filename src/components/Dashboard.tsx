@@ -190,7 +190,22 @@ export default function Dashboard() {
 
   // Bar Chart Component
   const BarChart = ({ data, labels, colors }: { data: number[], labels: string[], colors: string[] }) => {
-    const maxValue = Math.max(...data)
+    // Normalize data for better visual representation
+    const normalizedData = data.map((value, index) => {
+      const label = labels[index]
+      if (label.includes('Days')) {
+        // For days, use a scale where 5 days = 100% height
+        return Math.min((value / 5) * 100, 100)
+      } else if (label.includes('Denial Rate')) {
+        // For denial rate, invert the scale (lower is better)
+        return Math.max(100 - value, 10)
+      } else {
+        // For percentages (Clean Claims, Success Rate), use as-is
+        return value
+      }
+    })
+    
+    const maxValue = Math.max(...normalizedData)
     
     return (
       <div className="w-full h-32 flex items-end justify-between space-x-2">
@@ -198,7 +213,7 @@ export default function Dashboard() {
           <div key={index} className="flex-1 flex flex-col items-center group">
             <div 
               className={`w-full bg-gradient-to-t ${colors[index]} rounded-t transition-all duration-500 hover:opacity-80 relative group-hover:shadow-lg`}
-              style={{ height: `${(value / maxValue) * 100}%`, minHeight: '4px' }}
+              style={{ height: `${(normalizedData[index] / maxValue) * 100}%`, minHeight: '8px' }}
               title={`${labels[index]}: ${value}${labels[index].includes('%') ? '' : labels[index].includes('Days') ? ' days' : '%'}`}
             >
               {/* Value display on hover */}

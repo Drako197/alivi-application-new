@@ -190,39 +190,27 @@ export default function Dashboard() {
 
   // Bar Chart Component
   const BarChart = ({ data, labels, colors }: { data: number[], labels: string[], colors: string[] }) => {
-    // Debug logging
-    console.log('BarChart data:', data)
-    console.log('BarChart labels:', labels)
-    
     // Normalize data for better visual representation
     const normalizedData = data.map((value, index) => {
       const label = labels[index]
       if (label.includes('Days')) {
         // For days, use a scale where 5 days = 100% height
-        const normalized = Math.min((value / 5) * 100, 100)
-        console.log(`Days ${value}: normalized to ${normalized}`)
-        return normalized
+        return Math.min((value / 5) * 100, 100)
       } else if (label.includes('Denial Rate')) {
         // For denial rate, use a different scale (0-20% range maps to 0-100% height)
-        const normalized = Math.min((value / 20) * 100, 100)
-        console.log(`Denial Rate ${value}: normalized to ${normalized}`)
-        return normalized
+        return Math.min((value / 20) * 100, 100)
       } else {
         // For percentages (Clean Claims, Success Rate), use as-is
-        console.log(`Percentage ${value}: using as-is`)
         return value
       }
     })
     
-    console.log('Normalized data:', normalizedData)
     const maxValue = Math.max(...normalizedData)
-    console.log('Max value:', maxValue)
     
     return (
       <div className="w-full h-32 flex items-end justify-between space-x-2">
         {data.map((value, index) => {
           const heightPercentage = (normalizedData[index] / maxValue) * 100
-          console.log(`${labels[index]} (${value}): normalized=${normalizedData[index]}, height=${heightPercentage}%`)
           
           return (
           <div key={index} className="flex-1 flex flex-col items-center group">
